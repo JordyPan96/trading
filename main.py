@@ -239,6 +239,10 @@ if 'current_page' not in st.session_state:
     st.session_state.current_page = "Home"
 if 'saved_records' not in st.session_state:
     st.session_state.saved_records = []
+if 'file_processed' not in st.session_state:  # Add this flag
+    st.session_state.file_processed = False
+
+
 
 # Navigation buttons
 col1, col2, col3 = st.sidebar.columns([1,1,1])
@@ -266,10 +270,26 @@ col1, col2 = st.sidebar.columns([1,0.5])
 if col1.button("📊 Entry Model Check"):
     st.session_state.current_page = "Entry Criteria Check"
 
-# File uploader (available on all pages)
-uploaded_file = st.sidebar.file_uploader("Upload data", type=['csv'])
-if uploaded_file:
-    st.session_state.uploaded_data = pd.read_csv(uploaded_file)
+# File uploader with better state management
+def handle_file_upload():
+    uploaded_file = st.sidebar.file_uploader("Upload data", type=['csv'], key="file_uploader")
+
+    if uploaded_file and not st.session_state.file_processed:
+        try:
+            st.session_state.uploaded_data = pd.read_csv(uploaded_file)
+            st.session_state.file_processed = True
+            st.sidebar.success("File uploaded successfully!")
+        except Exception as e:
+            st.sidebar.error(f"Error reading file: {e}")
+    elif uploaded_file is None and st.session_state.file_processed:
+        # Reset if user removes the file
+        st.session_state.uploaded_data = None
+        st.session_state.file_processed = False
+
+
+
+# Call the file upload handler
+handle_file_upload()
 
 starting_capital = 50000
 

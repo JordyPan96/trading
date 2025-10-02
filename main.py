@@ -1,4 +1,6 @@
 # main.py (your entry point)
+import os
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -232,6 +234,65 @@ def styled_metric_value(value, delta=None, label_size="20px", value_size="16px")
     """
     st.markdown(html, unsafe_allow_html=True)
 
+
+# === SAFE SESSION PERSISTENCE ===
+def initialize_persistent_session():
+    """Initialize session state without interfering with widgets"""
+    try:
+        if os.path.exists("app_session.json"):
+            with open("app_session.json", "r") as f:
+                saved_data = json.load(f)
+
+            # Only restore specific keys that won't conflict with widgets
+            safe_keys = ['uploaded_data_filename', 'current_page', 'saved_records', 'file_processed']
+            for key in safe_keys:
+                if key in saved_data and key not in st.session_state:
+                    st.session_state[key] = saved_data[key]
+
+            # Reload uploaded data if filename exists
+            if (st.session_state.get('uploaded_data_filename') and
+                    os.path.exists(st.session_state.uploaded_data_filename)):
+                try:
+                    st.session_state.uploaded_data = pd.read_csv(st.session_state.uploaded_data_filename)
+                    st.session_state.file_processed = True
+                except Exception as e:
+                    print(f"Could not reload data file: {e}")
+
+    except Exception as e:
+        print(f"Session restore warning: {e}")
+
+
+def save_persistent_session():
+    """Save session state without widget interference"""
+    try:
+        # Only save specific safe keys
+        safe_data = {}
+        safe_keys = ['current_page', 'saved_records', 'file_processed', 'uploaded_data_filename']
+
+        for key in safe_keys:
+            if key in st.session_state:
+                safe_data[key] = st.session_state[key]
+
+        with open("app_session.json", "w") as f:
+            json.dump(safe_data, f)
+
+    except Exception as e:
+        print(f"Session save error: {e}")
+
+
+def clear_persistent_session():
+    """Clear persisted session data"""
+    try:
+        if os.path.exists("app_session.json"):
+            os.remove("app_session.json")
+        if st.session_state.get('uploaded_data_filename') and os.path.exists(st.session_state.uploaded_data_filename):
+            os.remove(st.session_state.uploaded_data_filename)
+    except:
+        pass
+
+
+# Initialize persistent session
+initialize_persistent_session()
 # Initialize session state variables
 if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
@@ -242,49 +303,81 @@ if 'saved_records' not in st.session_state:
 if 'file_processed' not in st.session_state:  # Add this flag
     st.session_state.file_processed = False
 
+# Load persistent data (do this once at startup)
+if 'session_initialized' not in st.session_state:
+    initialize_persistent_session()
+    st.session_state.session_initialized = True
 
+
+# Navigation with safe session saving
+def create_nav_button(label, page, key):
+    if st.sidebar.button(label, key=key):
+        st.session_state.current_page = page
+        # Use a small delay to avoid conflicts
+        import time
+        time.sleep(0.1)
+        save_persistent_session()
 
 # Navigation buttons
 col1, col2, col3 = st.sidebar.columns([1,1,1])
-if col1.button("🏠 Home"):
-    st.session_state.current_page = "Home"
-if col2.button("📊 Account"):
-    st.session_state.current_page = "Account Overview"
-if col3.button("📊 Symbol"):
-    st.session_state.current_page = "Symbol Stats"
-
+create_nav_button("🏠 Home", "Home", "nav_home")
+create_nav_button("📊 Account", "Account Overview", "nav_account")
+create_nav_button("📊 Symbol", "Symbol Stats", "nav_symbol")
 col1, col2 = st.sidebar.columns([1,1])
-if col1.button("📊 Grading"):
-    st.session_state.current_page = "Risk Calculation"
-if col2.button("📊 Active Opps"):
-    st.session_state.current_page = "Active Opps"
-
-
+create_nav_button("📊 Grading", "Risk Calculation", "Risk_Calculation")
+create_nav_button("📊 Active Opps", "Active Opps", "Active_Opps")
 col1, col2 = st.sidebar.columns([1,1])
-if col1.button("📊 Guidelines"):
-    st.session_state.current_page = "Guidelines"
-if col2.button("📊 Stats"):
-    st.session_state.current_page = "Stats"
-
+create_nav_button("📊 Guidelines", "Guidelines", "Guidelines")
+create_nav_button("📊 Stats", "Stats", "Stats")
 col1, col2 = st.sidebar.columns([1,0.5])
-if col1.button("📊 Entry Model Check"):
-    st.session_state.current_page = "Entry Criteria Check"
+create_nav_button("📊 Entry Model Check", "Entry Criteria Check", "Entry_Criteria_Check")
 
-# File uploader with better state management
+# Add session management to your sidebar
+with st.sidebar.expander("Session Management"):
+    st.write(f"Current page: `{st.session_state.current_page}`")
+    if st.session_state.uploaded_data is not None:
+        st.write(f"Data: {len(st.session_state.uploaded_data)} rows")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💾 Save Session"):
+            save_persistent_session()
+            st.success("Saved!")
+    with col2:
+        if st.button("🗑️ Clear Session"):
+            clear_persistent_session()
+            st.session_state.clear()
+            st.rerun()
+
+
+# Safe file uploader
 def handle_file_upload():
     uploaded_file = st.sidebar.file_uploader("Upload data", type=['csv'], key="file_uploader")
 
-    if uploaded_file and not st.session_state.file_processed:
+    if uploaded_file is not None:
         try:
-            st.session_state.uploaded_data = pd.read_csv(uploaded_file)
-            st.session_state.file_processed = True
-            st.sidebar.success("File uploaded successfully!")
+            # Only process if it's a new file
+            if not st.session_state.file_processed:
+                st.session_state.uploaded_data = pd.read_csv(uploaded_file)
+                st.session_state.file_processed = True
+
+                # Save to disk for persistence
+                filename = f"uploaded_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                st.session_state.uploaded_data.to_csv(filename, index=False)
+                st.session_state.uploaded_data_filename = filename
+
+                # Save session
+                save_persistent_session()
+
+                st.sidebar.success("✅ File uploaded successfully!")
+
         except Exception as e:
             st.sidebar.error(f"Error reading file: {e}")
-    elif uploaded_file is None and st.session_state.file_processed:
-        # Reset if user removes the file
+    elif st.session_state.file_processed and uploaded_file is None:
+        # File was removed
         st.session_state.uploaded_data = None
         st.session_state.file_processed = False
+        save_persistent_session()
 
 
 
@@ -2448,14 +2541,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
 elif st.session_state.current_page == "Active Opps":
-
-
     st.title("Saved Records")
 
     # Count current Limit Placed and Order Filled records
     limit_placed_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Limit Placed')
     order_filled_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Filled')
     total_active_count = limit_placed_count + order_filled_count
+    speculation_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Speculation')
 
     # Show current record counts
     st.write(f"**Records:** {len(st.session_state.saved_records)}/5")
@@ -2469,8 +2561,12 @@ elif st.session_state.current_page == "Active Opps":
         records_df = pd.DataFrame(st.session_state.saved_records)
         st.dataframe(records_df, use_container_width=True)
 
-        # Create tabs for different status groups
-        tab1, tab2, tab3 = st.tabs(["📝 Speculation", "⏳ Limit Placed", "✅ Order Filled"])
+        # Create tabs for different status groups with counts
+        tab1, tab2, tab3 = st.tabs([
+            f"Speculation ({speculation_count})",
+            f"Limit Placed ({limit_placed_count})",
+            f"Order Filled ({order_filled_count})"
+        ])
 
         # Speculation Tab
         with tab1:

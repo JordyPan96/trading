@@ -499,35 +499,57 @@ if 'session_initialized' not in st.session_state:
     st.session_state.session_initialized = True
 
 
-# Google Sheets connection - UPDATED VERSION
 @st.cache_resource
 def get_google_sheets_client():
-    """Initialize Google Sheets connection"""
+    """Initialize Google Sheets connection - supports both Streamlit secrets and GitHub secrets"""
     try:
         scope = ['https://spreadsheets.google.com/feeds',
                  'https://www.googleapis.com/auth/drive']
 
-        # Debug: Check what's in secrets
-        st.sidebar.write("🔧 Debug: Checking secrets...")
-
-        if "gcp_service_account" not in st.secrets:
-            st.sidebar.error("gcp_service_account not found in secrets")
+        creds_dict = None
+        
+        # Option 1: Check for GitHub Actions secrets (environment variables)
+        if all(key in os.environ for key in ['GCP_TYPE', 'GCP_PRIVATE_KEY', 'GCP_CLIENT_EMAIL']):
+            st.sidebar.info("🔧 Using GitHub Actions secrets")
+            creds_dict = {
+                "type": os.environ['GCP_TYPE'],
+                "project_id": os.environ.get('GCP_PROJECT_ID', ''),
+                "private_key_id": os.environ.get('GCP_PRIVATE_KEY_ID', ''),
+                "private_key": os.environ['GCP_PRIVATE_KEY'].replace('\\n', '\n'),
+                "client_email": os.environ['GCP_CLIENT_EMAIL'],
+                "client_id": os.environ.get('GCP_CLIENT_ID', ''),
+                "auth_uri": os.environ.get('GCP_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
+                "token_uri": os.environ.get('GCP_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
+                "auth_provider_x509_cert_url": os.environ.get('GCP_AUTH_PROVIDER_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
+                "client_x509_cert_url": os.environ.get('GCP_CLIENT_CERT_URL', '')
+            }
+        
+        # Option 2: Check for Streamlit secrets (secrets.toml)
+        elif "gcp_service_account" in st.secrets:
+            st.sidebar.info("🔧 Using Streamlit secrets")
+            creds_dict = st.secrets["gcp_service_account"]
+        
+        else:
+            st.sidebar.error("❌ No Google Sheets credentials found")
+            st.sidebar.info("Configure either GitHub Actions secrets or Streamlit secrets")
             return None
 
-        # Get the service account config
-        sa_config = st.secrets["gcp_service_account"]
-        st.sidebar.write(f"✅ Found service account: {sa_config.get('client_email', 'Unknown')}")
+        # Validate we have the minimum required fields
+        if not creds_dict or not creds_dict.get('private_key') or not creds_dict.get('client_email'):
+            st.sidebar.error("❌ Missing required credentials (private_key or client_email)")
+            return None
+
+        st.sidebar.success(f"✅ Service Account: {creds_dict.get('client_email', 'Unknown')}")
 
         # Create credentials
-        creds = Credentials.from_service_account_info(sa_config, scopes=scope)
+        creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         client = gspread.authorize(creds)
 
         st.sidebar.success("✅ Google Sheets connected successfully!")
         return client
 
     except Exception as e:
-        st.error(f"Failed to connect to Google Sheets: {e}")
-        st.sidebar.error(f"Connection failed: {str(e)}")
+        st.sidebar.error(f"❌ Google Sheets connection failed: {str(e)}")
         return None
 
 
@@ -4349,3 +4371,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+

@@ -6,4 +6,5 @@ plotly
 streamlit-aggrid
 yfinance
 matplotlib
+gspread
 

@@ -21,9 +21,196 @@ from typing import Dict, List, Optional
 from globals_manager import set_global, get_global, clear_global
 from datetime import datetime
 
+import gspread
+from google.oauth2.service_account import Credentials
+
 # Configure page
 st.set_page_config(layout="wide")
 ## Every year change starting_balance =, starting_capital = and base_risk =
+
+def clean_data_for_google_sheets(df):
+    """
+    Clean data specifically for Google Sheets to avoid JSON serialization errors
+    """
+    if df is None or df.empty:
+        return df
+
+    df_clean = df.copy()
+
+    # Handle Date column specifically - ensure YYYY-MM-DD format
+    if 'Date' in df_clean.columns:
+        # Convert to string first
+        df_clean['Date'] = df_clean['Date'].astype(str)
+
+        # Remove time components if present and format to YYYY-MM-DD
+        df_clean['Date'] = df_clean['Date'].str.split().str[0]
+
+        # Ensure consistent format
+        try:
+            # Try to parse and reformat any dates
+            dates_parsed = pd.to_datetime(df_clean['Date'], errors='coerce')
+            valid_dates = ~dates_parsed.isna()
+            df_clean.loc[valid_dates, 'Date'] = dates_parsed[valid_dates].dt.strftime('%Y-%m-%d')
+        except:
+            # If parsing fails, keep as is
+            pass
+
+        df_clean['Date'] = df_clean['Date'].fillna('')
+
+    # Ensure Variance is treated as string
+    if 'Variance' in df_clean.columns:
+        df_clean['Variance'] = df_clean['Variance'].astype(str)
+        variance_mapping = {
+            '50.0': '50',
+            '559.0': '559-66',
+            '66.0': '66-805',
+            '805.0': '>805'
+        }
+        df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
+
+    # Convert other datetime columns to strings
+    for col in df_clean.columns:
+        if col != 'Date' and (pd.api.types.is_datetime64_any_dtype(df_clean[col]) or hasattr(df_clean[col], 'dt')):
+            df_clean[col] = df_clean[col].astype(str)
+
+    # Ensure all other object types are strings
+    for col in df_clean.columns:
+        if df_clean[col].dtype == 'object' and col != 'Date':
+            df_clean[col] = df_clean[col].astype(str)
+
+    # Convert numeric columns (excluding Variance)
+    numeric_columns = ['PnL', 'RR', 'PROP_Pct', 'Risk_Percentage', 'Lot_Size',
+                       'Starting_Balance', 'Ending_Balance', 'Withdrawal_Deposit']
+
+    for col in numeric_columns:
+        if col in df_clean.columns:
+            df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
+            df_clean[col] = df_clean[col].fillna(0.0)
+            df_clean[col] = df_clean[col].apply(lambda x: float(x) if pd.notna(x) else 0.0)
+
+    # Handle any remaining NaN values
+    for col in df_clean.columns:
+        if col not in numeric_columns and col != 'Variance':
+            df_clean[col] = df_clean[col].fillna('')
+            df_clean[col] = df_clean[col].astype(str)
+
+    return df_clean
+
+
+def clean_data_for_calculations(df):
+    """
+    Clean data to match CSV upload format and ensure proper data types
+    This fixes the Google Sheets vs CSV data type differences
+    """
+    if df is None or df.empty:
+        return df
+
+    df_clean = df.copy()
+
+    # Define column mappings and expected types
+    numeric_columns = [
+        'PnL', 'RR', 'PROP_Pct', 'Risk_Percentage', 'Lot_Size',
+        'Starting_Balance', 'Ending_Balance', 'Withdrawal_Deposit',
+        'MonthNum', 'Cash_Flow', 'Risk_Amount'
+    ]
+
+    date_columns = ['Date', 'Entry_Time', 'Exit_Time']
+
+    string_columns = [
+        'Symbol', 'Direction', 'Strategy', 'Result', 'Grade',
+        'Month', 'Year', 'MonthYear', 'Variance', 'Trend Position'
+    ]
+
+    # Clean numeric columns
+    for col in numeric_columns:
+        if col in df_clean.columns:
+            # Convert to string first to handle any Google Sheets formatting
+            series_str = df_clean[col].astype(str)
+
+            # Remove common non-numeric characters that might come from Google Sheets
+            series_clean = series_str.str.replace(r'[^\d.-]', '', regex=True)
+
+            # Handle empty strings and convert to numeric
+            series_clean = series_clean.replace('', '0').replace('nan', '0')
+
+            df_clean[col] = pd.to_numeric(series_clean, errors='coerce')
+            df_clean[col] = df_clean[col].fillna(0)
+
+    # Handle Variance as string
+    if 'Variance' in df_clean.columns:
+        # Convert to string and handle any numeric values that might be there
+        df_clean['Variance'] = df_clean['Variance'].astype(str)
+        # Map any legacy numeric values to their string equivalents
+        variance_mapping = {
+            '50.0': '50',
+            '559.0': '559-66',
+            '66.0': '66-805',
+            '805.0': '>805',
+            '50': '50',
+            '559': '559-66',
+            '66': '66-805',
+            '805': '>805'
+        }
+        df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
+
+    # Clean date columns - be more careful not to break existing formats
+    for col in date_columns:
+        if col in df_clean.columns:
+            # First, ensure it's string to see what we're working with
+            df_clean[col] = df_clean[col].astype(str)
+
+            # Only convert to datetime if it looks like it needs conversion
+            # Check if we have datetime strings with time components
+            has_time = df_clean[col].str.contains(r'\d{1,2}:\d{2}:\d{2}', na=False, regex=True)
+
+            if has_time.any():
+                # Convert only the ones with time components to datetime and format
+                df_clean.loc[has_time, col] = pd.to_datetime(
+                    df_clean.loc[has_time, col], errors='coerce'
+                ).dt.strftime('%Y-%m-%d')
+
+            # Fill any NaT values with empty string
+            df_clean[col] = df_clean[col].fillna('')
+
+    # Clean string columns - ensure they're proper strings
+    for col in string_columns:
+        if col in df_clean.columns:
+            df_clean[col] = df_clean[col].astype(str).str.strip()
+            # Replace 'nan' strings with empty string
+            df_clean[col] = df_clean[col].replace('nan', '')
+            df_clean[col] = df_clean[col].fillna('')
+
+    return df_clean
+
+def clean_trading_data(df):
+    """Clean and convert data types for trading data"""
+    if df is None or df.empty:
+        return df
+
+    df_clean = df.copy()
+
+    # Convert numeric columns
+    numeric_columns = ['PnL', 'RR', 'PROP_Pct', 'Risk_Percentage', 'Lot_Size', 'Starting_Balance', 'Ending_Balance']
+
+    for col in numeric_columns:
+        if col in df_clean.columns:
+            # Remove any non-numeric characters and convert to float
+            df_clean[col] = pd.to_numeric(df_clean[col].astype(str).str.replace('[^\d.-]', '', regex=True),
+                                          errors='coerce')
+
+    # Convert date columns
+    date_columns = ['Date', 'Entry_Time', 'Exit_Time']
+    for col in date_columns:
+        if col in df_clean.columns:
+            df_clean[col] = pd.to_datetime(df_clean[col], errors='coerce')
+
+    # Clean string columns
+    string_columns = ['Symbol', 'Direction', 'Strategy', 'Result', 'Grade']
+    for col in string_columns:
+        if col in df_clean.columns:
+            df_clean[col] = df_clean[col].astype(str).str.strip()
+
+    return df_clean
 
 # Calculate metrics
 def calculate_metrics_2(data):
@@ -244,7 +431,8 @@ def initialize_persistent_session():
                 saved_data = json.load(f)
 
             # Only restore specific keys that won't conflict with widgets
-            safe_keys = ['uploaded_data_filename', 'current_page', 'saved_records', 'file_processed']
+            safe_keys = ['uploaded_data_filename', 'current_page', 'saved_records', 'file_processed',
+                         'cloud_data_loaded']
             for key in safe_keys:
                 if key in saved_data and key not in st.session_state:
                     st.session_state[key] = saved_data[key]
@@ -267,7 +455,7 @@ def save_persistent_session():
     try:
         # Only save specific safe keys
         safe_data = {}
-        safe_keys = ['current_page', 'saved_records', 'file_processed', 'uploaded_data_filename']
+        safe_keys = ['current_page', 'saved_records', 'file_processed', 'uploaded_data_filename', 'cloud_data_loaded']
 
         for key in safe_keys:
             if key in st.session_state:
@@ -302,11 +490,144 @@ if 'saved_records' not in st.session_state:
     st.session_state.saved_records = []
 if 'file_processed' not in st.session_state:  # Add this flag
     st.session_state.file_processed = False
+if 'cloud_data_loaded' not in st.session_state:
+    st.session_state.cloud_data_loaded = False
 
 # Load persistent data (do this once at startup)
 if 'session_initialized' not in st.session_state:
     initialize_persistent_session()
     st.session_state.session_initialized = True
+
+
+# Google Sheets connection - UPDATED VERSION
+@st.cache_resource
+def get_google_sheets_client():
+    """Initialize Google Sheets connection"""
+    try:
+        scope = ['https://spreadsheets.google.com/feeds',
+                 'https://www.googleapis.com/auth/drive']
+
+        # Debug: Check what's in secrets
+        st.sidebar.write("🔧 Debug: Checking secrets...")
+
+        if "gcp_service_account" not in st.secrets:
+            st.sidebar.error("gcp_service_account not found in secrets")
+            return None
+
+        # Get the service account config
+        sa_config = st.secrets["gcp_service_account"]
+        st.sidebar.write(f"✅ Found service account: {sa_config.get('client_email', 'Unknown')}")
+
+        # Create credentials
+        creds = Credentials.from_service_account_info(sa_config, scopes=scope)
+        client = gspread.authorize(creds)
+
+        st.sidebar.success("✅ Google Sheets connected successfully!")
+        return client
+
+    except Exception as e:
+        st.error(f"Failed to connect to Google Sheets: {e}")
+        st.sidebar.error(f"Connection failed: {str(e)}")
+        return None
+
+
+def load_data_from_sheets(sheet_name="Trade", worksheet_name="Trade.csv"):
+    """Load data from Google Sheets and clean it"""
+    try:
+        client = get_google_sheets_client()
+        if client is None:
+            return None
+
+        # Try to access the sheet
+        try:
+            sheet = client.open(sheet_name)
+            worksheet = sheet.worksheet(worksheet_name)
+            records = worksheet.get_all_records()
+
+            if records:
+                df = pd.DataFrame(records)
+                st.sidebar.success(f"✅ Loaded {len(df)} rows from Google Sheets")
+
+                # CLEAN THE DATA - This is the key fix!
+                df_clean = clean_data_for_calculations(df)
+
+                return df_clean
+            else:
+                st.sidebar.warning("Sheet found but no data returned")
+                return None
+
+        except gspread.SpreadsheetNotFound:
+            available_sheets = [s.title for s in client.openall()]
+            st.sidebar.error(f"Sheet '{sheet_name}' not found")
+            st.sidebar.info(f"Available sheets: {available_sheets}")
+            return None
+
+        except gspread.WorksheetNotFound:
+            st.sidebar.error(f"Worksheet '{worksheet_name}' not found")
+            return None
+
+    except Exception as e:
+        st.sidebar.error(f"Error loading from Google Sheets: {e}")
+        return None
+
+
+def save_data_to_sheets(df, sheet_name="Trade", worksheet_name="Trade.csv"):
+    """Save data to Google Sheets with better error handling"""
+    try:
+        client = get_google_sheets_client()
+        if client is None:
+            return False
+
+        # Try to open existing sheet or create new one
+        try:
+            sheet = client.open(sheet_name)
+            try:
+                worksheet = sheet.worksheet(worksheet_name)
+            except gspread.WorksheetNotFound:
+                # Create new worksheet
+                worksheet = sheet.add_worksheet(title=worksheet_name, rows=1000, cols=20)
+
+        except gspread.SpreadsheetNotFound:
+            # Create new spreadsheet
+            sheet = client.create(sheet_name)
+            worksheet = sheet.add_worksheet(title=worksheet_name, rows=1000, cols=20)
+
+        # Ensure data is clean for JSON serialization
+        df_clean = df.copy()
+
+        # Convert all data to basic Python types
+        for col in df_clean.columns:
+            if pd.api.types.is_numeric_dtype(df_clean[col]):
+                df_clean[col] = df_clean[col].apply(lambda x: float(x) if pd.notna(x) else 0.0)
+            else:
+                df_clean[col] = df_clean[col].astype(str).fillna('')
+
+        # Clear and update data in smaller batches if needed
+        worksheet.clear()
+
+        # Prepare data for update
+        data_to_update = [df_clean.columns.values.tolist()] + df_clean.values.tolist()
+
+        # Update in one go
+        worksheet.update(data_to_update, value_input_option='RAW')
+
+        st.sidebar.success(f"✅ Data saved to '{worksheet_name}' in Google Sheets")
+        return True
+
+    except Exception as e:
+        st.sidebar.error(f"Error saving to Google Sheets: {e}")
+        return False
+
+
+def delete_data_from_sheets(sheet_name="Trade.csv"):
+    """Delete data from Google Sheets"""
+    try:
+        client = get_google_sheets_client()
+        client.del_spreadsheet(sheet_name)
+        return True
+    except Exception as e:
+        st.error(f"Error deleting data: {e}")
+        return False
 
 
 # Navigation with safe session saving
@@ -318,25 +639,42 @@ def create_nav_button(label, page, key):
         time.sleep(0.1)
         save_persistent_session()
 
-# Navigation buttons
-col1, col2, col3 = st.sidebar.columns([1,1,1])
-create_nav_button("🏠 Home", "Home", "nav_home")
-create_nav_button("📊 Account", "Account Overview", "nav_account")
-create_nav_button("📊 Symbol", "Symbol Stats", "nav_symbol")
-col1, col2 = st.sidebar.columns([1,1])
-create_nav_button("📊 Grading", "Risk Calculation", "Risk_Calculation")
-create_nav_button("📊 Active Opps", "Active Opps", "Active_Opps")
-col1, col2 = st.sidebar.columns([1,1])
-create_nav_button("📊 Guidelines", "Guidelines", "Guidelines")
-create_nav_button("📊 Stats", "Stats", "Stats")
-col1, col2 = st.sidebar.columns([1,0.5])
-create_nav_button("📊 Entry Model Check", "Entry Criteria Check", "Entry_Criteria_Check")
 
-# Add session management to your sidebar
-with st.sidebar.expander("Session Management"):
+# Core Section
+st.sidebar.markdown("**Core**")
+create_nav_button("🏠 Home Dashboard", "Home", "nav_home")
+create_nav_button("💰 Account Overview", "Account Overview", "nav_account")
+create_nav_button("📈 Symbol Statistics", "Symbol Stats", "nav_symbol")
+
+st.sidebar.markdown("---")
+
+# Trading Section
+st.sidebar.markdown("**Trading**")
+create_nav_button("🎯 Risk Calculation", "Risk Calculation", "Risk_Calculation")
+create_nav_button("📋 Active Opportunities", "Active Opps", "Active_Opps")
+
+st.sidebar.markdown("---")
+
+# Analysis Section
+st.sidebar.markdown("**Analysis**")
+create_nav_button("📚 Trading Guidelines", "Guidelines", "Guidelines")
+create_nav_button("📊 Performance Stats", "Stats", "Stats")
+
+st.sidebar.markdown("---")
+
+# Tools Section
+st.sidebar.markdown("**Tools**")
+create_nav_button("✅ Entry Model Check", "Entry Criteria Check", "Entry_Criteria_Check")
+
+# Session Management (Always show in sidebar)
+with st.sidebar.expander("⚙️ Session Management"):
     st.write(f"Current page: `{st.session_state.current_page}`")
     if st.session_state.uploaded_data is not None:
         st.write(f"Data: {len(st.session_state.uploaded_data)} rows")
+        if st.session_state.cloud_data_loaded:
+            st.write("📍 Source: Cloud Storage")
+        else:
+            st.write("📍 Source: Local Upload")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -344,102 +682,369 @@ with st.sidebar.expander("Session Management"):
             save_persistent_session()
             st.success("Saved!")
     with col2:
-        if st.button("🗑️ Clear Session"):
+        if st.button("🔄 Clear Session"):
             clear_persistent_session()
             st.session_state.clear()
             st.rerun()
 
-
-# Safe file uploader
-def handle_file_upload():
-    uploaded_file = st.sidebar.file_uploader("Upload data", type=['csv'], key="file_uploader")
-
-    if uploaded_file is not None:
-        try:
-            # Only process if it's a new file
-            if not st.session_state.file_processed:
-                st.session_state.uploaded_data = pd.read_csv(uploaded_file)
-                st.session_state.file_processed = True
-
-                # Save to disk for persistence
-                filename = f"uploaded_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-                st.session_state.uploaded_data.to_csv(filename, index=False)
-                st.session_state.uploaded_data_filename = filename
-
-                # Save session
-                save_persistent_session()
-
-                st.sidebar.success("✅ File uploaded successfully!")
-
-        except Exception as e:
-            st.sidebar.error(f"Error reading file: {e}")
-    elif st.session_state.file_processed and uploaded_file is None:
-        # File was removed
-        st.session_state.uploaded_data = None
-        st.session_state.file_processed = False
-        save_persistent_session()
-
-
-
-# Call the file upload handler
-handle_file_upload()
-
 starting_capital = 50000
-
-
 
 # Page content
 if st.session_state.current_page == "Home":
+    # Show data management options only on Home page
+    with st.sidebar.expander("📁 Cloud Data Management", expanded=True):
+        st.subheader("Google Sheets Storage")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("📥 Load from Cloud"):
+                df = load_data_from_sheets()
+                if df is not None and not df.empty:
+                    st.session_state.uploaded_data = df
+                    st.session_state.cloud_data_loaded = True
+                    st.session_state.file_processed = True
+                    save_persistent_session()
+                    st.success(f"Loaded {len(df)} rows from cloud")
+                    st.rerun()
+                else:
+                    st.info("No data found in cloud storage")
+
+        with col2:
+            if st.button("💾 Save to Cloud"):
+                if st.session_state.uploaded_data is not None:
+                    # Clean data before saving to fix JSON serialization issues
+                    data_to_save = clean_data_for_google_sheets(st.session_state.uploaded_data)
+                    success = save_data_to_sheets(data_to_save)
+                    if success:
+                        st.success("Data saved to cloud!")
+                    else:
+                        st.error("Failed to save to cloud")
+                else:
+                    st.warning("No data to save")
+
+        # Manual file upload as backup - ONLY ON HOME PAGE
+        st.subheader("Manual Upload (Backup)")
+        uploaded_file = st.file_uploader("Upload CSV", type=['csv'], key="file_uploader")
+        if uploaded_file is not None and not st.session_state.file_processed:
+            try:
+                # Load CSV
+                df_raw = pd.read_csv(uploaded_file)
+
+                # CLEAN THE DATA to ensure consistency
+                st.session_state.uploaded_data = clean_data_for_calculations(df_raw)
+                st.session_state.file_processed = True
+
+                # Auto-save to cloud
+                data_to_save = clean_data_for_google_sheets(st.session_state.uploaded_data)
+                success = save_data_to_sheets(data_to_save)
+                if success:
+                    st.success("File uploaded and saved to cloud!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error reading file: {e}")
+
+        # Data management
+        if st.session_state.uploaded_data is not None:
+            st.write(f"**Current data:** {len(st.session_state.uploaded_data)} rows")
+            if st.button("🗑️ Clear All Data"):
+                if st.session_state.cloud_data_loaded:
+                    delete_data_from_sheets()
+                st.session_state.uploaded_data = None
+                st.session_state.file_processed = False
+                st.session_state.cloud_data_loaded = False
+                st.rerun()
+
+    # Main Home page content
     if st.session_state.uploaded_data is not None:
         data = st.session_state.uploaded_data
+
+        # Clean the data first (without debug output)
+        data = clean_data_for_calculations(data)
+
+        # Handle Date column - ensure it's in YYYY-MM-DD format but don't break existing dates
+        if 'Date' in data.columns:
+            # First, ensure it's treated as string to preserve existing formats
+            data['Date'] = data['Date'].astype(str)
+
+            # Remove any time components if they exist (handle '2025-09-04 00:00:00' format)
+            data['Date'] = data['Date'].str.split().str[0]  # Keep only the date part if time exists
+
+            # For any dates that are still in datetime format, convert to YYYY-MM-DD
+            # But don't break already properly formatted dates
+            try:
+                # Only convert if we detect datetime objects or improperly formatted dates
+                mask = data['Date'].str.contains('00:00:00', na=False)
+                if mask.any():
+                    data.loc[mask, 'Date'] = pd.to_datetime(data.loc[mask, 'Date']).dt.strftime('%Y-%m-%d')
+            except:
+                # If conversion fails, keep the original values
+                pass
+
+        # Track newly added rows
+        if 'original_data_count' not in st.session_state:
+            # First time loading, all rows are considered "original"
+            st.session_state.original_data_count = len(data)
+
         st.write("Your uploaded raw trading data:")
-        # Configure grid
+
+        # Add New Record Form with exact same fields and specific dropdown values
+        with st.expander("➕ Add New Record", expanded=False):
+            st.subheader("Add New Trading Record")
+
+            # First row of fields
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                # Date picker with calendar
+                new_date = st.date_input("Date", value=datetime.now(), key="new_date")
+                # Convert to YYYY-MM-DD format
+                new_date_str = new_date.strftime("%Y-%m-%d")
+
+                # Symbol dropdown with specific values
+                symbol_options = ["GBPUSD", "EURUSD", "AUDUSD", "USDJPY", "EURJPY", "GBPJPY",
+                                  "AUDJPY", "USDCAD", "XAUUSD", "GBPAUD", "EURAUD"]
+                new_symbol = st.selectbox("Symbol", options=symbol_options, key="new_symbol")
+
+                # Direction dropdown
+                direction_options = ["buy", "sell"]
+                new_direction = st.selectbox("Direction", options=direction_options, key="new_direction")
+
+            with col2:
+                # POI dropdown
+                poi_options = ["Weekly", "2_Daily"]
+                new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
+
+                # Strategy dropdown (uses existing values from data)
+                strategy_options = data['Strategy'].unique() if 'Strategy' in data.columns else []
+                new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
+
+                # Variance dropdown - STORE AS STRING
+                variance_display = ["50", "559-66", "66-805", ">805"]
+                new_variance = st.selectbox("Variance", options=variance_display, key="new_variance")
+                # Store as string directly (no numeric conversion)
+                new_variance_str = new_variance
+
+            with col3:
+                # Result dropdown
+                result_options = ["BE", "Win", "Loss"]
+                new_result = st.selectbox("Result", options=result_options, key="new_result")
+
+                new_rr = st.number_input("RR", value=0.0, step=0.01, key="new_rr")
+                new_pnl = st.number_input("PnL", value=0.0, step=0.01, key="new_pnl")
+
+            # Second row of fields
+            col4, col5, col6 = st.columns(3)
+            with col4:
+                new_withdrawal_deposit = st.number_input("Withdrawal_Deposit", value=0.0, step=0.01,
+                                                         key="new_withdrawal_deposit")
+
+            with col5:
+                new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
+
+                # Trend Position dropdown
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
+                new_trend_position = st.selectbox("Trend Position", options=trend_position_options,
+                                                  key="new_trend_position")
+
+            with col6:
+                # Optional additional fields that might be in your data
+                if 'Risk_Percentage' in data.columns:
+                    new_risk_percentage = st.number_input("Risk_Percentage", value=0.0, step=0.01,
+                                                          key="new_risk_percentage")
+                if 'Lot_Size' in data.columns:
+                    new_lot_size = st.number_input("Lot_Size", value=0.0, step=0.01, key="new_lot_size")
+
+            if st.button("Add Record", type="primary", key="add_record_btn"):
+                # Create new record with exact field names
+                new_record = {}
+
+                # Exact fields as requested
+                if 'Date' in data.columns:
+                    new_record['Date'] = new_date_str  # Use the formatted date string (YYYY-MM-DD)
+                if 'Symbol' in data.columns:
+                    new_record['Symbol'] = new_symbol
+                if 'Direction' in data.columns:
+                    new_record['Direction'] = new_direction
+                if 'POI' in data.columns:
+                    new_record['POI'] = new_poi
+                if 'Strategy' in data.columns:
+                    new_record['Strategy'] = new_strategy
+                if 'Variance' in data.columns:
+                    new_record['Variance'] = new_variance_str  # Use string value instead of numeric
+                if 'Result' in data.columns:
+                    new_record['Result'] = new_result
+                if 'RR' in data.columns:
+                    new_record['RR'] = new_rr
+                if 'PnL' in data.columns:
+                    new_record['PnL'] = new_pnl
+                if 'Withdrawal_Deposit' in data.columns:
+                    new_record['Withdrawal_Deposit'] = new_withdrawal_deposit
+                if 'PROP_Pct' in data.columns:
+                    new_record['PROP_Pct'] = new_prop_pct
+
+                # Trend Position field (existing field with space)
+                if 'Trend Position' in data.columns:
+                    new_record['Trend Position'] = new_trend_position
+
+                # Optional additional fields
+                if 'Risk_Percentage' in data.columns:
+                    new_record['Risk_Percentage'] = new_risk_percentage
+                if 'Lot_Size' in data.columns:
+                    new_record['Lot_Size'] = new_lot_size
+                if 'Starting_Balance' in data.columns:
+                    new_record['Starting_Balance'] = 0.0
+                if 'Ending_Balance' in data.columns:
+                    new_record['Ending_Balance'] = 0.0
+
+                # Add the new record to the dataframe
+                new_df = pd.DataFrame([new_record])
+                updated_data = pd.concat([data, new_df], ignore_index=True)
+
+                # AUTO-RECALCULATE METRICS after adding record
+                updated_data = clean_data_for_calculations(updated_data)
+
+                # Update session state
+                st.session_state.uploaded_data = updated_data
+                save_persistent_session()
+
+                st.success("✅ New record added successfully! Metrics recalculated.")
+                st.rerun()
+
+        # Configure grid for VIEWING ONLY (no editing)
         gb = GridOptionsBuilder.from_dataframe(data)
+
+        # Define columns to hide (they will still be in the data, just not visible)
+        columns_to_hide = [
+            'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum',
+            'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity'
+        ]
 
         # Pagination
         gb.configure_pagination(
             paginationAutoPageSize=False,
-                paginationPageSize=25,
-                #paginationPageSizeSelector=[10, 25, 50, 100]
+            paginationPageSize=25,
         )
 
-        # Enable features
+        # DISABLE editing features
         gb.configure_default_column(
-                filterable=True,
-                sortable=True,
-                resizable=True,
-                editable=False
+            filterable=True,
+            sortable=True,
+            resizable=True,
+            editable=False,  # DISABLE editing for all columns
+            min_column_width=100
         )
-
 
         # Build options
         grid_options = gb.build()
+
+        # Manually hide the columns in the grid options
+        for column in grid_options['columnDefs']:
+            if column['field'] in columns_to_hide:
+                column['hide'] = True
+                column['editable'] = False  # Don't allow editing hidden columns
 
         # Display
         st.title("Trading Data Dashboard")
         st.markdown("Use the grid below to explore and filter trading data")
 
+        # Delete records - SIMPLIFIED VERSION
+        # st.subheader("Delete Records")
+
+        # Get the current data
+        current_data = st.session_state.uploaded_data
+
+        if len(current_data) > 0:
+            # Show the most recent record for reference
+            last_record = current_data.iloc[-1].copy()
+            # st.write(
+            # f"**Last record:** Row {len(current_data)} - {last_record['Date']} - {last_record['Symbol']} - {last_record.get('Direction', 'N/A')} - PnL: {last_record.get('PnL', 'N/A')}")
+
+            # Delete Last Record button
+            if st.button("🗑️ Delete Last Record", type="secondary"):
+                try:
+                    # Remove the last row
+                    updated_data = current_data.iloc[:-1].reset_index(drop=True)
+
+                    # AUTO-RECALCULATE METRICS after deleting record
+                    updated_data = clean_data_for_calculations(updated_data)
+
+                    # Update session state
+                    st.session_state.uploaded_data = updated_data
+                    save_persistent_session()
+
+                    st.success("✅ Last record deleted successfully! Metrics recalculated.")
+                    st.rerun()
+
+                except Exception as e:
+                    st.error(f"Error deleting last record: {e}")
+        else:
+            st.write("No records available to delete.")
+
+        # Row Actions
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Refresh Grid"):
+                st.rerun()
+        with col2:
+            if st.button("💾 Save All Changes"):
+                if st.session_state.uploaded_data is not None:
+                    try:
+                        # Clean data before saving to fix JSON serialization issues
+                        data_to_save = clean_data_for_google_sheets(st.session_state.uploaded_data)
+
+                        if st.session_state.cloud_data_loaded:
+                            success = save_data_to_sheets(data_to_save)
+                            if success:
+                                st.success("All changes saved to cloud!")
+                            else:
+                                st.error("Failed to save to cloud")
+                        else:
+                            st.success("Changes saved locally!")
+                    except Exception as e:
+                        st.error(f"Error saving data: {e}")
+                else:
+                    st.warning("No data to save")
+
+        # Display the grid
         grid_response = AgGrid(
             data,
             gridOptions=grid_options,
-            height=700,
+            height=500,
             width='100%',
-            theme='streamlit',  # or 'alpine', 'balham', 'material'
-            update_mode=GridUpdateMode.FILTERING_CHANGED,
-            allow_unsafe_jscode=True
+            theme='streamlit',
+            update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
+            allow_unsafe_jscode=True,
+            key="home_aggrid_main",
+            enable_enterprise_modules=False,
+            reload_data=True
         )
 
-        # Show filtered data stats
+        # Show data stats
         try:
-            current_data = pd.DataFrame(grid_response['data'])
-            st.write(f"Displaying {len(current_data)} rows")
-            if len(current_data) < len(data):
-                    st.success(f"Filter active: Showing {len(current_data)} of {len(data)} rows")
+            current_data = st.session_state.uploaded_data
+            st.write(f"**Total records:** {len(current_data)} rows")
+
+            # Quick stats
+            if len(grid_response['data']) < len(current_data):
+                st.success(f"🔍 Filter active: Showing {len(grid_response['data'])} of {len(current_data)} rows")
             else:
-                    st.info("Showing complete dataset (no filters)")
-        
+                st.info("📊 Showing complete dataset")
+
         except Exception as e:
-                st.error(f"Error processing grid response: {str(e)}")
+            st.error(f"Error processing grid response: {str(e)}")
+
+    else:
+        # Show welcome message when no data is loaded
+        st.title("Trading Data Dashboard")
+        st.info("👆 Use the **Cloud Data Management** section in the sidebar to load your data")
+        st.markdown("""
+        ### How to get started:
+        1. **Load from Cloud** - Load your existing data from Google Sheets
+        2. **Upload CSV** - Upload a new CSV file (will auto-save to cloud)
+        3. **Save to Cloud** - Manually save current data to cloud storage
+
+        Your data will be available across all pages once loaded.
+        """)
+
 
 
 elif st.session_state.current_page == "Account Overview":
@@ -550,7 +1155,7 @@ elif st.session_state.current_page == "Symbol Stats":
         df = st.session_state.uploaded_data.copy()
         
         # Convert date and extract year/month
-        df['Date'] = pd.to_datetime(df['Date'], format='%Y.%m.%d', errors='coerce')
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d', errors='coerce')
         df = df.dropna(subset=['Date'])  # Remove rows with invalid dates
         
         df['Year'] = df['Date'].dt.year
@@ -1179,7 +1784,7 @@ elif st.session_state.current_page == "Risk Calculation":
         current_month_name = datetime.now().strftime("%B")
 
         df = st.session_state.uploaded_data
-        df['Date'] = pd.to_datetime(df['Date'], format='%Y.%m.%d')
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
         df['Year'] = df['Date'].dt.year
         df['Month'] = df['Date'].dt.month_name()
         df['MonthNum'] = df['Date'].dt.month
@@ -2420,7 +3025,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 else:
                                     # Create a record with timestamp and all selections
                                     record = {
-                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d"),
                                         'selected_pair': selected_pair,
                                         'trend_position': trend_position,
                                         'POI': POI,
@@ -2502,7 +3107,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 else:
                                     # Create a record with timestamp and all selections
                                     record = {
-                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d"),
                                         'selected_pair': selected_pair,
                                         'trend_position': trend_position,
                                         'POI': POI,
@@ -2538,10 +3143,169 @@ elif st.session_state.current_page == "Risk Calculation":
             #container.metric("test", get_live_rate("USDJPY"))
 
 
-
-
 elif st.session_state.current_page == "Active Opps":
     st.title("Saved Records")
+
+
+    # Use your existing Google Sheets functions
+    def load_workflow_from_sheets():
+        """Load workflow data from Google Sheets using existing functions"""
+        try:
+            # Use your existing load_data_from_sheets function but specify the workflow worksheet
+            df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
+            if df is not None and not df.empty:
+                # Convert timestamp to string for consistency
+                if 'timestamp' in df.columns:
+                    df['timestamp'] = df['timestamp'].astype(str)
+
+                # Clean numeric columns - convert string 'None' to actual None/0.0
+                numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size']
+                for col in numeric_columns:
+                    if col in df.columns:
+                        # Replace string 'None' with actual None, then convert to float
+                        df[col] = df[col].replace('None', None)
+                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
+
+                return df
+            return pd.DataFrame()
+        except Exception as e:
+            st.error(f"Error loading workflow data: {e}")
+            return pd.DataFrame()
+
+
+    def save_workflow_to_sheets(data):
+        """Save workflow data to Google Sheets using existing functions"""
+        try:
+            # Convert records to DataFrame if it's a list
+            if isinstance(data, list):
+                data_to_save = pd.DataFrame(data)
+            else:
+                data_to_save = data.copy()
+
+            # Ensure all required columns exist
+            required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
+                                'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+
+            for col in required_columns:
+                if col not in data_to_save.columns:
+                    data_to_save[col] = None
+
+            # Clean data using your existing function
+            data_clean = clean_data_for_google_sheets(data_to_save)
+
+            # Save using your existing function but specify the workflow worksheet
+            success = save_data_to_sheets(data_clean, sheet_name="Trade", worksheet_name="Workflow")
+            return success
+        except Exception as e:
+            st.error(f"Error saving workflow data: {e}")
+            return False
+
+
+    # Helper function to safely convert record values to float
+    def safe_float(value, default=0.0):
+        """Safely convert value to float, handling None and string 'None'"""
+        if value is None or value == 'None' or value == '':
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+
+
+    # Load data from Google Sheets on initial load or when syncing
+    if 'saved_records' not in st.session_state or st.button("🔄 Sync with Cloud"):
+        workflow_data = load_workflow_from_sheets()
+        if not workflow_data.empty:
+            # Convert DataFrame back to list of dictionaries
+            st.session_state.saved_records = workflow_data.to_dict('records')
+            st.success("Workflow data loaded from cloud!")
+        else:
+            # Initialize empty if no data exists in cloud
+            st.session_state.saved_records = []
+            st.info("No data found in cloud. You can upload a CSV backup below.")
+
+    # CSV Upload as fallback
+    st.sidebar.markdown("---")
+    with st.sidebar.expander("📁 CSV Backup", expanded=False):
+        st.subheader("Upload Workflow Backup")
+        uploaded_workflow_file = st.file_uploader("Upload Workflow CSV", type=['csv'], key="workflow_uploader")
+
+        if uploaded_workflow_file is not None:
+            try:
+                # Load CSV with expected columns
+                workflow_csv_data = pd.read_csv(uploaded_workflow_file)
+
+                # Validate required columns
+                required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
+                                    'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+
+                missing_columns = [col for col in required_columns if col not in workflow_csv_data.columns]
+
+                if missing_columns:
+                    st.error(f"Missing required columns in CSV: {', '.join(missing_columns)}")
+                    st.info(
+                        "Expected columns: selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
+                else:
+                    # Clean the data - handle None values and convert numeric columns
+                    for col in ['position_size', 'stop_pips', 'entry_price', 'exit_price', 'target_price']:
+                        if col in workflow_csv_data.columns:
+                            workflow_csv_data[col] = workflow_csv_data[col].replace('None', None)
+                            workflow_csv_data[col] = pd.to_numeric(workflow_csv_data[col], errors='coerce').fillna(0.0)
+
+                    # Ensure status values are valid
+                    valid_statuses = ['Speculation', 'Limit Placed', 'Order Filled']
+                    workflow_csv_data['status'] = workflow_csv_data['status'].apply(
+                        lambda x: x if x in valid_statuses else 'Speculation'
+                    )
+
+                    # Convert DataFrame to list of dictionaries
+                    csv_records = workflow_csv_data.to_dict('records')
+
+                    # Show preview and options
+                    st.success(f"✅ Valid CSV format! Found {len(csv_records)} records")
+
+                    # Show summary statistics
+                    status_counts = workflow_csv_data['status'].value_counts()
+                    st.write("**Records by status:**")
+                    for status, count in status_counts.items():
+                        st.write(f"- {status}: {count}")
+
+                    col_replace, col_merge = st.columns(2)
+                    with col_replace:
+                        if st.button("Replace Current Data", key="replace_csv", type="primary"):
+                            st.session_state.saved_records = csv_records
+                            st.success(f"✅ Replaced current data with {len(csv_records)} records from CSV!")
+                            st.rerun()
+
+                    with col_merge:
+                        if st.button("Merge with Current", key="merge_csv"):
+                            # Merge without duplicates based on timestamp
+                            current_timestamps = {r.get('timestamp') for r in st.session_state.saved_records}
+                            new_records = [r for r in csv_records if r.get('timestamp') not in current_timestamps]
+
+                            if new_records:
+                                st.session_state.saved_records.extend(new_records)
+                                st.success(f"✅ Added {len(new_records)} new records from CSV!")
+                            else:
+                                st.info("No new records to add (all timestamps already exist)")
+                            st.rerun()
+
+                    # Show preview of CSV data
+                    with st.expander("📋 Preview CSV Data (first 5 rows)"):
+                        st.dataframe(workflow_csv_data.head())
+
+                    # Show data quality info
+                    with st.expander("🔍 Data Quality Check"):
+                        st.write(f"**Total records:** {len(csv_records)}")
+                        st.write(f"**Unique pairs:** {workflow_csv_data['selected_pair'].nunique()}")
+                        st.write(f"**Records with entry price > 0:** {(workflow_csv_data['entry_price'] > 0).sum()}")
+                        st.write(f"**Records with target price > 0:** {(workflow_csv_data['target_price'] > 0).sum()}")
+
+            except Exception as e:
+                st.error(f"Error reading workflow CSV: {e}")
+                st.info("Make sure your CSV has the correct format with these columns:")
+                st.code(
+                    "selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
 
     # Count current Limit Placed and Order Filled records
     limit_placed_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Limit Placed')
@@ -2554,8 +3318,60 @@ elif st.session_state.current_page == "Active Opps":
     st.write(f"**Active Records (Limit Placed + Order Filled):** {total_active_count}/2")
     st.write(f"Limit Placed: {limit_placed_count}, Order Filled: {order_filled_count}")
 
+    # Manual sync buttons with enhanced error handling
+    col_sync1, col_sync2, col_export = st.columns(3)
+    with col_sync1:
+        if st.button("💾 Save to Cloud"):
+            if st.session_state.saved_records:
+                success = save_workflow_to_sheets(st.session_state.saved_records)
+                if success:
+                    st.success("Workflow data saved to cloud!")
+                else:
+                    st.error("Failed to save to cloud. Use CSV export below to backup your data.")
+            else:
+                st.warning("No records to save")
+
+    with col_sync2:
+        if st.button("📥 Load from Cloud"):
+            workflow_data = load_workflow_from_sheets()
+            if not workflow_data.empty:
+                st.session_state.saved_records = workflow_data.to_dict('records')
+                st.success("Workflow data loaded from cloud!")
+                st.rerun()
+            else:
+                st.error("No workflow data found in cloud. Try uploading a CSV backup.")
+
+    with col_export:
+        # Export current data to CSV
+        if st.session_state.saved_records:
+            csv_data = pd.DataFrame(st.session_state.saved_records)
+
+            # Ensure we export with the correct column order
+            column_order = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
+                            'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+
+            # Reorder columns and fill any missing ones
+            for col in column_order:
+                if col not in csv_data.columns:
+                    csv_data[col] = None
+
+            csv_data = csv_data[column_order]
+
+            csv = csv_data.to_csv(index=False)
+            st.download_button(
+                label="📤 Export to CSV",
+                data=csv,
+                file_name=f"workflow_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv",
+                help="Download current workflow data as CSV backup",
+                key="export_csv"
+            )
+        else:
+            st.button("📤 Export to CSV", disabled=True, help="No data to export", key="export_disabled")
+
     if not st.session_state.saved_records:
-        st.info("No records saved yet. Go to Risk Calculation page and save some records.")
+        st.info(
+            "No records saved yet. Go to Risk Calculation page and save some records, or upload a CSV backup above.")
     else:
         # Convert records to DataFrame for nice display
         records_df = pd.DataFrame(st.session_state.saved_records)
@@ -2567,6 +3383,34 @@ elif st.session_state.current_page == "Active Opps":
             f"Limit Placed ({limit_placed_count})",
             f"Order Filled ({order_filled_count})"
         ])
+
+
+        # Helper function to update record and sync to cloud
+        def update_record_and_sync(original_index, updates):
+            """Update record and sync to Google Sheets"""
+            for key, value in updates.items():
+                st.session_state.saved_records[original_index][key] = value
+
+            # Auto-save to cloud
+            success = save_workflow_to_sheets(st.session_state.saved_records)
+            if success:
+                st.success(f"Record updated and saved to cloud!")
+            else:
+                st.warning("Record updated locally but failed to save to cloud. Use CSV export to backup.")
+
+
+        # Helper function to delete record and sync to cloud
+        def delete_record_and_sync(original_index):
+            """Delete record and sync to Google Sheets"""
+            st.session_state.saved_records.pop(original_index)
+
+            # Auto-save to cloud
+            success = save_workflow_to_sheets(st.session_state.saved_records)
+            if success:
+                st.success(f"Record deleted and changes saved to cloud!")
+            else:
+                st.warning("Record deleted locally but failed to save to cloud. Use CSV export to backup.")
+
 
         # Speculation Tab
         with tab1:
@@ -2583,7 +3427,8 @@ elif st.session_state.current_page == "Active Opps":
 
                     if original_index is not None:
                         with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",expanded = True):
+                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
+                                expanded=True):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -2595,7 +3440,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col2:
                                 new_entry_price = st.number_input(
                                     "Entry Price",
-                                    value=0.0,
+                                    value=safe_float(record.get('entry_price'), 0.0),
                                     format="%.5f",
                                     key=f"spec_entry_{original_index}"
                                 )
@@ -2603,7 +3448,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col3:
                                 new_exit_price = st.number_input(
                                     "Exit Price",
-                                    value=0.0,
+                                    value=safe_float(record.get('exit_price'), 0.0),
                                     format="%.5f",
                                     key=f"spec_exit_{original_index}"
                                 )
@@ -2611,7 +3456,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col4:
                                 new_target_price = st.number_input(
                                     "Target Price",
-                                    value=record.get('target_price', 0.0),
+                                    value=safe_float(record.get('target_price'), 0.0),
                                     format="%.5f",
                                     key=f"spec_target_{original_index}"
                                 )
@@ -2691,30 +3536,27 @@ elif st.session_state.current_page == "Active Opps":
                                                 st.error(
                                                     "Maximum of 2 active records (Limit Placed + Order Filled) reached! You cannot change this record to active status.")
                                             else:
-                                                st.session_state.saved_records[original_index][
-                                                    'entry_price'] = new_entry_price
-                                                st.session_state.saved_records[original_index][
-                                                    'exit_price'] = new_exit_price
-                                                st.session_state.saved_records[original_index][
-                                                    'target_price'] = new_target_price
-                                                st.session_state.saved_records[original_index]['status'] = new_status
-                                                st.success(f"Record updated for {record['selected_pair']}!")
+                                                updates = {
+                                                    'entry_price': new_entry_price,
+                                                    'exit_price': new_exit_price,
+                                                    'target_price': new_target_price,
+                                                    'status': new_status
+                                                }
+                                                update_record_and_sync(original_index, updates)
                                                 st.rerun()
                                         else:
-                                            st.session_state.saved_records[original_index][
-                                                'entry_price'] = new_entry_price
-                                            st.session_state.saved_records[original_index][
-                                                'exit_price'] = new_exit_price
-                                            st.session_state.saved_records[original_index][
-                                                'target_price'] = new_target_price
-                                            st.session_state.saved_records[original_index]['status'] = new_status
-                                            st.success(f"Record updated for {record['selected_pair']}!")
+                                            updates = {
+                                                'entry_price': new_entry_price,
+                                                'exit_price': new_exit_price,
+                                                'target_price': new_target_price,
+                                                'status': new_status
+                                            }
+                                            update_record_and_sync(original_index, updates)
                                             st.rerun()
 
                             with col_delete:
-                                if st.button(f"Delete Record", key=f"spec_delete_{original_index}"):
-                                    st.session_state.saved_records.pop(original_index)
-                                    st.success(f"Record {original_index + 1} deleted successfully!")
+                                if st.button(f"🗑️ Delete Record", key=f"spec_delete_{original_index}"):
+                                    delete_record_and_sync(original_index)
                                     st.rerun()
 
         # Limit Placed Tab
@@ -2731,7 +3573,8 @@ elif st.session_state.current_page == "Active Opps":
 
                     if original_index is not None:
                         with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",expanded = True):
+                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
+                                expanded=True):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -2743,7 +3586,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col2:
                                 new_entry_price = st.number_input(
                                     "Entry Price",
-                                    value=0.0,
+                                    value=safe_float(record.get('entry_price'), 0.0),
                                     format="%.5f",
                                     key=f"limit_entry_{original_index}"
                                 )
@@ -2751,7 +3594,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col3:
                                 new_exit_price = st.number_input(
                                     "Exit Price",
-                                    value=record['exit_price'],
+                                    value=safe_float(record.get('exit_price'), 0.0),
                                     format="%.5f",
                                     key=f"limit_exit_{original_index}"
                                 )
@@ -2759,7 +3602,7 @@ elif st.session_state.current_page == "Active Opps":
                             with col4:
                                 new_target_price = st.number_input(
                                     "Target Price",
-                                    value=record.get('target_price', 0.0),
+                                    value=safe_float(record.get('target_price'), 0.0),
                                     format="%.5f",
                                     key=f"limit_target_{original_index}"
                                 )
@@ -2778,17 +3621,18 @@ elif st.session_state.current_page == "Active Opps":
                             col_update, col_delete = st.columns(2)
                             with col_update:
                                 if st.button(f"Update Record", key=f"limit_update_{original_index}"):
-                                    st.session_state.saved_records[original_index]['entry_price'] = new_entry_price
-                                    st.session_state.saved_records[original_index]['exit_price'] = new_exit_price
-                                    st.session_state.saved_records[original_index]['target_price'] = new_target_price
-                                    st.session_state.saved_records[original_index]['status'] = new_status
-                                    st.success(f"Record updated for {record['selected_pair']}!")
+                                    updates = {
+                                        'entry_price': new_entry_price,
+                                        'exit_price': new_exit_price,
+                                        'target_price': new_target_price,
+                                        'status': new_status
+                                    }
+                                    update_record_and_sync(original_index, updates)
                                     st.rerun()
 
                             with col_delete:
-                                if st.button(f"Delete Record", key=f"limit_delete_{original_index}"):
-                                    st.session_state.saved_records.pop(original_index)
-                                    st.success(f"Record {original_index + 1} deleted successfully!")
+                                if st.button(f"🗑️ Delete Record", key=f"limit_delete_{original_index}"):
+                                    delete_record_and_sync(original_index)
                                     st.rerun()
 
         # Order Filled Tab
@@ -2805,7 +3649,8 @@ elif st.session_state.current_page == "Active Opps":
 
                     if original_index is not None:
                         with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",expanded = True):
+                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
+                                expanded=True):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -2813,56 +3658,167 @@ elif st.session_state.current_page == "Active Opps":
                                 st.write(f"**Strategy:** {record['risk_multiplier']}")
                                 st.write(f"**Position Size:** {record['position_size']}")
                                 st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
+                                st.write(f"**Entry Price:** {record.get('entry_price', 'N/A')}")
+                                st.write(f"**Exit Price:** {record.get('exit_price', 'N/A')}")
+                                st.write(f"**Target Price:** {record.get('target_price', 'N/A')}")
+
+                                # Display existing Trend Position and Variance (read-only)
+                                existing_trend_position = record.get('trend_position', 'Not set')
+                                existing_variance = record.get('Variances', 'Not set')
+                                st.write(f"**Trend Position:** {existing_trend_position}")
+                                st.write(f"**Variance:** {existing_variance}")
 
                             with col2:
-                                new_entry_price = st.number_input(
-                                    "Entry Price",
-                                    value=0.0,
-                                    format="%.5f",
-                                    key=f"filled_entry_{original_index}"
+                                # Result dropdown
+                                result_options = ["BE", "Loss", "Win"]
+                                new_result = st.selectbox(
+                                    "Result",
+                                    options=result_options,
+                                    index=0,
+                                    key=f"filled_result_{original_index}"
+                                )
+
+                                # Direction dropdown
+                                direction_options = ["buy", "sell"]
+                                new_direction = st.selectbox(
+                                    "Direction",
+                                    options=direction_options,
+                                    index=0,
+                                    key=f"filled_direction_{original_index}"
                                 )
 
                             with col3:
-                                new_exit_price = st.number_input(
-                                    "Exit Price",
+                                # RR input
+                                new_rr = st.number_input(
+                                    "RR",
                                     value=0.0,
-                                    format="%.5f",
-                                    key=f"filled_exit_{original_index}"
+                                    step=0.01,
+                                    format="%.2f",
+                                    key=f"filled_rr_{original_index}"
                                 )
 
                             with col4:
-                                new_target_price = st.number_input(
-                                    "Target Price",
-                                    value=record.get('target_price', 0.0),
-                                    format="%.5f",
-                                    key=f"filled_target_{original_index}"
+                                # PnL input
+                                new_pnl = st.number_input(
+                                    "PnL",
+                                    value=0.0,
+                                    step=0.01,
+                                    format="%.2f",
+                                    key=f"filled_pnl_{original_index}"
                                 )
 
-                            # Status dropdown in a new row
-                            status_options = ["Speculation", "Limit Placed", "Order Filled"]
-                            current_status = record.get('status', 'Order Filled')
-                            new_status = st.selectbox(
-                                "Status",
-                                status_options,
-                                index=status_options.index(current_status) if current_status in status_options else 2,
-                                key=f"filled_status_{original_index}"
-                            )
+                            # Additional required fields
+                            col5, col6 = st.columns(2)
+                            with col5:
+                                # POI dropdown
+                                poi_options = ["Weekly", "2_Daily"]
+                                new_poi = st.selectbox(
+                                    "POI",
+                                    options=poi_options,
+                                    index=0,
+                                    key=f"filled_poi_{original_index}"
+                                )
 
-                            # Update button for this record
-                            col_update, col_delete = st.columns(2)
-                            with col_update:
-                                if st.button(f"Update Record", key=f"filled_update_{original_index}"):
-                                    st.session_state.saved_records[original_index]['entry_price'] = new_entry_price
-                                    st.session_state.saved_records[original_index]['exit_price'] = new_exit_price
-                                    st.session_state.saved_records[original_index]['target_price'] = new_target_price
-                                    st.session_state.saved_records[original_index]['status'] = new_status
-                                    st.success(f"Record updated for {record['selected_pair']}!")
-                                    st.rerun()
+                            with col6:
+                                # Strategy (pre-filled from record)
+                                st.text_input(
+                                    "Strategy",
+                                    value=record['risk_multiplier'],
+                                    key=f"filled_strategy_{original_index}",
+                                    disabled=True
+                                )
+
+                            # Close Record button
+                            col_close, col_delete = st.columns(2)
+                            with col_close:
+                                if st.button(f"💾 Close Record", key=f"filled_close_{original_index}", type="primary"):
+                                    # Validate required fields
+                                    if (new_result and new_direction and new_poi and
+                                            new_rr is not None and new_pnl is not None):
+
+                                        # Get existing Trend Position and Variance from the record
+                                        existing_trend_position = record.get('trend_position')
+                                        existing_variance = record.get('Variances')
+
+                                        # Validate that we have the required existing values
+                                        if not existing_trend_position or not existing_variance:
+                                            st.error(
+                                                "Missing Trend Position or Variance data from original record. Cannot close trade.")
+                                        else:
+                                            # Create the completed trade record with specified fields
+                                            completed_trade = {
+                                                'Date': datetime.now().strftime("%Y-%m-%d"),  # YYYY-MM-DD format
+                                                'Symbol': record['selected_pair'],
+                                                'Direction': new_direction,
+                                                'Trend Position': existing_trend_position,  # Use existing value
+                                                'POI': new_poi,
+                                                'Strategy': record['risk_multiplier'],
+                                                'Variance': existing_variance,  # Use existing value
+                                                'Result': new_result,
+                                                'RR': new_rr,
+                                                'PnL': new_pnl,
+                                                'Withdrawal_Deposit': 0.0,  # Default 0
+                                                'PROP_Pct': 0.0  # Default 0
+                                            }
+
+                                            # Load current Trade.csv data
+                                            current_trade_data = load_data_from_sheets(sheet_name="Trade",
+                                                                                       worksheet_name="Trade.csv")
+
+                                            if current_trade_data is not None:
+                                                # Ensure only the specified columns exist in current data
+                                                required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
+                                                                    'POI', 'Strategy',
+                                                                    'Variance', 'Result', 'RR', 'PnL',
+                                                                    'Withdrawal_Deposit', 'PROP_Pct']
+
+                                                # Add missing columns if they don't exist
+                                                for col in required_columns:
+                                                    if col not in current_trade_data.columns:
+                                                        current_trade_data[col] = None
+
+                                                # Keep only the required columns
+                                                current_trade_data = current_trade_data[required_columns]
+
+                                                # Append the new completed trade
+                                                new_trade_df = pd.DataFrame([completed_trade])
+                                                updated_trade_data = pd.concat([current_trade_data, new_trade_df],
+                                                                               ignore_index=True)
+
+                                                # Save to Trade.csv worksheet
+                                                success = save_data_to_sheets(updated_trade_data, sheet_name="Trade",
+                                                                              worksheet_name="Trade.csv")
+
+                                                if success:
+                                                    # Remove from active opps
+                                                    st.session_state.saved_records.pop(original_index)
+                                                    # Save the updated workflow
+                                                    save_workflow_to_sheets(st.session_state.saved_records)
+                                                    st.success("✅ Record closed and saved to trade history!")
+                                                    st.rerun()
+                                                else:
+                                                    st.error("Failed to save to trade history")
+                                            else:
+                                                # If no existing trade data, create new with only specified columns
+                                                new_trade_df = pd.DataFrame([completed_trade])
+                                                success = save_data_to_sheets(new_trade_df, sheet_name="Trade",
+                                                                              worksheet_name="Trade.csv")
+
+                                                if success:
+                                                    # Remove from active opps
+                                                    st.session_state.saved_records.pop(original_index)
+                                                    # Save the updated workflow
+                                                    save_workflow_to_sheets(st.session_state.saved_records)
+                                                    st.success("✅ Record closed and saved to trade history!")
+                                                    st.rerun()
+                                                else:
+                                                    st.error("Failed to save to trade history")
+                                    else:
+                                        st.error("Please fill in all required fields")
 
                             with col_delete:
-                                if st.button(f"Delete Record", key=f"filled_delete_{original_index}"):
-                                    st.session_state.saved_records.pop(original_index)
-                                    st.success(f"Record {original_index + 1} deleted successfully!")
+                                if st.button(f"🗑️ Delete Record", key=f"filled_delete_{original_index}"):
+                                    delete_record_and_sync(original_index)
                                     st.rerun()
 
         st.markdown("---")
@@ -2870,7 +3826,11 @@ elif st.session_state.current_page == "Active Opps":
         # Option to clear all records
         if st.button("Clear All Records", type="secondary"):
             st.session_state.saved_records = []
-            st.success("All records cleared!")
+            success = save_workflow_to_sheets([])
+            if success:
+                st.success("All records cleared and saved to cloud!")
+            else:
+                st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
 
 
@@ -2881,7 +3841,7 @@ elif st.session_state.current_page == "Stats":
             return ['background-color: lightyellow; font-weight: bold' if row['Month'] == 'Total' else '' for _ in row]
 
         df = st.session_state.uploaded_data
-        df['Date'] = pd.to_datetime(df['Date'], format='%Y.%m.%d')
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
         df['Year'] = df['Date'].dt.year
         df['Month'] = df['Date'].dt.month_name()
         df['MonthNum'] = df['Date'].dt.month

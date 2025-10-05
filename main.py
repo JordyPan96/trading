@@ -4119,6 +4119,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
 
+
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available
     try:
@@ -4317,8 +4318,9 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Trade error: {str(e)}"
 
 
+    # OPTIMIZED STATUS CHECKING FUNCTIONS
     async def find_matching_order(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Find matching order in MT5 by comparing order parameters"""
+        """Find matching order in MT5 by comparing order parameters - FIXED VERSION"""
         try:
             account, error = await get_metaapi_account()
             if error:
@@ -4335,60 +4337,85 @@ elif st.session_state.current_page == "Trade Signal":
             # Look for matching order based on symbol, type, price, and volume
             matching_orders = []
             for order in orders:
-                # Check if order matches our criteria
-                if (order.symbol == formatted_symbol and
-                        abs(order.open_price - entry_price) < 0.0001 and  # Small tolerance for price matching
-                        abs(order.volume - volume) < 0.01):  # Small tolerance for volume matching
+                try:
+                    # Safely access order properties
+                    order_dict = order.__dict__ if hasattr(order, '__dict__') else {}
+                    order_symbol = order_dict.get('symbol') or getattr(order, 'symbol', None)
+                    order_open_price = order_dict.get('openPrice') or order_dict.get('open_price') or getattr(order,
+                                                                                                              'openPrice',
+                                                                                                              getattr(
+                                                                                                                  order,
+                                                                                                                  'open_price',
+                                                                                                                  None))
+                    order_volume = order_dict.get('volume') or getattr(order, 'volume', None)
+                    order_order_type = order_dict.get('type') or getattr(order, 'type', None)
 
-                    # Determine order type from MT5 order
-                    order_type_mt5 = "BUY" if order.type.startswith('ORDER_TYPE_BUY') else "SELL"
+                    # Skip if any required attribute is missing
+                    if not all([order_symbol, order_open_price is not None, order_volume is not None]):
+                        continue
 
-                    if order_type_mt5 == order_type:
-                        matching_orders.append(order)
+                    # Check if order matches our criteria with tolerance
+                    price_match = abs(float(order_open_price) - float(entry_price)) < 0.0001
+                    volume_match = abs(float(order_volume) - float(volume)) < 0.01
+                    symbol_match = order_symbol == formatted_symbol
+
+                    if symbol_match and price_match and volume_match:
+                        matching_orders.append({
+                            'id': order_dict.get('id') or getattr(order, 'id', None),
+                            'state': order_dict.get('state') or getattr(order, 'state', 'UNKNOWN'),
+                            'symbol': order_symbol,
+                            'type': order_order_type,
+                            'volume': order_volume,
+                            'open_price': order_open_price
+                        })
+
+                except Exception as e:
+                    print(f"Error processing order: {e}")
+                    continue
 
             await connection.close()
 
             if matching_orders:
                 # Return the first matching order
-                order = matching_orders[0]
-                return {
-                    'id': order.id,
-                    'state': order.state,
-                    'symbol': order.symbol,
-                    'type': order.type,
-                    'volume': order.volume,
-                    'open_price': order.open_price,
-                    'stop_loss': order.stop_loss,
-                    'take_profit': order.take_profit,
-                    'current_price': order.current_price if hasattr(order, 'current_price') else None
-                }, None
+                return matching_orders[0], None
             else:
                 # Check if order might be filled (check positions)
                 positions = await connection.get_positions()
-                position = next((p for p in positions if p.symbol == formatted_symbol), None)
+                for position in positions:
+                    try:
+                        position_dict = position.__dict__ if hasattr(position, '__dict__') else {}
+                        position_symbol = position_dict.get('symbol') or getattr(position, 'symbol', None)
+                        position_open_price = position_dict.get('openPrice') or position_dict.get(
+                            'open_price') or getattr(position, 'openPrice', getattr(position, 'open_price', None))
+                        position_volume = position_dict.get('volume') or getattr(position, 'volume', None)
 
-                if position:
-                    # Check if position matches our order parameters
-                    if (abs(position.open_price - entry_price) < 0.0001 and
-                            abs(position.volume - volume) < 0.01):
-                        return {
-                            'state': 'FILLED',
-                            'symbol': position.symbol,
-                            'volume': position.volume,
-                            'open_price': position.open_price,
-                            'stop_loss': position.stop_loss,
-                            'take_profit': position.take_profit,
-                            'current_price': position.current_price if hasattr(position, 'current_price') else None
-                        }, None
+                        if (position_symbol == formatted_symbol and
+                                abs(float(position_open_price) - float(entry_price)) < 0.0001 and
+                                abs(float(position_volume) - float(volume)) < 0.01):
+                            return {
+                                'state': 'FILLED',
+                                'symbol': position_symbol,
+                                'volume': position_volume,
+                                'open_price': position_open_price
+                            }, None
 
-                return None, "No matching order found - may be filled, cancelled, or not yet placed"
+                    except Exception as e:
+                        print(f"Error processing position: {e}")
+                        continue
+
+                return None, "No matching order or position found"
 
         except Exception as e:
+            # Try to close connection if it exists
+            try:
+                await connection.close()
+            except:
+                pass
             return None, f"Error finding matching order: {str(e)}"
 
 
     async def cancel_matching_order(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Cancel matching order in MT5 by comparing order parameters"""
+        """Cancel matching order in MT5 by comparing order parameters - FIXED VERSION"""
         try:
             account, error = await get_metaapi_account()
             if error:
@@ -4400,22 +4427,30 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Find the matching order first
             order_info, error = await find_matching_order(symbol, order_type, entry_price, volume)
-            if error or not order_info:
+            if error:
                 await connection.close()
-                return False, f"❌ No matching order found to cancel: {error}"
+                return False, f"❌ Error finding order: {error}"
+
+            if not order_info:
+                await connection.close()
+                return False, "❌ No matching order found in MT5 - it may already be filled, cancelled, or expired"
 
             # Cancel the order using its ID
             if order_info.get('id'):
-                result = await connection.cancel_order(order_info['id'])
-                await connection.close()
+                try:
+                    result = await connection.cancel_order(order_info['id'])
+                    await connection.close()
 
-                if result:
-                    return True, f"✅ Order cancelled successfully"
-                else:
-                    return False, "❌ Failed to cancel order"
+                    if result:
+                        return True, f"✅ Order cancelled successfully"
+                    else:
+                        return False, "❌ Failed to cancel order"
+                except Exception as e:
+                    await connection.close()
+                    return False, f"❌ Error during cancellation: {str(e)}"
             else:
                 await connection.close()
-                return False, "❌ Cannot cancel - order may already be filled or cancelled"
+                return False, "❌ Cannot cancel - order ID not found"
 
         except Exception as e:
             # Try to close connection if it exists
@@ -4426,13 +4461,91 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Error cancelling order: {str(e)}"
 
 
-    async def check_all_orders_status():
-        """Check status of all orders in Order Placed tab and update accordingly"""
+    async def quick_check_order_status(order):
+        """Fast order status check for a single order - FIXED VERSION"""
+        try:
+            account, error = await get_metaapi_account()
+            if error:
+                return None, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            symbol = order['selected_pair']
+            entry_price = safe_float(order.get('entry_price'), 0.0)
+            volume = safe_float(order.get('position_size'), 0.1)
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            # Check orders first
+            orders = await connection.get_orders()
+            order_found = False
+
+            for mt5_order in orders:
+                try:
+                    order_dict = mt5_order.__dict__ if hasattr(mt5_order, '__dict__') else {}
+                    order_symbol = order_dict.get('symbol') or getattr(mt5_order, 'symbol', None)
+                    order_open_price = order_dict.get('openPrice') or order_dict.get('open_price') or getattr(mt5_order,
+                                                                                                              'openPrice',
+                                                                                                              getattr(
+                                                                                                                  mt5_order,
+                                                                                                                  'open_price',
+                                                                                                                  None))
+                    order_volume = order_dict.get('volume') or getattr(mt5_order, 'volume', None)
+
+                    if (order_symbol == formatted_symbol and
+                            abs(float(order_open_price) - float(entry_price)) < 0.0001 and
+                            abs(float(order_volume) - float(volume)) < 0.01):
+                        order_found = True
+                        break
+
+                except Exception as e:
+                    print(f"Error checking order: {e}")
+                    continue
+
+            # Check positions if order not found
+            if not order_found:
+                positions = await connection.get_positions()
+                for position in positions:
+                    try:
+                        position_dict = position.__dict__ if hasattr(position, '__dict__') else {}
+                        position_symbol = position_dict.get('symbol') or getattr(position, 'symbol', None)
+                        position_open_price = position_dict.get('openPrice') or position_dict.get(
+                            'open_price') or getattr(position, 'openPrice', getattr(position, 'open_price', None))
+                        position_volume = position_dict.get('volume') or getattr(position, 'volume', None)
+
+                        if (position_symbol == formatted_symbol and
+                                abs(float(position_open_price) - float(entry_price)) < 0.0001 and
+                                abs(float(position_volume) - float(volume)) < 0.01):
+                            await connection.close()
+                            return 'FILLED', None
+
+                    except Exception as e:
+                        print(f"Error checking position: {e}")
+                        continue
+
+            await connection.close()
+
+            if order_found:
+                return 'PENDING', None
+            else:
+                return 'NOT_FOUND', None
+
+        except Exception as e:
+            # Try to close connection if it exists
+            try:
+                await connection.close()
+            except:
+                pass
+            return None, f"Status check error: {str(e)}"
+
+
+    async def quick_check_all_orders_status():
+        """Fast batch status check for all orders - FIXED VERSION"""
         try:
             if not st.session_state.order_placed:
                 return True, "No orders to check"
 
-            updates_made = False
             account, error = await get_metaapi_account()
             if error:
                 return False, error
@@ -4441,68 +4554,234 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get all current orders and positions from MT5
+            # Single API call for all data
             mt5_orders = await connection.get_orders()
             mt5_positions = await connection.get_positions()
 
             await connection.close()
 
-            # Check each order in our Order Placed tab
-            for i, order in enumerate(st.session_state.order_placed[:]):  # Use copy for safe iteration
-                symbol = order['selected_pair']
-                order_type = order.get('direction', 'Unknown')
-                entry_price = safe_float(order.get('entry_price'), 0.0)
-                volume = safe_float(order.get('position_size'), 0.1)
-                formatted_symbol = format_symbol_for_pepperstone(symbol)
+            updates_made = 0
 
-                # Look for matching order in MT5
-                order_found = False
-                position_found = False
+            # Process each order with safe attribute access
+            for order in st.session_state.order_placed[:]:  # Use copy for safe removal
+                try:
+                    symbol = order['selected_pair']
+                    entry_price = safe_float(order.get('entry_price'), 0.0)
+                    volume = safe_float(order.get('position_size'), 0.1)
+                    formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-                # Check pending orders
-                for mt5_order in mt5_orders:
-                    if (mt5_order.symbol == formatted_symbol and
-                            abs(mt5_order.open_price - entry_price) < 0.0001 and
-                            abs(mt5_order.volume - volume) < 0.01):
-                        order_found = True
-                        # Order still pending in MT5
-                        break
+                    # Check if filled (position exists)
+                    position_found = False
+                    for position in mt5_positions:
+                        try:
+                            position_dict = position.__dict__ if hasattr(position, '__dict__') else {}
+                            position_symbol = position_dict.get('symbol') or getattr(position, 'symbol', None)
+                            position_open_price = position_dict.get('openPrice') or position_dict.get(
+                                'open_price') or getattr(position, 'openPrice', getattr(position, 'open_price', None))
+                            position_volume = position_dict.get('volume') or getattr(position, 'volume', None)
 
-                # Check if order was filled (exists as position)
-                for position in mt5_positions:
-                    if (position.symbol == formatted_symbol and
-                            abs(position.open_price - entry_price) < 0.0001 and
-                            abs(position.volume - volume) < 0.01):
-                        position_found = True
-                        # Order filled - move to In Trade
+                            if (position_symbol == formatted_symbol and
+                                    abs(float(position_open_price) - float(entry_price)) < 0.0001 and
+                                    abs(float(position_volume) - float(volume)) < 0.01):
+                                position_found = True
+                                break
+                        except Exception as e:
+                            print(f"Error processing position: {e}")
+                            continue
+
+                    if position_found:
+                        # Fast move to in_trade
                         st.session_state.order_placed.remove(order)
                         st.session_state.in_trade.append({
                             **order,
                             'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'order_status': 'FILLED'
                         })
-                        updates_made = True
-                        break
+                        updates_made += 1
+                        continue
 
-                # If order not found in MT5 and not filled, it might be cancelled
-                if not order_found and not position_found:
-                    # Order not found in MT5 - likely cancelled or expired
-                    st.session_state.order_placed.remove(order)
-                    # Move back to ready_to_order for potential re-entry
-                    st.session_state.ready_to_order.append({
-                        **{k: v for k, v in order.items() if k not in ['order_time', 'order_status']},
-                        'status': 'Order Ready'
-                    })
-                    updates_made = True
+                    # Check if still pending
+                    order_found = False
+                    for mt5_order in mt5_orders:
+                        try:
+                            order_dict = mt5_order.__dict__ if hasattr(mt5_order, '__dict__') else {}
+                            order_symbol = order_dict.get('symbol') or getattr(mt5_order, 'symbol', None)
+                            order_open_price = order_dict.get('openPrice') or order_dict.get('open_price') or getattr(
+                                mt5_order, 'openPrice', getattr(mt5_order, 'open_price', None))
+                            order_volume = order_dict.get('volume') or getattr(mt5_order, 'volume', None)
 
-            if updates_made:
+                            if (order_symbol == formatted_symbol and
+                                    abs(float(order_open_price) - float(entry_price)) < 0.0001 and
+                                    abs(float(order_volume) - float(volume)) < 0.01):
+                                order_found = True
+                                break
+                        except Exception as e:
+                            print(f"Error processing order: {e}")
+                            continue
+
+                    if not order_found and not position_found:
+                        # Order not found - cancelled or expired
+                        st.session_state.order_placed.remove(order)
+                        st.session_state.ready_to_order.append({
+                            **{k: v for k, v in order.items() if k not in ['order_time', 'order_status']},
+                            'status': 'Order Ready'
+                        })
+                        updates_made += 1
+
+                except Exception as e:
+                    print(f"Error processing order {order.get('selected_pair')}: {e}")
+                    continue
+
+            if updates_made > 0:
                 sync_with_active_opps()
-                return True, "Order status updated successfully"
+                return True, f"Updated {updates_made} orders"
             else:
-                return True, "No status changes detected"
+                return True, "No status changes"
 
         except Exception as e:
-            return False, f"Error checking orders status: {str(e)}"
+            return False, f"Batch check error: {str(e)}"
+
+
+    # BACKGROUND PROCESSING FUNCTIONS
+    def execute_trade_non_blocking(signal, direction):
+        """Execute trade in background without blocking the UI"""
+        import asyncio
+        import threading
+
+        def run_async():
+            try:
+                # Create new event loop for this thread
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
+                # Execute the trade
+                formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
+                success, message = loop.run_until_complete(place_trade(
+                    symbol=signal['selected_pair'],
+                    volume=float(signal.get('position_size', 0.1)),
+                    order_type=direction,
+                    entry_price=safe_float(signal.get('entry_price'), 0.0),
+                    sl=safe_float(signal.get('exit_price'), 0.0),
+                    tp=safe_float(signal.get('target_price'), 0.0)
+                ))
+
+                # Update session state after trade execution
+                if success:
+                    # Move from ready_to_order to order_placed
+                    st.session_state.ready_to_order = [s for s in st.session_state.ready_to_order if
+                                                       s['timestamp'] != signal['timestamp']]
+                    st.session_state.order_placed.append({
+                        **signal,
+                        'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'order_status': 'PENDING',
+                        'direction': direction
+                    })
+                    # Sync with Active Opps to update status to Order Completed
+                    sync_with_active_opps()
+
+                # Store the result for the main thread to check
+                st.session_state.last_trade_result = {
+                    'success': success,
+                    'message': message,
+                    'timestamp': datetime.now().strftime('%H:%M:%S')
+                }
+
+            except Exception as e:
+                st.session_state.last_trade_result = {
+                    'success': False,
+                    'message': f"Trade execution error: {str(e)}",
+                    'timestamp': datetime.now().strftime('%H:%M:%S')
+                }
+            finally:
+                loop.close()
+
+        # Start the trade execution in a separate thread
+        thread = threading.Thread(target=run_async)
+        thread.daemon = True
+        thread.start()
+
+        return True
+
+
+    def background_status_check():
+        """Run status check in background without blocking"""
+        import asyncio
+        import threading
+
+        def run_async():
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                success, message = loop.run_until_complete(quick_check_all_orders_status())
+                st.session_state.last_status_check = {
+                    'success': success,
+                    'message': message,
+                    'timestamp': datetime.now().strftime('%H:%M:%S')
+                }
+                loop.close()
+            except Exception as e:
+                st.session_state.last_status_check = {
+                    'success': False,
+                    'message': f"Background check failed: {str(e)}",
+                    'timestamp': datetime.now().strftime('%H:%M:%S')
+                }
+
+        thread = threading.Thread(target=run_async)
+        thread.daemon = True
+        thread.start()
+
+
+    def quick_sync_with_active_opps():
+        """Fast sync that only checks for essential changes"""
+        try:
+            # Load only necessary columns from workflow data
+            workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
+
+            if workflow_df is not None and not workflow_df.empty:
+                # Fast filtering for Order Ready records only
+                order_ready_records = workflow_df[workflow_df['status'] == 'Order Ready']
+
+                # Get current timestamps quickly
+                current_timestamps = set(order_ready_records['timestamp'].astype(str))
+
+                # Fast removal of deleted records
+                st.session_state.ready_to_order = [
+                    signal for signal in st.session_state.ready_to_order
+                    if signal.get('timestamp') in current_timestamps
+                ]
+
+                # Fast addition of new records
+                existing_timestamps = {s.get('timestamp') for s in st.session_state.ready_to_order}
+                existing_placed_timestamps = {o.get('timestamp') for o in st.session_state.order_placed}
+                existing_trade_timestamps = {t.get('timestamp') for t in st.session_state.in_trade}
+
+                new_signals = []
+                for _, record in order_ready_records.iterrows():
+                    timestamp = str(record.get('timestamp'))
+                    if (timestamp not in existing_timestamps and
+                            timestamp not in existing_placed_timestamps and
+                            timestamp not in existing_trade_timestamps):
+                        new_signals.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record.get('selected_pair'),
+                            'risk_multiplier': record.get('risk_multiplier'),
+                            'position_size': record.get('position_size'),
+                            'stop_pips': record.get('stop_pips'),
+                            'entry_price': record.get('entry_price'),
+                            'exit_price': record.get('exit_price'),
+                            'target_price': record.get('target_price'),
+                            'trend_position': record.get('trend_position', 'Not set'),
+                            'variances': record.get('Variances', 'Not set'),
+                            'status': 'Order Ready'
+                        })
+
+                st.session_state.ready_to_order.extend(new_signals)
+                return True, f"Synced {len(new_signals)} new signals"
+
+            return True, "No changes detected"
+
+        except Exception as e:
+            return False, f"Sync error: {str(e)}"
 
 
     # Add trade signal functions next - UPDATED TO SYNC WITH ACTIVE OPPS
@@ -4700,84 +4979,134 @@ elif st.session_state.current_page == "Trade Signal":
     if 'order_history' not in st.session_state:
         st.session_state.order_history = {}
 
-    # Sync with Active Opps on page load
+    # Initialize trade execution states
+    if 'trade_execution_in_progress' not in st.session_state:
+        st.session_state.trade_execution_in_progress = False
+
+    if 'last_trade_result' not in st.session_state:
+        st.session_state.last_trade_result = None
+
+    if 'last_status_check' not in st.session_state:
+        st.session_state.last_status_check = None
+
+    # Quick sync on page load
     if not st.session_state.ready_to_order:
-        with st.spinner("🔄 Syncing with Active Opportunities..."):
-            sync_with_active_opps()
+        with st.spinner("🔄 Quick syncing with Active Opportunities..."):
+            quick_sync_with_active_opps()
 
     # Auto-connect to MetaApi account in background
     if not st.session_state.metaapi_connected:
         import asyncio
 
         try:
-            # First test basic connection
+            # Quick connection test
             success, message = asyncio.run(test_metaapi_connection())
             if success:
-                # If basic connection works, try to connect to trading account
-                with st.spinner("🔗 Connecting to trading account..."):
-                    success, message = asyncio.run(connect_metaapi_account())
-                    if success:
-                        st.session_state.metaapi_connected = True
-                        st.success("✅ Automatically connected to trading account")
-                    else:
-                        st.session_state.metaapi_connected = False
-                        st.error(f"❌ Auto-connection failed: {message}")
+                st.session_state.metaapi_connected = True
+                st.success("✅ Connected to trading account")
             else:
                 st.session_state.metaapi_connected = False
-                st.error(f"❌ MetaApi connection failed: {message}")
-        except Exception as e:
-            st.session_state.metaapi_connected = False
-            st.error(f"❌ Auto-connection error: {str(e)}")
-
-    # Auto-check order status on page load
-    if st.session_state.metaapi_connected and st.session_state.order_placed:
-        import asyncio
-
-        try:
-            success, message = asyncio.run(check_all_orders_status())
-            if success and "updated" in message.lower():
-                st.success("🔄 Auto-checked order status from MT5")
         except:
-            pass  # Silent fail for auto-check
+            st.session_state.metaapi_connected = False
 
-    # Connection Management
+    # Auto-check order status on page load in background
+    if st.session_state.metaapi_connected and st.session_state.order_placed:
+        background_status_check()
+
+    # Performance Optimizations at the top
+    st.markdown("---")
+    col_perf1, col_perf2, col_perf3, col_perf4 = st.columns(4)
+
+    with col_perf1:
+        st.metric("Ready Signals", len(st.session_state.ready_to_order))
+
+    with col_perf2:
+        st.metric("Orders Placed", len(st.session_state.order_placed))
+
+    with col_perf3:
+        st.metric("Active Trades", len(st.session_state.in_trade))
+
+    with col_perf4:
+        if st.button("🚀 Quick Refresh", type="primary"):
+            st.rerun()
+
+    # Show last trade result if available
+    if st.session_state.last_trade_result:
+        result = st.session_state.last_trade_result
+        if result['success']:
+            st.success(f"✅ {result['message']} (at {result['timestamp']})")
+        else:
+            st.error(f"❌ {result['message']} (at {result['timestamp']})")
+        # Clear the result after showing it
+        if st.button("Clear Message", key="clear_trade_msg"):
+            st.session_state.last_trade_result = None
+            st.rerun()
+
+    # Show last status check result if available
+    if st.session_state.last_status_check:
+        result = st.session_state.last_status_check
+        if result['success']:
+            st.success(f"✅ {result['message']} (at {result['timestamp']})")
+        else:
+            st.error(f"❌ {result['message']} (at {result['timestamp']})")
+        if st.button("Clear Message", key="clear_status_msg"):
+            st.session_state.last_status_check = None
+            st.rerun()
+
+    # Connection Management - OPTIMIZED
     st.subheader("🔧 Connection Management")
     col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
 
     with col_conn1:
-        if st.button("🔄 Reconnect to Account", type="primary", use_container_width=True):
-            import asyncio
-
-            with st.spinner("Reconnecting to trading account..."):
-                success, message = asyncio.run(connect_metaapi_account())
+        if st.button("🔄 Quick Sync", type="primary", use_container_width=True):
+            with st.spinner("Quick sync..."):
+                success, message = quick_sync_with_active_opps()
                 if success:
-                    st.session_state.metaapi_connected = True
-                    st.success(message)
+                    st.success(f"✅ {message}")
                 else:
-                    st.session_state.metaapi_connected = False
-                    st.error(message)
-
-    with col_conn2:
-        if st.button("🔄 Refresh Signals", type="secondary", use_container_width=True):
-            with st.spinner("Syncing with Active Opps..."):
-                sync_with_active_opps()
-            st.success(f"🔄 Synced {len(st.session_state.ready_to_order)} Order Ready signals")
+                    st.error(f"❌ {message}")
             st.rerun()
 
-    with col_conn3:
-        if st.button("📊 Check All Orders", type="secondary", use_container_width=True):
+    with col_conn2:
+        if st.button("📊 Check Status", type="secondary", use_container_width=True):
             if st.session_state.metaapi_connected:
-                import asyncio
-
-                with st.spinner("Checking all orders status in MT5..."):
-                    success, message = asyncio.run(check_all_orders_status())
-                    if success:
-                        st.success(message)
-                    else:
-                        st.error(message)
-                st.rerun()
+                # Run in background without blocking
+                background_status_check()
+                st.info("🔄 Status check started in background... Refresh in a few seconds.")
             else:
                 st.error("Not connected to trading account")
+
+    with col_conn3:
+        if st.button("🔍 Check Single", type="secondary", use_container_width=True):
+            if st.session_state.metaapi_connected and st.session_state.order_placed:
+                # Let user select which order to check
+                order_options = [f"{o['selected_pair']} - {o.get('order_time', 'N/A')}"
+                                 for o in st.session_state.order_placed]
+                selected_order = st.selectbox("Select order to check:", order_options, key="single_order_select")
+
+                if selected_order and st.button("Check This Order", key="check_single"):
+                    import asyncio
+
+                    order_index = order_options.index(selected_order)
+                    order = st.session_state.order_placed[order_index]
+
+                    with st.spinner(f"Checking {order['selected_pair']}..."):
+                        status, error = asyncio.run(quick_check_order_status(order))
+                        if error:
+                            st.error(f"❌ {error}")
+                        else:
+                            st.info(f"**Status:** {status}")
+                            if status == 'FILLED':
+                                st.success("Order filled! Moving to In Trade.")
+                                # Move order
+                                st.session_state.order_placed.pop(order_index)
+                                st.session_state.in_trade.append({
+                                    **order,
+                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                    'order_status': 'FILLED'
+                                })
+                                sync_with_active_opps()
+                                st.rerun()
 
     with col_conn4:
         if st.button("📊 View Active Opps", type="secondary", use_container_width=True):
@@ -4880,37 +5209,26 @@ elif st.session_state.current_page == "Trade Signal":
                                             key=f"execute_ready_{i}",
                                             type="primary",
                                             use_container_width=True,
+                                            disabled=st.session_state.trade_execution_in_progress
                                     ):
-                                        import asyncio
+                                        # Set execution in progress
+                                        st.session_state.trade_execution_in_progress = True
+                                        st.session_state.last_trade_result = None
 
-                                        formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
-                                        with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
-                                            success, message = asyncio.run(place_trade(
-                                                symbol=signal['selected_pair'],
-                                                volume=float(signal.get('position_size', 0.1)),
-                                                order_type=direction,
-                                                entry_price=entry_price,
-                                                sl=stop_val,
-                                                tp=target_val
-                                            ))
-                                            if success:
-                                                # Move from ready_to_order to order_placed
-                                                st.session_state.ready_to_order = [s for s in
-                                                                                   st.session_state.ready_to_order if
-                                                                                   s['timestamp'] != signal[
-                                                                                       'timestamp']]
-                                                st.session_state.order_placed.append({
-                                                    **signal,
-                                                    'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                                    'order_status': 'PENDING',
-                                                    'direction': direction
-                                                })
-                                                # Sync with Active Opps to update status to Order Completed
-                                                sync_with_active_opps()
-                                                st.success(f"✅ Order placed: {message}")
-                                                st.rerun()
-                                            else:
-                                                st.error(f"❌ Order failed: {message}")
+                                        # Show immediate feedback
+                                        st.info("🔄 Order execution started... You can continue using the app.")
+
+                                        # Execute trade in background
+                                        execute_trade_non_blocking(signal, direction)
+
+                                        # Show refresh suggestion
+                                        st.write(
+                                            "💡 **Tip:** The order is being placed in the background. Refresh the page in a few seconds to see updates.")
+
+                                        # Add a refresh button
+                                        if st.button("🔄 Refresh Page", key=f"refresh_{i}"):
+                                            st.session_state.trade_execution_in_progress = False
+                                            st.rerun()
                                 else:
                                     st.warning("⚠️ Cannot execute - missing required price parameters")
                             else:
@@ -4966,8 +5284,7 @@ elif st.session_state.current_page == "Trade Signal":
                 st.info("No orders placed yet. Orders will appear here after execution from Ready to Order tab.")
             else:
                 for i, order in enumerate(st.session_state.order_placed):
-                    with st.expander(f"⏳ {order['selected_pair']} | Placed: {order.get('order_time', 'N/A')}",
-                                     expanded=True):
+                    with st.expander(f"⏳ {order['selected_pair']} | {order.get('order_time', 'N/A')}", expanded=False):
                         col1, col2, col3 = st.columns([2, 1, 1])
 
                         with col1:
@@ -4987,7 +5304,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**Order Time:** {order.get('order_time', 'N/A')}")
 
-                        # Action buttons
+                        # Action buttons with better error handling
                         col_check, col_cancel, col_manual = st.columns(3)
 
                         with col_check:
@@ -4995,22 +5312,14 @@ elif st.session_state.current_page == "Trade Signal":
                                 if st.session_state.metaapi_connected:
                                     import asyncio
 
-                                    with st.spinner("Checking order status in MT5..."):
-                                        order_info, error = asyncio.run(
-                                            find_matching_order(
-                                                order['selected_pair'],
-                                                order.get('direction', 'Unknown'),
-                                                safe_float(order.get('entry_price'), 0.0),
-                                                safe_float(order.get('position_size'), 0.1)
-                                            )
-                                        )
-
+                                    with st.spinner("Checking order status..."):
+                                        status, error = asyncio.run(quick_check_order_status(order))
                                         if error:
                                             st.error(f"❌ {error}")
-                                        elif order_info:
-                                            st.info(f"**MT5 Status:** {order_info['state']}")
+                                        else:
+                                            st.info(f"**MT5 Status:** {status}")
 
-                                            if order_info['state'] == 'FILLED':
+                                            if status == 'FILLED':
                                                 st.success("✅ Order filled! Moving to In Trade tab.")
                                                 # Move to in_trade
                                                 st.session_state.order_placed = [o for o in
@@ -5024,8 +5333,10 @@ elif st.session_state.current_page == "Trade Signal":
                                                 # Sync with Active Opps to update status to Order Completed
                                                 sync_with_active_opps()
                                                 st.rerun()
+                                            elif status == 'PENDING':
+                                                st.info("Order still pending in MT5")
                                             else:
-                                                st.info(f"Order still {order_info['state'].lower()} in MT5")
+                                                st.warning("Order not found in MT5 - may be cancelled")
                                 else:
                                     st.error("Not connected to trading account")
 
@@ -5036,15 +5347,12 @@ elif st.session_state.current_page == "Trade Signal":
                                     import asyncio
 
                                     with st.spinner("Cancelling order in MT5..."):
-                                        success, message = asyncio.run(
-                                            cancel_matching_order(
-                                                order['selected_pair'],
-                                                order.get('direction', 'Unknown'),
-                                                safe_float(order.get('entry_price'), 0.0),
-                                                safe_float(order.get('position_size'), 0.1)
-                                            )
-                                        )
-
+                                        success, message = asyncio.run(cancel_matching_order(
+                                            order['selected_pair'],
+                                            order.get('direction', 'Unknown'),
+                                            safe_float(order.get('entry_price'), 0.0),
+                                            safe_float(order.get('position_size'), 0.1)
+                                        ))
                                         if success:
                                             st.success(message)
                                             # Remove from order_placed and move back to ready_to_order

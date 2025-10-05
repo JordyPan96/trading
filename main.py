@@ -4122,20 +4122,19 @@ elif st.session_state.current_page == "Trade Signal":
             exit = safe_float(exit_price, 0.0)
 
             if entry > exit:
-                return "buy"
+                return "BUY"
             elif entry < exit:
-                return "sell"
+                return "SELL"
             else:
                 return "Unknown"
         except:
             return "Unknown"
 
 
-    # FASTAPI Functions for MT5 Connection
+    # FASTAPI Functions
     def get_fastapi_config():
         """Get FastAPI configuration from secrets.toml"""
         try:
-            # Try to get from mt5_fastapi section first, then fallback to api section
             fastapi_config = st.secrets.get("mt5_fastapi", {})
             if not fastapi_config:
                 fastapi_config = st.secrets.get("api", {})
@@ -4156,20 +4155,26 @@ elif st.session_state.current_page == "Trade Signal":
 
             if response.status_code == 200:
                 data = response.json()
-                return True, f"FastAPI connection successful - MT5 Connected: {data.get('mt5_connected', False)}"
+                pepperstone_status = data.get('pepperstone_connected', False)
+
+                if pepperstone_status:
+                    return True, "✅ Connected to Pepperstone cTrader API"
+                else:
+                    return True, "✅ FastAPI Connected (Authenticate with Pepperstone)"
             else:
-                return False, f"FastAPI connection failed: {response.status_code} - {response.text}"
+                return False, f"FastAPI connection failed: {response.status_code}"
 
         except requests.exceptions.ConnectionError:
-            return False, "Cannot connect to FastAPI backend. Please ensure the service is running on localhost:8000"
+            return False, "❌ Cannot connect to FastAPI backend. Please ensure the service is running on localhost:8000"
         except requests.exceptions.Timeout:
-            return False, "FastAPI connection timeout. Please check if the service is running."
+            return False, "⏰ FastAPI connection timeout."
         except Exception as e:
-            return False, f"FastAPI connection error: {str(e)}"
+            return False, f"🔧 FastAPI connection error: {str(e)}"
 
 
-    def connect_to_mt5_via_fastapi(server, login, password):
-        """Connect to MT5 via FastAPI"""
+    # Pepperstone cTrader API Functions
+    def authenticate_pepperstone(client_id: str, client_secret: str, account_id: str):
+        """Authenticate with Pepperstone cTrader"""
         try:
             import requests
 
@@ -4177,147 +4182,117 @@ elif st.session_state.current_page == "Trade Signal":
             base_url = config.get("backend_url", "http://localhost:8000")
 
             response = requests.post(
-                f"{base_url}/connect",
+                f"{base_url}/auth/pepperstone",
                 json={
-                    "server": server,
-                    "login": login,
-                    "password": password
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "account_id": account_id
                 },
-                timeout=30
+                timeout=10
             )
 
             if response.status_code == 200:
-                data = response.json()
-                return True, data.get("message", "Connected successfully")
+                return True, "✅ Authenticated with Pepperstone successfully"
             else:
-                return False, f"Connection failed: {response.status_code} - {response.text}"
+                return False, f"❌ Authentication failed: {response.text}"
 
         except Exception as e:
-            return False, f"Connection error: {str(e)}"
+            return False, f"🔧 Authentication error: {str(e)}"
 
 
-    def disconnect_from_mt5_via_fastapi():
-        """Disconnect from MT5 via FastAPI"""
+    def place_pepperstone_trade(symbol: str, volume: float, order_type: str, sl: float = None, tp: float = None):
+        """Place a trade with Pepperstone"""
         try:
             import requests
 
             config = get_fastapi_config()
             base_url = config.get("backend_url", "http://localhost:8000")
 
-            response = requests.post(f"{base_url}/disconnect", timeout=10)
-
-            if response.status_code == 200:
-                return True, "Disconnected successfully"
-            else:
-                return False, f"Disconnection failed: {response.status_code} - {response.text}"
-
-        except Exception as e:
-            return False, f"Disconnection error: {str(e)}"
-
-
-    def get_account_info_via_fastapi():
-        """Get account information via FastAPI"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/account-info", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("status") == "success":
-                    return data.get("account_info", {})
-                else:
-                    return None
-            else:
-                return None
-
-        except:
-            return None
-
-
-    def get_symbols_via_fastapi():
-        """Get available symbols via FastAPI"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/symbols", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("status") == "success":
-                    return data.get("symbols", [])
-                else:
-                    return []
-            else:
-                return []
-
-        except:
-            return []
-
-
-    def get_positions_via_fastapi():
-        """Get open positions via FastAPI"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/positions", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("status") == "success":
-                    return data.get("positions", [])
-                else:
-                    return []
-            else:
-                return []
-
-        except:
-            return []
-
-
-    def place_trade_via_fastapi(symbol, order_type, direction, volume, price, sl, tp, comment=""):
-        """Place a trade via FastAPI (you'll need to extend your FastAPI for this)"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            # This endpoint would need to be added to your FastAPI
             trade_data = {
                 "symbol": symbol,
-                "order_type": order_type,
-                "direction": direction,
                 "volume": volume,
-                "price": price,
-                "stop_loss": sl,
-                "take_profit": tp,
-                "comment": comment
+                "order_type": order_type
             }
 
+            if sl:
+                trade_data["stop_loss"] = sl
+            if tp:
+                trade_data["take_profit"] = tp
+
             response = requests.post(
-                f"{base_url}/place-trade",
+                f"{base_url}/pepperstone/trade",
                 json=trade_data,
                 timeout=30
             )
 
             if response.status_code == 200:
                 data = response.json()
-                return True, data.get("message", "Trade placed successfully")
+                return True, f"✅ {data.get('message', 'Trade executed successfully')}"
             else:
-                return False, f"Trade failed: {response.status_code} - {response.text}"
+                return False, f"❌ Trade failed: {response.text}"
 
         except Exception as e:
-            return False, f"Trade error: {str(e)}"
+            return False, f"🔧 Trade error: {str(e)}"
+
+
+    def get_pepperstone_accounts():
+        """Get Pepperstone account information"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            response = requests.get(f"{base_url}/pepperstone/accounts", timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("accounts", [])
+            else:
+                return []
+
+        except:
+            return []
+
+
+    def get_pepperstone_symbols():
+        """Get available symbols from Pepperstone"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            response = requests.get(f"{base_url}/pepperstone/symbols", timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("symbols", [])
+            else:
+                return []
+
+        except:
+            return []
+
+
+    def get_pepperstone_positions():
+        """Get open positions from Pepperstone"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            response = requests.get(f"{base_url}/pepperstone/positions", timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("positions", [])
+            else:
+                return []
+
+        except:
+            return []
 
 
     # Add trade signal functions next
@@ -4340,7 +4315,6 @@ elif st.session_state.current_page == "Trade Signal":
                         axis=1
                     )
                 else:
-                    # If direction columns don't exist, create empty direction column
                     df['direction'] = "Unknown"
 
                 return df.to_dict('records')
@@ -4357,17 +4331,16 @@ elif st.session_state.current_page == "Trade Signal":
     if 'fastapi_connected' not in st.session_state:
         st.session_state.fastapi_connected = False
 
-    if 'mt5_connected' not in st.session_state:
-        st.session_state.mt5_connected = False
+    if 'pepperstone_authenticated' not in st.session_state:
+        st.session_state.pepperstone_authenticated = False
 
     # Load from Google Sheets on page load
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # FastAPI & MT5 Connection Section
-    st.subheader("FastAPI MT5 Integration")
+    # Connection Status Section
+    st.subheader("🔗 Pepperstone cTrader Connection")
 
-    # Connection Status
     col_status1, col_status2, col_status3 = st.columns(3)
 
     with col_status1:
@@ -4376,191 +4349,203 @@ elif st.session_state.current_page == "Trade Signal":
         st.metric("FastAPI Status", f"{status_color_fastapi} {status_text_fastapi}")
 
     with col_status2:
-        status_color_mt5 = "🟢" if st.session_state.mt5_connected else "🔴"
-        status_text_mt5 = "Connected" if st.session_state.mt5_connected else "Disconnected"
-        st.metric("MT5 Status", f"{status_color_mt5} {status_text_mt5}")
+        status_color_pepperstone = "🟢" if st.session_state.pepperstone_authenticated else "🔴"
+        status_text_pepperstone = "Authenticated" if st.session_state.pepperstone_authenticated else "Not Authenticated"
+        st.metric("Pepperstone", f"{status_color_pepperstone} {status_text_pepperstone}")
 
     with col_status3:
-        if st.button("🔄 Check Connection"):
+        # Display signal count
+        signal_count = len(st.session_state.trade_signals)
+        status_color_signals = "🟢" if signal_count > 0 else "⚪"
+        st.metric("Active Signals", f"{status_color_signals} {signal_count}")
+
+    # Connection Management
+    col_conn1, col_conn2 = st.columns(2)
+
+    with col_conn1:
+        if st.button("🔄 Check Connection", type="primary"):
             success, message = test_fastapi_connection()
             if success:
                 st.session_state.fastapi_connected = True
-                # Check if MT5 is connected by getting account info
-                account_info = get_account_info_via_fastapi()
-                st.session_state.mt5_connected = account_info is not None
                 st.success(message)
             else:
                 st.session_state.fastapi_connected = False
-                st.session_state.mt5_connected = False
                 st.error(message)
 
-    # MT5 Connection Form
-    with st.expander("🔐 MT5 Connection Settings", expanded=not st.session_state.mt5_connected):
-        col_conn1, col_conn2, col_conn3 = st.columns(3)
+    with col_conn2:
+        if st.button("🔄 Refresh Signals", type="secondary"):
+            cloud_signals = load_trade_signals_from_sheets()
+            st.session_state.trade_signals = cloud_signals
+            st.success(f"🔄 Synced {len(cloud_signals)} trade signals")
+            st.rerun()
 
-        with col_conn1:
-            mt5_server = st.text_input("Server", value=st.secrets.get("mt5", {}).get("server", ""))
-            mt5_login = st.number_input("Login", value=st.secrets.get("mt5", {}).get("login", 0), step=1)
+    # Pepperstone Authentication Section
+    st.subheader("🔐 Pepperstone Authentication")
 
-        with col_conn2:
-            mt5_password = st.text_input("Password",
-                                         value=st.secrets.get("mt5", {}).get("password", ""),
-                                         type="password")
-            auto_connect = st.checkbox("Auto-connect on startup", value=True)
+    with st.expander("Authentication Settings", expanded=not st.session_state.pepperstone_authenticated):
+        col_ps1, col_ps2 = st.columns(2)
 
-        with col_conn3:
-            if st.session_state.mt5_connected:
-                if st.button("🔌 Disconnect MT5", type="secondary"):
-                    success, message = disconnect_from_mt5_via_fastapi()
-                    if success:
-                        st.session_state.mt5_connected = False
-                        st.success(message)
-                    else:
-                        st.error(message)
-            else:
-                if st.button("🔗 Connect to MT5", type="primary"):
-                    if mt5_server and mt5_login and mt5_password:
-                        success, message = connect_to_mt5_via_fastapi(mt5_server, int(mt5_login), mt5_password)
+        with col_ps1:
+            client_id = st.text_input("Client ID",
+                                      value=st.secrets.get("pepperstone", {}).get("client_id", ""),
+                                      key="ps_client_id")
+            client_secret = st.text_input("Client Secret",
+                                          value=st.secrets.get("pepperstone", {}).get("client_secret", ""),
+                                          type="password",
+                                          key="ps_client_secret")
+
+        with col_ps2:
+            account_id = st.text_input("Account ID",
+                                       value=st.secrets.get("pepperstone", {}).get("account_id", ""),
+                                       key="ps_account_id")
+
+            st.write("")  # Spacing
+            st.write("")  # Spacing
+
+            if st.button("🔐 Authenticate with Pepperstone", type="primary"):
+                if client_id and client_secret and account_id:
+                    with st.spinner("Authenticating with Pepperstone cTrader API..."):
+                        success, message = authenticate_pepperstone(client_id, client_secret, account_id)
                         if success:
-                            st.session_state.mt5_connected = True
+                            st.session_state.pepperstone_authenticated = True
                             st.success(message)
                         else:
+                            st.session_state.pepperstone_authenticated = False
                             st.error(message)
-                    else:
-                        st.error("Please fill in all connection details")
+                else:
+                    st.error("Please fill all authentication fields")
 
-    # Display configuration info
-    fastapi_config = get_fastapi_config()
-    if fastapi_config.get("backend_url"):
-        st.info(f"📋 Using FastAPI endpoint: {fastapi_config.get('backend_url')}")
+    # Pepperstone Account Information
+    if st.session_state.pepperstone_authenticated:
+        st.success("✅ Pepperstone cTrader is ready for trading")
 
-    # Display Account Info and Open Positions if connected
-    if st.session_state.mt5_connected:
-        # Account Information
-        account_info = get_account_info_via_fastapi()
-        if account_info:
-            st.subheader("Account Information")
-            col_acc1, col_acc2, col_acc3, col_acc4 = st.columns(4)
-            with col_acc1:
-                st.metric("Balance", f"${account_info.get('balance', 0):.2f}")
-            with col_acc2:
-                st.metric("Equity", f"${account_info.get('equity', 0):.2f}")
-            with col_acc3:
-                st.metric("Margin", f"${account_info.get('margin', 0):.2f}")
-            with col_acc4:
-                free_margin = account_info.get('equity', 0) - account_info.get('margin', 0)
-                st.metric("Free Margin", f"${free_margin:.2f}")
+        # Display account information and symbols in columns
+        col_info1, col_info2 = st.columns(2)
 
-            # Additional account details
-            col_acc5, col_acc6, col_acc7 = st.columns(3)
-            with col_acc5:
-                st.write(f"**Account:** {account_info.get('login', 'N/A')}")
-            with col_acc6:
-                st.write(f"**Server:** {account_info.get('server', 'N/A')}")
-            with col_acc7:
-                st.write(f"**Leverage:** 1:{account_info.get('leverage', 'N/A')}")
+        with col_info1:
+            st.subheader("📊 Account Overview")
+            accounts = get_pepperstone_accounts()
+            if accounts:
+                for account in accounts[:3]:  # Show first 3 accounts
+                    st.write(f"**Account ID:** {account.get('accountId', 'N/A')}")
+                    st.write(f"**Balance:** ${account.get('balance', 0):.2f}")
+                    st.write(f"**Currency:** {account.get('currency', 'N/A')}")
+                    st.write("---")
+            else:
+                st.info("No account information available")
+
+        with col_info2:
+            st.subheader("💱 Available Symbols")
+            symbols = get_pepperstone_symbols()
+            if symbols:
+                # Group symbols by category for better display
+                major_pairs = [s for s in symbols if any(
+                    currency in s for currency in ['EUR', 'GBP', 'USD', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD'])]
+                commodities = [s for s in symbols if any(asset in s for asset in ['XAU', 'XAG', 'OIL'])]
+                indices = [s for s in symbols if
+                           any(index in s for index in ['US30', 'NAS100', 'SPX500', 'GER30', 'UK100'])]
+
+                if major_pairs:
+                    st.write("**Forex Majors:**")
+                    cols = st.columns(4)
+                    for i, symbol in enumerate(major_pairs[:8]):
+                        with cols[i % 4]:
+                            st.code(symbol)
+
+                if commodities:
+                    st.write("**Commodities:**")
+                    cols = st.columns(4)
+                    for i, symbol in enumerate(commodities[:4]):
+                        with cols[i % 4]:
+                            st.code(symbol)
+            else:
+                st.info("No symbols available")
 
         # Open Positions
-        st.subheader("Open Positions")
-        open_positions = get_positions_via_fastapi()
-
-        if open_positions:
-            positions_df = pd.DataFrame(open_positions)
-
-            # Calculate additional metrics
-            if 'profit' in positions_df.columns and 'volume' in positions_df.columns:
-                positions_df['profit_loss_pct'] = (positions_df['profit'] / positions_df['volume']) * 100
-
-            # Display metrics
-            total_profit = positions_df['profit'].sum() if 'profit' in positions_df.columns else 0
-            total_volume = positions_df['volume'].sum() if 'volume' in positions_df.columns else 0
-
-            col_pos1, col_pos2, col_pos3 = st.columns(3)
-            with col_pos1:
-                st.metric("Total Positions", len(open_positions))
-            with col_pos2:
-                st.metric("Total Profit/Loss", f"${total_profit:.2f}")
-            with col_pos3:
-                st.metric("Total Volume", f"{total_volume:.2f}")
-
-            # Display positions table
+        st.subheader("📈 Open Positions")
+        positions = get_pepperstone_positions()
+        if positions:
+            positions_df = pd.DataFrame(positions)
             st.dataframe(positions_df, use_container_width=True)
+
+            # Calculate totals
+            if 'profit' in positions_df.columns:
+                total_profit = positions_df['profit'].sum()
+                total_volume = positions_df['volume'].sum() if 'volume' in positions_df.columns else 0
+
+                col_pos1, col_pos2, col_pos3 = st.columns(3)
+                with col_pos1:
+                    st.metric("Total Positions", len(positions))
+                with col_pos2:
+                    st.metric("Total P/L", f"${total_profit:.2f}")
+                with col_pos3:
+                    st.metric("Total Volume", f"{total_volume:.2f}")
         else:
             st.info("No open positions found")
 
-        # Available Symbols
-        st.subheader("Available Symbols")
-        symbols = get_symbols_via_fastapi()
-        if symbols:
-            # Filter major pairs for display
-            major_pairs = [s for s in symbols if
-                           any(currency in s for currency in ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'XAU'])]
-            st.write(f"Found {len(symbols)} symbols ({len(major_pairs)} major pairs)")
-
-            # Display major pairs in a compact format
-            cols = st.columns(4)
-            for i, pair in enumerate(major_pairs[:20]):  # Show first 20 major pairs
-                with cols[i % 4]:
-                    st.code(pair)
-        else:
-            st.info("No symbols available")
-
     st.markdown("---")
 
-    # Rest of your existing Trade Signals functionality...
-    # Sync button
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔄 Sync with Active Opps"):
-            cloud_signals = load_trade_signals_from_sheets()
-            st.session_state.trade_signals = cloud_signals
-            st.success(f"Synced with Active Opps! Loaded {len(cloud_signals)} trade signals.")
-            st.rerun()
+    # Trade Signals Display Section
+    st.subheader("🎯 Active Trade Signals")
 
-    with col2:
-        if st.session_state.trade_signals:
-            # Ensure direction column exists before exporting
-            export_data = []
-            for signal in st.session_state.trade_signals:
-                signal_copy = signal.copy()
-                if 'direction' not in signal_copy:
-                    signal_copy['direction'] = calculate_direction(
-                        signal_copy.get('entry_price'),
-                        signal_copy.get('exit_price')
-                    )
-                export_data.append(signal_copy)
+    # Export functionality
+    if st.session_state.trade_signals:
+        # Ensure direction column exists before exporting
+        export_data = []
+        for signal in st.session_state.trade_signals:
+            signal_copy = signal.copy()
+            if 'direction' not in signal_copy:
+                signal_copy['direction'] = calculate_direction(
+                    signal_copy.get('entry_price'),
+                    signal_copy.get('exit_price')
+                )
+            export_data.append(signal_copy)
 
-            csv_data = pd.DataFrame(export_data)
-            csv = csv_data.to_csv(index=False)
+        csv_data = pd.DataFrame(export_data)
+        csv = csv_data.to_csv(index=False)
+
+        col_export1, col_export2 = st.columns(2)
+
+        with col_export1:
             st.download_button(
-                label="📤 Export CSV",
+                label="📤 Export Signals CSV",
                 data=csv,
-                file_name=f"trade_signals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                mime="text/csv"
+                file_name=f"pepperstone_signals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv",
+                use_container_width=True
             )
-        else:
-            st.button("📤 Export CSV", disabled=True)
 
-    st.markdown("---")
+        with col_export2:
+            if st.button("🔄 Sync with Google Sheets", use_container_width=True):
+                cloud_signals = load_trade_signals_from_sheets()
+                st.session_state.trade_signals = cloud_signals
+                st.success(f"Synced {len(cloud_signals)} signals from Google Sheets")
+                st.rerun()
+    else:
+        st.button("📤 Export CSV", disabled=True)
 
     # Display trade signals
     if not st.session_state.trade_signals:
         st.info("""
-        **No active trade signals.** 
+        ## 📭 No Active Trade Signals
 
-        Trade signals will automatically appear here when you move orders to **'Order Ready'** in the Active Opportunities page.
+        **How to get started:**
 
-        When orders are moved to **'Order Completed'**, **'Speculation'**, or **deleted** in Active Opportunities, they will be automatically removed from here.
+        1. **Add signals** in the Active Opportunities page by moving orders to **'Order Ready'**
+        2. **Signals will automatically appear** here when synced
+        3. **Execute trades** directly via Pepperstone cTrader API
+        4. **Manage positions** in the Pepperstone section above
+
+        When orders are moved to **'Order Completed'**, **'Speculation'**, or **deleted** in Active Opportunities, 
+        they will be automatically removed from here.
         """)
     else:
-        st.subheader(f"Active Trade Signals ({len(st.session_state.trade_signals)})")
-        st.info("💡 These are read-only signals synced from Active Opportunities. Manage them in the Active Opps page.")
+        st.success(f"🎯 Found {len(st.session_state.trade_signals)} active trade signals ready for execution")
 
-        # Convert to DataFrame for nice display and ensure direction column exists
+        # Convert to DataFrame for nice display
         signals_data = []
         for signal in st.session_state.trade_signals:
             signal_copy = signal.copy()
-            # Ensure direction is calculated for each signal
             if 'direction' not in signal_copy:
                 signal_copy['direction'] = calculate_direction(
                     signal_copy.get('entry_price'),
@@ -4570,26 +4555,27 @@ elif st.session_state.current_page == "Trade Signal":
 
         signals_df = pd.DataFrame(signals_data)
 
-        # Display the dataframe with direction
-        st.dataframe(signals_df, use_container_width=True)
+        # Display compact overview
+        st.subheader("Signals Overview")
+        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'position_size', 'timestamp']
+        available_columns = [col for col in display_columns if col in signals_df.columns]
 
-        # Detailed view - READ ONLY (EXPANDED BY DEFAULT)
-        st.subheader("Signal Details")
-        st.warning("🔒 These signals are managed in Active Opportunities. To modify them, go to the Active Opps page.")
+        st.dataframe(signals_df[available_columns], use_container_width=True)
+
+        # Detailed view with execution
+        st.subheader("📋 Signal Details & Execution")
 
         for i, signal in enumerate(st.session_state.trade_signals):
-            with st.expander(f"Signal {i + 1}: {signal['selected_pair']} - {signal['timestamp']}", expanded=True):
+            with st.expander(f"🎯 Signal {i + 1}: {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}",
+                             expanded=True):
                 col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                 with col1:
-                    st.write(f"**Pair:** {signal['selected_pair']}")
-                    st.write(f"**Strategy:** {signal['risk_multiplier']}")
-                    st.write(f"**Position Size:** {signal.get('position_size', 'N/A')}")
+                    st.write(f"**Instrument:** {signal['selected_pair']}")
+                    st.write(f"**Strategy:** {signal.get('risk_multiplier', 'N/A')}")
+                    st.write(f"**Position Size:** {signal.get('position_size', 'N/A')} lots")
                     st.write(f"**Stop Pips:** {signal.get('stop_pips', 'N/A')}")
-                    st.write(f"**Trend Position:** {signal.get('trend_position', 'N/A')}")
-                    st.write(f"**Variance:** {signal.get('variances', 'N/A')}")
-                    st.write(f"**Created:** {signal.get('created_date', 'N/A')}")
-                    st.write(f"**Status:** {signal.get('status', 'N/A')}")
+                    st.write(f"**Trend:** {signal.get('trend_position', 'N/A')}")
 
                 with col2:
                     entry_price = safe_float(signal.get('entry_price'), 0.0)
@@ -4597,52 +4583,102 @@ elif st.session_state.current_page == "Trade Signal":
 
                 with col3:
                     exit_price = safe_float(signal.get('exit_price'), 0.0)
-                    st.write(f"**Exit Price:** {exit_price:.5f}")
+                    st.write(f"**Stop Loss:** {exit_price:.5f}")
 
                 with col4:
                     target_price = safe_float(signal.get('target_price'), 0.0)
-                    st.write(f"**Target Price:** {target_price:.5f}")
+                    st.write(f"**Take Profit:** {target_price:.5f}")
 
                 # Calculate and display Direction
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-                st.write(f"**Direction:** {direction.upper()}")
+                direction_color = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
+                st.write(f"**Direction:** {direction_color} {direction}")
 
-                # Display price relationship explanation
-                if direction != "Unknown" and entry_price > 0 and exit_price > 0:
-                    price_difference = abs(entry_price - exit_price)
-                    if signal['selected_pair'] == 'XAUUSD':
-                        st.write(f"**Stop Distance:** ${price_difference:.2f}")
-                    else:
-                        st.write(f"**Stop Distance:** {price_difference * 10:.1f} pips")
+                # Trading Execution Section
+                st.markdown("---")
+                st.subheader("🚀 Trade Execution")
 
-                # FastAPI Trade Execution (if connected)
-                if st.session_state.mt5_connected:
-                    st.markdown("---")
-                    st.subheader("Trade Execution via FastAPI")
+                if st.session_state.pepperstone_authenticated:
+                    col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
 
-                    # You can add trade execution buttons here
-                    col_trade1, col_trade2 = st.columns(2)
+                    with col_exec1:
+                        # Trade execution button
+                        if st.button(f"🎯 Execute {direction} Order",
+                                     key=f"execute_{i}",
+                                     type="primary",
+                                     use_container_width=True):
+                            with st.spinner(f"Executing {direction} order for {signal['selected_pair']}..."):
+                                success, message = place_pepperstone_trade(
+                                    symbol=signal['selected_pair'],
+                                    volume=float(signal.get('position_size', 0.1)),
+                                    order_type=direction,
+                                    sl=safe_float(signal.get('exit_price'), 0.0),
+                                    tp=safe_float(signal.get('target_price'), 0.0)
+                                )
+                                if success:
+                                    st.success(message)
+                                else:
+                                    st.error(message)
 
-                    with col_trade1:
-                        if st.button(f"📈 Execute Trade", key=f"execute_{i}", type="primary"):
-                            # This would call your place_trade_via_fastapi function
-                            st.info("Trade execution feature would be implemented here")
-                            # Example:
-                            # success, message = place_trade_via_fastapi(
-                            #     symbol=signal['selected_pair'],
-                            #     order_type="LIMIT",
-                            #     direction=direction.upper(),
-                            #     volume=float(signal.get('position_size', 0.1)),
-                            #     price=safe_float(signal.get('entry_price'), 0.0),
-                            #     sl=safe_float(signal.get('exit_price'), 0.0),
-                            #     tp=safe_float(signal.get('target_price'), 0.0),
-                            #     comment=f"From Trade Signal: {signal.get('risk_multiplier', '')}"
-                            # )
+                    with col_exec2:
+                        # Quick edit position size
+                        new_size = st.number_input(
+                            "Size (lots)",
+                            min_value=0.01,
+                            max_value=100.0,
+                            value=float(signal.get('position_size', 0.1)),
+                            step=0.01,
+                            key=f"size_{i}"
+                        )
 
-                # Display notes if any
+                    with col_exec3:
+                        # Risk calculator
+                        entry = safe_float(signal.get('entry_price'), 0.0)
+                        stop = safe_float(signal.get('exit_price'), 0.0)
+                        if entry > 0 and stop > 0:
+                            risk_pips = abs(entry - stop) * 10000
+                            st.metric("Risk", f"{risk_pips:.1f} pips")
+                else:
+                    st.warning("🔒 Please authenticate with Pepperstone to execute trades")
+                    st.info("Go to the Pepperstone Authentication section above to connect your account")
+
+                # Additional signal information
+                if signal.get('variances'):
+                    st.write(f"**Variance Analysis:** {signal.get('variances', 'N/A')}")
+
                 if signal.get('notes'):
                     st.write("---")
                     st.write(f"**Notes:** {signal.get('notes')}")
+
+                # Risk Management Information
+                st.write("---")
+                st.subheader("📊 Risk Management")
+
+                entry_val = safe_float(signal.get('entry_price'), 0.0)
+                stop_val = safe_float(signal.get('exit_price'), 0.0)
+                target_val = safe_float(signal.get('target_price'), 0.0)
+
+                if entry_val > 0 and stop_val > 0 and target_val > 0:
+                    col_risk1, col_risk2, col_risk3 = st.columns(3)
+
+                    with col_risk1:
+                        stop_distance = abs(entry_val - stop_val)
+                        if signal['selected_pair'] == 'XAUUSD':
+                            st.metric("Stop Distance", f"${stop_distance:.2f}")
+                        else:
+                            st.metric("Stop Distance", f"{stop_distance * 10000:.1f} pips")
+
+                    with col_risk2:
+                        target_distance = abs(entry_val - target_val)
+                        if signal['selected_pair'] == 'XAUUSD':
+                            st.metric("Target Distance", f"${target_distance:.2f}")
+                        else:
+                            st.metric("Target Distance", f"{target_distance * 10000:.1f} pips")
+
+                    with col_risk3:
+                        if stop_distance > 0:
+                            reward_ratio = target_distance / stop_distance
+                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
 
 elif st.session_state.current_page == "Stats":
 

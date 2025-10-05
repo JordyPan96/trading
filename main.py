@@ -4541,14 +4541,69 @@ elif st.session_state.current_page == "Trade Signal":
             else:
                 for i, signal in enumerate(st.session_state.ready_to_order):
                     with st.expander(f"🎯 {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}", expanded=True):
-                        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+                        # First row: Instrument and Execution button side by side
+                        col_instrument, col_execute = st.columns([2, 1])
 
-                        with col1:
+                        with col_instrument:
                             st.write(f"**Instrument:** {signal['selected_pair']}")
                             st.write(f"**Strategy:** {signal.get('risk_multiplier', 'N/A')}")
                             st.write(f"**Position Size:** {signal.get('position_size', 'N/A')} lots")
                             st.write(f"**Stop Pips:** {signal.get('stop_pips', 'N/A')}")
                             st.write(f"**Trend:** {signal.get('trend_position', 'N/A')}")
+
+                        with col_execute:
+                            # Execution button placed beside Instrument
+                            if st.session_state.metaapi_connected:
+                                entry_price = safe_float(signal.get('entry_price'), 0.0)
+                                stop_val = safe_float(signal.get('exit_price'), 0.0)
+                                target_val = safe_float(signal.get('target_price'), 0.0)
+                                validation_ok = entry_price > 0 and stop_val > 0 and target_val > 0
+
+                                if validation_ok:
+                                    direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
+                                    button_text = f"🎯 Execute {direction} Order"
+
+                                    if st.button(
+                                            button_text,
+                                            key=f"execute_ready_{i}",
+                                            type="primary",
+                                            use_container_width=True,
+                                    ):
+                                        import asyncio
+
+                                        formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
+                                        with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
+                                            success, message = asyncio.run(place_trade(
+                                                symbol=signal['selected_pair'],
+                                                volume=float(signal.get('position_size', 0.1)),
+                                                order_type=direction,
+                                                entry_price=entry_price,
+                                                sl=stop_val,
+                                                tp=target_val
+                                            ))
+                                            if success:
+                                                # Move from ready_to_order to order_placed
+                                                st.session_state.ready_to_order = [s for s in
+                                                                                   st.session_state.ready_to_order if
+                                                                                   s['timestamp'] != signal[
+                                                                                       'timestamp']]
+                                                st.session_state.order_placed.append({
+                                                    **signal,
+                                                    'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                                    'order_status': 'PENDING',
+                                                    'direction': direction
+                                                })
+                                                st.success(f"✅ Order placed: {message}")
+                                                st.rerun()
+                                            else:
+                                                st.error(f"❌ Order failed: {message}")
+                                else:
+                                    st.warning("⚠️ Cannot execute - missing required price parameters")
+                            else:
+                                st.warning("🔒 Not connected to trading account")
+
+                        # Second row: Price information
+                        col2, col3, col4 = st.columns([1, 1, 1])
 
                         with col2:
                             entry_price = safe_float(signal.get('entry_price'), 0.0)
@@ -4583,60 +4638,6 @@ elif st.session_state.current_page == "Trade Signal":
                         formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
                         if formatted_symbol != signal['selected_pair']:
                             st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
-
-                        # Centered, smaller execution button
-                        st.markdown("<br>", unsafe_allow_html=True)  # Add some spacing
-
-                        # Create centered columns for the button
-                        col_left, col_center, col_right = st.columns([1, 2, 1])
-
-                        with col_center:
-                            if st.session_state.metaapi_connected:
-                                validation_ok = entry_price > 0 and stop_val > 0 and target_val > 0
-                                if validation_ok:
-                                    # Smaller button with conditional styling
-                                    button_text = f"🎯 Execute {direction} Order"
-                                    button_type = "primary"
-
-                                    if st.button(
-                                            button_text,
-                                            key=f"execute_ready_{i}",
-                                            type=button_type,
-                                            use_container_width=False,  # Don't use full container width
-                                    ):
-                                        import asyncio
-
-                                        with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
-                                            success, message = asyncio.run(place_trade(
-                                                symbol=signal['selected_pair'],
-                                                volume=float(signal.get('position_size', 0.1)),
-                                                order_type=direction,
-                                                entry_price=entry_price,
-                                                sl=stop_val,
-                                                tp=target_val
-                                            ))
-                                            if success:
-                                                # Move from ready_to_order to order_placed
-                                                st.session_state.ready_to_order = [s for s in
-                                                                                   st.session_state.ready_to_order if
-                                                                                   s['timestamp'] != signal[
-                                                                                       'timestamp']]
-                                                st.session_state.order_placed.append({
-                                                    **signal,
-                                                    'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                                    'order_status': 'PENDING',
-                                                    'direction': direction
-                                                })
-                                                st.success(f"✅ Order placed: {message}")
-                                                st.rerun()
-                                            else:
-                                                st.error(f"❌ Order failed: {message}")
-                                else:
-                                    st.warning("⚠️ Cannot execute - missing required price parameters")
-                            else:
-                                st.warning("🔒 Not connected to trading account")
-
-                        st.markdown("<br>", unsafe_allow_html=True)  # Add spacing after button
 
                         # Notes section
                         if signal.get('notes'):

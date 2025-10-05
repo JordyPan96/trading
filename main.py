@@ -4143,11 +4143,19 @@ elif st.session_state.current_page == "Trade Signal":
 
     def format_symbol_for_pepperstone(symbol):
         """Add .a suffix to symbols for Pepperstone broker"""
-        # Common symbols that need .a suffix for Pepperstone
+        # Complete list of symbols that need .a suffix for Pepperstone
         pepperstone_symbols = [
-            'XAUUSD', 'XAGUSD', 'USOIL', 'UKOIL', 'NAS100', 'US30', 'SPX500',
-            'GER30', 'UK100', 'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD',
-            'USDCAD', 'NZDUSD', 'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY'
+            # Forex Majors
+            'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
+            # Forex Minors
+            'EURGBP', 'EURJPY', 'EURCHF', 'EURCAD', 'EURAUD', 'EURNZD',
+            'GBPJPY', 'GBPCHF', 'GBPCAD', 'GBPAUD', 'GBPNZD',
+            'AUDJPY', 'AUDCHF', 'AUDCAD', 'AUDNZD',
+            'CADJPY', 'CHFJPY', 'NZDJPY',
+            # Commodities
+            'XAUUSD', 'XAGUSD',
+            # Indices
+            'USOIL', 'UKOIL', 'NAS100', 'US30', 'SPX500', 'GER30', 'UK100'
         ]
 
         # Check if the symbol is in our list and add .a suffix
@@ -4505,50 +4513,30 @@ elif st.session_state.current_page == "Trade Signal":
                 if formatted_symbol != signal['selected_pair']:
                     st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
 
-                # Trade Validation Section
-                st.write("---")
-                st.subheader("🔍 Trade Validation")
+                # Calculate risk metrics
+                entry_val = safe_float(signal.get('entry_price'), 0.0)
+                stop_val = safe_float(signal.get('exit_price'), 0.0)
+                target_val = safe_float(signal.get('target_price'), 0.0)
 
-                validation_ok = True
-                if entry_price <= 0:
-                    st.error("❌ Entry price missing or invalid")
-                    validation_ok = False
-                if sl_price <= 0:
-                    st.error("❌ Stop loss price missing or invalid")
-                    validation_ok = False
-                if tp_price <= 0:
-                    st.error("❌ Take profit price missing or invalid")
-                    validation_ok = False
-
-                if validation_ok:
-                    st.success("✅ All trade parameters are ready")
-
-                    # Calculate and display risk metrics
-                    stop_distance = abs(entry_price - sl_price)
-                    target_distance = abs(entry_price - tp_price)
-
-                    col_val1, col_val2, col_val3 = st.columns(3)
-                    with col_val1:
-                        if signal['selected_pair'] == 'XAUUSD':
-                            st.metric("Stop Distance", f"${stop_distance:.2f}")
-                        else:
-                            st.metric("Stop Distance", f"{stop_distance * 10000:.1f} pips")
-                    with col_val2:
-                        if signal['selected_pair'] == 'XAUUSD':
-                            st.metric("Target Distance", f"${target_distance:.2f}")
-                        else:
-                            st.metric("Target Distance", f"{target_distance * 10000:.1f} pips")
-                    with col_val3:
-                        if stop_distance > 0:
-                            reward_ratio = target_distance / stop_distance
-                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
-
-                # Trading Execution Section
+                # Trading Execution Section with R:R Ratio
                 st.markdown("---")
                 st.subheader("🚀 Trade Execution")
 
                 if st.session_state.metaapi_connected:
+                    # Validation check
+                    validation_ok = True
+                    if entry_val <= 0:
+                        st.error("❌ Entry price missing or invalid")
+                        validation_ok = False
+                    if stop_val <= 0:
+                        st.error("❌ Stop loss price missing or invalid")
+                        validation_ok = False
+                    if target_val <= 0:
+                        st.error("❌ Take profit price missing or invalid")
+                        validation_ok = False
+
                     if validation_ok:
+                        # Display R:R Ratio and execution button in the same section
                         col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
 
                         with col_exec1:
@@ -4561,12 +4549,12 @@ elif st.session_state.current_page == "Trade Signal":
 
                                 with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
                                     success, message = asyncio.run(place_trade(
-                                        symbol=signal['selected_pair'],  # Original symbol gets formatted in place_trade
+                                        symbol=signal['selected_pair'],
                                         volume=float(signal.get('position_size', 0.1)),
                                         order_type=direction,
-                                        entry_price=entry_price,
-                                        sl=sl_price,
-                                        tp=tp_price
+                                        entry_price=entry_val,
+                                        sl=stop_val,
+                                        tp=target_val
                                     ))
                                     if success:
                                         st.success(message)
@@ -4585,10 +4573,17 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_exec3:
-                            # Risk calculator
-                            if entry_price > 0 and sl_price > 0:
-                                risk_pips = abs(entry_price - sl_price) * 10000
+                            # Risk calculator and R:R Ratio
+                            if entry_val > 0 and stop_val > 0:
+                                risk_pips = abs(entry_val - stop_val) * 10000
                                 st.metric("Risk", f"{risk_pips:.1f} pips")
+
+                            if stop_val > 0 and target_val > 0:
+                                stop_distance = abs(entry_val - stop_val)
+                                target_distance = abs(entry_val - target_val)
+                                if stop_distance > 0:
+                                    reward_ratio = target_distance / stop_distance
+                                    st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
                     else:
                         st.warning("⚠️ Cannot execute trade - missing required parameters")
                 else:

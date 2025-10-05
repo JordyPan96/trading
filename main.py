@@ -369,18 +369,18 @@ def calculate_be_rate(len_be, len_df):
     Calculate BE rate percentage where PnL is >= 0 and < 3000
     """
     # Filter rows that meet the BE condition
-    
+
     # Calculate percentage
     if len_be > 0:
         be_rate = f"{(len_be / len_df) * 100:.1f}%"
     else:
         be_rate = 0
-    
+
     return be_rate
 
 
 def styled_metric(label, value, delta=None, label_size="20px", value_size="16px"):
-    
+
     html = f"""
     <div style="
         background-color: #f8f9fa;
@@ -403,7 +403,7 @@ def styled_metric(label, value, delta=None, label_size="20px", value_size="16px"
     st.markdown(html, unsafe_allow_html=True)
 
 def styled_metric_value(value, delta=None, label_size="20px", value_size="16px"):
-    
+
     html = f"""
     <div style="
         background-color: #f8f9fa;
@@ -507,7 +507,7 @@ def get_google_sheets_client():
                  'https://www.googleapis.com/auth/drive']
 
         creds_dict = None
-        
+
         # Option 1: Check for GitHub Actions secrets (environment variables)
         if all(key in os.environ for key in ['GCP_TYPE', 'GCP_PRIVATE_KEY', 'GCP_CLIENT_EMAIL']):
             st.sidebar.info("🔧 Using GitHub Actions secrets")
@@ -523,12 +523,12 @@ def get_google_sheets_client():
                 "auth_provider_x509_cert_url": os.environ.get('GCP_AUTH_PROVIDER_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
                 "client_x509_cert_url": os.environ.get('GCP_CLIENT_CERT_URL', '')
             }
-        
+
         # Option 2: Check for Streamlit secrets (secrets.toml)
         elif "gcp_service_account" in st.secrets:
             st.sidebar.info("🔧 Using Streamlit secrets")
             creds_dict = st.secrets["gcp_service_account"]
-        
+
         else:
             st.sidebar.error("❌ No Google Sheets credentials found")
             st.sidebar.info("Configure either GitHub Actions secrets or Streamlit secrets")
@@ -1310,17 +1310,17 @@ elif st.session_state.current_page == "Symbol Stats":
     if st.session_state.uploaded_data is not None:
         df2 = st.session_state.uploaded_data.copy()
         df = st.session_state.uploaded_data.copy()
-        
+
         # Convert date and extract year/month
         df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d', errors='coerce')
         df = df.dropna(subset=['Date'])  # Remove rows with invalid dates
-        
+
         df['Year'] = df['Date'].dt.year
         df['Month'] = df['Date'].dt.month
         df['Month_Name'] = df['Date'].dt.month_name()
-        
+
         st.sidebar.header("Filters")
-        
+
         # Add multi-select for symbols
         all_symbols = sorted(df['Symbol'].unique())
         selected_symbols = st.sidebar.multiselect(
@@ -1328,27 +1328,27 @@ elif st.session_state.current_page == "Symbol Stats":
             options=all_symbols,
             default=all_symbols
         )
-        
+
         # Filter by selected symbols if any are selected
         if selected_symbols:
             df = df[df['Symbol'].isin(selected_symbols)]
-        
+
         selected_year = st.sidebar.selectbox(
             "Select Year",
             options=sorted(df['Year'].unique()),
             index=len(df['Year'].unique()) - 1
         )
-        
+
         # Filter data for selected year
         year_data = df[df['Year'] == selected_year].copy()
-        
+
         if year_data.empty:
             st.warning(f"No data found for {selected_year}")
         else:
             # Create tabs for better organization
             tab1, tab2, tab3, tab4, tab5 = st.tabs([
-                "Overall Performance", 
-                "Monthly Analysis", 
+                "Overall Performance",
+                "Monthly Analysis",
                 "Direction Analysis",
                 "Strategy Analysis",
                 "Visualizations"
@@ -1571,40 +1571,40 @@ elif st.session_state.current_page == "Symbol Stats":
             with tab2:
                 # Monthly Performance by Symbol
                 st.header("Monthly Performance by Symbol")
-                
+
                 monthly_symbol_perf = year_data.groupby(['Month_Name', 'Symbol', 'Month']).agg({
                     'PnL': 'sum',
                     'Result': lambda x: (x == 'Win').sum() / len(x) * 100
                 }).reset_index()
-                
+
                 monthly_symbol_perf = monthly_symbol_perf.sort_values('Month')
-                
+
                 # Pivot for better visualization
                 monthly_pivot = monthly_symbol_perf.pivot_table(
-                    index='Symbol', 
-                    columns='Month_Name', 
-                    values='PnL', 
+                    index='Symbol',
+                    columns='Month_Name',
+                    values='PnL',
                     aggfunc='sum',
                     fill_value=0
                 )
-                
+
                 # Reorder columns by month number
-                month_order = ['January', 'February', 'March', 'April', 'May', 'June', 
+                month_order = ['January', 'February', 'March', 'April', 'May', 'June',
                               'July', 'August', 'September', 'October', 'November', 'December']
                 available_months = [m for m in month_order if m in monthly_pivot.columns]
                 monthly_pivot = monthly_pivot.reindex(columns=available_months)
-                
+
                 st.dataframe(
                     monthly_pivot.style.format('${:,.2f}').background_gradient(cmap='RdYlGn', axis=None),
                     use_container_width=True
                 )
-                
+
                 # Monthly heatmap visualization
                 st.subheader("Monthly Performance Heatmap")
-                
+
                 # Prepare data for heatmap
                 heatmap_data = monthly_pivot.fillna(0)
-                
+
                 fig = px.imshow(
                     heatmap_data,
                     labels=dict(x="Month", y="Symbol", color="PnL"),
@@ -1615,26 +1615,26 @@ elif st.session_state.current_page == "Symbol Stats":
                 )
                 fig.update_layout(title=f"Monthly PnL Heatmap for {selected_year}")
                 st.plotly_chart(fig, use_container_width=True)
-                
+
             with tab3:
                 # Direction Performance - Improved with Visualizations
                 st.header("Direction Performance Analysis")
-                
+
                 # Calculate direction performance metrics
                 direction_stats = year_data.groupby('Direction').agg({
                     'PnL': 'sum',
                     'Result': lambda x: (x == 'Win').sum() / len(x) * 100,
                     'Symbol': 'count'
                 }).rename(columns={'Symbol': 'Trade_Count'}).round(2)
-                
+
                 col1, col2, col3 = st.columns(3)
-                
+
                 with col1:
                     # Direction Win Rate Pie Chart
                     win_rate_by_direction = year_data.groupby('Direction')['Result'].apply(
                         lambda x: (x == 'Win').sum() / len(x) * 100
                     ).reset_index(name='Win_Rate')
-                    
+
                     fig = px.pie(
                         win_rate_by_direction,
                         values='Win_Rate',
@@ -1644,12 +1644,12 @@ elif st.session_state.current_page == "Symbol Stats":
                         color_discrete_map={'Long': 'lightgreen', 'Short': 'lightblue'}
                     )
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 with col2:
                     # Trade Distribution by Direction
                     trade_count_by_direction = year_data['Direction'].value_counts().reset_index()
                     trade_count_by_direction.columns = ['Direction', 'Count']
-                    
+
                     fig = px.pie(
                         trade_count_by_direction,
                         values='Count',
@@ -1659,11 +1659,11 @@ elif st.session_state.current_page == "Symbol Stats":
                         color_discrete_map={'Long': 'lightgreen', 'Short': 'lightblue'}
                     )
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 with col3:
                     # PnL by Direction
                     pnl_by_direction = year_data.groupby('Direction')['PnL'].sum().reset_index()
-                    
+
                     fig = px.bar(
                         pnl_by_direction,
                         x='Direction',
@@ -1674,10 +1674,10 @@ elif st.session_state.current_page == "Symbol Stats":
                     )
                     fig.update_yaxes(tickprefix='$')
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 # Best Performing Direction by Symbol
                 st.subheader("Best Performing Direction by Symbol")
-                
+
                 best_direction_by_symbol = []
                 for symbol in year_data['Symbol'].unique():
                     if(symbol!="PROP"):
@@ -1686,7 +1686,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             'PnL': 'sum',
                             'Result': lambda x: (x == 'Win').sum() / len(x) * 100
                         }).round(2)
-                    
+
                         if not direction_stats.empty:
                             best_direction = direction_stats.nlargest(1, 'PnL').iloc[0]
                             best_direction_name = direction_stats.nlargest(1, 'PnL').index[0]
@@ -1696,18 +1696,18 @@ elif st.session_state.current_page == "Symbol Stats":
                                 'Direction_PnL': best_direction['PnL'],
                                 'Direction_Win_Rate': best_direction['Result']
                             })
-                
+
                 best_direction_df = pd.DataFrame(best_direction_by_symbol).sort_values('Direction_PnL', ascending=False)
-                
+
                 st.dataframe(
                     best_direction_df.style.format({
                         'Direction_PnL': '${:,.2f}',
                         'Direction_Win_Rate': '{:.1f}%'
-                    }).apply(lambda x: ['background-color: lightgreen' if x['Direction_PnL'] > 0 else 
+                    }).apply(lambda x: ['background-color: lightgreen' if x['Direction_PnL'] > 0 else
                                        'background-color: lightcoral' for _ in x], axis=1),
                     use_container_width=True
                 )
-            
+
             with tab4:
                 # Strategy Performance by Symbol
                 st.header("Strategy Performance by Symbol")
@@ -1721,40 +1721,40 @@ elif st.session_state.current_page == "Symbol Stats":
 
                 if strategy_symbol:
                     symbol_strategy_data = year_data[year_data['Symbol'] == strategy_symbol].copy()
-                    
+
                     # Calculate strategy performance for the selected symbol
                     strategy_perf = symbol_strategy_data.groupby('Strategy').agg({
                         'PnL': ['sum', 'mean', 'count'],
                         'RR': 'mean',
                         'Result': lambda x: (x == 'Win').sum() / len(x) * 100
                     }).round(2)
-                    
+
                     # Flatten column names
                     strategy_perf.columns = ['Total_PnL', 'Avg_PnL', 'Trade_Count', 'Avg_RR', 'Win_Rate']
                     strategy_perf = strategy_perf.sort_values('Total_PnL', ascending=False)
-                    
+
                     # Display strategy performance for the selected symbol
                     st.subheader(f"Strategy Performance for {strategy_symbol}")
-                    
+
                     col1, col2, col3, col4 = st.columns(4)
-                    
+
                     with col1:
                         best_strategy = strategy_perf.index[0] if not strategy_perf.empty else "N/A"
                         best_pnl = strategy_perf['Total_PnL'].iloc[0] if not strategy_perf.empty else 0
                         st.metric("Best Strategy", best_strategy, f"${best_pnl:,.2f}")
-                    
+
                     with col2:
                         total_strategy_pnl = strategy_perf['Total_PnL'].sum()
                         st.metric("Total Strategy PnL", f"${total_strategy_pnl:,.2f}")
-                    
+
                     with col3:
                         avg_strategy_rr = strategy_perf['Avg_RR'].mean()
                         st.metric("Avg Strategy RR", f"{avg_strategy_rr:.2f}")
-                    
+
                     with col4:
                         total_strategy_trades = strategy_perf['Trade_Count'].sum()
                         st.metric("Total Trades", total_strategy_trades)
-                    
+
                     # Display strategy performance table
                     st.dataframe(
                         strategy_perf.style.format({
@@ -1762,11 +1762,11 @@ elif st.session_state.current_page == "Symbol Stats":
                             'Avg_PnL': '${:.2f}',
                             'Avg_RR': '{:.2f}',
                             'Win_Rate': '{:.1f}%'
-                        }).apply(lambda x: ['background-color: lightgreen' if x['Total_PnL'] > 0 else 
+                        }).apply(lambda x: ['background-color: lightgreen' if x['Total_PnL'] > 0 else
                                            'background-color: lightcoral' for _ in x], axis=1),
                         use_container_width=True
                     )
-                    
+
 
                 # Summary of Best Strategies Across All Symbols
                 st.header("Best Strategies Summary")
@@ -1780,7 +1780,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             'PnL': 'sum',
                             'Result': lambda x: (x == 'Win').sum() / len(x) * 100
                         }).round(2)
-                    
+
                         if not strategy_stats.empty:
                             best_strategy = strategy_stats.nlargest(1, 'PnL').iloc[0]
                             best_strategies.append({
@@ -1796,7 +1796,7 @@ elif st.session_state.current_page == "Symbol Stats":
                     best_strategies_df.style.format({
                         'Strategy_PnL': '${:,.2f}',
                         'Strategy_Win_Rate': '{:.1f}%'
-                    }).apply(lambda x: ['background-color: lightgreen' if x['Strategy_PnL'] > 0 else 
+                    }).apply(lambda x: ['background-color: lightgreen' if x['Strategy_PnL'] > 0 else
                                        'background-color: lightcoral' for _ in x], axis=1),
                     use_container_width=True
                 )
@@ -1818,13 +1818,13 @@ elif st.session_state.current_page == "Symbol Stats":
                     strategy_symbol_matrix.style.background_gradient(cmap='RdYlGn', axis=None),
                     use_container_width=True
                 )
-            
+
             with tab5:
                 # Visualization Section
                 st.header("Performance Visualization")
-                
+
                 col1, col2 = st.columns(2)
-                
+
                 with col1:
                     # Top 10 Symbols by PnL
                     top_symbols = symbol_performance.nlargest(10, 'Total_PnL')
@@ -1838,7 +1838,7 @@ elif st.session_state.current_page == "Symbol Stats":
                     )
                     fig.update_yaxes(tickprefix='$')
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 with col2:
                     # Win Rate vs Avg RR
                     fig = px.scatter(
@@ -1852,14 +1852,14 @@ elif st.session_state.current_page == "Symbol Stats":
                         color_continuous_scale='RdYlGn'
                     )
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 # Cumulative PnL Over Time
                 st.subheader("Cumulative PnL Over Time")
-                
+
                 # Prepare cumulative data
                 cumulative_data = year_data.sort_values('Date').groupby(['Date', 'Symbol'])['PnL'].sum().reset_index()
                 cumulative_data['Cumulative_PnL'] = cumulative_data.groupby('Symbol')['PnL'].cumsum()
-                
+
                 fig = px.line(
                     cumulative_data,
                     x='Date',
@@ -1869,7 +1869,7 @@ elif st.session_state.current_page == "Symbol Stats":
                 )
                 fig.update_yaxes(tickprefix='$')
                 st.plotly_chart(fig, use_container_width=True)
-    
+
     else:
         st.warning("Please upload data first to analyze symbol statistics")
 
@@ -3543,15 +3543,15 @@ elif st.session_state.current_page == "Active Opps":
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown(f"### 🧠 Speculation ({speculation_count})")
+            st.markdown(f"### Speculation ({speculation_count})")
             st.progress(speculation_count / max(len(st.session_state.saved_records), 1))
 
         with col2:
-            st.markdown(f"### ✅ Order Ready ({order_ready_count})")
+            st.markdown(f"### Order Ready ({order_ready_count})")
             st.progress(order_ready_count / max(len(st.session_state.saved_records), 1))
 
         with col3:
-            st.markdown(f"### 🎯 Order Completed ({order_completed_count})")
+            st.markdown(f"### Order Completed ({order_completed_count})")
             st.progress(order_completed_count / max(len(st.session_state.saved_records), 1))
 
         st.markdown("---")
@@ -3584,11 +3584,15 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Record deleted locally but failed to save to cloud. Use CSV export to backup.")
 
 
-        # WORKFLOW STAGES - Display records in workflow order
-        st.subheader("Workflow Stages")
+        # Create tabs for the three stages
+        tab1, tab2, tab3 = st.tabs([
+            f"Speculation ({speculation_count})",
+            f"Order Ready ({order_ready_count})",
+            f"Order Completed ({order_completed_count})"
+        ])
 
-        # Stage 1: Speculation
-        with st.expander(f"🧠 Speculation Stage ({speculation_count} records)", expanded=True):
+        # Tab 1: Speculation
+        with tab1:
             speculation_records = [record for record in st.session_state.saved_records if
                                    record.get('status') == 'Speculation']
             if not speculation_records:
@@ -3635,43 +3639,6 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"spec_target_{original_index}"
                                 )
 
-                            # Status dropdown in a new row
-                            status_options = ["Speculation", "Order Ready", "Order Completed"]
-                            current_status = record.get('status', 'Speculation')
-
-                            # Check if target price is valid for active status
-                            target_price_valid = new_target_price > 0
-
-                            # Disable active status options if conditions not met
-                            disable_active_status = False
-                            warning_message = ""
-
-                            if total_active_count >= 2 and current_status == 'Speculation':
-                                disable_active_status = True
-                                warning_message = "Maximum active records reached. Cannot change to Order Ready or Order Completed."
-                            elif not target_price_valid:
-                                disable_active_status = True
-                                warning_message = "Target price must be greater than 0 to change to Order Ready or Order Completed."
-
-                            if disable_active_status:
-                                new_status = st.selectbox(
-                                    "Next Stage",
-                                    status_options,
-                                    index=status_options.index(
-                                        current_status) if current_status in status_options else 0,
-                                    disabled=True,
-                                    key=f"spec_status_{original_index}"
-                                )
-                                st.warning(warning_message)
-                            else:
-                                new_status = st.selectbox(
-                                    "Next Stage",
-                                    status_options,
-                                    index=status_options.index(
-                                        current_status) if current_status in status_options else 0,
-                                    key=f"spec_status_{original_index}"
-                                )
-
                             # Calculate expected stop pips based on current entry/exit prices
                             expected_stop_pips = None
                             if new_entry_price != 0 and new_exit_price != 0:
@@ -3688,6 +3655,20 @@ elif st.session_state.current_page == "Active Opps":
                                     st.error(
                                         f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected from prices: {expected_stop_pips:.2f}")
 
+                            # Check if all required fields are filled for moving to Order Ready
+                            entry_price_valid = new_entry_price > 0
+                            exit_price_valid = new_exit_price > 0
+                            target_price_valid = new_target_price > 0
+                            all_required_fields_valid = entry_price_valid and exit_price_valid and target_price_valid
+
+                            # Show validation messages
+                            if not entry_price_valid:
+                                st.error("Entry price must be greater than 0 to move to Order Ready")
+                            if not exit_price_valid:
+                                st.error("Exit price must be greater than 0 to move to Order Ready")
+                            if not target_price_valid:
+                                st.error("Target price must be greater than 0 to move to Order Ready")
+
                             # Update button for this record
                             col_update, col_delete = st.columns(2)
                             with col_update:
@@ -3696,45 +3677,33 @@ elif st.session_state.current_page == "Active Opps":
                                     if abs(expected_stop_pips - current_stop_pips) > 0.01:
                                         update_disabled = True
 
-                                if st.button(f"Update & Move to Next Stage", key=f"spec_update_{original_index}",
+                                # Disable if required fields not filled
+                                if not all_required_fields_valid:
+                                    update_disabled = True
+
+                                if st.button(f"Move to Order Ready", key=f"spec_update_{original_index}",
                                              disabled=update_disabled):
-                                    # Additional validation for active status
-                                    if new_status in ['Order Ready', 'Order Completed'] and new_target_price <= 0:
-                                        st.error("Cannot change to active status: Target price must be greater than 0!")
+                                    # Check if updating to active status would exceed the limit
+                                    if total_active_count >= 2:
+                                        st.error(
+                                            "Maximum of 2 active records (Order Ready + Order Completed) reached! You cannot move this record to Order Ready.")
                                     else:
-                                        # Check if updating to active status would exceed the limit
-                                        current_status = record.get('status', 'Speculation')
-                                        if new_status in ['Order Ready',
-                                                          'Order Completed'] and current_status == 'Speculation':
-                                            if total_active_count >= 2:
-                                                st.error(
-                                                    "Maximum of 2 active records (Order Ready + Order Completed) reached! You cannot move this record to active status.")
-                                            else:
-                                                updates = {
-                                                    'entry_price': new_entry_price,
-                                                    'exit_price': new_exit_price,
-                                                    'target_price': new_target_price,
-                                                    'status': new_status
-                                                }
-                                                update_record_and_sync(original_index, updates)
-                                                st.rerun()
-                                        else:
-                                            updates = {
-                                                'entry_price': new_entry_price,
-                                                'exit_price': new_exit_price,
-                                                'target_price': new_target_price,
-                                                'status': new_status
-                                            }
-                                            update_record_and_sync(original_index, updates)
-                                            st.rerun()
+                                        updates = {
+                                            'entry_price': new_entry_price,
+                                            'exit_price': new_exit_price,
+                                            'target_price': new_target_price,
+                                            'status': 'Order Ready'  # Automatically move to next stage
+                                        }
+                                        update_record_and_sync(original_index, updates)
+                                        st.rerun()
 
                             with col_delete:
                                 if st.button(f"🗑️ Delete Record", key=f"spec_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Stage 2: Order Ready
-        with st.expander(f"✅ Order Ready Stage ({order_ready_count} records)", expanded=True):
+        # Tab 2: Order Ready
+        with tab2:
             order_ready_records = [record for record in st.session_state.saved_records if
                                    record.get('status') == 'Order Ready']
             if not order_ready_records:
@@ -3780,25 +3749,15 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"ready_target_{original_index}"
                                 )
 
-                            # Status dropdown in a new row
-                            status_options = ["Speculation", "Order Ready", "Order Completed"]
-                            current_status = record.get('status', 'Order Ready')
-                            new_status = st.selectbox(
-                                "Next Stage",
-                                status_options,
-                                index=status_options.index(current_status) if current_status in status_options else 1,
-                                key=f"ready_status_{original_index}"
-                            )
-
                             # Update button for this record
                             col_update, col_delete = st.columns(2)
                             with col_update:
-                                if st.button(f"Update & Move to Next Stage", key=f"ready_update_{original_index}"):
+                                if st.button(f"Move to Order Completed", key=f"ready_update_{original_index}"):
                                     updates = {
                                         'entry_price': new_entry_price,
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price,
-                                        'status': new_status
+                                        'status': 'Order Completed'  # Automatically move to next stage
                                     }
                                     update_record_and_sync(original_index, updates)
                                     st.rerun()
@@ -3808,8 +3767,8 @@ elif st.session_state.current_page == "Active Opps":
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Stage 3: Order Completed
-        with st.expander(f"🎯 Order Completed Stage ({order_completed_count} records)", expanded=True):
+        # Tab 3: Order Completed
+        with tab3:
             completed_records = [record for record in st.session_state.saved_records if
                                  record.get('status') == 'Order Completed']
             if not completed_records:
@@ -3903,7 +3862,7 @@ elif st.session_state.current_page == "Active Opps":
                             # Close Record button
                             col_close, col_delete = st.columns(2)
                             with col_close:
-                                if st.button(f"💾 Finalize & Close Trade", key=f"completed_close_{original_index}",
+                                if st.button(f"Finalize & Close Trade", key=f"completed_close_{original_index}",
                                              type="primary"):
                                     # Validate required fields
                                     if (new_result and new_direction and new_poi and

@@ -4264,20 +4264,11 @@ elif st.session_state.current_page == "Trade Signal":
                     target_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Target Price:** {target_price:.5f}")
 
-                # Calculate and display Direction with color coding
+                # Calculate and display Direction in regular black text
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-                direction_color = "🟢" if direction == "buy" else "🔴" if direction == "sell" else "⚪"
 
-                col_dir1, col_dir2 = st.columns([1, 3])
-                with col_dir1:
-                    st.write(f"**Direction:**")
-                with col_dir2:
-                    if direction == "buy":
-                        st.success(f"{direction_color} {direction.upper()}")
-                    elif direction == "sell":
-                        st.error(f"{direction_color} {direction.upper()}")
-                    else:
-                        st.warning(f"{direction_color} {direction}")
+                # Display direction in regular black text like other fields
+                st.write(f"**Direction:** {direction.upper()}")
 
                 # Display price relationship explanation
                 if direction != "Unknown" and entry_price > 0 and exit_price > 0:
@@ -4291,16 +4282,6 @@ elif st.session_state.current_page == "Trade Signal":
                 if signal.get('notes'):
                     st.write("---")
                     st.write(f"**Notes:** {signal.get('notes')}")
-
-        # Clear all signals button
-        st.markdown("---")
-        st.warning(
-            "Clearing signals here will remove them from view, but they will reappear if they still exist in Active Opportunities as 'Order Ready'.")
-        if st.button("Clear All Trade Signals from View", type="secondary"):
-            st.session_state.trade_signals = []
-            # Note: We don't clear the sheet here because Active Opps manages it
-            st.success("Trade signals cleared from view! They will reappear on next sync if still active.")
-            st.rerun()
 
 elif st.session_state.current_page == "Stats":
 

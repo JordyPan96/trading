@@ -4507,21 +4507,13 @@ elif st.session_state.current_page == "Trade Signal":
                     sl_price = safe_float(signal.get('exit_price'), 0.0)
                     st.write(f"**Stop Loss:** {sl_price:.5f}")
 
-                    # Position size editor in col3 below Stop Loss
-                    new_size = st.number_input(
-                        "Size (lots)",
-                        min_value=0.01,
-                        max_value=100.0,
-                        value=float(signal.get('position_size', 0.1)),
-                        step=0.01,
-                        key=f"size_{i}"
-                    )
+                    # Position size removed from here
 
                 with col4:
                     tp_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                    # R:R Ratio in col4 below Take Profit
+                    # R:R Ratio in col4 below Take Profit - CHANGED TO 1:XX format
                     entry_val = safe_float(signal.get('entry_price'), 0.0)
                     stop_val = safe_float(signal.get('exit_price'), 0.0)
                     target_val = safe_float(signal.get('target_price'), 0.0)
@@ -4531,7 +4523,7 @@ elif st.session_state.current_page == "Trade Signal":
                         target_distance = abs(entry_val - target_val)
                         if stop_distance > 0:
                             reward_ratio = target_distance / stop_distance
-                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
+                            st.metric("R:R Ratio", f"1:{reward_ratio:.2f}")  # CHANGED TO 1:XX format
 
                 # Calculate and display Direction
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
@@ -4564,10 +4556,7 @@ elif st.session_state.current_page == "Trade Signal":
                     if not validation_ok:
                         st.warning("⚠️ Cannot execute trade - missing required parameters")
 
-                # Additional signal information
-                if signal.get('variances'):
-                    st.write("---")
-                    st.write(f"**Variance Analysis:** {signal.get('variances', 'N/A')}")
+                # Variance Analysis section REMOVED
 
                 if signal.get('notes'):
                     st.write("---")

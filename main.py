@@ -713,6 +713,21 @@ starting_capital = 50000
 
 # Page content
 if st.session_state.current_page == "Home":
+    # AUTOMATIC CLOUD SYNC ON APP LOAD
+    if 'auto_sync_done' not in st.session_state:
+        with st.spinner("🔄 Syncing with cloud..."):
+            df = load_data_from_sheets()
+            if df is not None and not df.empty:
+                st.session_state.uploaded_data = df
+                st.session_state.cloud_data_loaded = True
+                st.session_state.file_processed = True
+                st.session_state.auto_sync_done = True
+                save_persistent_session()
+                # Don't rerun here to avoid double execution
+            else:
+                st.session_state.auto_sync_done = True
+                # No data in cloud, continue with manual options
+
     # Show data management options only on Home page
     with st.sidebar.expander("📁 Cloud Data Management", expanded=True):
         st.subheader("Google Sheets Storage")

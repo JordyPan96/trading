@@ -4453,8 +4453,6 @@ elif st.session_state.current_page == "Trade Signal":
         they will be automatically removed from here.
         """)
     else:
-        # Removed Signals Overview section
-
         # Detailed view with execution
         st.subheader("📋 Signal Details & Execution")
 
@@ -4507,8 +4505,6 @@ elif st.session_state.current_page == "Trade Signal":
                     sl_price = safe_float(signal.get('exit_price'), 0.0)
                     st.write(f"**Stop Loss:** {sl_price:.5f}")
 
-                    # REMOVED: Position size editor section
-
                 with col4:
                     tp_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Take Profit:** {tp_price:.5f}")
@@ -4523,7 +4519,6 @@ elif st.session_state.current_page == "Trade Signal":
                         target_distance = abs(entry_val - target_val)
                         if stop_distance > 0:
                             reward_ratio = target_distance / stop_distance
-                            # CHANGED: Format as 1:XX instead of XX:1
                             st.metric("R:R Ratio", f"1:{reward_ratio:.2f}")
 
                 # Calculate and display Direction
@@ -4557,8 +4552,7 @@ elif st.session_state.current_page == "Trade Signal":
                     if not validation_ok:
                         st.warning("⚠️ Cannot execute trade - missing required parameters")
 
-                # REMOVED: Variance Analysis section completely
-
+                # Notes section only - Variance Analysis completely removed
                 if signal.get('notes'):
                     st.write("---")
                     st.write(f"**Notes:** {signal.get('notes')}")

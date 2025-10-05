@@ -3358,80 +3358,88 @@ elif st.session_state.current_page == "Active Opps":
             return False
 
 
-    # Trade Signal Functions
-    def push_to_trade_signal(record):
-        """Push order details to Trade Signal page"""
+    # Trade Signal Functions - UPDATED FOR SYNC
+    def sync_trade_signals_with_active_opps():
+        """Sync trade signals with current Active Opps status"""
         try:
             # Initialize trade_signals in session state if not exists
             if 'trade_signals' not in st.session_state:
                 st.session_state.trade_signals = []
 
-            # Check if this record already exists in trade signals (by timestamp)
-            existing_signal = next((sig for sig in st.session_state.trade_signals
-                                    if sig.get('timestamp') == record.get('timestamp')), None)
+            # Get all Order Ready records from Active Opps
+            order_ready_records = [record for record in st.session_state.saved_records
+                                   if record.get('status') == 'Order Ready']
 
-            if not existing_signal:
-                # Create trade signal record
-                trade_signal = {
-                    'timestamp': record.get('timestamp'),
-                    'selected_pair': record.get('selected_pair'),
-                    'risk_multiplier': record.get('risk_multiplier'),
-                    'position_size': record.get('position_size'),
-                    'stop_pips': record.get('stop_pips'),
-                    'entry_price': record.get('entry_price'),
-                    'exit_price': record.get('exit_price'),
-                    'target_price': record.get('target_price'),
-                    'trend_position': record.get('trend_position', 'Not set'),
-                    'variances': record.get('Variances', 'Not set'),
-                    'status': 'Active',  # New status for trade signals
-                    'created_date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
+            # Get timestamps of current Order Ready records
+            current_order_ready_timestamps = {record.get('timestamp') for record in order_ready_records}
 
-                st.session_state.trade_signals.append(trade_signal)
+            # Remove trade signals that are no longer Order Ready
+            st.session_state.trade_signals = [
+                signal for signal in st.session_state.trade_signals
+                if signal.get('timestamp') in current_order_ready_timestamps
+            ]
 
-                # Also save to Google Sheets for persistence
-                save_trade_signal_to_sheets(trade_signal)
+            # Add or update trade signals for current Order Ready records
+            for record in order_ready_records:
+                timestamp = record.get('timestamp')
+                existing_signal = next((sig for sig in st.session_state.trade_signals
+                                        if sig.get('timestamp') == timestamp), None)
 
-                return True
-            else:
-                # Update existing signal
-                existing_signal.update({
-                    'entry_price': record.get('entry_price'),
-                    'exit_price': record.get('exit_price'),
-                    'target_price': record.get('target_price'),
-                    'status': 'Active'
-                })
-                return True
+                if existing_signal:
+                    # Update existing signal
+                    existing_signal.update({
+                        'selected_pair': record.get('selected_pair'),
+                        'risk_multiplier': record.get('risk_multiplier'),
+                        'position_size': record.get('position_size'),
+                        'stop_pips': record.get('stop_pips'),
+                        'entry_price': record.get('entry_price'),
+                        'exit_price': record.get('exit_price'),
+                        'target_price': record.get('target_price'),
+                        'trend_position': record.get('trend_position', 'Not set'),
+                        'variances': record.get('Variances', 'Not set'),
+                        'status': 'Active'
+                    })
+                else:
+                    # Create new trade signal
+                    trade_signal = {
+                        'timestamp': timestamp,
+                        'selected_pair': record.get('selected_pair'),
+                        'risk_multiplier': record.get('risk_multiplier'),
+                        'position_size': record.get('position_size'),
+                        'stop_pips': record.get('stop_pips'),
+                        'entry_price': record.get('entry_price'),
+                        'exit_price': record.get('exit_price'),
+                        'target_price': record.get('target_price'),
+                        'trend_position': record.get('trend_position', 'Not set'),
+                        'variances': record.get('Variances', 'Not set'),
+                        'status': 'Active',
+                        'created_date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                    st.session_state.trade_signals.append(trade_signal)
+
+            # Save to Google Sheets for persistence
+            save_all_trade_signals_to_sheets()
+            return True
 
         except Exception as e:
-            st.error(f"Error pushing to trade signal: {e}")
+            st.error(f"Error syncing trade signals: {e}")
             return False
 
 
-    def save_trade_signal_to_sheets(trade_signal):
-        """Save trade signal to Google Sheets"""
+    def save_all_trade_signals_to_sheets():
+        """Save all trade signals to Google Sheets"""
         try:
-            # Load existing trade signals
-            existing_signals = load_trade_signals_from_sheets()
-
-            # Check if signal already exists
-            existing_df = pd.DataFrame(existing_signals) if existing_signals else pd.DataFrame()
-            if not existing_df.empty and 'timestamp' in existing_df.columns:
-                # Remove existing signal with same timestamp
-                existing_df = existing_df[existing_df['timestamp'] != trade_signal['timestamp']]
-
-            # Add new signal
-            new_df = pd.DataFrame([trade_signal])
-            if not existing_df.empty:
-                updated_df = pd.concat([existing_df, new_df], ignore_index=True)
+            if st.session_state.trade_signals:
+                df = pd.DataFrame(st.session_state.trade_signals)
+                success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="TradeSignals")
+                return success
             else:
-                updated_df = new_df
-
-            # Save using your existing function
-            success = save_data_to_sheets(updated_df, sheet_name="Trade", worksheet_name="TradeSignals")
-            return success
+                # If no signals, save empty dataframe to clear the sheet
+                empty_df = pd.DataFrame()
+                success = save_data_to_sheets(empty_df, sheet_name="Trade", worksheet_name="TradeSignals")
+                return success
         except Exception as e:
-            print(f"Error saving trade signal to sheets: {e}")
+            print(f"Error saving trade signals to sheets: {e}")
             return False
 
 
@@ -3465,10 +3473,17 @@ elif st.session_state.current_page == "Active Opps":
             # Convert DataFrame back to list of dictionaries
             st.session_state.saved_records = workflow_data.to_dict('records')
             st.success("Workflow data loaded from cloud!")
+
+            # Sync trade signals after loading data
+            sync_trade_signals_with_active_opps()
         else:
             # Initialize empty if no data exists in cloud
             st.session_state.saved_records = []
             st.info("No data found in cloud. You can upload a CSV backup below.")
+
+    # Initialize trade signals if not exists
+    if 'trade_signals' not in st.session_state:
+        st.session_state.trade_signals = load_trade_signals_from_sheets()
 
     # CSV Upload as fallback
     st.sidebar.markdown("---")
@@ -3520,6 +3535,8 @@ elif st.session_state.current_page == "Active Opps":
                     with col_replace:
                         if st.button("Replace Current Data", key="replace_csv", type="primary"):
                             st.session_state.saved_records = csv_records
+                            # Sync trade signals after replacing data
+                            sync_trade_signals_with_active_opps()
                             st.success(f"✅ Replaced current data with {len(csv_records)} records from CSV!")
                             st.rerun()
 
@@ -3531,6 +3548,8 @@ elif st.session_state.current_page == "Active Opps":
 
                             if new_records:
                                 st.session_state.saved_records.extend(new_records)
+                                # Sync trade signals after merging data
+                                sync_trade_signals_with_active_opps()
                                 st.success(f"✅ Added {len(new_records)} new records from CSV!")
                             else:
                                 st.info("No new records to add (all timestamps already exist)")
@@ -3573,6 +3592,8 @@ elif st.session_state.current_page == "Active Opps":
             if st.session_state.saved_records:
                 success = save_workflow_to_sheets(st.session_state.saved_records)
                 if success:
+                    # Also sync trade signals
+                    sync_trade_signals_with_active_opps()
                     st.success("Workflow data saved to cloud!")
                 else:
                     st.error("Failed to save to cloud. Use CSV export below to backup your data.")
@@ -3584,6 +3605,8 @@ elif st.session_state.current_page == "Active Opps":
             workflow_data = load_workflow_from_sheets()
             if not workflow_data.empty:
                 st.session_state.saved_records = workflow_data.to_dict('records')
+                # Sync trade signals after loading data
+                sync_trade_signals_with_active_opps()
                 st.success("Workflow data loaded from cloud!")
                 st.rerun()
             else:
@@ -3682,6 +3705,8 @@ elif st.session_state.current_page == "Active Opps":
             # Auto-save to cloud
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
+                # Sync trade signals after updating record
+                sync_trade_signals_with_active_opps()
                 st.success(f"Record updated and saved to cloud!")
             else:
                 st.warning("Record updated locally but failed to save to cloud. Use CSV export to backup.")
@@ -3695,6 +3720,8 @@ elif st.session_state.current_page == "Active Opps":
             # Auto-save to cloud
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
+                # Sync trade signals after deleting record
+                sync_trade_signals_with_active_opps()
                 st.success(f"Record deleted and changes saved to cloud!")
             else:
                 st.warning("Record deleted locally but failed to save to cloud. Use CSV export to backup.")
@@ -3830,11 +3857,6 @@ elif st.session_state.current_page == "Active Opps":
                                             'status': 'Order Ready'  # Automatically move to next stage
                                         }
                                         update_record_and_sync(original_index, updates)
-
-                                        # Push to Trade Signal page
-                                        updated_record = {**record, **updates}
-                                        if push_to_trade_signal(updated_record):
-                                            st.success("✅ Order pushed to Trade Signal page!")
                                         st.rerun()
 
                             with col_delete:
@@ -4030,6 +4052,8 @@ elif st.session_state.current_page == "Active Opps":
                                                     st.session_state.saved_records.pop(original_index)
                                                     # Save the updated workflow
                                                     save_workflow_to_sheets(st.session_state.saved_records)
+                                                    # Sync trade signals after closing trade
+                                                    sync_trade_signals_with_active_opps()
                                                     st.success("✅ Trade finalized and saved to trade history!")
                                                     st.rerun()
                                                 else:
@@ -4045,6 +4069,8 @@ elif st.session_state.current_page == "Active Opps":
                                                     st.session_state.saved_records.pop(original_index)
                                                     # Save the updated workflow
                                                     save_workflow_to_sheets(st.session_state.saved_records)
+                                                    # Sync trade signals after closing trade
+                                                    sync_trade_signals_with_active_opps()
                                                     st.success("✅ Trade finalized and saved to trade history!")
                                                     st.rerun()
                                                 else:
@@ -4064,6 +4090,9 @@ elif st.session_state.current_page == "Active Opps":
             st.session_state.saved_records = []
             success = save_workflow_to_sheets([])
             if success:
+                # Also clear trade signals
+                st.session_state.trade_signals = []
+                save_all_trade_signals_to_sheets()
                 st.success("All records cleared and saved to cloud!")
             else:
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
@@ -4103,44 +4132,6 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
-    def save_trade_signals_to_sheets():
-        """Save all trade signals to Google Sheets"""
-        try:
-            if st.session_state.trade_signals:
-                df = pd.DataFrame(st.session_state.trade_signals)
-                success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="TradeSignals")
-                return success
-            return True
-        except Exception as e:
-            st.error(f"Error saving trade signals: {e}")
-            return False
-
-
-    def update_trade_signal(original_index, updates):
-        """Update trade signal and sync to cloud"""
-        for key, value in updates.items():
-            st.session_state.trade_signals[original_index][key] = value
-
-        # Auto-save to cloud
-        success = save_trade_signals_to_sheets()
-        if success:
-            st.success("Trade signal updated and saved to cloud!")
-        else:
-            st.warning("Trade signal updated locally but failed to save to cloud.")
-
-
-    def delete_trade_signal(original_index):
-        """Delete trade signal and sync to cloud"""
-        st.session_state.trade_signals.pop(original_index)
-
-        # Auto-save to cloud
-        success = save_trade_signals_to_sheets()
-        if success:
-            st.success("Trade signal deleted and changes saved to cloud!")
-        else:
-            st.warning("Trade signal deleted locally but failed to save to cloud.")
-
-
     # NOW initialize trade_signals after functions are defined
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
@@ -4149,28 +4140,16 @@ elif st.session_state.current_page == "Trade Signal":
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # Rest of the Trade Signal page code continues...
-    # Sync buttons
-    col1, col2, col3 = st.columns(3)
+    # Sync button
+    col1, col2 = st.columns(2)
     with col1:
-        if st.button("🔄 Sync with Cloud"):
+        if st.button("🔄 Sync with Active Opps"):
             cloud_signals = load_trade_signals_from_sheets()
             st.session_state.trade_signals = cloud_signals
-            st.success(f"Loaded {len(cloud_signals)} trade signals from cloud!")
+            st.success(f"Synced with Active Opps! Loaded {len(cloud_signals)} trade signals.")
             st.rerun()
 
     with col2:
-        if st.button("💾 Save to Cloud"):
-            if st.session_state.trade_signals:
-                success = save_trade_signals_to_sheets()
-                if success:
-                    st.success("Trade signals saved to cloud!")
-                else:
-                    st.error("Failed to save to cloud.")
-            else:
-                st.warning("No trade signals to save")
-
-    with col3:
         if st.session_state.trade_signals:
             csv_data = pd.DataFrame(st.session_state.trade_signals)
             csv = csv_data.to_csv(index=False)
@@ -4187,16 +4166,39 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Display trade signals
     if not st.session_state.trade_signals:
-        st.info("No active trade signals. Orders moved to 'Order Ready' in Active Opportunities will appear here.")
+        st.info("""
+        **No active trade signals.** 
+
+        Trade signals will automatically appear here when you move orders to **'Order Ready'** in the Active Opportunities page.
+
+        When orders are moved to **'Order Completed'**, **'Speculation'**, or **deleted** in Active Opportunities, they will be automatically removed from here.
+        """)
     else:
         st.subheader(f"Active Trade Signals ({len(st.session_state.trade_signals)})")
+        st.info("💡 These are read-only signals synced from Active Opportunities. Manage them in the Active Opps page.")
 
         # Convert to DataFrame for nice display
         signals_df = pd.DataFrame(st.session_state.trade_signals)
+
+        # Display summary statistics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Signals", len(signals_df))
+        with col2:
+            unique_pairs = signals_df['selected_pair'].nunique()
+            st.metric("Unique Pairs", unique_pairs)
+        with col3:
+            active_signals = len(signals_df[signals_df['status'] == 'Active'])
+            st.metric("Active Signals", active_signals)
+        with col4:
+            avg_position = signals_df['position_size'].mean()
+            st.metric("Avg Position Size", f"{avg_position:.2f}")
+
         st.dataframe(signals_df, use_container_width=True)
 
-        # Detailed view
-        st.subheader("Manage Trade Signals")
+        # Detailed view - READ ONLY
+        st.subheader("Signal Details")
+        st.warning("🔒 These signals are managed in Active Opportunities. To modify them, go to the Active Opps page.")
 
         for i, signal in enumerate(st.session_state.trade_signals):
             with st.expander(f"Signal {i + 1}: {signal['selected_pair']} - {signal['timestamp']}", expanded=False):
@@ -4210,83 +4212,30 @@ elif st.session_state.current_page == "Trade Signal":
                     st.write(f"**Trend Position:** {signal.get('trend_position', 'N/A')}")
                     st.write(f"**Variance:** {signal.get('variances', 'N/A')}")
                     st.write(f"**Created:** {signal.get('created_date', 'N/A')}")
+                    st.write(f"**Status:** {signal.get('status', 'N/A')}")
 
                 with col2:
-                    new_entry_price = st.number_input(
-                        "Entry Price",
-                        value=safe_float(signal.get('entry_price'), 0.0),
-                        format="%.5f",
-                        key=f"signal_entry_{i}"
-                    )
+                    st.write(f"**Entry Price:** {safe_float(signal.get('entry_price'), 0.0):.5f}")
 
                 with col3:
-                    new_exit_price = st.number_input(
-                        "Exit Price",
-                        value=safe_float(signal.get('exit_price'), 0.0),
-                        format="%.5f",
-                        key=f"signal_exit_{i}"
-                    )
+                    st.write(f"**Exit Price:** {safe_float(signal.get('exit_price'), 0.0):.5f}")
 
                 with col4:
-                    new_target_price = st.number_input(
-                        "Target Price",
-                        value=safe_float(signal.get('target_price'), 0.0),
-                        format="%.5f",
-                        key=f"signal_target_{i}"
-                    )
+                    st.write(f"**Target Price:** {safe_float(signal.get('target_price'), 0.0):.5f}")
 
-                # Status management
-                col_status, col_actions = st.columns(2)
-
-                with col_status:
-                    status_options = ["Active", "Executed", "Cancelled", "Expired"]
-                    new_status = st.selectbox(
-                        "Status",
-                        options=status_options,
-                        index=status_options.index(signal.get('status', 'Active')),
-                        key=f"signal_status_{i}"
-                    )
-
-                with col_actions:
-                    col_update, col_delete = st.columns(2)
-
-                    with col_update:
-                        if st.button("Update Signal", key=f"signal_update_{i}"):
-                            updates = {
-                                'entry_price': new_entry_price,
-                                'exit_price': new_exit_price,
-                                'target_price': new_target_price,
-                                'status': new_status
-                            }
-                            update_trade_signal(i, updates)
-                            st.rerun()
-
-                    with col_delete:
-                        if st.button("🗑️ Delete", key=f"signal_delete_{i}"):
-                            delete_trade_signal(i)
-                            st.rerun()
-
-                # Additional notes field
-                current_notes = signal.get('notes', '')
-                new_notes = st.text_area(
-                    "Notes",
-                    value=current_notes,
-                    key=f"signal_notes_{i}",
-                    placeholder="Add any additional notes or comments..."
-                )
-
-                if new_notes != current_notes:
-                    if st.button("Save Notes", key=f"signal_save_notes_{i}"):
-                        updates = {'notes': new_notes}
-                        update_trade_signal(i, updates)
-                        st.rerun()
+                # Display notes if any
+                if signal.get('notes'):
+                    st.write("---")
+                    st.write(f"**Notes:** {signal.get('notes')}")
 
         # Clear all signals button
         st.markdown("---")
-        if st.button("Clear All Trade Signals", type="secondary"):
+        st.warning(
+            "Clearing signals here will remove them from view, but they will reappear if they still exist in Active Opportunities as 'Order Ready'.")
+        if st.button("Clear All Trade Signals from View", type="secondary"):
             st.session_state.trade_signals = []
-            save_trade_signals_to_sheets()
-            st.success("All trade signals cleared!")
+            # Note: We don't clear the sheet here because Active Opps manages it
+            st.success("Trade signals cleared from view! They will reappear on next sync if still active.")
             st.rerun()
 
 elif st.session_state.current_page == "Stats":

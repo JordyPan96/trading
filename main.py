@@ -4453,7 +4453,7 @@ elif st.session_state.current_page == "Trade Signal":
         they will be automatically removed from here.
         """)
     else:
-        st.success(f"🎯 Found {len(st.session_state.trade_signals)} active trade signals ready for execution")
+        # Removed the "Found X active trade signals" message
 
         # Convert to DataFrame for nice display
         signals_data = []
@@ -4476,7 +4476,7 @@ elif st.session_state.current_page == "Trade Signal":
 
         st.dataframe(signals_df[available_columns], use_container_width=True)
 
-        # Detailed view with execution
+        # Detailed view with execution - ALL CONTENT MOVED INSIDE EACH SIGNAL
         st.subheader("📋 Signal Details & Execution")
 
         for i, signal in enumerate(st.session_state.trade_signals):
@@ -4518,7 +4518,7 @@ elif st.session_state.current_page == "Trade Signal":
                 stop_val = safe_float(signal.get('exit_price'), 0.0)
                 target_val = safe_float(signal.get('target_price'), 0.0)
 
-                # Trading Execution Section with R:R Ratio
+                # TRADE EXECUTION SECTION - MOVED INSIDE EACH SIGNAL
                 st.markdown("---")
                 st.subheader("🚀 Trade Execution")
 

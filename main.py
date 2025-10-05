@@ -4032,7 +4032,10 @@ elif st.session_state.current_page == "Active Opps":
             st.rerun()
 
 elif st.session_state.current_page == "Trade Signal":
-    # Add this to Trade Signal page
+    st.title("📡 Trade Signals")
+
+
+    # Add helper function first
     def safe_float(value, default=0.0):
         """Safely convert value to float, handling None and string 'None'"""
         if value is None or value == 'None' or value == '':
@@ -4042,18 +4045,8 @@ elif st.session_state.current_page == "Trade Signal":
         except (ValueError, TypeError):
             return default
 
-    st.title("📡 Trade Signals")
 
-    # Initialize trade_signals in session state if not exists
-    if 'trade_signals' not in st.session_state:
-        st.session_state.trade_signals = []
-
-    # Load from Google Sheets on page load
-    if not st.session_state.trade_signals:
-        st.session_state.trade_signals = load_trade_signals_from_sheets()
-
-
-    # Add these functions to the Trade Signal page
+    # Add trade signal functions next
     def load_trade_signals_from_sheets():
         """Load trade signals from Google Sheets"""
         try:
@@ -4110,6 +4103,15 @@ elif st.session_state.current_page == "Trade Signal":
             st.warning("Trade signal deleted locally but failed to save to cloud.")
 
 
+    # NOW initialize trade_signals after functions are defined
+    if 'trade_signals' not in st.session_state:
+        st.session_state.trade_signals = []
+
+    # Load from Google Sheets on page load
+    if not st.session_state.trade_signals:
+        st.session_state.trade_signals = load_trade_signals_from_sheets()
+
+    # Rest of the Trade Signal page code continues...
     # Sync buttons
     col1, col2, col3 = st.columns(3)
     with col1:

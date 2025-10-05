@@ -4102,6 +4102,7 @@ elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available
     try:
         from metaapi_cloud_sdk import MetaApi
+
         metaapi_available = True
     except ImportError:
         metaapi_available = False
@@ -4109,6 +4110,7 @@ elif st.session_state.current_page == "Trade Signal":
         st.stop()
 
     st.title("📡 Trade Signals")
+
 
     # Add helper function first
     def safe_float(value, default=0.0):
@@ -4119,6 +4121,7 @@ elif st.session_state.current_page == "Trade Signal":
             return float(value)
         except (ValueError, TypeError):
             return default
+
 
     def calculate_direction(entry_price, exit_price):
         """Calculate direction based on entry and exit prices"""
@@ -4137,6 +4140,7 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             return "Unknown"
 
+
     def format_symbol_for_pepperstone(symbol):
         """Add .a suffix to symbols for Pepperstone broker"""
         # Common symbols that need .a suffix for Pepperstone
@@ -4152,6 +4156,7 @@ elif st.session_state.current_page == "Trade Signal":
         else:
             return symbol
 
+
     # METAAPI SDK Functions
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
@@ -4160,6 +4165,7 @@ elif st.session_state.current_page == "Trade Signal":
             return metaapi_config
         except:
             return {}
+
 
     async def get_metaapi_account():
         """Get MetaApi account instance"""
@@ -4178,6 +4184,7 @@ elif st.session_state.current_page == "Trade Signal":
             return account, None
         except Exception as e:
             return None, f"Error getting account: {str(e)}"
+
 
     async def test_metaapi_connection():
         """Test connection to MetaAPI - SIMPLIFIED"""
@@ -4198,6 +4205,7 @@ elif st.session_state.current_page == "Trade Signal":
         except Exception as e:
             return False, f"❌ MetaApi connection error: {str(e)}"
 
+
     async def connect_metaapi_account():
         """Connect to MetaApi account"""
         try:
@@ -4209,10 +4217,10 @@ elif st.session_state.current_page == "Trade Signal":
             deployed_states = ['DEPLOYING', 'DEPLOYED']
 
             if initial_state not in deployed_states:
-                st.info("Deploying account...")
+                # Deploy account if not deployed
                 await account.deploy()
 
-            st.info("Waiting for API server to connect to broker...")
+            # Wait for connection to broker
             await account.wait_connected()
 
             # Get RPC connection
@@ -4220,13 +4228,13 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
 
             # Wait for synchronization
-            st.info("Waiting for SDK to synchronize to terminal state...")
             await connection.wait_synchronized()
 
             return True, f"✅ Successfully connected to account: {account.name}"
 
         except Exception as e:
             return False, f"❌ Connection error: {str(e)}"
+
 
     async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
         """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
@@ -4254,7 +4262,7 @@ elif st.session_state.current_page == "Trade Signal":
                     formatted_symbol,  # Use formatted symbol with .a suffix
                     volume,
                     entry_price,  # Limit price for buy
-                    stop_loss=sl,   # CORRECT: snake_case
+                    stop_loss=sl,  # CORRECT: snake_case
                     take_profit=tp  # CORRECT: snake_case
                 )
             else:  # SELL
@@ -4262,7 +4270,7 @@ elif st.session_state.current_page == "Trade Signal":
                     formatted_symbol,  # Use formatted symbol with .a suffix
                     volume,
                     entry_price,  # Limit price for sell
-                    stop_loss=sl,   # CORRECT: snake_case
+                    stop_loss=sl,  # CORRECT: snake_case
                     take_profit=tp  # CORRECT: snake_case
                 )
 
@@ -4278,6 +4286,7 @@ elif st.session_state.current_page == "Trade Signal":
             except:
                 pass
             return False, f"❌ Trade error: {str(e)}"
+
 
     # Add trade signal functions next
     def load_trade_signals_from_sheets():
@@ -4307,6 +4316,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.error(f"Error loading trade signals: {e}")
             return []
 
+
     # Initialize session states
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
@@ -4324,31 +4334,46 @@ elif st.session_state.current_page == "Trade Signal":
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # Auto-check connection in background on page load
+    # Auto-connect to MetaApi account in background
     if not st.session_state.metaapi_connected:
         import asyncio
+
         try:
+            # First test basic connection
             success, message = asyncio.run(test_metaapi_connection())
             if success:
-                st.session_state.metaapi_connected = True
-                # Don't show success message to keep UI clean
-        except:
+                # If basic connection works, try to connect to trading account
+                with st.spinner("🔗 Connecting to trading account..."):
+                    success, message = asyncio.run(connect_metaapi_account())
+                    if success:
+                        st.session_state.metaapi_connected = True
+                        st.success("✅ Automatically connected to trading account")
+                    else:
+                        st.session_state.metaapi_connected = False
+                        st.error(f"❌ Auto-connection failed: {message}")
+            else:
+                st.session_state.metaapi_connected = False
+                st.error(f"❌ MetaApi connection failed: {message}")
+        except Exception as e:
             st.session_state.metaapi_connected = False
+            st.error(f"❌ Auto-connection error: {str(e)}")
 
     # Connection Management
     st.subheader("🔧 Connection Management")
     col_conn1, col_conn2 = st.columns(2)
 
     with col_conn1:
-        if st.button("🔄 Check MetaApi Connection", type="primary", use_container_width=True):
+        if st.button("🔄 Reconnect to Account", type="primary", use_container_width=True):
             import asyncio
-            success, message = asyncio.run(test_metaapi_connection())
-            if success:
-                st.session_state.metaapi_connected = True
-                st.success(message)
-            else:
-                st.session_state.metaapi_connected = False
-                st.error(message)
+
+            with st.spinner("Reconnecting to trading account..."):
+                success, message = asyncio.run(connect_metaapi_account())
+                if success:
+                    st.session_state.metaapi_connected = True
+                    st.success(message)
+                else:
+                    st.session_state.metaapi_connected = False
+                    st.error(message)
 
     with col_conn2:
         if st.button("🔄 Refresh Signals", type="secondary", use_container_width=True):
@@ -4357,38 +4382,11 @@ elif st.session_state.current_page == "Trade Signal":
             st.success(f"🔄 Synced {len(cloud_signals)} trade signals")
             st.rerun()
 
-    # MetaApi Account Connection Section
-    st.subheader("🔐 Account Setup")
-
-    with st.expander("MetaApi Configuration", expanded=not st.session_state.metaapi_connected):
-        config = get_metaapi_config()
-        token = config.get("token", "")
-
-        if not token:
-            st.error("❌ MetaApi token not found in secrets.toml")
-            st.info("Please add your MetaApi token to secrets.toml under [metaapi] section")
-        else:
-            st.success("✅ MetaApi token configured")
-
-            # Display current account ID in a nice box
-            st.markdown(f"""
-            <div style="background-color: #e8f4fd; padding: 10px; border-radius: 5px; border: 1px solid #b8daff;">
-                <strong>Account ID:</strong> <code>{st.session_state.metaapi_account_id}</code>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.write("")  # Spacing
-
-            # Manual connection
-            if st.button("🔗 Connect to Trading Account", type="primary", use_container_width=True):
-                import asyncio
-                with st.spinner("Connecting to MetaApi account..."):
-                    success, message = asyncio.run(connect_metaapi_account())
-                    if success:
-                        st.session_state.metaapi_connected = True
-                        st.success(message)
-                    else:
-                        st.error(message)
+    # Show connection status
+    if st.session_state.metaapi_connected:
+        st.success("✅ Connected to trading account - Ready for trading")
+    else:
+        st.warning("⚠️ Not connected to trading account - Trades will not execute")
 
     st.markdown("---")
 
@@ -4464,7 +4462,8 @@ elif st.session_state.current_page == "Trade Signal":
 
         # Display compact overview
         st.subheader("Signals Overview")
-        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'target_price', 'position_size', 'timestamp']
+        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'target_price', 'position_size',
+                           'timestamp']
         available_columns = [col for col in display_columns if col in signals_df.columns]
 
         st.dataframe(signals_df[available_columns], use_container_width=True)
@@ -4473,7 +4472,8 @@ elif st.session_state.current_page == "Trade Signal":
         st.subheader("📋 Signal Details & Execution")
 
         for i, signal in enumerate(st.session_state.trade_signals):
-            with st.expander(f"🎯 Signal {i + 1}: {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}", expanded=True):
+            with st.expander(f"🎯 Signal {i + 1}: {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}",
+                             expanded=True):
                 col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                 with col1:
@@ -4558,6 +4558,7 @@ elif st.session_state.current_page == "Trade Signal":
                                          type="primary",
                                          use_container_width=True):
                                 import asyncio
+
                                 with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
                                     success, message = asyncio.run(place_trade(
                                         symbol=signal['selected_pair'],  # Original symbol gets formatted in place_trade
@@ -4591,8 +4592,9 @@ elif st.session_state.current_page == "Trade Signal":
                     else:
                         st.warning("⚠️ Cannot execute trade - missing required parameters")
                 else:
-                    st.warning("🔒 Please connect to a MetaApi account to execute trades")
-                    st.info("Go to the MetaApi Account Setup section above to connect your account")
+                    st.warning("🔒 Not connected to trading account")
+                    st.info(
+                        "The system will automatically try to reconnect. You can also manually reconnect using the button above.")
 
                 # Additional signal information
                 if signal.get('variances'):

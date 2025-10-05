@@ -3794,21 +3794,36 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"{current_stage.lower()}_target_{original_index}"
                             )
 
-                        # Stage-specific logic
+                        # In the Speculation stage section, replace the stop pip calculation with this:
+
                         if current_stage == 'Speculation':
                             # Calculate expected stop pips based on current entry/exit prices
                             expected_stop_pips = None
                             if new_entry_price != 0 and new_exit_price != 0:
                                 if record['selected_pair'] == 'XAUUSD':
+                                    # For gold, use absolute difference
                                     expected_stop_pips = abs(new_exit_price - new_entry_price)
                                 else:
-                                    expected_stop_pips = abs(new_exit_price - new_entry_price) / 10
+                                    # For forex pairs, calculate pips properly regardless of price level
+                                    # Forex pairs: 1 pip = 0.0001 for most pairs, 0.01 for JPY pairs
+                                    price_diff = abs(new_exit_price - new_entry_price)
+
+                                    # Determine pip size based on currency pair
+                                    if any(currency in record['selected_pair'] for currency in ['JPY', 'XAU']):
+                                        # JPY pairs and Gold: 1 pip = 0.01
+                                        pip_size = 0.01
+                                    else:
+                                        # Most forex pairs: 1 pip = 0.0001
+                                        pip_size = 0.0001
+
+                                    # Calculate pips
+                                    expected_stop_pips = price_diff / pip_size
 
                             # Show validation message if stop pips don't match
                             current_stop_pips = record.get('stop_pips')
                             if expected_stop_pips is not None and current_stop_pips is not None:
-                                # Allow small rounding differences (0.01 tolerance)
-                                if abs(expected_stop_pips - current_stop_pips) > 0.01:
+                                # Allow small rounding differences (0.1 pip tolerance)
+                                if abs(expected_stop_pips - current_stop_pips) > 0.1:
                                     st.error(
                                         f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected from prices: {expected_stop_pips:.2f}")
 

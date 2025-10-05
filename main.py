@@ -4131,7 +4131,7 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # METAAPI Functions - UPDATED WITH CORRECT ENDPOINTS
+    # METAAPI Functions - CORRECTED ENDPOINTS
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
         try:
@@ -4152,8 +4152,9 @@ elif st.session_state.current_page == "Trade Signal":
             if not token:
                 return False, "❌ MetaApi token not configured"
 
+            # Test with the correct accounts endpoint
             response = requests.get(
-                "https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts",
+                "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4180,7 +4181,7 @@ elif st.session_state.current_page == "Trade Signal":
             token = config.get("token", "")
 
             response = requests.get(
-                "https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts",
+                "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4207,7 +4208,7 @@ elif st.session_state.current_page == "Trade Signal":
             token = config.get("token", "")
 
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account_id}",
+                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4231,13 +4232,13 @@ elif st.session_state.current_page == "Trade Signal":
             token = config.get("token", "")
 
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account_id}/symbols",
+                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/symbols",
                 headers={"auth-token": token},
                 timeout=10
             )
 
             if response.status_code == 200:
-                return response.json().get("symbols", [])
+                return response.json()
             else:
                 return []
         except:
@@ -4253,13 +4254,13 @@ elif st.session_state.current_page == "Trade Signal":
             token = config.get("token", "")
 
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account_id}/positions",
+                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/positions",
                 headers={"auth-token": token},
                 timeout=10
             )
 
             if response.status_code == 200:
-                return response.json().get("positions", [])
+                return response.json()
             else:
                 return []
         except:
@@ -4275,11 +4276,11 @@ elif st.session_state.current_page == "Trade Signal":
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            # MetaApi trade structure
             trade_data = {
                 "symbol": symbol,
                 "volume": volume,
-                "type": order_type.upper(),
-                "actionType": "ORDER_TYPE_BUY" if order_type.upper() == "BUY" else "ORDER_TYPE_SELL"
+                "type": order_type.upper(),  # BUY or SELL
             }
 
             if sl:
@@ -4288,7 +4289,7 @@ elif st.session_state.current_page == "Trade Signal":
                 trade_data["takeProfit"] = tp
 
             response = requests.post(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account_id}/trade",
+                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/trade",
                 headers={"auth-token": token},
                 json=trade_data,
                 timeout=30
@@ -4296,12 +4297,34 @@ elif st.session_state.current_page == "Trade Signal":
 
             if response.status_code == 200:
                 data = response.json()
-                return True, f"✅ Trade executed successfully (ID: {data.get('orderId', 'N/A')})"
+                return True, f"✅ Trade executed successfully (ID: {data.get('id', 'N/A')})"
             else:
                 return False, f"❌ Trade failed: {response.text}"
 
         except Exception as e:
             return False, f"🔧 Trade error: {str(e)}"
+
+
+    def get_account_information(account_id: str):
+        """Get detailed account information"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            response = requests.get(
+                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/account-information",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return None
+        except:
+            return None
 
 
     # Add trade signal functions next
@@ -4453,45 +4476,41 @@ elif st.session_state.current_page == "Trade Signal":
 
         with col_info1:
             st.subheader("📊 Account Overview")
-            accounts = get_metaapi_accounts()
-            if accounts:
-                current_account = next((acc for acc in accounts if acc['_id'] == st.session_state.metaapi_account_id),
-                                       None)
-                if current_account:
-                    st.write(f"**Account Name:** {current_account.get('name', 'N/A')}")
-                    st.write(f"**Account ID:** {current_account['_id']}")
-                    st.write(f"**Broker:** {current_account.get('broker', {}).get('name', 'N/A')}")
-                    st.write(f"**Type:** {current_account.get('type', 'N/A')}")
-                    st.write(f"**Status:** {current_account.get('state', 'N/A')}")
-                else:
-                    st.info("Account details not available")
+            account_info = get_account_information(st.session_state.metaapi_account_id)
+            if account_info:
+                st.write(f"**Balance:** ${account_info.get('balance', 'N/A')}")
+                st.write(f"**Equity:** ${account_info.get('equity', 'N/A')}")
+                st.write(f"**Margin:** ${account_info.get('margin', 'N/A')}")
+                st.write(f"**Free Margin:** ${account_info.get('freeMargin', 'N/A')}")
+                st.write(f"**Margin Level:** {account_info.get('marginLevel', 'N/A')}%")
             else:
-                st.info("No account information available")
+                accounts = get_metaapi_accounts()
+                if accounts:
+                    current_account = next(
+                        (acc for acc in accounts if acc['_id'] == st.session_state.metaapi_account_id), None)
+                    if current_account:
+                        st.write(f"**Account Name:** {current_account.get('name', 'N/A')}")
+                        st.write(f"**Account ID:** {current_account['_id']}")
+                        st.write(f"**Broker:** {current_account.get('broker', {}).get('name', 'N/A')}")
+                        st.write(f"**Type:** {current_account.get('type', 'N/A')}")
+                        st.write(f"**Status:** {current_account.get('state', 'N/A')}")
+                    else:
+                        st.info("Account details not available")
+                else:
+                    st.info("No account information available")
 
         with col_info2:
             st.subheader("💱 Available Symbols")
             symbols = get_metaapi_symbols(st.session_state.metaapi_account_id)
             if symbols:
-                # Group symbols by category for better display
-                major_pairs = [s for s in symbols if any(
-                    currency in s for currency in ['EUR', 'GBP', 'USD', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD'])]
-                commodities = [s for s in symbols if any(asset in s for asset in ['XAU', 'XAG', 'OIL'])]
-                indices = [s for s in symbols if
-                           any(index in s for index in ['US30', 'NAS100', 'SPX500', 'GER30', 'UK100'])]
+                # Display first 12 symbols in a compact format
+                cols = st.columns(4)
+                for i, symbol in enumerate(symbols[:12]):
+                    with cols[i % 4]:
+                        st.code(symbol)
 
-                if major_pairs:
-                    st.write("**Forex Majors:**")
-                    cols = st.columns(4)
-                    for i, symbol in enumerate(major_pairs[:8]):
-                        with cols[i % 4]:
-                            st.code(symbol)
-
-                if commodities:
-                    st.write("**Commodities:**")
-                    cols = st.columns(4)
-                    for i, symbol in enumerate(commodities[:4]):
-                        with cols[i % 4]:
-                            st.code(symbol)
+                if len(symbols) > 12:
+                    st.write(f"... and {len(symbols) - 12} more symbols")
             else:
                 st.info("No symbols available")
 
@@ -4505,15 +4524,13 @@ elif st.session_state.current_page == "Trade Signal":
             # Calculate totals
             if 'profit' in positions_df.columns:
                 total_profit = positions_df['profit'].sum()
-                total_volume = positions_df['volume'].sum() if 'volume' in positions_df.columns else 0
+                total_positions = len(positions)
 
-                col_pos1, col_pos2, col_pos3 = st.columns(3)
+                col_pos1, col_pos2 = st.columns(2)
                 with col_pos1:
-                    st.metric("Total Positions", len(positions))
+                    st.metric("Total Positions", total_positions)
                 with col_pos2:
                     st.metric("Total P/L", f"${total_profit:.2f}")
-                with col_pos3:
-                    st.metric("Total Volume", f"{total_volume:.2f}")
         else:
             st.info("No open positions found")
 
@@ -4715,7 +4732,7 @@ elif st.session_state.current_page == "Trade Signal":
                             reward_ratio = target_distance / stop_distance
                             st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
 
-    # Debug section (optional - remove in production)
+    # Debug section
     with st.expander("🔧 Debug Tools", expanded=False):
         def test_token_validity():
             """Test if the token can fetch account data"""
@@ -4725,12 +4742,11 @@ elif st.session_state.current_page == "Trade Signal":
                 config = get_metaapi_config()
                 token = config.get("token", "")
 
-                # Test the token length
                 st.write(f"Token length: {len(token)} characters")
 
-                # Try to get user accounts (correct endpoint)
+                # Test with correct endpoint
                 response = requests.get(
-                    "https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts",
+                    "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
                     headers={"auth-token": token},
                     timeout=10
                 )
@@ -4739,6 +4755,8 @@ elif st.session_state.current_page == "Trade Signal":
                     accounts_data = response.json()
                     st.success("✅ Token is valid!")
                     st.write(f"Found {len(accounts_data)} accounts")
+                    if accounts_data:
+                        st.write("First account:", accounts_data[0].get('name', 'Unknown'))
                     return True
                 else:
                     st.error(f"❌ Token validation failed: {response.status_code}")
@@ -4750,7 +4768,7 @@ elif st.session_state.current_page == "Trade Signal":
                 return False
 
 
-        if st.button("Test Token Validity"):
+        if st.button("Test Token & Accounts"):
             test_token_validity()
 
         if st.button("Clear Session State"):

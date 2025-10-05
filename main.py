@@ -4141,6 +4141,22 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
+    def format_symbol_for_pepperstone(symbol):
+        """Add .a suffix to symbols for Pepperstone broker"""
+        # Common symbols that need .a suffix for Pepperstone
+        pepperstone_symbols = [
+            'XAUUSD', 'XAGUSD', 'USOIL', 'UKOIL', 'NAS100', 'US30', 'SPX500',
+            'GER30', 'UK100', 'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD',
+            'USDCAD', 'NZDUSD', 'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY'
+        ]
+
+        # Check if the symbol is in our list and add .a suffix
+        if symbol in pepperstone_symbols:
+            return f"{symbol}.a"
+        else:
+            return symbol
+
+
     # METAAPI SDK Functions
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
@@ -4221,86 +4237,6 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Connection error: {str(e)}"
 
 
-    async def get_account_information():
-        """Get detailed account information"""
-        try:
-            account, error = await get_metaapi_account()
-            if error:
-                return None
-
-            # Always create a fresh connection for data fetching
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            account_info = await connection.get_account_information()
-
-            # Close connection after use
-            await connection.close()
-
-            return account_info
-        except Exception as e:
-            st.error(f"Error getting account info: {str(e)}")
-            return None
-
-
-    async def get_positions():
-        """Get open positions"""
-        try:
-            account, error = await get_metaapi_account()
-            if error:
-                return []
-
-            # Always create a fresh connection for data fetching
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            positions = await connection.get_positions()
-
-            # Close connection after use
-            await connection.close()
-
-            return positions
-        except Exception as e:
-            st.error(f"Error getting positions: {str(e)}")
-            return []
-
-
-    async def get_symbols():
-        """Get available symbols"""
-        try:
-            account, error = await get_metaapi_account()
-            if error:
-                return []
-
-            # Always create a fresh connection for data fetching
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            # Try to get symbols from server time or use common ones
-            try:
-                server_time = await connection.get_server_time()
-                common_symbols = [
-                    'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
-                    'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
-                ]
-                await connection.close()
-                return common_symbols
-            except:
-                common_symbols = [
-                    'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
-                    'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
-                ]
-                await connection.close()
-                return common_symbols
-
-        except Exception as e:
-            st.error(f"Error getting symbols: {str(e)}")
-            return []
-
-
     async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
         """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
         try:
@@ -4318,10 +4254,13 @@ elif st.session_state.current_page == "Trade Signal":
                 await connection.close()
                 return False, "❌ Stop loss and take profit are mandatory"
 
+            # Format symbol for Pepperstone broker (add .a suffix)
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
             # Place LIMIT order with mandatory SL and TP - USING SNAKE_CASE
             if order_type.upper() == "BUY":
                 result = await connection.create_limit_buy_order(
-                    symbol,
+                    formatted_symbol,  # Use formatted symbol with .a suffix
                     volume,
                     entry_price,  # Limit price for buy
                     stop_loss=sl,  # CORRECT: snake_case
@@ -4329,7 +4268,7 @@ elif st.session_state.current_page == "Trade Signal":
                 )
             else:  # SELL
                 result = await connection.create_limit_sell_order(
-                    symbol,
+                    formatted_symbol,  # Use formatted symbol with .a suffix
                     volume,
                     entry_price,  # Limit price for sell
                     stop_loss=sl,  # CORRECT: snake_case
@@ -4339,7 +4278,7 @@ elif st.session_state.current_page == "Trade Signal":
             # Close connection after trade
             await connection.close()
 
-            return True, f"✅ Limit order placed successfully with SL and TP (Code: {result.get('stringCode', 'N/A')})"
+            return True, f"✅ Limit order placed successfully for {formatted_symbol} with SL and TP (Code: {result.get('stringCode', 'N/A')})"
 
         except Exception as e:
             # Try to close connection if it exists
@@ -4396,32 +4335,70 @@ elif st.session_state.current_page == "Trade Signal":
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # Connection Status Section
-    st.subheader("🔗 MetaApi Connection")
+    # Connection Status Section - REDESIGNED
+    st.subheader("🔗 Connection Status")
 
-    col_status1, col_status2, col_status3 = st.columns(3)
+    # Create a more visually appealing status display
+    col1, col2, col3 = st.columns(3)
 
-    with col_status1:
-        status_color_metaapi = "🟢" if st.session_state.metaapi_connected else "🔴"
-        status_text_metaapi = "Connected" if st.session_state.metaapi_connected else "Disconnected"
-        st.metric("MetaApi Status", f"{status_color_metaapi} {status_text_metaapi}")
+    with col1:
+        # MetaApi Status
+        if st.session_state.metaapi_connected:
+            st.markdown("""
+            <div style="background-color: #d4edda; padding: 15px; border-radius: 10px; border-left: 5px solid #28a745;">
+                <h4 style="margin: 0; color: #155724;">🌐 MetaApi</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #155724;">🟢 Connected</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color: #f8d7da; padding: 15px; border-radius: 10px; border-left: 5px solid #dc3545;">
+                <h4 style="margin: 0; color: #721c24;">🌐 MetaApi</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #721c24;">🔴 Disconnected</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col_status2:
-        status_color_account = "🟢" if st.session_state.metaapi_account_id else "🔴"
-        status_text_account = "Connected" if st.session_state.metaapi_account_id else "No Account"
-        st.metric("Trading Account", f"{status_color_account} {status_text_account}")
+    with col2:
+        # Trading Account Status
+        if st.session_state.metaapi_account_id:
+            st.markdown("""
+            <div style="background-color: #d4edda; padding: 15px; border-radius: 10px; border-left: 5px solid #28a745;">
+                <h4 style="margin: 0; color: #155724;">📊 Trading Account</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #155724;">🟢 Connected</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 10px; border-left: 5px solid #ffc107;">
+                <h4 style="margin: 0; color: #856404;">📊 Trading Account</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #856404;">🟡 No Account</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col_status3:
-        # Display signal count
+    with col3:
+        # Active Signals
         signal_count = len(st.session_state.trade_signals)
-        status_color_signals = "🟢" if signal_count > 0 else "⚪"
-        st.metric("Active Signals", f"{status_color_signals} {signal_count}")
+        if signal_count > 0:
+            st.markdown(f"""
+            <div style="background-color: #d1ecf1; padding: 15px; border-radius: 10px; border-left: 5px solid #17a2b8;">
+                <h4 style="margin: 0; color: #0c5460;">🎯 Active Signals</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #0c5460;">🟢 {signal_count}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background-color: #e2e3e5; padding: 15px; border-radius: 10px; border-left: 5px solid #6c757d;">
+                <h4 style="margin: 0; color: #383d41;">🎯 Active Signals</h4>
+                <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #383d41;">⚪ 0</p>
+            </div>
+            """, unsafe_allow_html=True)
 
     # Connection Management
+    st.subheader("🔧 Connection Management")
     col_conn1, col_conn2 = st.columns(2)
 
     with col_conn1:
-        if st.button("🔄 Check MetaApi Connection", type="primary"):
+        if st.button("🔄 Check MetaApi Connection", type="primary", use_container_width=True):
             import asyncio
 
             success, message = asyncio.run(test_metaapi_connection())
@@ -4433,16 +4410,16 @@ elif st.session_state.current_page == "Trade Signal":
                 st.error(message)
 
     with col_conn2:
-        if st.button("🔄 Refresh Signals", type="secondary"):
+        if st.button("🔄 Refresh Signals", type="secondary", use_container_width=True):
             cloud_signals = load_trade_signals_from_sheets()
             st.session_state.trade_signals = cloud_signals
             st.success(f"🔄 Synced {len(cloud_signals)} trade signals")
             st.rerun()
 
     # MetaApi Account Connection Section
-    st.subheader("🔐 MetaApi Account Setup")
+    st.subheader("🔐 Account Setup")
 
-    with st.expander("Account Configuration", expanded=not st.session_state.metaapi_connected):
+    with st.expander("MetaApi Configuration", expanded=not st.session_state.metaapi_connected):
         config = get_metaapi_config()
         token = config.get("token", "")
 
@@ -4452,11 +4429,17 @@ elif st.session_state.current_page == "Trade Signal":
         else:
             st.success("✅ MetaApi token configured")
 
-            # Display current account ID
-            st.info(f"**Account ID:** {st.session_state.metaapi_account_id}")
+            # Display current account ID in a nice box
+            st.markdown(f"""
+            <div style="background-color: #e8f4fd; padding: 10px; border-radius: 5px; border: 1px solid #b8daff;">
+                <strong>Account ID:</strong> <code>{st.session_state.metaapi_account_id}</code>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.write("")  # Spacing
 
             # Manual connection
-            if st.button("🔗 Connect to Account", type="primary"):
+            if st.button("🔗 Connect to Trading Account", type="primary", use_container_width=True):
                 import asyncio
 
                 with st.spinner("Connecting to MetaApi account..."):
@@ -4466,66 +4449,6 @@ elif st.session_state.current_page == "Trade Signal":
                         st.success(message)
                     else:
                         st.error(message)
-
-    # MetaApi Account Information
-    if st.session_state.metaapi_connected:
-        st.success(f"✅ MetaApi Account {st.session_state.metaapi_account_id} is connected")
-
-        # Display account information and symbols in columns
-        col_info1, col_info2 = st.columns(2)
-
-        with col_info1:
-            st.subheader("📊 Account Overview")
-            if st.button("🔄 Refresh Account Info"):
-                import asyncio
-
-                account_info = asyncio.run(get_account_information())
-                if account_info:
-                    st.write(f"**Balance:** ${account_info.get('balance', 'N/A')}")
-                    st.write(f"**Equity:** ${account_info.get('equity', 'N/A')}")
-                    st.write(f"**Margin:** ${account_info.get('margin', 'N/A')}")
-                    st.write(f"**Free Margin:** ${account_info.get('freeMargin', 'N/A')}")
-                    st.write(f"**Margin Level:** {account_info.get('marginLevel', 'N/A')}%")
-                else:
-                    st.info("Could not load account information")
-
-        with col_info2:
-            st.subheader("💱 Available Symbols")
-            if st.button("🔄 Refresh Symbols"):
-                import asyncio
-
-                symbols = asyncio.run(get_symbols())
-                if symbols:
-                    # Display symbols in a compact format
-                    cols = st.columns(4)
-                    for i, symbol in enumerate(symbols[:12]):
-                        with cols[i % 4]:
-                            st.code(symbol)
-                else:
-                    st.info("Could not load symbols")
-
-        # Open Positions
-        st.subheader("📈 Open Positions")
-        if st.button("🔄 Refresh Positions"):
-            import asyncio
-
-            positions = asyncio.run(get_positions())
-            if positions:
-                positions_df = pd.DataFrame(positions)
-                st.dataframe(positions_df, use_container_width=True)
-
-                # Calculate totals
-                if 'profit' in positions_df.columns:
-                    total_profit = positions_df['profit'].sum()
-                    total_positions = len(positions)
-
-                    col_pos1, col_pos2 = st.columns(2)
-                    with col_pos1:
-                        st.metric("Total Positions", total_positions)
-                    with col_pos2:
-                        st.metric("Total P/L", f"${total_profit:.2f}")
-            else:
-                st.info("No open positions found")
 
     st.markdown("---")
 
@@ -4639,6 +4562,11 @@ elif st.session_state.current_page == "Trade Signal":
                 direction_color = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
                 st.write(f"**Direction:** {direction_color} {direction}")
 
+                # Show formatted symbol for trading
+                formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
+                if formatted_symbol != signal['selected_pair']:
+                    st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
+
                 # Trade Validation Section
                 st.write("---")
                 st.subheader("🔍 Trade Validation")
@@ -4693,9 +4621,9 @@ elif st.session_state.current_page == "Trade Signal":
                                          use_container_width=True):
                                 import asyncio
 
-                                with st.spinner(f"Placing {direction} limit order for {signal['selected_pair']}..."):
+                                with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
                                     success, message = asyncio.run(place_trade(
-                                        symbol=signal['selected_pair'],
+                                        symbol=signal['selected_pair'],  # Original symbol gets formatted in place_trade
                                         volume=float(signal.get('position_size', 0.1)),
                                         order_type=direction,
                                         entry_price=entry_price,

@@ -4150,6 +4150,9 @@ elif st.session_state.current_page == "Trade Signal":
                         lambda row: calculate_direction(row['entry_price'], row['exit_price']),
                         axis=1
                     )
+                else:
+                    # If direction columns don't exist, create empty direction column
+                    df['direction'] = "Unknown"
 
                 return df.to_dict('records')
             return []
@@ -4177,7 +4180,18 @@ elif st.session_state.current_page == "Trade Signal":
 
     with col2:
         if st.session_state.trade_signals:
-            csv_data = pd.DataFrame(st.session_state.trade_signals)
+            # Ensure direction column exists before exporting
+            export_data = []
+            for signal in st.session_state.trade_signals:
+                signal_copy = signal.copy()
+                if 'direction' not in signal_copy:
+                    signal_copy['direction'] = calculate_direction(
+                        signal_copy.get('entry_price'),
+                        signal_copy.get('exit_price')
+                    )
+                export_data.append(signal_copy)
+
+            csv_data = pd.DataFrame(export_data)
             csv = csv_data.to_csv(index=False)
             st.download_button(
                 label="📤 Export CSV",
@@ -4203,13 +4217,39 @@ elif st.session_state.current_page == "Trade Signal":
         st.subheader(f"Active Trade Signals ({len(st.session_state.trade_signals)})")
         st.info("💡 These are read-only signals synced from Active Opportunities. Manage them in the Active Opps page.")
 
-        # Convert to DataFrame for nice display
-        signals_df = pd.DataFrame(st.session_state.trade_signals)
+        # Convert to DataFrame for nice display and ensure direction column exists
+        signals_data = []
+        for signal in st.session_state.trade_signals:
+            signal_copy = signal.copy()
+            # Ensure direction is calculated for each signal
+            if 'direction' not in signal_copy:
+                signal_copy['direction'] = calculate_direction(
+                    signal_copy.get('entry_price'),
+                    signal_copy.get('exit_price')
+                )
+            signals_data.append(signal_copy)
 
-        # Calculate direction counts
-        buy_signals = len(signals_df[signals_df['direction'] == 'buy'])
-        sell_signals = len(signals_df[signals_df['direction'] == 'sell'])
-        unknown_signals = len(signals_df[signals_df['direction'] == 'Unknown'])
+        signals_df = pd.DataFrame(signals_data)
+
+        # Safely calculate direction counts
+        buy_signals = 0
+        sell_signals = 0
+        unknown_signals = 0
+
+        if 'direction' in signals_df.columns:
+            buy_signals = len(signals_df[signals_df['direction'] == 'buy'])
+            sell_signals = len(signals_df[signals_df['direction'] == 'sell'])
+            unknown_signals = len(signals_df[signals_df['direction'] == 'Unknown'])
+        else:
+            # If direction column doesn't exist, calculate for all signals
+            for signal in st.session_state.trade_signals:
+                direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
+                if direction == 'buy':
+                    buy_signals += 1
+                elif direction == 'sell':
+                    sell_signals += 1
+                else:
+                    unknown_signals += 1
 
         # Display summary statistics
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -4223,7 +4263,7 @@ elif st.session_state.current_page == "Trade Signal":
         with col4:
             st.metric("Sell Signals", sell_signals)
         with col5:
-            avg_position = signals_df['position_size'].mean()
+            avg_position = signals_df['position_size'].mean() if 'position_size' in signals_df.columns else 0
             st.metric("Avg Position Size", f"{avg_position:.2f}")
 
         # Display the dataframe with direction
@@ -4240,7 +4280,7 @@ elif st.session_state.current_page == "Trade Signal":
                 with col1:
                     st.write(f"**Pair:** {signal['selected_pair']}")
                     st.write(f"**Strategy:** {signal['risk_multiplier']}")
-                    st.write(f"**Position Size:** {signal['position_size']}")
+                    st.write(f"**Position Size:** {signal.get('position_size', 'N/A')}")
                     st.write(f"**Stop Pips:** {signal.get('stop_pips', 'N/A')}")
                     st.write(f"**Trend Position:** {signal.get('trend_position', 'N/A')}")
                     st.write(f"**Variance:** {signal.get('variances', 'N/A')}")
@@ -4259,7 +4299,7 @@ elif st.session_state.current_page == "Trade Signal":
                     target_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Target Price:** {target_price:.5f}")
 
-                # Display Direction with color coding
+                # Calculate and display Direction with color coding
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
                 direction_color = "🟢" if direction == "buy" else "🔴" if direction == "sell" else "⚪"
 
@@ -4293,20 +4333,27 @@ elif st.session_state.current_page == "Trade Signal":
 
         col_sum1, col_sum2, col_sum3 = st.columns(3)
         with col_sum1:
+            total_signals = len(signals_df)
+            buy_percentage = (buy_signals / total_signals * 100) if total_signals > 0 else 0
             st.metric("Buy Signals", buy_signals,
-                      delta=f"{(buy_signals / len(signals_df) * 100):.1f}%" if signals_df else "0%")
+                      delta=f"{buy_percentage:.1f}%")
         with col_sum2:
+            sell_percentage = (sell_signals / total_signals * 100) if total_signals > 0 else 0
             st.metric("Sell Signals", sell_signals,
-                      delta=f"{(sell_signals / len(signals_df) * 100):.1f}%" if signals_df else "0%")
+                      delta=f"{sell_percentage:.1f}%")
         with col_sum3:
+            unknown_percentage = (unknown_signals / total_signals * 100) if total_signals > 0 else 0
             st.metric("Unknown", unknown_signals,
-                      delta=f"{(unknown_signals / len(signals_df) * 100):.1f}%" if signals_df else "0%")
+                      delta=f"{unknown_percentage:.1f}%")
 
         # Direction by Pair
-        if len(signals_df) > 0:
+        if len(signals_df) > 0 and 'direction' in signals_df.columns:
             st.subheader("Direction by Trading Pair")
-            direction_by_pair = signals_df.groupby(['selected_pair', 'direction']).size().unstack(fill_value=0)
-            st.dataframe(direction_by_pair, use_container_width=True)
+            try:
+                direction_by_pair = signals_df.groupby(['selected_pair', 'direction']).size().unstack(fill_value=0)
+                st.dataframe(direction_by_pair, use_container_width=True)
+            except Exception as e:
+                st.warning("Could not generate direction by pair analysis.")
 
         # Clear all signals button
         st.markdown("---")

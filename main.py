@@ -3535,23 +3535,49 @@ elif st.session_state.current_page == "Active Opps":
         records_df = pd.DataFrame(st.session_state.saved_records)
         st.dataframe(records_df, use_container_width=True)
 
-        # WORKFLOW VISUALIZATION - Horizontal workflow display
+        # WORKFLOW VISUALIZATION - Clickable stage headers
         st.markdown("---")
-        st.subheader("Workflow Progress")
+        st.subheader("Workflow Stages")
 
-        # Create a horizontal workflow visualization
+        # Create clickable stage headers using columns
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown(f"### Speculation ({speculation_count})")
-            st.progress(speculation_count / max(len(st.session_state.saved_records), 1))
+            # Initialize session state for current stage if not exists
+            if 'current_stage' not in st.session_state:
+                st.session_state.current_stage = 'Speculation'
+
+            # Make Speculation clickable
+            if st.button(f"Speculation ({speculation_count})",
+                         use_container_width=True,
+                         type="primary" if st.session_state.current_stage == 'Speculation' else "secondary"):
+                st.session_state.current_stage = 'Speculation'
+                st.rerun()
 
         with col2:
-            st.markdown(f"### Order Ready ({order_ready_count})")
-            st.progress(order_ready_count / max(len(st.session_state.saved_records), 1))
+            # Make Order Ready clickable
+            if st.button(f"Order Ready ({order_ready_count})",
+                         use_container_width=True,
+                         type="primary" if st.session_state.current_stage == 'Order Ready' else "secondary"):
+                st.session_state.current_stage = 'Order Ready'
+                st.rerun()
 
         with col3:
-            st.markdown(f"### Order Completed ({order_completed_count})")
+            # Make Order Completed clickable
+            if st.button(f"Order Completed ({order_completed_count})",
+                         use_container_width=True,
+                         type="primary" if st.session_state.current_stage == 'Order Completed' else "secondary"):
+                st.session_state.current_stage = 'Order Completed'
+                st.rerun()
+
+        # Progress bars below the clickable headers
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_prog1, col_prog2, col_prog3 = st.columns(3)
+        with col_prog1:
+            st.progress(speculation_count / max(len(st.session_state.saved_records), 1))
+        with col_prog2:
+            st.progress(order_ready_count / max(len(st.session_state.saved_records), 1))
+        with col_prog3:
             st.progress(order_completed_count / max(len(st.session_state.saved_records), 1))
 
         st.markdown("---")
@@ -3584,61 +3610,69 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Record deleted locally but failed to save to cloud. Use CSV export to backup.")
 
 
-        # Create tabs for the three stages
-        tab1, tab2, tab3 = st.tabs([
-            f"Speculation ({speculation_count})",
-            f"Order Ready ({order_ready_count})",
-            f"Order Completed ({order_completed_count})"
-        ])
+        # Display records based on selected stage
+        current_stage = st.session_state.current_stage
+        st.subheader(f"{current_stage} Stage")
 
-        # Tab 1: Speculation
-        with tab1:
-            speculation_records = [record for record in st.session_state.saved_records if
-                                   record.get('status') == 'Speculation']
-            if not speculation_records:
-                st.info("No records in speculation stage.")
-            else:
-                for i, record in enumerate(speculation_records):
-                    # Find the original index in the main records list
-                    original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
-                                           r['timestamp'] == record['timestamp']), None)
+        # Get records for the current stage
+        if current_stage == 'Speculation':
+            stage_records = [record for record in st.session_state.saved_records if
+                             record.get('status') == 'Speculation']
+        elif current_stage == 'Order Ready':
+            stage_records = [record for record in st.session_state.saved_records if
+                             record.get('status') == 'Order Ready']
+        else:  # Order Completed
+            stage_records = [record for record in st.session_state.saved_records if
+                             record.get('status') == 'Order Completed']
 
-                    if original_index is not None:
-                        with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=False):
-                            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+        if not stage_records:
+            st.info(f"No records in {current_stage.lower()} stage.")
+        else:
+            for i, record in enumerate(stage_records):
+                # Find the original index in the main records list
+                original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
+                                       r['timestamp'] == record['timestamp']), None)
 
-                            with col1:
-                                st.write(f"**Pair:** {record['selected_pair']}")
-                                st.write(f"**Strategy:** {record['risk_multiplier']}")
-                                st.write(f"**Position Size:** {record['position_size']}")
-                                st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
+                if original_index is not None:
+                    with st.expander(
+                            f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
+                            expanded=False):
 
-                            with col2:
-                                new_entry_price = st.number_input(
-                                    "Entry Price",
-                                    value=safe_float(record.get('entry_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"spec_entry_{original_index}"
-                                )
+                        # Common fields for all stages
+                        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
-                            with col3:
-                                new_exit_price = st.number_input(
-                                    "Exit Price",
-                                    value=safe_float(record.get('exit_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"spec_exit_{original_index}"
-                                )
+                        with col1:
+                            st.write(f"**Pair:** {record['selected_pair']}")
+                            st.write(f"**Strategy:** {record['risk_multiplier']}")
+                            st.write(f"**Position Size:** {record['position_size']}")
+                            st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
 
-                            with col4:
-                                new_target_price = st.number_input(
-                                    "Target Price",
-                                    value=safe_float(record.get('target_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"spec_target_{original_index}"
-                                )
+                        with col2:
+                            new_entry_price = st.number_input(
+                                "Entry Price",
+                                value=safe_float(record.get('entry_price'), 0.0),
+                                format="%.5f",
+                                key=f"{current_stage.lower()}_entry_{original_index}"
+                            )
 
+                        with col3:
+                            new_exit_price = st.number_input(
+                                "Exit Price",
+                                value=safe_float(record.get('exit_price'), 0.0),
+                                format="%.5f",
+                                key=f"{current_stage.lower()}_exit_{original_index}"
+                            )
+
+                        with col4:
+                            new_target_price = st.number_input(
+                                "Target Price",
+                                value=safe_float(record.get('target_price'), 0.0),
+                                format="%.5f",
+                                key=f"{current_stage.lower()}_target_{original_index}"
+                            )
+
+                        # Stage-specific logic
+                        if current_stage == 'Speculation':
                             # Calculate expected stop pips based on current entry/exit prices
                             expected_stop_pips = None
                             if new_entry_price != 0 and new_exit_price != 0:
@@ -3702,53 +3736,7 @@ elif st.session_state.current_page == "Active Opps":
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Tab 2: Order Ready
-        with tab2:
-            order_ready_records = [record for record in st.session_state.saved_records if
-                                   record.get('status') == 'Order Ready']
-            if not order_ready_records:
-                st.info("No records in order ready stage.")
-            else:
-                for i, record in enumerate(order_ready_records):
-                    original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
-                                           r['timestamp'] == record['timestamp']), None)
-
-                    if original_index is not None:
-                        with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=False):
-                            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-
-                            with col1:
-                                st.write(f"**Pair:** {record['selected_pair']}")
-                                st.write(f"**Strategy:** {record['risk_multiplier']}")
-                                st.write(f"**Position Size:** {record['position_size']}")
-                                st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
-
-                            with col2:
-                                new_entry_price = st.number_input(
-                                    "Entry Price",
-                                    value=safe_float(record.get('entry_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"ready_entry_{original_index}"
-                                )
-
-                            with col3:
-                                new_exit_price = st.number_input(
-                                    "Exit Price",
-                                    value=safe_float(record.get('exit_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"ready_exit_{original_index}"
-                                )
-
-                            with col4:
-                                new_target_price = st.number_input(
-                                    "Target Price",
-                                    value=safe_float(record.get('target_price'), 0.0),
-                                    format="%.5f",
-                                    key=f"ready_target_{original_index}"
-                                )
-
+                        elif current_stage == 'Order Ready':
                             # Update button for this record
                             col_update, col_delete = st.columns(2)
                             with col_update:
@@ -3767,39 +3755,11 @@ elif st.session_state.current_page == "Active Opps":
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Tab 3: Order Completed
-        with tab3:
-            completed_records = [record for record in st.session_state.saved_records if
-                                 record.get('status') == 'Order Completed']
-            if not completed_records:
-                st.info("No records in order completed stage.")
-            else:
-                for i, record in enumerate(completed_records):
-                    original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
-                                           r['timestamp'] == record['timestamp']), None)
+                        else:  # Order Completed
+                            # Additional fields for Order Completed stage
+                            col5, col6, col7, col8 = st.columns(4)
 
-                    if original_index is not None:
-                        with st.expander(
-                                f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=False):
-                            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-
-                            with col1:
-                                st.write(f"**Pair:** {record['selected_pair']}")
-                                st.write(f"**Strategy:** {record['risk_multiplier']}")
-                                st.write(f"**Position Size:** {record['position_size']}")
-                                st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
-                                st.write(f"**Entry Price:** {record.get('entry_price', 'N/A')}")
-                                st.write(f"**Exit Price:** {record.get('exit_price', 'N/A')}")
-                                st.write(f"**Target Price:** {record.get('target_price', 'N/A')}")
-
-                                # Display existing Trend Position and Variance (read-only)
-                                existing_trend_position = record.get('trend_position', 'Not set')
-                                existing_variance = record.get('Variances', 'Not set')
-                                st.write(f"**Trend Position:** {existing_trend_position}")
-                                st.write(f"**Variance:** {existing_variance}")
-
-                            with col2:
+                            with col5:
                                 # Result dropdown
                                 result_options = ["BE", "Loss", "Win"]
                                 new_result = st.selectbox(
@@ -3809,6 +3769,7 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"completed_result_{original_index}"
                                 )
 
+                            with col6:
                                 # Direction dropdown
                                 direction_options = ["buy", "sell"]
                                 new_direction = st.selectbox(
@@ -3818,7 +3779,7 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"completed_direction_{original_index}"
                                 )
 
-                            with col3:
+                            with col7:
                                 # RR input
                                 new_rr = st.number_input(
                                     "RR",
@@ -3828,7 +3789,7 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"completed_rr_{original_index}"
                                 )
 
-                            with col4:
+                            with col8:
                                 # PnL input
                                 new_pnl = st.number_input(
                                     "PnL",
@@ -3839,8 +3800,8 @@ elif st.session_state.current_page == "Active Opps":
                                 )
 
                             # Additional required fields
-                            col5, col6 = st.columns(2)
-                            with col5:
+                            col9, col10 = st.columns(2)
+                            with col9:
                                 # POI dropdown
                                 poi_options = ["Weekly", "2_Daily"]
                                 new_poi = st.selectbox(
@@ -3850,7 +3811,7 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"completed_poi_{original_index}"
                                 )
 
-                            with col6:
+                            with col10:
                                 # Strategy (pre-filled from record)
                                 st.text_input(
                                     "Strategy",
@@ -3858,6 +3819,16 @@ elif st.session_state.current_page == "Active Opps":
                                     key=f"completed_strategy_{original_index}",
                                     disabled=True
                                 )
+
+                            # Display existing Trend Position and Variance (read-only)
+                            st.write("---")
+                            col_info1, col_info2 = st.columns(2)
+                            with col_info1:
+                                existing_trend_position = record.get('trend_position', 'Not set')
+                                st.write(f"**Trend Position:** {existing_trend_position}")
+                            with col_info2:
+                                existing_variance = record.get('Variances', 'Not set')
+                                st.write(f"**Variance:** {existing_variance}")
 
                             # Close Record button
                             col_close, col_delete = st.columns(2)

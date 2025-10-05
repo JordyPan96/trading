@@ -4322,7 +4322,7 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Error checking order status: {str(e)}"
 
 
-    # Add trade signal functions next
+    # Add trade signal functions next - UPDATED TO SYNC WITH ACTIVE OPPS
     def load_trade_signals_from_sheets():
         """Load trade signals from Google Sheets"""
         try:
@@ -4351,6 +4351,43 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
+    def sync_with_active_opps():
+        """Sync trade signals with current Active Opps Order Ready records"""
+        try:
+            # Load current workflow data to get Order Ready records
+            workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
+
+            if workflow_df is not None and not workflow_df.empty:
+                # Get Order Ready records
+                order_ready_records = workflow_df[workflow_df['status'] == 'Order Ready'].to_dict('records')
+
+                # Update session state
+                st.session_state.ready_to_order = []
+
+                for record in order_ready_records:
+                    trade_signal = {
+                        'timestamp': record.get('timestamp'),
+                        'selected_pair': record.get('selected_pair'),
+                        'risk_multiplier': record.get('risk_multiplier'),
+                        'position_size': record.get('position_size'),
+                        'stop_pips': record.get('stop_pips'),
+                        'entry_price': record.get('entry_price'),
+                        'exit_price': record.get('exit_price'),
+                        'target_price': record.get('target_price'),
+                        'trend_position': record.get('trend_position', 'Not set'),
+                        'variances': record.get('Variances', 'Not set'),
+                        'status': 'Order Ready'
+                    }
+                    st.session_state.ready_to_order.append(trade_signal)
+
+                return True
+            return False
+
+        except Exception as e:
+            st.error(f"Error syncing with Active Opps: {e}")
+            return False
+
+
     # Initialize session states
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
@@ -4377,11 +4414,10 @@ elif st.session_state.current_page == "Trade Signal":
     if 'order_history' not in st.session_state:
         st.session_state.order_history = {}
 
-    # Load from Google Sheets on page load
-    if not st.session_state.trade_signals:
-        st.session_state.trade_signals = load_trade_signals_from_sheets()
-        # Initialize ready_to_order with all signals
-        st.session_state.ready_to_order = st.session_state.trade_signals.copy()
+    # Sync with Active Opps on page load
+    if not st.session_state.ready_to_order:
+        with st.spinner("🔄 Syncing with Active Opportunities..."):
+            sync_with_active_opps()
 
     # Auto-connect to MetaApi account in background
     if not st.session_state.metaapi_connected:
@@ -4409,7 +4445,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Connection Management
     st.subheader("🔧 Connection Management")
-    col_conn1, col_conn2 = st.columns(2)
+    col_conn1, col_conn2, col_conn3 = st.columns(3)
 
     with col_conn1:
         if st.button("🔄 Reconnect to Account", type="primary", use_container_width=True):
@@ -4426,14 +4462,14 @@ elif st.session_state.current_page == "Trade Signal":
 
     with col_conn2:
         if st.button("🔄 Refresh Signals", type="secondary", use_container_width=True):
-            cloud_signals = load_trade_signals_from_sheets()
-            st.session_state.trade_signals = cloud_signals
-            # Add new signals to ready_to_order
-            current_ready_symbols = [s['selected_pair'] for s in st.session_state.ready_to_order]
-            for signal in cloud_signals:
-                if signal['selected_pair'] not in current_ready_symbols:
-                    st.session_state.ready_to_order.append(signal)
-            st.success(f"🔄 Synced {len(cloud_signals)} trade signals")
+            with st.spinner("Syncing with Active Opps..."):
+                sync_with_active_opps()
+            st.success(f"🔄 Synced {len(st.session_state.ready_to_order)} Order Ready signals")
+            st.rerun()
+
+    with col_conn3:
+        if st.button("📊 View Active Opps", type="secondary", use_container_width=True):
+            st.session_state.current_page = "Active Opps"
             st.rerun()
 
     # Show connection status
@@ -4448,19 +4484,9 @@ elif st.session_state.current_page == "Trade Signal":
     st.subheader("🎯 Active Trade Signals")
 
     # Export functionality
-    if st.session_state.trade_signals:
-        # Ensure direction column exists before exporting
-        export_data = []
-        for signal in st.session_state.trade_signals:
-            signal_copy = signal.copy()
-            if 'direction' not in signal_copy:
-                signal_copy['direction'] = calculate_direction(
-                    signal_copy.get('entry_price'),
-                    signal_copy.get('exit_price')
-                )
-            export_data.append(signal_copy)
-
-        csv_data = pd.DataFrame(export_data)
+    if st.session_state.ready_to_order or st.session_state.order_placed or st.session_state.in_trade:
+        all_signals = st.session_state.ready_to_order + st.session_state.order_placed + st.session_state.in_trade
+        csv_data = pd.DataFrame(all_signals)
         csv = csv_data.to_csv(index=False)
 
         col_export1, col_export2 = st.columns(2)
@@ -4476,15 +4502,15 @@ elif st.session_state.current_page == "Trade Signal":
 
         with col_export2:
             if st.button("🔄 Sync with Google Sheets", use_container_width=True):
-                cloud_signals = load_trade_signals_from_sheets()
-                st.session_state.trade_signals = cloud_signals
-                st.success(f"Synced {len(cloud_signals)} signals from Google Sheets")
+                with st.spinner("Syncing with Active Opps..."):
+                    sync_with_active_opps()
+                st.success(f"Synced {len(st.session_state.ready_to_order)} signals from Active Opps")
                 st.rerun()
     else:
         st.button("📤 Export CSV", disabled=True)
 
     # Display trade signals in tabs
-    if not st.session_state.trade_signals:
+    if not st.session_state.ready_to_order and not st.session_state.order_placed and not st.session_state.in_trade:
         st.info("""
         ## 📭 No Active Trade Signals
 
@@ -4508,8 +4534,10 @@ elif st.session_state.current_page == "Trade Signal":
 
         with tab1:
             st.subheader("📋 Ready to Order")
+            st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
+
             if not st.session_state.ready_to_order:
-                st.info("No signals ready for ordering. All signals have been processed.")
+                st.info("No signals ready for ordering. Check Active Opps page for 'Order Ready' records.")
             else:
                 for i, signal in enumerate(st.session_state.ready_to_order):
                     with st.expander(f"🎯 {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}", expanded=True):
@@ -4551,6 +4579,11 @@ elif st.session_state.current_page == "Trade Signal":
                         direction_color = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
                         st.write(f"**Direction:** {direction_color} {direction}")
 
+                        # Show formatted symbol for trading
+                        formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
+                        if formatted_symbol != signal['selected_pair']:
+                            st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
+
                         # Execution button
                         if st.session_state.metaapi_connected:
                             validation_ok = entry_price > 0 and stop_val > 0 and target_val > 0
@@ -4562,7 +4595,6 @@ elif st.session_state.current_page == "Trade Signal":
                                         use_container_width=True):
                                     import asyncio
 
-                                    formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
                                     with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
                                         success, message = asyncio.run(place_trade(
                                             symbol=signal['selected_pair'],
@@ -4576,12 +4608,12 @@ elif st.session_state.current_page == "Trade Signal":
                                             # Move from ready_to_order to order_placed
                                             st.session_state.ready_to_order = [s for s in
                                                                                st.session_state.ready_to_order if
-                                                                               s['selected_pair'] != signal[
-                                                                                   'selected_pair']]
+                                                                               s['timestamp'] != signal['timestamp']]
                                             st.session_state.order_placed.append({
                                                 **signal,
                                                 'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                                'order_status': 'PENDING'
+                                                'order_status': 'PENDING',
+                                                'direction': direction
                                             })
                                             st.success(f"✅ Order placed: {message}")
                                             st.rerun()
@@ -4592,10 +4624,17 @@ elif st.session_state.current_page == "Trade Signal":
                         else:
                             st.warning("🔒 Not connected to trading account")
 
+                        # Notes section
+                        if signal.get('notes'):
+                            st.write("---")
+                            st.write(f"**Notes:** {signal.get('notes')}")
+
         with tab2:
             st.subheader("⏳ Order Placed")
+            st.info("Orders that have been placed but not yet filled. Check status and mark as filled when executed.")
+
             if not st.session_state.order_placed:
-                st.info("No orders placed yet. Orders will appear here after execution.")
+                st.info("No orders placed yet. Orders will appear here after execution from Ready to Order tab.")
             else:
                 for i, order in enumerate(st.session_state.order_placed):
                     with st.expander(f"⏳ {order['selected_pair']} | Placed: {order.get('order_time', 'N/A')}",
@@ -4604,8 +4643,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         with col1:
                             st.write(f"**Instrument:** {order['selected_pair']}")
-                            st.write(
-                                f"**Direction:** {calculate_direction(order.get('entry_price'), order.get('exit_price'))}")
+                            st.write(f"**Direction:** {order.get('direction', 'Unknown')}")
                             st.write(f"**Position Size:** {order.get('position_size', 'N/A')} lots")
                             st.write(f"**Status:** {order.get('order_status', 'PENDING')}")
 
@@ -4628,7 +4666,7 @@ elif st.session_state.current_page == "Trade Signal":
                                 st.success("✅ Order filled! Moving to In Trade tab.")
                                 # Move to in_trade
                                 st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['selected_pair'] != order['selected_pair']]
+                                                                 o['timestamp'] != order['timestamp']]
                                 st.session_state.in_trade.append({
                                     **order,
                                     'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -4640,7 +4678,7 @@ elif st.session_state.current_page == "Trade Signal":
                             if st.button("✅ Mark as Filled", key=f"fill_{i}", type="primary", use_container_width=True):
                                 # Move to in_trade
                                 st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['selected_pair'] != order['selected_pair']]
+                                                                 o['timestamp'] != order['timestamp']]
                                 st.session_state.in_trade.append({
                                     **order,
                                     'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -4651,6 +4689,8 @@ elif st.session_state.current_page == "Trade Signal":
 
         with tab3:
             st.subheader("✅ In Trade")
+            st.info("Active trades that have been filled. Monitor these positions and close when trade is completed.")
+
             if not st.session_state.in_trade:
                 st.info("No active trades. Filled orders will appear here.")
             else:
@@ -4661,8 +4701,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         with col1:
                             st.write(f"**Instrument:** {trade['selected_pair']}")
-                            st.write(
-                                f"**Direction:** {calculate_direction(trade.get('entry_price'), trade.get('exit_price'))}")
+                            st.write(f"**Direction:** {trade.get('direction', 'Unknown')}")
                             st.write(f"**Position Size:** {trade.get('position_size', 'N/A')} lots")
                             st.write(f"**Status:** {trade.get('order_status', 'FILLED')}")
 
@@ -4682,14 +4721,14 @@ elif st.session_state.current_page == "Trade Signal":
                         with col_close:
                             if st.button("📊 Close Trade", key=f"close_{i}", type="primary", use_container_width=True):
                                 st.session_state.in_trade = [t for t in st.session_state.in_trade if
-                                                             t['selected_pair'] != trade['selected_pair']]
+                                                             t['timestamp'] != trade['timestamp']]
                                 st.success("Trade closed and removed from active trades")
                                 st.rerun()
 
                         with col_cancel:
                             if st.button("↩️ Move Back", key=f"back_{i}", use_container_width=True):
                                 st.session_state.in_trade = [t for t in st.session_state.in_trade if
-                                                             t['selected_pair'] != trade['selected_pair']]
+                                                             t['timestamp'] != trade['timestamp']]
                                 st.session_state.order_placed.append(trade)
                                 st.success("Trade moved back to Order Placed")
                                 st.rerun()

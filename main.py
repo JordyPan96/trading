@@ -3409,7 +3409,7 @@ elif st.session_state.current_page == "Active Opps":
                             workflow_csv_data[col] = pd.to_numeric(workflow_csv_data[col], errors='coerce').fillna(0.0)
 
                     # Ensure status values are valid
-                    valid_statuses = ['Speculation', 'Limit Placed', 'Order Filled']
+                    valid_statuses = ['Speculation', 'Order Ready', 'Order Completed']
                     workflow_csv_data['status'] = workflow_csv_data['status'].apply(
                         lambda x: x if x in valid_statuses else 'Speculation'
                     )
@@ -3463,16 +3463,18 @@ elif st.session_state.current_page == "Active Opps":
                 st.code(
                     "selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
 
-    # Count current Limit Placed and Order Filled records
-    limit_placed_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Limit Placed')
-    order_filled_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Filled')
-    total_active_count = limit_placed_count + order_filled_count
+    # Count current records by status
     speculation_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Speculation')
+    order_ready_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Ready')
+    order_completed_count = sum(
+        1 for record in st.session_state.saved_records if record.get('status') == 'Order Completed')
+    total_active_count = order_ready_count + order_completed_count
 
     # Show current record counts
-    st.write(f"**Records:** {len(st.session_state.saved_records)}/5")
-    st.write(f"**Active Records (Limit Placed + Order Filled):** {total_active_count}/2")
-    st.write(f"Limit Placed: {limit_placed_count}, Order Filled: {order_filled_count}")
+    st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
+    st.write(f"**Active Records (Order Ready + Order Completed):** {total_active_count}/2")
+    st.write(
+        f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Completed: {order_completed_count}")
 
     # Manual sync buttons with enhanced error handling
     col_sync1, col_sync2, col_export = st.columns(3)
@@ -3533,12 +3535,26 @@ elif st.session_state.current_page == "Active Opps":
         records_df = pd.DataFrame(st.session_state.saved_records)
         st.dataframe(records_df, use_container_width=True)
 
-        # Create tabs for different status groups with counts
-        tab1, tab2, tab3 = st.tabs([
-            f"Speculation ({speculation_count})",
-            f"Limit Placed ({limit_placed_count})",
-            f"Order Filled ({order_filled_count})"
-        ])
+        # WORKFLOW VISUALIZATION - Horizontal workflow display
+        st.markdown("---")
+        st.subheader("Workflow Progress")
+
+        # Create a horizontal workflow visualization
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown(f"### 🧠 Speculation ({speculation_count})")
+            st.progress(speculation_count / max(len(st.session_state.saved_records), 1))
+
+        with col2:
+            st.markdown(f"### ✅ Order Ready ({order_ready_count})")
+            st.progress(order_ready_count / max(len(st.session_state.saved_records), 1))
+
+        with col3:
+            st.markdown(f"### 🎯 Order Completed ({order_completed_count})")
+            st.progress(order_completed_count / max(len(st.session_state.saved_records), 1))
+
+        st.markdown("---")
 
 
         # Helper function to update record and sync to cloud
@@ -3568,14 +3584,16 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Record deleted locally but failed to save to cloud. Use CSV export to backup.")
 
 
-        # Speculation Tab
-        with tab1:
+        # WORKFLOW STAGES - Display records in workflow order
+        st.subheader("Workflow Stages")
+
+        # Stage 1: Speculation
+        with st.expander(f"🧠 Speculation Stage ({speculation_count} records)", expanded=True):
             speculation_records = [record for record in st.session_state.saved_records if
                                    record.get('status') == 'Speculation']
             if not speculation_records:
-                st.info("No speculation records.")
+                st.info("No records in speculation stage.")
             else:
-                st.subheader(f"Speculation Records ({len(speculation_records)})")
                 for i, record in enumerate(speculation_records):
                     # Find the original index in the main records list
                     original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
@@ -3584,7 +3602,7 @@ elif st.session_state.current_page == "Active Opps":
                     if original_index is not None:
                         with st.expander(
                                 f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=True):
+                                expanded=False):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -3618,7 +3636,7 @@ elif st.session_state.current_page == "Active Opps":
                                 )
 
                             # Status dropdown in a new row
-                            status_options = ["Speculation", "Limit Placed", "Order Filled"]
+                            status_options = ["Speculation", "Order Ready", "Order Completed"]
                             current_status = record.get('status', 'Speculation')
 
                             # Check if target price is valid for active status
@@ -3630,14 +3648,14 @@ elif st.session_state.current_page == "Active Opps":
 
                             if total_active_count >= 2 and current_status == 'Speculation':
                                 disable_active_status = True
-                                warning_message = "Maximum active records reached. Cannot change to Limit Placed or Order Filled."
+                                warning_message = "Maximum active records reached. Cannot change to Order Ready or Order Completed."
                             elif not target_price_valid:
                                 disable_active_status = True
-                                warning_message = "Target price must be greater than 0 to change to Limit Placed or Order Filled."
+                                warning_message = "Target price must be greater than 0 to change to Order Ready or Order Completed."
 
                             if disable_active_status:
                                 new_status = st.selectbox(
-                                    "Status",
+                                    "Next Stage",
                                     status_options,
                                     index=status_options.index(
                                         current_status) if current_status in status_options else 0,
@@ -3647,7 +3665,7 @@ elif st.session_state.current_page == "Active Opps":
                                 st.warning(warning_message)
                             else:
                                 new_status = st.selectbox(
-                                    "Status",
+                                    "Next Stage",
                                     status_options,
                                     index=status_options.index(
                                         current_status) if current_status in status_options else 0,
@@ -3678,19 +3696,19 @@ elif st.session_state.current_page == "Active Opps":
                                     if abs(expected_stop_pips - current_stop_pips) > 0.01:
                                         update_disabled = True
 
-                                if st.button(f"Update Record", key=f"spec_update_{original_index}",
+                                if st.button(f"Update & Move to Next Stage", key=f"spec_update_{original_index}",
                                              disabled=update_disabled):
                                     # Additional validation for active status
-                                    if new_status in ['Limit Placed', 'Order Filled'] and new_target_price <= 0:
+                                    if new_status in ['Order Ready', 'Order Completed'] and new_target_price <= 0:
                                         st.error("Cannot change to active status: Target price must be greater than 0!")
                                     else:
                                         # Check if updating to active status would exceed the limit
                                         current_status = record.get('status', 'Speculation')
-                                        if new_status in ['Limit Placed',
-                                                          'Order Filled'] and current_status == 'Speculation':
+                                        if new_status in ['Order Ready',
+                                                          'Order Completed'] and current_status == 'Speculation':
                                             if total_active_count >= 2:
                                                 st.error(
-                                                    "Maximum of 2 active records (Limit Placed + Order Filled) reached! You cannot change this record to active status.")
+                                                    "Maximum of 2 active records (Order Ready + Order Completed) reached! You cannot move this record to active status.")
                                             else:
                                                 updates = {
                                                     'entry_price': new_entry_price,
@@ -3715,22 +3733,21 @@ elif st.session_state.current_page == "Active Opps":
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Limit Placed Tab
-        with tab2:
-            limit_records = [record for record in st.session_state.saved_records if
-                             record.get('status') == 'Limit Placed']
-            if not limit_records:
-                st.info("No limit placed records.")
+        # Stage 2: Order Ready
+        with st.expander(f"✅ Order Ready Stage ({order_ready_count} records)", expanded=True):
+            order_ready_records = [record for record in st.session_state.saved_records if
+                                   record.get('status') == 'Order Ready']
+            if not order_ready_records:
+                st.info("No records in order ready stage.")
             else:
-                st.subheader(f"Limit Placed Records ({len(limit_records)})")
-                for i, record in enumerate(limit_records):
+                for i, record in enumerate(order_ready_records):
                     original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
                                            r['timestamp'] == record['timestamp']), None)
 
                     if original_index is not None:
                         with st.expander(
                                 f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=True):
+                                expanded=False):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -3744,7 +3761,7 @@ elif st.session_state.current_page == "Active Opps":
                                     "Entry Price",
                                     value=safe_float(record.get('entry_price'), 0.0),
                                     format="%.5f",
-                                    key=f"limit_entry_{original_index}"
+                                    key=f"ready_entry_{original_index}"
                                 )
 
                             with col3:
@@ -3752,7 +3769,7 @@ elif st.session_state.current_page == "Active Opps":
                                     "Exit Price",
                                     value=safe_float(record.get('exit_price'), 0.0),
                                     format="%.5f",
-                                    key=f"limit_exit_{original_index}"
+                                    key=f"ready_exit_{original_index}"
                                 )
 
                             with col4:
@@ -3760,23 +3777,23 @@ elif st.session_state.current_page == "Active Opps":
                                     "Target Price",
                                     value=safe_float(record.get('target_price'), 0.0),
                                     format="%.5f",
-                                    key=f"limit_target_{original_index}"
+                                    key=f"ready_target_{original_index}"
                                 )
 
                             # Status dropdown in a new row
-                            status_options = ["Speculation", "Limit Placed", "Order Filled"]
-                            current_status = record.get('status', 'Limit Placed')
+                            status_options = ["Speculation", "Order Ready", "Order Completed"]
+                            current_status = record.get('status', 'Order Ready')
                             new_status = st.selectbox(
-                                "Status",
+                                "Next Stage",
                                 status_options,
                                 index=status_options.index(current_status) if current_status in status_options else 1,
-                                key=f"limit_status_{original_index}"
+                                key=f"ready_status_{original_index}"
                             )
 
                             # Update button for this record
                             col_update, col_delete = st.columns(2)
                             with col_update:
-                                if st.button(f"Update Record", key=f"limit_update_{original_index}"):
+                                if st.button(f"Update & Move to Next Stage", key=f"ready_update_{original_index}"):
                                     updates = {
                                         'entry_price': new_entry_price,
                                         'exit_price': new_exit_price,
@@ -3787,26 +3804,25 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                             with col_delete:
-                                if st.button(f"🗑️ Delete Record", key=f"limit_delete_{original_index}"):
+                                if st.button(f"🗑️ Delete Record", key=f"ready_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
-        # Order Filled Tab
-        with tab3:
-            filled_records = [record for record in st.session_state.saved_records if
-                              record.get('status') == 'Order Filled']
-            if not filled_records:
-                st.info("No order filled records.")
+        # Stage 3: Order Completed
+        with st.expander(f"🎯 Order Completed Stage ({order_completed_count} records)", expanded=True):
+            completed_records = [record for record in st.session_state.saved_records if
+                                 record.get('status') == 'Order Completed']
+            if not completed_records:
+                st.info("No records in order completed stage.")
             else:
-                st.subheader(f"Order Filled Records ({len(filled_records)})")
-                for i, record in enumerate(filled_records):
+                for i, record in enumerate(completed_records):
                     original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
                                            r['timestamp'] == record['timestamp']), None)
 
                     if original_index is not None:
                         with st.expander(
                                 f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                expanded=True):
+                                expanded=False):
                             col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                             with col1:
@@ -3831,7 +3847,7 @@ elif st.session_state.current_page == "Active Opps":
                                     "Result",
                                     options=result_options,
                                     index=0,
-                                    key=f"filled_result_{original_index}"
+                                    key=f"completed_result_{original_index}"
                                 )
 
                                 # Direction dropdown
@@ -3840,7 +3856,7 @@ elif st.session_state.current_page == "Active Opps":
                                     "Direction",
                                     options=direction_options,
                                     index=0,
-                                    key=f"filled_direction_{original_index}"
+                                    key=f"completed_direction_{original_index}"
                                 )
 
                             with col3:
@@ -3850,7 +3866,7 @@ elif st.session_state.current_page == "Active Opps":
                                     value=0.0,
                                     step=0.01,
                                     format="%.2f",
-                                    key=f"filled_rr_{original_index}"
+                                    key=f"completed_rr_{original_index}"
                                 )
 
                             with col4:
@@ -3860,7 +3876,7 @@ elif st.session_state.current_page == "Active Opps":
                                     value=0.0,
                                     step=0.01,
                                     format="%.2f",
-                                    key=f"filled_pnl_{original_index}"
+                                    key=f"completed_pnl_{original_index}"
                                 )
 
                             # Additional required fields
@@ -3872,7 +3888,7 @@ elif st.session_state.current_page == "Active Opps":
                                     "POI",
                                     options=poi_options,
                                     index=0,
-                                    key=f"filled_poi_{original_index}"
+                                    key=f"completed_poi_{original_index}"
                                 )
 
                             with col6:
@@ -3880,14 +3896,15 @@ elif st.session_state.current_page == "Active Opps":
                                 st.text_input(
                                     "Strategy",
                                     value=record['risk_multiplier'],
-                                    key=f"filled_strategy_{original_index}",
+                                    key=f"completed_strategy_{original_index}",
                                     disabled=True
                                 )
 
                             # Close Record button
                             col_close, col_delete = st.columns(2)
                             with col_close:
-                                if st.button(f"💾 Close Record", key=f"filled_close_{original_index}", type="primary"):
+                                if st.button(f"💾 Finalize & Close Trade", key=f"completed_close_{original_index}",
+                                             type="primary"):
                                     # Validate required fields
                                     if (new_result and new_direction and new_poi and
                                             new_rr is not None and new_pnl is not None):
@@ -3950,7 +3967,7 @@ elif st.session_state.current_page == "Active Opps":
                                                     st.session_state.saved_records.pop(original_index)
                                                     # Save the updated workflow
                                                     save_workflow_to_sheets(st.session_state.saved_records)
-                                                    st.success("✅ Record closed and saved to trade history!")
+                                                    st.success("✅ Trade finalized and saved to trade history!")
                                                     st.rerun()
                                                 else:
                                                     st.error("Failed to save to trade history")
@@ -3965,7 +3982,7 @@ elif st.session_state.current_page == "Active Opps":
                                                     st.session_state.saved_records.pop(original_index)
                                                     # Save the updated workflow
                                                     save_workflow_to_sheets(st.session_state.saved_records)
-                                                    st.success("✅ Record closed and saved to trade history!")
+                                                    st.success("✅ Trade finalized and saved to trade history!")
                                                     st.rerun()
                                                 else:
                                                     st.error("Failed to save to trade history")
@@ -3973,7 +3990,7 @@ elif st.session_state.current_page == "Active Opps":
                                         st.error("Please fill in all required fields")
 
                             with col_delete:
-                                if st.button(f"🗑️ Delete Record", key=f"filled_delete_{original_index}"):
+                                if st.button(f"🗑️ Delete Record", key=f"completed_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 

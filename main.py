@@ -4453,8 +4453,6 @@ elif st.session_state.current_page == "Trade Signal":
         they will be automatically removed from here.
         """)
     else:
-        # Removed the "Found X active trade signals" message
-
         # Convert to DataFrame for nice display
         signals_data = []
         for signal in st.session_state.trade_signals:
@@ -4476,7 +4474,7 @@ elif st.session_state.current_page == "Trade Signal":
 
         st.dataframe(signals_df[available_columns], use_container_width=True)
 
-        # Detailed view with execution - ALL CONTENT MOVED INSIDE EACH SIGNAL
+        # Detailed view with execution
         st.subheader("📋 Signal Details & Execution")
 
         for i, signal in enumerate(st.session_state.trade_signals):
@@ -4518,9 +4516,8 @@ elif st.session_state.current_page == "Trade Signal":
                 stop_val = safe_float(signal.get('exit_price'), 0.0)
                 target_val = safe_float(signal.get('target_price'), 0.0)
 
-                # TRADE EXECUTION SECTION - MOVED INSIDE EACH SIGNAL
+                # EXECUTION BUTTON AND R:R RATIO - PLACED BELOW PRICE FIELDS
                 st.markdown("---")
-                st.subheader("🚀 Trade Execution")
 
                 if st.session_state.metaapi_connected:
                     # Validation check
@@ -4536,7 +4533,7 @@ elif st.session_state.current_page == "Trade Signal":
                         validation_ok = False
 
                     if validation_ok:
-                        # Display R:R Ratio and execution button in the same section
+                        # Execution button and R:R ratio in the same row
                         col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
 
                         with col_exec1:
@@ -4573,11 +4570,7 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_exec3:
-                            # Risk calculator and R:R Ratio
-                            if entry_val > 0 and stop_val > 0:
-                                risk_pips = abs(entry_val - stop_val) * 10000
-                                st.metric("Risk", f"{risk_pips:.1f} pips")
-
+                            # R:R Ratio only
                             if stop_val > 0 and target_val > 0:
                                 stop_distance = abs(entry_val - stop_val)
                                 target_distance = abs(entry_val - target_val)

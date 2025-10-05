@@ -7,4 +7,5 @@ streamlit-aggrid
 yfinance
 matplotlib
 gspread
+metaapi-cloud-sdk>=7.0.0
 

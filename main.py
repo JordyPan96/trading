@@ -4131,152 +4131,238 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # MT5 Connection Functions with secrets.toml support
-    def is_mt5_available():
-        """Check if MetaTrader5 package is installed"""
+    # REST API Functions for MT5 Bridge
+    def get_api_config(environment="default"):
+        """Get API configuration from secrets.toml"""
         try:
-            import MetaTrader5 as mt5
-            return True
-        except ImportError:
-            return False
+            mt5_config = st.secrets.get("mt5_api", {})
 
-
-    def initialize_mt5_from_secrets():
-        """Initialize MT5 using credentials from secrets.toml"""
-        try:
-            import MetaTrader5 as mt5
-
-            # Get credentials from secrets.toml
-            mt5_config = st.secrets.get("mt5", {})
-
-            if not mt5_config:
-                return False, "No MT5 configuration found in secrets.toml"
-
-            account = mt5_config.get("account", "")
-            password = mt5_config.get("password", "")
-            server = mt5_config.get("server", "")
-            mt5_paths = mt5_config.get("mt5_paths", [
-                "C:/Program Files/MetaTrader 5/terminal64.exe",
-                "C:/Program Files (x86)/MetaTrader 5/terminal64.exe",
-                "C:/Program Files/MetaTrader 5/terminal.exe",
-                "C:/Program Files (x86)/MetaTrader 5/terminal.exe"
-            ])
-
-            # Try to initialize with different paths
-            initialized = False
-            for path in mt5_paths:
-                try:
-                    if mt5.initialize(path=path):
-                        initialized = True
-                        break
-                except:
-                    continue
-
-            if not initialized:
-                # Try without path
-                if not mt5.initialize():
-                    return False, "Could not initialize MT5. Please ensure MetaTrader 5 is installed and running."
-
-            # Login if credentials provided
-            if account and password and server:
-                authorized = mt5.login(
-                    login=int(account),
-                    password=password,
-                    server=server
-                )
-                if authorized:
-                    return True, "Successfully connected and logged into MT5"
-                else:
-                    return False, f"MT5 login failed: {mt5.last_error()}"
+            if environment != "default" and environment in mt5_config:
+                return mt5_config[environment]
             else:
-                # Just initialize without login
-                return True, "MT5 initialized (no login credentials in secrets.toml)"
-
-        except ImportError:
-            return False, "MetaTrader5 package not installed. MT5 features disabled."
-        except Exception as e:
-            return False, f"MT5 initialization error: {str(e)}"
+                return mt5_config
+        except:
+            return {}
 
 
-    def place_limit_order(signal):
-        """Place a limit order in MT5"""
+    def test_api_connection():
+        """Test connection to MT5 REST API"""
         try:
-            import MetaTrader5 as mt5
+            import requests
 
-            if not mt5.initialize():
-                return False, "MT5 not initialized"
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
 
-            symbol = signal['selected_pair']
+            if not base_url:
+                return False, "No API URL configured in secrets.toml"
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+
+            response = requests.get(f"{base_url}/health", headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                return True, "API connection successful"
+            else:
+                return False, f"API connection failed: {response.status_code} - {response.text}"
+
+        except requests.exceptions.ConnectionError:
+            return False, "Cannot connect to API. Please ensure the MT5 REST API bridge is running."
+        except requests.exceptions.Timeout:
+            return False, "API connection timeout. Please check if the service is running."
+        except Exception as e:
+            return False, f"API connection error: {str(e)}"
+
+
+    def place_limit_order_via_api(signal):
+        """Place a limit order via REST API"""
+        try:
+            import requests
+
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
+            account = config.get("account", "")
+
+            if not base_url:
+                return False, "No API URL configured in secrets.toml"
+
             direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-            volume = signal.get('position_size', 0.1)
-            entry_price = safe_float(signal.get('entry_price'), 0.0)
-            stop_loss = safe_float(signal.get('exit_price'), 0.0)
-            take_profit = safe_float(signal.get('target_price'), 0.0)
 
             if direction == "Unknown":
                 return False, "Cannot determine order direction from prices"
 
-            # Prepare limit order request
-            if direction == "buy":
-                order_type = mt5.ORDER_TYPE_BUY_LIMIT
-            else:  # sell
-                order_type = mt5.ORDER_TYPE_SELL_LIMIT
-
-            request = {
-                "action": mt5.TRADE_ACTION_PENDING,
-                "symbol": symbol,
-                "volume": volume,
-                "type": order_type,
-                "price": entry_price,
-                "sl": stop_loss,
-                "tp": take_profit,
-                "deviation": 10,
-                "magic": 234000,
-                "comment": "Limit order from Trade Signal",
-                "type_time": mt5.ORDER_TIME_GTC,
-                "type_filling": mt5.ORDER_FILLING_IOC,
+            order_data = {
+                "symbol": signal['selected_pair'],
+                "order_type": "LIMIT",
+                "direction": direction.upper(),
+                "volume": float(signal.get('position_size', 0.1)),
+                "price": safe_float(signal.get('entry_price'), 0.0),
+                "stop_loss": safe_float(signal.get('exit_price'), 0.0),
+                "take_profit": safe_float(signal.get('target_price'), 0.0),
+                "comment": "From Trade Signal App",
+                "magic": 234000
             }
 
-            # Send order
-            result = mt5.order_send(request)
-            if result.retcode != mt5.TRADE_RETCODE_DONE:
-                return False, f"Order failed: {result.retcode} - {result.comment}"
+            if account:
+                order_data["account"] = account
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+            headers["Content-Type"] = "application/json"
+
+            response = requests.post(
+                f"{base_url}/orders/limit",
+                json=order_data,
+                headers=headers,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return True, f"Limit order placed successfully! Order ID: {result.get('order_id', 'N/A')}"
             else:
-                return True, f"Limit order placed successfully! Ticket: {result.order}"
+                return False, f"Order failed: {response.status_code} - {response.text}"
 
         except Exception as e:
             return False, f"Order placement error: {str(e)}"
 
 
-    def get_open_orders():
-        """Get all open orders from MT5"""
+    def get_open_orders_via_api():
+        """Get open orders via REST API"""
         try:
-            import MetaTrader5 as mt5
+            import requests
 
-            if not mt5.initialize():
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
+            account = config.get("account", "")
+
+            if not base_url:
                 return []
 
-            orders = mt5.orders_get()
-            if orders is None:
+            params = {}
+            if account:
+                params["account"] = account
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+
+            response = requests.get(
+                f"{base_url}/orders",
+                params=params,
+                headers=headers,
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json().get("orders", [])
+            else:
                 return []
 
-            order_list = []
-            for order in orders:
-                order_list.append({
-                    'ticket': order.ticket,
-                    'symbol': order.symbol,
-                    'type': order.type,
-                    'volume': order.volume_current,
-                    'price_open': order.price_open,
-                    'sl': order.sl,
-                    'tp': order.tp,
-                    'profit': order.profit,
-                    'comment': order.comment
-                })
-
-            return order_list
         except:
             return []
+
+
+    def modify_order_sl_tp_via_api(order_id, new_sl, new_tp):
+        """Modify stop loss and take profit via REST API"""
+        try:
+            import requests
+
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
+
+            if not base_url:
+                return False, "No API URL configured"
+
+            modify_data = {
+                "order_id": order_id,
+                "stop_loss": new_sl
+            }
+
+            if new_tp is not None:
+                modify_data["take_profit"] = new_tp
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+            headers["Content-Type"] = "application/json"
+
+            response = requests.put(
+                f"{base_url}/orders/modify",
+                json=modify_data,
+                headers=headers,
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return True, "Stop loss/take profit modified successfully"
+            else:
+                return False, f"Modify failed: {response.status_code} - {response.text}"
+
+        except Exception as e:
+            return False, f"Modify error: {str(e)}"
+
+
+    def close_order_via_api(order_id):
+        """Close an order via REST API"""
+        try:
+            import requests
+
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
+
+            if not base_url:
+                return False, "No API URL configured"
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+
+            response = requests.delete(
+                f"{base_url}/orders/{order_id}",
+                headers=headers,
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return True, "Order closed successfully"
+            else:
+                return False, f"Close failed: {response.status_code} - {response.text}"
+
+        except Exception as e:
+            return False, f"Close error: {str(e)}"
+
+
+    def get_account_info_via_api():
+        """Get account information via REST API"""
+        try:
+            import requests
+
+            config = get_api_config()
+            base_url = config.get("base_url", "")
+            api_key = config.get("api_key", "")
+            account = config.get("account", "")
+
+            if not base_url:
+                return None
+
+            params = {}
+            if account:
+                params["account"] = account
+
+            headers = {"X-API-Key": api_key} if api_key else {}
+
+            response = requests.get(
+                f"{base_url}/account",
+                params=params,
+                headers=headers,
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return None
+
+        except:
+            return None
 
 
     # Add trade signal functions next
@@ -4313,89 +4399,120 @@ elif st.session_state.current_page == "Trade Signal":
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
 
-    if 'mt5_connected' not in st.session_state:
-        st.session_state.mt5_connected = False
+    if 'api_connected' not in st.session_state:
+        st.session_state.api_connected = False
 
     # Load from Google Sheets on page load
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # Check if MT5 is available
-    mt5_available = is_mt5_available()
+    # REST API Connection Section
+    st.subheader("MT5 REST API Integration")
 
-    # MT5 Connection Section (Only show if MT5 is available)
-    if mt5_available:
-        st.subheader("MetaTrader 5 Integration")
+    col_api_1, col_api_2, col_api_3 = st.columns(3)
 
-        col_mt5_1, col_mt5_2, col_mt5_3 = st.columns(3)
-
-        with col_mt5_1:
-            if st.button("🔗 Connect to MT5", type="primary"):
-                success, message = initialize_mt5_from_secrets()
-                if success:
-                    st.session_state.mt5_connected = True
-                    st.success(message)
-                else:
-                    st.error(message)
-
-        with col_mt5_2:
-            if st.button("🔌 Disconnect from MT5"):
-                try:
-                    import MetaTrader5 as mt5
-
-                    mt5.shutdown()
-                except:
-                    pass
-                st.session_state.mt5_connected = False
-                st.success("Disconnected from MT5")
-
-        with col_mt5_3:
-            status_color = "🟢" if st.session_state.mt5_connected else "🔴"
-            status_text = "Connected" if st.session_state.mt5_connected else "Disconnected"
-            st.metric("MT5 Status", f"{status_color} {status_text}")
-
-        # Display configuration info
-        mt5_config = st.secrets.get("mt5", {})
-        if mt5_config:
-            st.info(f"📋 Using MT5 configuration from secrets.toml")
-
-        # Display Open Orders if connected
-        if st.session_state.mt5_connected:
-            st.subheader("Open MT5 Orders")
-            open_orders = get_open_orders()
-
-            if open_orders:
-                orders_df = pd.DataFrame(open_orders)
-                st.dataframe(orders_df, use_container_width=True)
+    with col_api_1:
+        if st.button("🔗 Connect to API", type="primary"):
+            success, message = test_api_connection()
+            if success:
+                st.session_state.api_connected = True
+                st.success(message)
             else:
-                st.info("No open orders found in MT5")
+                st.error(message)
 
-    else:
-        # Show MT5 not available message
-        st.subheader("MetaTrader 5 Integration")
-        st.warning("""
-        **MT5 features are currently disabled.**
+    with col_api_2:
+        if st.button("🔄 Refresh Connection"):
+            success, message = test_api_connection()
+            if success:
+                st.session_state.api_connected = True
+                st.success(message)
+            else:
+                st.session_state.api_connected = False
+                st.error(message)
 
-        To enable MT5 integration:
+    with col_api_3:
+        status_color = "🟢" if st.session_state.api_connected else "🔴"
+        status_text = "Connected" if st.session_state.api_connected else "Disconnected"
+        st.metric("API Status", f"{status_color} {status_text}")
 
-        1. Install the MetaTrader5 package:
-        ```bash
-        pip install MetaTrader5
-        ```
+    # Display configuration info
+    api_config = get_api_config()
+    if api_config.get("base_url"):
+        st.info(f"📋 Using API endpoint: {api_config.get('base_url')}")
 
-        2. Add your MT5 credentials to `.streamlit/secrets.toml`:
-        ```toml
-        [mt5]
-        account = "1234567"
-        password = "your_password"
-        server = "YourBrokerServer"
-        ```
+    # Display Account Info and Open Orders if connected
+    if st.session_state.api_connected:
+        # Account Information
+        account_info = get_account_info_via_api()
+        if account_info:
+            col_acc1, col_acc2, col_acc3, col_acc4 = st.columns(4)
+            with col_acc1:
+                st.metric("Balance", f"{account_info.get('balance', 0):.2f}")
+            with col_acc2:
+                st.metric("Equity", f"{account_info.get('equity', 0):.2f}")
+            with col_acc3:
+                st.metric("Free Margin", f"{account_info.get('free_margin', 0):.2f}")
+            with col_acc4:
+                st.metric("Leverage", f"1:{account_info.get('leverage', 0)}")
 
-        3. Ensure MetaTrader 5 is installed and running
-        """)
+        # Open Orders
+        st.subheader("Open Orders")
+        open_orders = get_open_orders_via_api()
+
+        if open_orders:
+            orders_df = pd.DataFrame(open_orders)
+            st.dataframe(orders_df, use_container_width=True)
+
+            # Order Management
+            if open_orders:
+                st.subheader("Order Management")
+                selected_order = st.selectbox(
+                    "Select Order to Manage",
+                    options=[f"{order.get('order_id', 'N/A')} - {order.get('symbol', 'N/A')}" for order in open_orders]
+                )
+
+                if selected_order:
+                    order_id = selected_order.split(" - ")[0]
+                    selected_order_data = next(
+                        (order for order in open_orders if str(order.get('order_id')) == order_id), None)
+
+                    if selected_order_data:
+                        col_manage1, col_manage2, col_manage3 = st.columns(3)
+
+                        with col_manage1:
+                            new_sl = st.number_input(
+                                "New Stop Loss",
+                                value=float(selected_order_data.get('stop_loss', 0)),
+                                format="%.5f"
+                            )
+
+                        with col_manage2:
+                            new_tp = st.number_input(
+                                "New Take Profit",
+                                value=float(selected_order_data.get('take_profit', 0)),
+                                format="%.5f"
+                            )
+
+                        with col_manage3:
+                            if st.button("🔄 Modify SL/TP"):
+                                success, message = modify_order_sl_tp_via_api(order_id, new_sl, new_tp)
+                                if success:
+                                    st.success(message)
+                                else:
+                                    st.error(message)
+
+                            if st.button("❌ Close Order"):
+                                success, message = close_order_via_api(order_id)
+                                if success:
+                                    st.success(message)
+                                else:
+                                    st.error(message)
+        else:
+            st.info("No open orders found")
 
     st.markdown("---")
 
+    # Rest of the Trade Signals page continues...
     # Sync button
     col1, col2 = st.columns(2)
     with col1:
@@ -4405,7 +4522,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.success(f"Synced with Active Opps! Loaded {len(cloud_signals)} trade signals.")
             st.rerun()
 
-    with col_2:
+    with col2:
         if st.session_state.trade_signals:
             # Ensure direction column exists before exporting
             export_data = []
@@ -4505,13 +4622,13 @@ elif st.session_state.current_page == "Trade Signal":
                     else:
                         st.write(f"**Stop Distance:** {price_difference * 10:.1f} pips")
 
-                # MT5 Trade Management (if connected)
-                if st.session_state.mt5_connected and mt5_available:
+                # API Trade Management (if connected)
+                if st.session_state.api_connected:
                     st.markdown("---")
-                    st.subheader("MT5 Trade Management")
+                    st.subheader("Trade Execution")
 
-                    if st.button(f"📈 Place Limit Order in MT5", key=f"place_limit_{i}", type="primary"):
-                        success, message = place_limit_order(signal)
+                    if st.button(f"📈 Place Limit Order via API", key=f"place_limit_{i}", type="primary"):
+                        success, message = place_limit_order_via_api(signal)
                         if success:
                             st.success(message)
                         else:

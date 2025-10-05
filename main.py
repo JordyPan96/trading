@@ -4131,168 +4131,173 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # FASTAPI Functions
-    def get_fastapi_config():
-        """Get FastAPI configuration from secrets.toml"""
+    # METAAPI Functions
+    def get_metaapi_config():
+        """Get MetaApi configuration from secrets.toml"""
         try:
-            fastapi_config = st.secrets.get("mt5_fastapi", {})
-            if not fastapi_config:
-                fastapi_config = st.secrets.get("api", {})
-            return fastapi_config
+            metaapi_config = st.secrets.get("metaapi", {})
+            return metaapi_config
         except:
             return {}
 
 
-    def test_fastapi_connection():
-        """Test connection to FastAPI backend"""
+    def test_metaapi_connection():
+        """Test connection to MetaApi"""
         try:
             import requests
 
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
+            config = get_metaapi_config()
+            token = config.get("token", "")
 
-            response = requests.get(f"{base_url}/health", timeout=10)
+            if not token:
+                return False, "❌ MetaApi token not configured"
 
-            if response.status_code == 200:
-                data = response.json()
-                pepperstone_status = data.get('pepperstone_connected', False)
-
-                if pepperstone_status:
-                    return True, "✅ Connected to Pepperstone cTrader API"
-                else:
-                    return True, "✅ FastAPI Connected (Authenticate with Pepperstone)"
-            else:
-                return False, f"FastAPI connection failed: {response.status_code}"
-
-        except requests.exceptions.ConnectionError:
-            return False, "❌ Cannot connect to FastAPI backend. Please ensure the service is running on localhost:8000"
-        except requests.exceptions.Timeout:
-            return False, "⏰ FastAPI connection timeout."
-        except Exception as e:
-            return False, f"🔧 FastAPI connection error: {str(e)}"
-
-
-    # Pepperstone cTrader API Functions
-    def authenticate_pepperstone(client_id: str, client_secret: str, account_id: str):
-        """Authenticate with Pepperstone cTrader"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.post(
-                f"{base_url}/auth/pepperstone",
-                json={
-                    "client_id": client_id,
-                    "client_secret": client_secret,
-                    "account_id": account_id
-                },
+            response = requests.get(
+                "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts",
+                headers={"auth-token": token},
                 timeout=10
             )
 
             if response.status_code == 200:
-                return True, "✅ Authenticated with Pepperstone successfully"
+                return True, "✅ Connected to MetaApi successfully"
             else:
-                return False, f"❌ Authentication failed: {response.text}"
+                return False, f"❌ MetaApi connection failed: {response.status_code} - {response.text}"
 
+        except requests.exceptions.ConnectionError:
+            return False, "❌ Cannot connect to MetaApi. Please check your internet connection"
+        except requests.exceptions.Timeout:
+            return False, "⏰ MetaApi connection timeout"
         except Exception as e:
-            return False, f"🔧 Authentication error: {str(e)}"
+            return False, f"🔧 MetaApi connection error: {str(e)}"
 
 
-    def place_pepperstone_trade(symbol: str, volume: float, order_type: str, sl: float = None, tp: float = None):
-        """Place a trade with Pepperstone"""
+    def get_metaapi_accounts():
+        """Get MetaApi account information"""
         try:
             import requests
 
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            response = requests.get(
+                "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return []
+        except:
+            return []
+
+
+    def connect_metaapi_account(account_id: str):
+        """Connect to a specific MetaApi account"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            # First check if account exists and get connection status
+            response = requests.get(
+                f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                account_data = response.json()
+                return True, f"✅ Connected to account: {account_data.get('name', account_id)}"
+            else:
+                return False, f"❌ Failed to connect to account: {response.text}"
+
+        except Exception as e:
+            return False, f"🔧 Connection error: {str(e)}"
+
+
+    def get_metaapi_symbols(account_id: str):
+        """Get available symbols from MetaApi account"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            response = requests.get(
+                f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}/symbols",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json().get("symbols", [])
+            else:
+                return []
+        except:
+            return []
+
+
+    def get_metaapi_positions(account_id: str):
+        """Get open positions from MetaApi account"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            response = requests.get(
+                f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}/positions",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                return response.json().get("positions", [])
+            else:
+                return []
+        except:
+            return []
+
+
+    def place_metaapi_trade(account_id: str, symbol: str, volume: float, order_type: str, sl: float = None,
+                            tp: float = None):
+        """Place a trade with MetaApi"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
 
             trade_data = {
                 "symbol": symbol,
                 "volume": volume,
-                "order_type": order_type
+                "type": order_type.upper(),
+                "actionType": "ORDER_TYPE_BUY" if order_type.upper() == "BUY" else "ORDER_TYPE_SELL"
             }
 
             if sl:
-                trade_data["stop_loss"] = sl
+                trade_data["stopLoss"] = sl
             if tp:
-                trade_data["take_profit"] = tp
+                trade_data["takeProfit"] = tp
 
             response = requests.post(
-                f"{base_url}/pepperstone/trade",
+                f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}/trade",
+                headers={"auth-token": token},
                 json=trade_data,
                 timeout=30
             )
 
             if response.status_code == 200:
                 data = response.json()
-                return True, f"✅ {data.get('message', 'Trade executed successfully')}"
+                return True, f"✅ Trade executed successfully (ID: {data.get('orderId', 'N/A')})"
             else:
                 return False, f"❌ Trade failed: {response.text}"
 
         except Exception as e:
             return False, f"🔧 Trade error: {str(e)}"
-
-
-    def get_pepperstone_accounts():
-        """Get Pepperstone account information"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/pepperstone/accounts", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                return data.get("accounts", [])
-            else:
-                return []
-
-        except:
-            return []
-
-
-    def get_pepperstone_symbols():
-        """Get available symbols from Pepperstone"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/pepperstone/symbols", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                return data.get("symbols", [])
-            else:
-                return []
-
-        except:
-            return []
-
-
-    def get_pepperstone_positions():
-        """Get open positions from Pepperstone"""
-        try:
-            import requests
-
-            config = get_fastapi_config()
-            base_url = config.get("backend_url", "http://localhost:8000")
-
-            response = requests.get(f"{base_url}/pepperstone/positions", timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                return data.get("positions", [])
-            else:
-                return []
-
-        except:
-            return []
 
 
     # Add trade signal functions next
@@ -4328,30 +4333,30 @@ elif st.session_state.current_page == "Trade Signal":
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
 
-    if 'fastapi_connected' not in st.session_state:
-        st.session_state.fastapi_connected = False
+    if 'metaapi_connected' not in st.session_state:
+        st.session_state.metaapi_connected = False
 
-    if 'pepperstone_authenticated' not in st.session_state:
-        st.session_state.pepperstone_authenticated = False
+    if 'metaapi_account_id' not in st.session_state:
+        st.session_state.metaapi_account_id = None
 
     # Load from Google Sheets on page load
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
     # Connection Status Section
-    st.subheader("🔗 Pepperstone cTrader Connection")
+    st.subheader("🔗 MetaApi Connection")
 
     col_status1, col_status2, col_status3 = st.columns(3)
 
     with col_status1:
-        status_color_fastapi = "🟢" if st.session_state.fastapi_connected else "🔴"
-        status_text_fastapi = "Connected" if st.session_state.fastapi_connected else "Disconnected"
-        st.metric("FastAPI Status", f"{status_color_fastapi} {status_text_fastapi}")
+        status_color_metaapi = "🟢" if st.session_state.metaapi_connected else "🔴"
+        status_text_metaapi = "Connected" if st.session_state.metaapi_connected else "Disconnected"
+        st.metric("MetaApi Status", f"{status_color_metaapi} {status_text_metaapi}")
 
     with col_status2:
-        status_color_pepperstone = "🟢" if st.session_state.pepperstone_authenticated else "🔴"
-        status_text_pepperstone = "Authenticated" if st.session_state.pepperstone_authenticated else "Not Authenticated"
-        st.metric("Pepperstone", f"{status_color_pepperstone} {status_text_pepperstone}")
+        status_color_account = "🟢" if st.session_state.metaapi_account_id else "🔴"
+        status_text_account = "Connected" if st.session_state.metaapi_account_id else "No Account"
+        st.metric("Trading Account", f"{status_color_account} {status_text_account}")
 
     with col_status3:
         # Display signal count
@@ -4363,13 +4368,13 @@ elif st.session_state.current_page == "Trade Signal":
     col_conn1, col_conn2 = st.columns(2)
 
     with col_conn1:
-        if st.button("🔄 Check Connection", type="primary"):
-            success, message = test_fastapi_connection()
+        if st.button("🔄 Check MetaApi Connection", type="primary"):
+            success, message = test_metaapi_connection()
             if success:
-                st.session_state.fastapi_connected = True
+                st.session_state.metaapi_connected = True
                 st.success(message)
             else:
-                st.session_state.fastapi_connected = False
+                st.session_state.metaapi_connected = False
                 st.error(message)
 
     with col_conn2:
@@ -4379,64 +4384,70 @@ elif st.session_state.current_page == "Trade Signal":
             st.success(f"🔄 Synced {len(cloud_signals)} trade signals")
             st.rerun()
 
-    # Pepperstone Authentication Section
-    st.subheader("🔐 Pepperstone Authentication")
+    # MetaApi Account Connection Section
+    st.subheader("🔐 MetaApi Account Setup")
 
-    with st.expander("Authentication Settings", expanded=not st.session_state.pepperstone_authenticated):
-        col_ps1, col_ps2 = st.columns(2)
+    with st.expander("Account Configuration", expanded=not st.session_state.metaapi_account_id):
+        config = get_metaapi_config()
+        token = config.get("token", "")
 
-        with col_ps1:
-            client_id = st.text_input("Client ID",
-                                      value=st.secrets.get("pepperstone", {}).get("client_id", ""),
-                                      key="ps_client_id")
-            client_secret = st.text_input("Client Secret",
-                                          value=st.secrets.get("pepperstone", {}).get("client_secret", ""),
-                                          type="password",
-                                          key="ps_client_secret")
+        if not token:
+            st.error("❌ MetaApi token not found in secrets.toml")
+            st.info("Please add your MetaApi token to secrets.toml under [metaapi] section")
+        else:
+            st.success("✅ MetaApi token configured")
 
-        with col_ps2:
-            account_id = st.text_input("Account ID",
-                                       value=st.secrets.get("pepperstone", {}).get("account_id", ""),
-                                       key="ps_account_id")
+            # Get available accounts
+            accounts = get_metaapi_accounts()
 
-            st.write("")  # Spacing
-            st.write("")  # Spacing
+            if accounts:
+                account_options = {f"{acc.get('name', 'Unknown')} ({acc['_id']})": acc['_id'] for acc in accounts}
+                selected_account = st.selectbox(
+                    "Select Trading Account",
+                    options=list(account_options.keys()),
+                    key="metaapi_account_select"
+                )
 
-            if st.button("🔐 Authenticate with Pepperstone", type="primary"):
-                if client_id and client_secret and account_id:
-                    with st.spinner("Authenticating with Pepperstone cTrader API..."):
-                        success, message = authenticate_pepperstone(client_id, client_secret, account_id)
+                if st.button("🔗 Connect to Account", type="primary"):
+                    account_id = account_options[selected_account]
+                    with st.spinner(f"Connecting to MetaApi account..."):
+                        success, message = connect_metaapi_account(account_id)
                         if success:
-                            st.session_state.pepperstone_authenticated = True
+                            st.session_state.metaapi_account_id = account_id
                             st.success(message)
                         else:
-                            st.session_state.pepperstone_authenticated = False
                             st.error(message)
-                else:
-                    st.error("Please fill all authentication fields")
+            else:
+                st.error("❌ No MetaApi accounts found")
+                st.info("Please ensure your MetaApi token is valid and you have connected accounts")
 
-    # Pepperstone Account Information
-    if st.session_state.pepperstone_authenticated:
-        st.success("✅ Pepperstone cTrader is ready for trading")
+    # MetaApi Account Information
+    if st.session_state.metaapi_account_id:
+        st.success(f"✅ MetaApi Account {st.session_state.metaapi_account_id} is ready for trading")
 
         # Display account information and symbols in columns
         col_info1, col_info2 = st.columns(2)
 
         with col_info1:
             st.subheader("📊 Account Overview")
-            accounts = get_pepperstone_accounts()
+            accounts = get_metaapi_accounts()
             if accounts:
-                for account in accounts[:3]:  # Show first 3 accounts
-                    st.write(f"**Account ID:** {account.get('accountId', 'N/A')}")
-                    st.write(f"**Balance:** ${account.get('balance', 0):.2f}")
-                    st.write(f"**Currency:** {account.get('currency', 'N/A')}")
-                    st.write("---")
+                current_account = next((acc for acc in accounts if acc['_id'] == st.session_state.metaapi_account_id),
+                                       None)
+                if current_account:
+                    st.write(f"**Account Name:** {current_account.get('name', 'N/A')}")
+                    st.write(f"**Account ID:** {current_account['_id']}")
+                    st.write(f"**Broker:** {current_account.get('broker', {}).get('name', 'N/A')}")
+                    st.write(f"**Type:** {current_account.get('type', 'N/A')}")
+                    st.write(f"**Status:** {current_account.get('state', 'N/A')}")
+                else:
+                    st.info("Account details not available")
             else:
                 st.info("No account information available")
 
         with col_info2:
             st.subheader("💱 Available Symbols")
-            symbols = get_pepperstone_symbols()
+            symbols = get_metaapi_symbols(st.session_state.metaapi_account_id)
             if symbols:
                 # Group symbols by category for better display
                 major_pairs = [s for s in symbols if any(
@@ -4463,7 +4474,7 @@ elif st.session_state.current_page == "Trade Signal":
 
         # Open Positions
         st.subheader("📈 Open Positions")
-        positions = get_pepperstone_positions()
+        positions = get_metaapi_positions(st.session_state.metaapi_account_id)
         if positions:
             positions_df = pd.DataFrame(positions)
             st.dataframe(positions_df, use_container_width=True)
@@ -4510,7 +4521,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.download_button(
                 label="📤 Export Signals CSV",
                 data=csv,
-                file_name=f"pepperstone_signals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                file_name=f"metaapi_signals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime="text/csv",
                 use_container_width=True
             )
@@ -4533,8 +4544,8 @@ elif st.session_state.current_page == "Trade Signal":
 
         1. **Add signals** in the Active Opportunities page by moving orders to **'Order Ready'**
         2. **Signals will automatically appear** here when synced
-        3. **Execute trades** directly via Pepperstone cTrader API
-        4. **Manage positions** in the Pepperstone section above
+        3. **Execute trades** directly via MetaApi
+        4. **Manage positions** in the MetaApi section above
 
         When orders are moved to **'Order Completed'**, **'Speculation'**, or **deleted** in Active Opportunities, 
         they will be automatically removed from here.
@@ -4598,7 +4609,7 @@ elif st.session_state.current_page == "Trade Signal":
                 st.markdown("---")
                 st.subheader("🚀 Trade Execution")
 
-                if st.session_state.pepperstone_authenticated:
+                if st.session_state.metaapi_account_id:
                     col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
 
                     with col_exec1:
@@ -4608,7 +4619,8 @@ elif st.session_state.current_page == "Trade Signal":
                                      type="primary",
                                      use_container_width=True):
                             with st.spinner(f"Executing {direction} order for {signal['selected_pair']}..."):
-                                success, message = place_pepperstone_trade(
+                                success, message = place_metaapi_trade(
+                                    account_id=st.session_state.metaapi_account_id,
                                     symbol=signal['selected_pair'],
                                     volume=float(signal.get('position_size', 0.1)),
                                     order_type=direction,
@@ -4639,8 +4651,8 @@ elif st.session_state.current_page == "Trade Signal":
                             risk_pips = abs(entry - stop) * 10000
                             st.metric("Risk", f"{risk_pips:.1f} pips")
                 else:
-                    st.warning("🔒 Please authenticate with Pepperstone to execute trades")
-                    st.info("Go to the Pepperstone Authentication section above to connect your account")
+                    st.warning("🔒 Please connect to a MetaApi account to execute trades")
+                    st.info("Go to the MetaApi Account Setup section above to connect your account")
 
                 # Additional signal information
                 if signal.get('variances'):

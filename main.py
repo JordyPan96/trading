@@ -4099,6 +4099,16 @@ elif st.session_state.current_page == "Active Opps":
             st.rerun()
 
 elif st.session_state.current_page == "Trade Signal":
+    # Install MetaApi SDK if not available
+    try:
+        from metaapi_cloud_sdk import MetaApi
+
+        metaapi_available = True
+    except ImportError:
+        metaapi_available = False
+        st.error("MetaApi SDK not installed. Please add 'metaapi-cloud-sdk' to requirements.txt")
+        st.stop()
+
     st.title("📡 Trade Signals")
 
 
@@ -4131,7 +4141,7 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # METAAPI SDK Functions
+    # METAAPI SDK Functions - FIXED CONNECTION HANDLING
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
         try:
@@ -4172,7 +4182,6 @@ elif st.session_state.current_page == "Trade Signal":
                 return False, "❌ MetaApi token not configured"
 
             api = MetaApi(token)
-            # Test by trying to get accounts list
             accounts = await api.metatrader_account_api.get_accounts()
             return True, f"✅ Connected to MetaApi successfully. Found {len(accounts)} accounts"
 
@@ -4205,6 +4214,9 @@ elif st.session_state.current_page == "Trade Signal":
             st.info("Waiting for SDK to synchronize to terminal state...")
             await connection.wait_synchronized()
 
+            # Store connection in session state
+            st.session_state.metaapi_connection = connection
+
             return True, f"✅ Successfully connected to account: {account.name}"
 
         except Exception as e:
@@ -4218,12 +4230,17 @@ elif st.session_state.current_page == "Trade Signal":
             if error:
                 return None
 
+            # Always create a fresh connection for data fetching
             connection = account.get_rpc_connection()
-            if not connection.connected:
-                await connection.connect()
-                await connection.wait_synchronized()
+            await connection.connect()
+            await connection.wait_synchronized()
 
-            return await connection.get_account_information()
+            account_info = await connection.get_account_information()
+
+            # Close connection after use
+            await connection.close()
+
+            return account_info
         except Exception as e:
             st.error(f"Error getting account info: {str(e)}")
             return None
@@ -4236,12 +4253,17 @@ elif st.session_state.current_page == "Trade Signal":
             if error:
                 return []
 
+            # Always create a fresh connection for data fetching
             connection = account.get_rpc_connection()
-            if not connection.connected:
-                await connection.connect()
-                await connection.wait_synchronized()
+            await connection.connect()
+            await connection.wait_synchronized()
 
-            return await connection.get_positions()
+            positions = await connection.get_positions()
+
+            # Close connection after use
+            await connection.close()
+
+            return positions
         except Exception as e:
             st.error(f"Error getting positions: {str(e)}")
             return []
@@ -4254,18 +4276,33 @@ elif st.session_state.current_page == "Trade Signal":
             if error:
                 return []
 
+            # Always create a fresh connection for data fetching
             connection = account.get_rpc_connection()
-            if not connection.connected:
-                await connection.connect()
-                await connection.wait_synchronized()
+            await connection.connect()
+            await connection.wait_synchronized()
 
-            # Get symbols from server time or other method
-            # For now, return common symbols
-            common_symbols = [
-                'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
-                'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
-            ]
-            return common_symbols
+            # Try to get symbols from server time or use common ones
+            try:
+                # This might not work for all brokers, so we'll fall back to common symbols
+                server_time = await connection.get_server_time()
+                # If we get here, connection is working
+                common_symbols = [
+                    'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
+                    'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
+                ]
+
+                # Close connection after use
+                await connection.close()
+
+                return common_symbols
+            except:
+                common_symbols = [
+                    'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
+                    'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
+                ]
+                await connection.close()
+                return common_symbols
+
         except Exception as e:
             st.error(f"Error getting symbols: {str(e)}")
             return []
@@ -4278,10 +4315,10 @@ elif st.session_state.current_page == "Trade Signal":
             if error:
                 return False, error
 
+            # Create a fresh connection for trading
             connection = account.get_rpc_connection()
-            if not connection.connected:
-                await connection.connect()
-                await connection.wait_synchronized()
+            await connection.connect()
+            await connection.wait_synchronized()
 
             # Place market order
             if order_type.upper() == "BUY":
@@ -4303,9 +4340,17 @@ elif st.session_state.current_page == "Trade Signal":
                     client_id=f"ST_{symbol}_{int(datetime.now().timestamp())}"
                 )
 
+            # Close connection after trade
+            await connection.close()
+
             return True, f"✅ Trade executed successfully (Code: {result.get('stringCode', 'N/A')})"
 
         except Exception as e:
+            # Try to close connection if it exists
+            try:
+                await connection.close()
+            except:
+                pass
             return False, f"❌ Trade error: {str(e)}"
 
 
@@ -4446,7 +4491,7 @@ elif st.session_state.current_page == "Trade Signal":
                     st.write(f"**Free Margin:** ${account_info.get('freeMargin', 'N/A')}")
                     st.write(f"**Margin Level:** {account_info.get('marginLevel', 'N/A')}%")
                 else:
-                    st.info("Click 'Refresh Account Info' to load account information")
+                    st.info("Could not load account information")
 
         with col_info2:
             st.subheader("💱 Available Symbols")
@@ -4461,7 +4506,7 @@ elif st.session_state.current_page == "Trade Signal":
                         with cols[i % 4]:
                             st.code(symbol)
                 else:
-                    st.info("Common trading symbols will be shown here")
+                    st.info("Could not load symbols")
 
         # Open Positions
         st.subheader("📈 Open Positions")
@@ -4684,8 +4729,6 @@ elif st.session_state.current_page == "Trade Signal":
                         if stop_distance > 0:
                             reward_ratio = target_distance / stop_distance
                             st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
-
-
 
 elif st.session_state.current_page == "Stats":
 

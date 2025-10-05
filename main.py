@@ -3590,17 +3590,17 @@ elif st.session_state.current_page == "Active Opps":
     st.write(
         f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Completed: {order_completed_count}")
 
-    # Manual sync buttons - Now only manual refresh available
+    # Manual sync buttons - Now only manual load available
     col_sync1, col_sync2, col_export = st.columns(3)
     with col_sync1:
-        if st.button("🔄 Refresh from Cloud"):
-            with st.spinner("Refreshing data from cloud..."):
+        if st.button("📥 Load from Cloud"):
+            with st.spinner("Loading data from cloud..."):
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
                     st.session_state.saved_records = workflow_data.to_dict('records')
                     # Sync trade signals after loading data
                     sync_trade_signals_with_active_opps()
-                    st.success("Workflow data refreshed from cloud!")
+                    st.success("Workflow data loaded from cloud!")
                     st.rerun()
                 else:
                     st.error("No workflow data found in cloud. Try uploading a CSV backup.")
@@ -4103,6 +4103,7 @@ elif st.session_state.current_page == "Active Opps":
             else:
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
+
 
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available

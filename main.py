@@ -3331,7 +3331,7 @@ elif st.session_state.current_page == "Active Opps":
 
 
     def save_workflow_to_sheets(data):
-        """Save workflow data to Google Sheets - copied from Active Opps page"""
+        """Save workflow data to Google Sheets using existing functions"""
         try:
             # Convert records to DataFrame if it's a list
             if isinstance(data, list):
@@ -3347,8 +3347,11 @@ elif st.session_state.current_page == "Active Opps":
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
 
+            # Clean data using your existing function
+            data_clean = clean_data_for_google_sheets(data_to_save)
+
             # Save using your existing function but specify the workflow worksheet
-            success = save_data_to_sheets(data_to_save, sheet_name="Trade", worksheet_name="Workflow")
+            success = save_data_to_sheets(data_clean, sheet_name="Trade", worksheet_name="Workflow")
             return success
         except Exception as e:
             st.error(f"Error saving workflow data: {e}")
@@ -3463,7 +3466,7 @@ elif st.session_state.current_page == "Active Opps":
             return default
 
 
-    # AUTO-SYNC ON PAGE LOAD - Updated to always load from cloud on page load
+    # SYNC ONLY ONCE ON APP LOAD - Updated to load only once
     if 'saved_records' not in st.session_state:
         # First time loading the page - load from cloud with spinner
         with st.spinner("🔄 Loading data from cloud..."):
@@ -3481,16 +3484,7 @@ elif st.session_state.current_page == "Active Opps":
                 # Initialize empty if no data exists in cloud
                 st.session_state.saved_records = []
                 st.info("No data found in cloud. You can upload a CSV backup below.")
-    else:
-        # Subsequent loads - auto-sync in background without message
-        workflow_data = load_workflow_from_sheets()
-        if not workflow_data.empty:
-            # Update session state with latest data
-            st.session_state.saved_records = workflow_data.to_dict('records')
-
-            # Sync trade signals after loading data
-            sync_trade_signals_with_active_opps()
-        # No message shown for background syncs
+    # No else condition - no background sync on subsequent loads
 
     # Initialize trade signals if not exists
     if 'trade_signals' not in st.session_state:
@@ -3596,7 +3590,7 @@ elif st.session_state.current_page == "Active Opps":
     st.write(
         f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Completed: {order_completed_count}")
 
-    # Manual sync buttons with enhanced error handling - Now just for manual refresh
+    # Manual sync buttons - Now only manual refresh available
     col_sync1, col_sync2, col_export = st.columns(3)
     with col_sync1:
         if st.button("🔄 Refresh from Cloud"):

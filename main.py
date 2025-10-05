@@ -4453,26 +4453,7 @@ elif st.session_state.current_page == "Trade Signal":
         they will be automatically removed from here.
         """)
     else:
-        # Convert to DataFrame for nice display
-        signals_data = []
-        for signal in st.session_state.trade_signals:
-            signal_copy = signal.copy()
-            if 'direction' not in signal_copy:
-                signal_copy['direction'] = calculate_direction(
-                    signal_copy.get('entry_price'),
-                    signal_copy.get('exit_price')
-                )
-            signals_data.append(signal_copy)
-
-        signals_df = pd.DataFrame(signals_data)
-
-        # Display compact overview
-        st.subheader("Signals Overview")
-        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'target_price', 'position_size',
-                           'timestamp']
-        available_columns = [col for col in display_columns if col in signals_df.columns]
-
-        st.dataframe(signals_df[available_columns], use_container_width=True)
+        # Removed Signals Overview section
 
         # Detailed view with execution
         st.subheader("📋 Signal Details & Execution")
@@ -4493,13 +4474,64 @@ elif st.session_state.current_page == "Trade Signal":
                     entry_price = safe_float(signal.get('entry_price'), 0.0)
                     st.write(f"**Entry Price:** {entry_price:.5f}")
 
+                    # Execution button in col2 below Entry Price
+                    if st.session_state.metaapi_connected:
+                        validation_ok = entry_price > 0 and safe_float(signal.get('exit_price'),
+                                                                       0.0) > 0 and safe_float(
+                            signal.get('target_price'), 0.0) > 0
+                        if validation_ok:
+                            if st.button(
+                                    f"🎯 Execute {calculate_direction(signal.get('entry_price'), signal.get('exit_price'))} Order",
+                                    key=f"execute_{i}",
+                                    type="primary",
+                                    use_container_width=True):
+                                import asyncio
+
+                                direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
+                                formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
+                                with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
+                                    success, message = asyncio.run(place_trade(
+                                        symbol=signal['selected_pair'],
+                                        volume=float(signal.get('position_size', 0.1)),
+                                        order_type=direction,
+                                        entry_price=entry_price,
+                                        sl=safe_float(signal.get('exit_price'), 0.0),
+                                        tp=safe_float(signal.get('target_price'), 0.0)
+                                    ))
+                                    if success:
+                                        st.success(message)
+                                    else:
+                                        st.error(message)
+
                 with col3:
                     sl_price = safe_float(signal.get('exit_price'), 0.0)
                     st.write(f"**Stop Loss:** {sl_price:.5f}")
 
+                    # Position size editor in col3 below Stop Loss
+                    new_size = st.number_input(
+                        "Size (lots)",
+                        min_value=0.01,
+                        max_value=100.0,
+                        value=float(signal.get('position_size', 0.1)),
+                        step=0.01,
+                        key=f"size_{i}"
+                    )
+
                 with col4:
                     tp_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Take Profit:** {tp_price:.5f}")
+
+                    # R:R Ratio in col4 below Take Profit
+                    entry_val = safe_float(signal.get('entry_price'), 0.0)
+                    stop_val = safe_float(signal.get('exit_price'), 0.0)
+                    target_val = safe_float(signal.get('target_price'), 0.0)
+
+                    if stop_val > 0 and target_val > 0:
+                        stop_distance = abs(entry_val - stop_val)
+                        target_distance = abs(entry_val - target_val)
+                        if stop_distance > 0:
+                            reward_ratio = target_distance / stop_distance
+                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
 
                 # Calculate and display Direction
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
@@ -4511,15 +4543,12 @@ elif st.session_state.current_page == "Trade Signal":
                 if formatted_symbol != signal['selected_pair']:
                     st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
 
-                # Calculate risk metrics
-                entry_val = safe_float(signal.get('entry_price'), 0.0)
-                stop_val = safe_float(signal.get('exit_price'), 0.0)
-                target_val = safe_float(signal.get('target_price'), 0.0)
-
-                # EXECUTION BUTTON AND R:R RATIO - PLACED BELOW PRICE FIELDS
-                st.markdown("---")
-
-                if st.session_state.metaapi_connected:
+                # Connection status and validation messages
+                if not st.session_state.metaapi_connected:
+                    st.warning("🔒 Not connected to trading account")
+                    st.info(
+                        "The system will automatically try to reconnect. You can also manually reconnect using the button above.")
+                else:
                     # Validation check
                     validation_ok = True
                     if entry_val <= 0:
@@ -4532,57 +4561,8 @@ elif st.session_state.current_page == "Trade Signal":
                         st.error("❌ Take profit price missing or invalid")
                         validation_ok = False
 
-                    if validation_ok:
-                        # Execution button and R:R ratio in the same row
-                        col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
-
-                        with col_exec1:
-                            # Trade execution button
-                            if st.button(f"🎯 Execute {direction} Limit Order",
-                                         key=f"execute_{i}",
-                                         type="primary",
-                                         use_container_width=True):
-                                import asyncio
-
-                                with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
-                                    success, message = asyncio.run(place_trade(
-                                        symbol=signal['selected_pair'],
-                                        volume=float(signal.get('position_size', 0.1)),
-                                        order_type=direction,
-                                        entry_price=entry_val,
-                                        sl=stop_val,
-                                        tp=target_val
-                                    ))
-                                    if success:
-                                        st.success(message)
-                                    else:
-                                        st.error(message)
-
-                        with col_exec2:
-                            # Quick edit position size
-                            new_size = st.number_input(
-                                "Size (lots)",
-                                min_value=0.01,
-                                max_value=100.0,
-                                value=float(signal.get('position_size', 0.1)),
-                                step=0.01,
-                                key=f"size_{i}"
-                            )
-
-                        with col_exec3:
-                            # R:R Ratio only
-                            if stop_val > 0 and target_val > 0:
-                                stop_distance = abs(entry_val - stop_val)
-                                target_distance = abs(entry_val - target_val)
-                                if stop_distance > 0:
-                                    reward_ratio = target_distance / stop_distance
-                                    st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
-                    else:
+                    if not validation_ok:
                         st.warning("⚠️ Cannot execute trade - missing required parameters")
-                else:
-                    st.warning("🔒 Not connected to trading account")
-                    st.info(
-                        "The system will automatically try to reconnect. You can also manually reconnect using the button above.")
 
                 # Additional signal information
                 if signal.get('variances'):

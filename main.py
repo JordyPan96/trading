@@ -3793,9 +3793,20 @@ elif st.session_state.current_page == "Active Opps":
                             if not target_price_valid:
                                 st.error("Target price must be greater than 0 to move to Order Ready")
 
-                            # Update button for this record
-                            col_update, col_delete = st.columns(2)
-                            with col_update:
+                            # Action buttons for Speculation stage
+                            col_update_only, col_move, col_delete = st.columns([1, 1, 1])
+
+                            with col_update_only:
+                                if st.button(f"Update Record", key=f"spec_update_only_{original_index}"):
+                                    updates = {
+                                        'entry_price': new_entry_price,
+                                        'exit_price': new_exit_price,
+                                        'target_price': new_target_price
+                                    }
+                                    update_record_and_sync(original_index, updates)
+                                    st.rerun()
+
+                            with col_move:
                                 update_disabled = False
                                 if expected_stop_pips is not None and current_stop_pips is not None:
                                     if abs(expected_stop_pips - current_stop_pips) > 0.01:
@@ -3805,7 +3816,7 @@ elif st.session_state.current_page == "Active Opps":
                                 if not all_required_fields_valid:
                                     update_disabled = True
 
-                                if st.button(f"Move to Order Ready", key=f"spec_update_{original_index}",
+                                if st.button(f"Move to Order Ready", key=f"spec_move_{original_index}",
                                              disabled=update_disabled):
                                     # Check if updating to active status would exceed the limit
                                     if total_active_count >= 2:
@@ -3827,15 +3838,26 @@ elif st.session_state.current_page == "Active Opps":
                                         st.rerun()
 
                             with col_delete:
-                                if st.button(f"🗑️ Delete Record", key=f"spec_delete_{original_index}"):
+                                if st.button(f"🗑️ Delete", key=f"spec_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
                         elif current_stage == 'Order Ready':
-                            # Update button for this record
-                            col_update, col_delete = st.columns(2)
-                            with col_update:
-                                if st.button(f"Move to Order Completed", key=f"ready_update_{original_index}"):
+                            # Action buttons for Order Ready stage
+                            col_update_only, col_move, col_delete = st.columns([1, 1, 1])
+
+                            with col_update_only:
+                                if st.button(f"Update Record", key=f"ready_update_only_{original_index}"):
+                                    updates = {
+                                        'entry_price': new_entry_price,
+                                        'exit_price': new_exit_price,
+                                        'target_price': new_target_price
+                                    }
+                                    update_record_and_sync(original_index, updates)
+                                    st.rerun()
+
+                            with col_move:
+                                if st.button(f"Move to Order Completed", key=f"ready_move_{original_index}"):
                                     updates = {
                                         'entry_price': new_entry_price,
                                         'exit_price': new_exit_price,
@@ -3846,7 +3868,7 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                             with col_delete:
-                                if st.button(f"🗑️ Delete Record", key=f"ready_delete_{original_index}"):
+                                if st.button(f"🗑️ Delete", key=f"ready_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 
@@ -3925,8 +3947,24 @@ elif st.session_state.current_page == "Active Opps":
                                 existing_variance = record.get('Variances', 'Not set')
                                 st.write(f"**Variance:** {existing_variance}")
 
-                            # Close Record button
-                            col_close, col_delete = st.columns(2)
+                            # Action buttons for Order Completed stage
+                            col_update_only, col_close, col_delete = st.columns([1, 1, 1])
+
+                            with col_update_only:
+                                if st.button(f"Update Record", key=f"completed_update_only_{original_index}"):
+                                    updates = {
+                                        'entry_price': new_entry_price,
+                                        'exit_price': new_exit_price,
+                                        'target_price': new_target_price,
+                                        'result': new_result,
+                                        'direction': new_direction,
+                                        'rr': new_rr,
+                                        'pnl': new_pnl,
+                                        'poi': new_poi
+                                    }
+                                    update_record_and_sync(original_index, updates)
+                                    st.rerun()
+
                             with col_close:
                                 if st.button(f"Finalize & Close Trade", key=f"completed_close_{original_index}",
                                              type="primary"):
@@ -4015,7 +4053,7 @@ elif st.session_state.current_page == "Active Opps":
                                         st.error("Please fill in all required fields")
 
                             with col_delete:
-                                if st.button(f"🗑️ Delete Record", key=f"completed_delete_{original_index}"):
+                                if st.button(f"🗑️ Delete", key=f"completed_delete_{original_index}"):
                                     delete_record_and_sync(original_index)
                                     st.rerun()
 

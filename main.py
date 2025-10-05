@@ -4363,6 +4363,31 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
+    def save_workflow_to_sheets(data):
+        """Save workflow data to Google Sheets - copied from Active Opps page"""
+        try:
+            # Convert records to DataFrame if it's a list
+            if isinstance(data, list):
+                data_to_save = pd.DataFrame(data)
+            else:
+                data_to_save = data.copy()
+
+            # Ensure all required columns exist
+            required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
+                                'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+
+            for col in required_columns:
+                if col not in data_to_save.columns:
+                    data_to_save[col] = None
+
+            # Save using your existing function but specify the workflow worksheet
+            success = save_data_to_sheets(data_to_save, sheet_name="Trade", worksheet_name="Workflow")
+            return success
+        except Exception as e:
+            st.error(f"Error saving workflow data: {e}")
+            return False
+
+
     def sync_with_active_opps():
         """Sync trade signals with current Active Opps Order Ready records - WITH ONE-WAY SYNC TO ORDER COMPLETED"""
         try:
@@ -4426,46 +4451,46 @@ elif st.session_state.current_page == "Trade Signal":
                             'target_price': record.get('target_price'),
                             'trend_position': record.get('trend_position', 'Not set'),
                             'variances': record.get('Variances', 'Not set')
-                        )
+                        })
 
-                        # LOGIC 3: ONE-WAY SYNC - Move records to "Order Completed" in Active Opps when they reach Order Placed or In Trade
-                        # Get all current records from Active Opps to update
-                        all_records = workflow_df.to_dict('records')
-                        records_updated = False
+                # LOGIC 3: ONE-WAY SYNC - Move records to "Order Completed" in Active Opps when they reach Order Placed or In Trade
+                # Get all current records from Active Opps to update
+                all_records = workflow_df.to_dict('records')
+                records_updated = False
 
-                        # Check for records in order_placed that need to be moved to Order Completed
-                        for order in st.session_state.order_placed:
-                            timestamp = order.get('timestamp')
-                        # Find the corresponding record in Active Opps
-                        opps_record_index = next(
-                            (idx for idx, r in enumerate(all_records) if r.get('timestamp') == timestamp), None)
+                # Check for records in order_placed that need to be moved to Order Completed
+                for order in st.session_state.order_placed:
+                    timestamp = order.get('timestamp')
+                    # Find the corresponding record in Active Opps
+                    opps_record_index = next(
+                        (idx for idx, r in enumerate(all_records) if r.get('timestamp') == timestamp), None)
 
-                        if opps_record_index is not None and all_records[opps_record_index].get(
-                                'status') != 'Order Completed':
+                    if opps_record_index is not None and all_records[opps_record_index].get(
+                            'status') != 'Order Completed':
                         # Update the record status to Order Completed
-                            all_records[opps_record_index]['status'] = 'Order Completed'
+                        all_records[opps_record_index]['status'] = 'Order Completed'
                         records_updated = True
 
-                        # Check for records in in_trade that need to be moved to Order Completed
-                        for trade in st.session_state.in_trade:
-                            timestamp = trade.get('timestamp')
-                        # Find the corresponding record in Active Opps
-                        opps_record_index = next(
-                            (idx for idx, r in enumerate(all_records) if r.get('timestamp') == timestamp), None)
+                # Check for records in in_trade that need to be moved to Order Completed
+                for trade in st.session_state.in_trade:
+                    timestamp = trade.get('timestamp')
+                    # Find the corresponding record in Active Opps
+                    opps_record_index = next(
+                        (idx for idx, r in enumerate(all_records) if r.get('timestamp') == timestamp), None)
 
-                        if opps_record_index is not None and all_records[opps_record_index].get(
-                                'status') != 'Order Completed':
+                    if opps_record_index is not None and all_records[opps_record_index].get(
+                            'status') != 'Order Completed':
                         # Update the record status to Order Completed
-                            all_records[opps_record_index]['status'] = 'Order Completed'
+                        all_records[opps_record_index]['status'] = 'Order Completed'
                         records_updated = True
 
-                        # Save the updated records back to Active Opps if any changes were made
-                        if records_updated:
-                            success = save_workflow_to_sheets(all_records)
-                        if success:
-                            st.success("✅ Updated Active Opps with completed orders")
-                        else:
-                            st.error("❌ Failed to update Active Opps")
+                # Save the updated records back to Active Opps if any changes were made
+                if records_updated:
+                    success = save_workflow_to_sheets(all_records)
+                    if success:
+                        st.success("✅ Updated Active Opps with completed orders")
+                    else:
+                        st.error("❌ Failed to update Active Opps")
 
                 return True
             else:
@@ -4683,6 +4708,8 @@ elif st.session_state.current_page == "Trade Signal":
                                                     'order_status': 'PENDING',
                                                     'direction': direction
                                                 })
+                                                # Sync with Active Opps to update status to Order Completed
+                                                sync_with_active_opps()
                                                 st.success(f"✅ Order placed: {message}")
                                                 st.rerun()
                                             else:
@@ -4777,6 +4804,8 @@ elif st.session_state.current_page == "Trade Signal":
                                     'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                     'order_status': 'FILLED'
                                 })
+                                # Sync with Active Opps to update status to Order Completed
+                                sync_with_active_opps()
                                 st.rerun()
 
                         with col_move:
@@ -4789,6 +4818,8 @@ elif st.session_state.current_page == "Trade Signal":
                                     'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                     'order_status': 'FILLED'
                                 })
+                                # Sync with Active Opps to update status to Order Completed
+                                sync_with_active_opps()
                                 st.success("Order moved to In Trade")
                                 st.rerun()
 

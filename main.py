@@ -4141,7 +4141,7 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # METAAPI SDK Functions - FIXED CONNECTION HANDLING
+    # METAAPI SDK Functions
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
         try:
@@ -4214,9 +4214,6 @@ elif st.session_state.current_page == "Trade Signal":
             st.info("Waiting for SDK to synchronize to terminal state...")
             await connection.wait_synchronized()
 
-            # Store connection in session state
-            st.session_state.metaapi_connection = connection
-
             return True, f"✅ Successfully connected to account: {account.name}"
 
         except Exception as e:
@@ -4283,17 +4280,12 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Try to get symbols from server time or use common ones
             try:
-                # This might not work for all brokers, so we'll fall back to common symbols
                 server_time = await connection.get_server_time()
-                # If we get here, connection is working
                 common_symbols = [
                     'EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD',
                     'EURGBP', 'EURJPY', 'EURCHF', 'GBPJPY', 'XAUUSD', 'XAGUSD'
                 ]
-
-                # Close connection after use
                 await connection.close()
-
                 return common_symbols
             except:
                 common_symbols = [
@@ -4308,8 +4300,8 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
-    async def place_trade(symbol: str, volume: float, order_type: str, sl: float = None, tp: float = None):
-        """Place a trade with MetaApi"""
+    async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
+        """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
         try:
             account, error = await get_metaapi_account()
             if error:
@@ -4320,30 +4312,33 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Place market order
+            # Validate that SL and TP are provided
+            if sl is None or tp is None:
+                await connection.close()
+                return False, "❌ Stop loss and take profit are mandatory"
+
+            # Place LIMIT order with mandatory SL and TP
             if order_type.upper() == "BUY":
-                result = await connection.create_market_buy_order(
+                result = await connection.create_limit_buy_order(
                     symbol,
                     volume,
-                    stop_loss=sl,
-                    take_profit=tp,
-                    comment=f"Trade from Streamlit App {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    client_id=f"ST_{symbol}_{int(datetime.now().timestamp())}"
+                    entry_price,  # Limit price for buy
+                    stopLoss=sl,  # Mandatory stop loss
+                    takeProfit=tp  # Mandatory take profit
                 )
             else:  # SELL
-                result = await connection.create_market_sell_order(
+                result = await connection.create_limit_sell_order(
                     symbol,
                     volume,
-                    stop_loss=sl,
-                    take_profit=tp,
-                    comment=f"Trade from Streamlit App {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    client_id=f"ST_{symbol}_{int(datetime.now().timestamp())}"
+                    entry_price,  # Limit price for sell
+                    stopLoss=sl,  # Mandatory stop loss
+                    takeProfit=tp  # Mandatory take profit
                 )
 
             # Close connection after trade
             await connection.close()
 
-            return True, f"✅ Trade executed successfully (Code: {result.get('stringCode', 'N/A')})"
+            return True, f"✅ Limit order placed successfully with SL and TP (Code: {result.get('stringCode', 'N/A')})"
 
         except Exception as e:
             # Try to close connection if it exists
@@ -4605,7 +4600,8 @@ elif st.session_state.current_page == "Trade Signal":
 
         # Display compact overview
         st.subheader("Signals Overview")
-        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'position_size', 'timestamp']
+        display_columns = ['selected_pair', 'direction', 'entry_price', 'exit_price', 'target_price', 'position_size',
+                           'timestamp']
         available_columns = [col for col in display_columns if col in signals_df.columns]
 
         st.dataframe(signals_df[available_columns], use_container_width=True)
@@ -4630,105 +4626,116 @@ elif st.session_state.current_page == "Trade Signal":
                     st.write(f"**Entry Price:** {entry_price:.5f}")
 
                 with col3:
-                    exit_price = safe_float(signal.get('exit_price'), 0.0)
-                    st.write(f"**Stop Loss:** {exit_price:.5f}")
+                    sl_price = safe_float(signal.get('exit_price'), 0.0)
+                    st.write(f"**Stop Loss:** {sl_price:.5f}")
 
                 with col4:
-                    target_price = safe_float(signal.get('target_price'), 0.0)
-                    st.write(f"**Take Profit:** {target_price:.5f}")
+                    tp_price = safe_float(signal.get('target_price'), 0.0)
+                    st.write(f"**Take Profit:** {tp_price:.5f}")
 
                 # Calculate and display Direction
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
                 direction_color = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
                 st.write(f"**Direction:** {direction_color} {direction}")
 
+                # Trade Validation Section
+                st.write("---")
+                st.subheader("🔍 Trade Validation")
+
+                validation_ok = True
+                if entry_price <= 0:
+                    st.error("❌ Entry price missing or invalid")
+                    validation_ok = False
+                if sl_price <= 0:
+                    st.error("❌ Stop loss price missing or invalid")
+                    validation_ok = False
+                if tp_price <= 0:
+                    st.error("❌ Take profit price missing or invalid")
+                    validation_ok = False
+
+                if validation_ok:
+                    st.success("✅ All trade parameters are ready")
+
+                    # Calculate and display risk metrics
+                    stop_distance = abs(entry_price - sl_price)
+                    target_distance = abs(entry_price - tp_price)
+
+                    col_val1, col_val2, col_val3 = st.columns(3)
+                    with col_val1:
+                        if signal['selected_pair'] == 'XAUUSD':
+                            st.metric("Stop Distance", f"${stop_distance:.2f}")
+                        else:
+                            st.metric("Stop Distance", f"{stop_distance * 10000:.1f} pips")
+                    with col_val2:
+                        if signal['selected_pair'] == 'XAUUSD':
+                            st.metric("Target Distance", f"${target_distance:.2f}")
+                        else:
+                            st.metric("Target Distance", f"{target_distance * 10000:.1f} pips")
+                    with col_val3:
+                        if stop_distance > 0:
+                            reward_ratio = target_distance / stop_distance
+                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
+
                 # Trading Execution Section
                 st.markdown("---")
                 st.subheader("🚀 Trade Execution")
 
                 if st.session_state.metaapi_connected:
-                    col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
+                    if validation_ok:
+                        col_exec1, col_exec2, col_exec3 = st.columns([2, 1, 1])
 
-                    with col_exec1:
-                        # Trade execution button
-                        if st.button(f"🎯 Execute {direction} Order",
-                                     key=f"execute_{i}",
-                                     type="primary",
-                                     use_container_width=True):
-                            import asyncio
+                        with col_exec1:
+                            # Trade execution button
+                            if st.button(f"🎯 Execute {direction} Limit Order",
+                                         key=f"execute_{i}",
+                                         type="primary",
+                                         use_container_width=True):
+                                import asyncio
 
-                            with st.spinner(f"Executing {direction} order for {signal['selected_pair']}..."):
-                                success, message = asyncio.run(place_trade(
-                                    symbol=signal['selected_pair'],
-                                    volume=float(signal.get('position_size', 0.1)),
-                                    order_type=direction,
-                                    sl=safe_float(signal.get('exit_price'), 0.0),
-                                    tp=safe_float(signal.get('target_price'), 0.0)
-                                ))
-                                if success:
-                                    st.success(message)
-                                else:
-                                    st.error(message)
+                                with st.spinner(f"Placing {direction} limit order for {signal['selected_pair']}..."):
+                                    success, message = asyncio.run(place_trade(
+                                        symbol=signal['selected_pair'],
+                                        volume=float(signal.get('position_size', 0.1)),
+                                        order_type=direction,
+                                        entry_price=entry_price,
+                                        sl=sl_price,
+                                        tp=tp_price
+                                    ))
+                                    if success:
+                                        st.success(message)
+                                    else:
+                                        st.error(message)
 
-                    with col_exec2:
-                        # Quick edit position size
-                        new_size = st.number_input(
-                            "Size (lots)",
-                            min_value=0.01,
-                            max_value=100.0,
-                            value=float(signal.get('position_size', 0.1)),
-                            step=0.01,
-                            key=f"size_{i}"
-                        )
+                        with col_exec2:
+                            # Quick edit position size
+                            new_size = st.number_input(
+                                "Size (lots)",
+                                min_value=0.01,
+                                max_value=100.0,
+                                value=float(signal.get('position_size', 0.1)),
+                                step=0.01,
+                                key=f"size_{i}"
+                            )
 
-                    with col_exec3:
-                        # Risk calculator
-                        entry = safe_float(signal.get('entry_price'), 0.0)
-                        stop = safe_float(signal.get('exit_price'), 0.0)
-                        if entry > 0 and stop > 0:
-                            risk_pips = abs(entry - stop) * 10000
-                            st.metric("Risk", f"{risk_pips:.1f} pips")
+                        with col_exec3:
+                            # Risk calculator
+                            if entry_price > 0 and sl_price > 0:
+                                risk_pips = abs(entry_price - sl_price) * 10000
+                                st.metric("Risk", f"{risk_pips:.1f} pips")
+                    else:
+                        st.warning("⚠️ Cannot execute trade - missing required parameters")
                 else:
                     st.warning("🔒 Please connect to a MetaApi account to execute trades")
                     st.info("Go to the MetaApi Account Setup section above to connect your account")
 
                 # Additional signal information
                 if signal.get('variances'):
+                    st.write("---")
                     st.write(f"**Variance Analysis:** {signal.get('variances', 'N/A')}")
 
                 if signal.get('notes'):
                     st.write("---")
                     st.write(f"**Notes:** {signal.get('notes')}")
-
-                # Risk Management Information
-                st.write("---")
-                st.subheader("📊 Risk Management")
-
-                entry_val = safe_float(signal.get('entry_price'), 0.0)
-                stop_val = safe_float(signal.get('exit_price'), 0.0)
-                target_val = safe_float(signal.get('target_price'), 0.0)
-
-                if entry_val > 0 and stop_val > 0 and target_val > 0:
-                    col_risk1, col_risk2, col_risk3 = st.columns(3)
-
-                    with col_risk1:
-                        stop_distance = abs(entry_val - stop_val)
-                        if signal['selected_pair'] == 'XAUUSD':
-                            st.metric("Stop Distance", f"${stop_distance:.2f}")
-                        else:
-                            st.metric("Stop Distance", f"{stop_distance * 10000:.1f} pips")
-
-                    with col_risk2:
-                        target_distance = abs(entry_val - target_val)
-                        if signal['selected_pair'] == 'XAUUSD':
-                            st.metric("Target Distance", f"${target_distance:.2f}")
-                        else:
-                            st.metric("Target Distance", f"{target_distance * 10000:.1f} pips")
-
-                    with col_risk3:
-                        if stop_distance > 0:
-                            reward_ratio = target_distance / stop_distance
-                            st.metric("R:R Ratio", f"{reward_ratio:.2f}:1")
 
 elif st.session_state.current_page == "Stats":
 

@@ -3466,20 +3466,34 @@ elif st.session_state.current_page == "Active Opps":
             return default
 
 
-    # Load data from Google Sheets on initial load or when syncing
-    if 'saved_records' not in st.session_state or st.button("🔄 Sync with Cloud"):
+    # AUTO-SYNC ON PAGE LOAD - Updated to always load from cloud on page load
+    if 'saved_records' not in st.session_state:
+        # First time loading the page - load from cloud with spinner
+        with st.spinner("🔄 Loading data from cloud..."):
+            workflow_data = load_workflow_from_sheets()
+            if not workflow_data.empty:
+                # Convert DataFrame back to list of dictionaries
+                st.session_state.saved_records = workflow_data.to_dict('records')
+
+                # Sync trade signals after loading data
+                sync_trade_signals_with_active_opps()
+
+                # Show success message only on initial load
+                st.success("Workflow data loaded from cloud!")
+            else:
+                # Initialize empty if no data exists in cloud
+                st.session_state.saved_records = []
+                st.info("No data found in cloud. You can upload a CSV backup below.")
+    else:
+        # Subsequent loads - auto-sync in background without message
         workflow_data = load_workflow_from_sheets()
         if not workflow_data.empty:
-            # Convert DataFrame back to list of dictionaries
+            # Update session state with latest data
             st.session_state.saved_records = workflow_data.to_dict('records')
-            st.success("Workflow data loaded from cloud!")
 
             # Sync trade signals after loading data
             sync_trade_signals_with_active_opps()
-        else:
-            # Initialize empty if no data exists in cloud
-            st.session_state.saved_records = []
-            st.info("No data found in cloud. You can upload a CSV backup below.")
+        # No message shown for background syncs
 
     # Initialize trade signals if not exists
     if 'trade_signals' not in st.session_state:
@@ -3585,9 +3599,22 @@ elif st.session_state.current_page == "Active Opps":
     st.write(
         f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Completed: {order_completed_count}")
 
-    # Manual sync buttons with enhanced error handling
+    # Manual sync buttons with enhanced error handling - Now just for manual refresh
     col_sync1, col_sync2, col_export = st.columns(3)
     with col_sync1:
+        if st.button("🔄 Refresh from Cloud"):
+            with st.spinner("Refreshing data from cloud..."):
+                workflow_data = load_workflow_from_sheets()
+                if not workflow_data.empty:
+                    st.session_state.saved_records = workflow_data.to_dict('records')
+                    # Sync trade signals after loading data
+                    sync_trade_signals_with_active_opps()
+                    st.success("Workflow data refreshed from cloud!")
+                    st.rerun()
+                else:
+                    st.error("No workflow data found in cloud. Try uploading a CSV backup.")
+
+    with col_sync2:
         if st.button("💾 Save to Cloud"):
             if st.session_state.saved_records:
                 success = save_workflow_to_sheets(st.session_state.saved_records)
@@ -3599,18 +3626,6 @@ elif st.session_state.current_page == "Active Opps":
                     st.error("Failed to save to cloud. Use CSV export below to backup your data.")
             else:
                 st.warning("No records to save")
-
-    with col_sync2:
-        if st.button("📥 Load from Cloud"):
-            workflow_data = load_workflow_from_sheets()
-            if not workflow_data.empty:
-                st.session_state.saved_records = workflow_data.to_dict('records')
-                # Sync trade signals after loading data
-                sync_trade_signals_with_active_opps()
-                st.success("Workflow data loaded from cloud!")
-                st.rerun()
-            else:
-                st.error("No workflow data found in cloud. Try uploading a CSV backup.")
 
     with col_export:
         # Export current data to CSV

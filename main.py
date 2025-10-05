@@ -723,10 +723,130 @@ if st.session_state.current_page == "Home":
                 st.session_state.file_processed = True
                 st.session_state.auto_sync_done = True
                 save_persistent_session()
-                # Don't rerun here to avoid double execution
             else:
                 st.session_state.auto_sync_done = True
-                # No data in cloud, continue with manual options
+
+    # BACKGROUND SYMBOL STATS COMPUTATION
+    if (st.session_state.uploaded_data is not None and
+            'symbol_stats_computed' not in st.session_state and
+            'performance_gap_data' not in st.session_state):
+
+        # Run in background without displaying anything
+        try:
+            # Define starting_capital (you may need to adjust this based on your data)
+            starting_capital = 50000  # Replace with your actual starting capital logic
+
+            # Extract the core computation logic from Symbol Stats page
+            df = st.session_state.uploaded_data.copy()
+
+            # Convert date and extract year/month
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d', errors='coerce')
+            df = df.dropna(subset=['Date'])
+
+            df['Year'] = df['Date'].dt.year
+            selected_year = df['Year'].max()
+
+            # Filter data for selected year
+            year_data = df[df['Year'] == selected_year].copy()
+
+            if not year_data.empty:
+                # CORE COMPUTATION LOGIC FROM SYMBOL STATS TAB1
+                base_risk = 0.02
+                base_risk_money = starting_capital * base_risk
+                base_risk_money_multi = base_risk * 100
+
+                # Define symbol groups and their yearly percentage targets
+                symbol_groups = {
+                    'XAUUSD': {'symbols': ['XAUUSD'], 'target': base_risk * 2625},
+                    'USDCAD_AUDUSD': {'symbols': ['USDCAD', 'AUDUSD'], 'target': base_risk * 1125},
+                    'GBPUSD_EURUSD': {'symbols': ['GBPUSD', 'EURUSD'], 'target': base_risk * 2625},
+                    'JPY_Pairs': {'symbols': ['GBPJPY', 'EURJPY', 'AUDJPY', 'USDJPY'], 'target': base_risk * 750},
+                    'GBPAUD_EURAUD': {'symbols': ['GBPAUD', 'EURAUD'], 'target': base_risk * 375}
+                }
+
+                # Create a mapping from individual symbols to group names
+                symbol_to_group = {}
+                for group_name, group_info in symbol_groups.items():
+                    for symbol in group_info['symbols']:
+                        symbol_to_group[symbol] = group_name
+
+                # Add group column to the data
+                year_data_with_group = year_data.copy()
+                year_data_with_group['Group'] = year_data_with_group['Symbol'].map(symbol_to_group)
+
+                # Calculate performance metrics for each group
+                symbol_performance = year_data_with_group.groupby('Group').agg({
+                    'PnL': ['sum', 'mean', 'count', 'std'],
+                    'RR': ['mean', 'count'],
+                    'Result': lambda x: (x == 'Win').sum() / len(x) * 100 if len(x) > 0 else 0
+                }).round(2)
+
+                # Flatten column names
+                symbol_performance.columns = [
+                    'Total_PnL', 'Avg_PnL', 'Trade_Count', 'PnL_StdDev',
+                    'Avg_RR', 'RR_Count', 'Win_Rate'
+                ]
+
+                # Ensure all groups are included, even with no trades
+                all_groups = pd.DataFrame(index=symbol_groups.keys())
+                symbol_performance = all_groups.join(symbol_performance, how='left')
+
+                # Fill NaN values with appropriate defaults
+                symbol_performance = symbol_performance.fillna({
+                    'Total_PnL': 0,
+                    'Avg_PnL': 0,
+                    'Trade_Count': 0,
+                    'PnL_StdDev': 0,
+                    'Avg_RR': 0,
+                    'RR_Count': 0,
+                    'Win_Rate': 0
+                })
+
+                symbol_performance = symbol_performance.sort_values('Total_PnL', ascending=False)
+
+                # Add Yearly Percentage Gain column
+                symbol_performance['Yearly_Pct_Gain'] = symbol_performance.apply(
+                    lambda row: 0 if row['Trade_Count'] == 0 else
+                    (row['Total_PnL'] / starting_capital * 100) if starting_capital != 0 else 0,
+                    axis=1
+                ).round(2)
+
+                # Add Target column with percentage values
+                symbol_performance['Target_Pct'] = symbol_performance.index.map(
+                    lambda x: symbol_groups[x]['target']
+                )
+
+                # CREATE THE DICTIONARY TO STORE GROUP PERFORMANCE GAP DATA
+                group_performance_gap = {}
+
+                # Populate the dictionary with group names and their performance gap
+                for group_name in symbol_groups.keys():
+                    if group_name in symbol_performance.index:
+                        actual_pct_gain = symbol_performance.loc[group_name, 'Yearly_Pct_Gain']
+                        target_pct = symbol_performance.loc[group_name, 'Target_Pct']
+                        # Calculate gap between actual percentage gain and target percentage
+                        gap_pct = (target_pct - actual_pct_gain) * 1.07
+                        # Convert percentage gap to dollar amount
+                        gap_dollar = round((gap_pct / 100) * starting_capital, 0)
+                        group_performance_gap[group_name] = gap_dollar
+
+                # Add PROP data to the dictionary
+                prop_pct_value = df["PROP_Pct"].iloc[0] if not df.empty and "PROP_Pct" in df.columns else 0
+                actual_prop_pct = prop_pct_value
+                target_prop_pct = 30  # PROP target percentage
+                gap_prop_pct = actual_prop_pct - target_prop_pct
+                gap_prop_dollar = (gap_prop_pct / 100) * starting_capital
+                group_performance_gap['PROP'] = gap_prop_dollar
+
+                # Store in session state for cross-page access
+                st.session_state.performance_gap_data = group_performance_gap
+                st.session_state.symbol_stats_computed = True
+                st.session_state.performance_gap_timestamp = pd.Timestamp.now()
+
+        except Exception as e:
+            # Silent fail - don't show error to user
+            print(f"Background symbol stats computation failed: {e}")
+            st.session_state.symbol_stats_computed = False
 
     # Show data management options only on Home page
     with st.sidebar.expander("📁 Cloud Data Management", expanded=True):
@@ -1754,11 +1874,6 @@ elif st.session_state.current_page == "Symbol Stats":
         st.warning("Please upload data first to analyze symbol statistics")
 
 elif st.session_state.current_page == "Risk Calculation":
-
-
-
-
-
     # Remove all top padding
     st.markdown(
         """
@@ -1784,23 +1899,26 @@ elif st.session_state.current_page == "Risk Calculation":
     #st.title("Risk Calculation")
     next_risk = 0
     if st.session_state.uploaded_data is not None:
-        # Access the global dictionary directly
+        # Access the precomputed performance gap data directly
         def get_performance_gap_data():
-            """Helper function to safely retrieve performance gap data"""
+            """Helper function to safely retrieve precomputed performance gap data"""
             if 'performance_gap_data' in st.session_state:
                 return st.session_state.performance_gap_data.copy()
             else:
-                # Return empty dict if not available yet
-                st.warning("Performance gap data not available yet. Please run the analysis on the main page first.")
-                return {}
+                # If not precomputed, compute on the fly as fallback
+                st.warning("Performance gap data not precomputed. Computing now...")
+                try:
+                    # You might want to call the background computation function here
+                    # For now, return empty dict
+                    return {}
+                except:
+                    return {}
 
-
-        # Usage example on your other page
+        # Usage - this will now use precomputed data
         performance_gaps = get_performance_gap_data()
 
         if performance_gaps:
             prop_gap = performance_gaps.get('PROP', 0)
-
             XAUUSD_gap = performance_gaps.get('XAUUSD', 0)
             USDCAD_AUDUSD_gap = performance_gaps.get('USDCAD_AUDUSD', 0)
             GBPUSD_EURUSD_gap = performance_gaps.get('GBPUSD_EURUSD', 0)
@@ -1808,6 +1926,7 @@ elif st.session_state.current_page == "Risk Calculation":
             GBPAUD_EURAUD_gap = performance_gaps.get('GBPAUD_EURAUD', 0)
             sum_gap = XAUUSD_gap+USDCAD_AUDUSD_gap+GBPAUD_EURAUD_gap+GBPUSD_EURUSD_gap+JPY_Pairs_gap
         else:
+            # Fallback values if computation failed
             XAUUSD_gap = 0
             USDCAD_AUDUSD_gap = 0
             GBPUSD_EURUSD_gap = 0

@@ -4119,7 +4119,6 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
 
-
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available
     try:
@@ -4267,11 +4266,11 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
-        """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
+        """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY - RETURNS ORDER ID"""
         try:
             account, error = await get_metaapi_account()
             if error:
-                return False, error
+                return False, error, None
 
             # Create a fresh connection for trading
             connection = account.get_rpc_connection()
@@ -4281,33 +4280,36 @@ elif st.session_state.current_page == "Trade Signal":
             # Validate that SL and TP are provided
             if sl is None or tp is None:
                 await connection.close()
-                return False, "❌ Stop loss and take profit are mandatory"
+                return False, "❌ Stop loss and take profit are mandatory", None
 
             # Format symbol for Pepperstone broker (add .a suffix)
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            # Place LIMIT order with mandatory SL and TP - USING SNAKE_CASE
+            # Place LIMIT order with mandatory SL and TP
             if order_type.upper() == "BUY":
                 result = await connection.create_limit_buy_order(
-                    formatted_symbol,  # Use formatted symbol with .a suffix
+                    formatted_symbol,
                     volume,
-                    entry_price,  # Limit price for buy
-                    stop_loss=sl,  # CORRECT: snake_case
-                    take_profit=tp  # CORRECT: snake_case
+                    entry_price,
+                    stop_loss=sl,
+                    take_profit=tp
                 )
             else:  # SELL
                 result = await connection.create_limit_sell_order(
-                    formatted_symbol,  # Use formatted symbol with .a suffix
+                    formatted_symbol,
                     volume,
-                    entry_price,  # Limit price for sell
-                    stop_loss=sl,  # CORRECT: snake_case
-                    take_profit=tp  # CORRECT: snake_case
+                    entry_price,
+                    stop_loss=sl,
+                    take_profit=tp
                 )
+
+            # Get the order ID from the result
+            order_id = result.get('id') or result.get('orderId')
 
             # Close connection after trade
             await connection.close()
 
-            return True, f"✅ Limit order placed successfully for {formatted_symbol} with SL and TP (Code: {result.get('stringCode', 'N/A')})"
+            return True, f"✅ Limit order placed successfully for {formatted_symbol} (Order ID: {order_id})", order_id
 
         except Exception as e:
             # Try to close connection if it exists
@@ -4315,11 +4317,11 @@ elif st.session_state.current_page == "Trade Signal":
                 await connection.close()
             except:
                 pass
-            return False, f"❌ Trade error: {str(e)}"
+            return False, f"❌ Trade error: {str(e)}", None
 
 
-    async def check_order_status(order_id: str):
-        """Check if an order has been filled"""
+    async def check_order_status_metaapi(order_id: str, symbol: str):
+        """Check order status using MetaApi"""
         try:
             account, error = await get_metaapi_account()
             if error:
@@ -4329,19 +4331,68 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get order information
+            # Get all orders
             orders = await connection.get_orders()
-            order = next((o for o in orders if o.id == order_id), None)
+
+            # Find our specific order
+            target_order = None
+            for o in orders:
+                if o.id == order_id:
+                    target_order = o
+                    break
 
             await connection.close()
 
-            if order:
-                return order.state, None
+            if target_order:
+                return {
+                    'state': target_order.state,
+                    'filled_volume': target_order.filled_volume,
+                    'remaining_volume': target_order.remaining_volume,
+                    'current_price': target_order.current_price if hasattr(target_order, 'current_price') else None
+                }, None
             else:
-                return None, "Order not found"
+                # Order not found - might be filled or cancelled
+                # Check positions to see if it was filled
+                positions = await connection.get_positions()
+                position = next((p for p in positions if p.symbol == format_symbol_for_pepperstone(symbol)), None)
+
+                if position:
+                    return {
+                        'state': 'FILLED',
+                        'filled_volume': position.volume,
+                        'remaining_volume': 0,
+                        'current_price': position.current_price if hasattr(position, 'current_price') else None
+                    }, None
+                else:
+                    return None, "Order not found - may be cancelled or filled and closed"
 
         except Exception as e:
             return None, f"Error checking order status: {str(e)}"
+
+
+    async def cancel_order_metaapi(order_id: str, symbol: str):
+        """Cancel order using MetaApi"""
+        try:
+            account, error = await get_metaapi_account()
+            if error:
+                return False, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Cancel the order
+            result = await connection.cancel_order(order_id)
+
+            await connection.close()
+
+            if result:
+                return True, f"✅ Order {order_id} cancelled successfully"
+            else:
+                return False, "❌ Failed to cancel order"
+
+        except Exception as e:
+            return False, f"❌ Error cancelling order: {str(e)}"
 
 
     # Add trade signal functions next - UPDATED TO SYNC WITH ACTIVE OPPS
@@ -4698,7 +4749,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                                         formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
                                         with st.spinner(f"Placing {direction} limit order for {formatted_symbol}..."):
-                                            success, message = asyncio.run(place_trade(
+                                            success, message, order_id = asyncio.run(place_trade(
                                                 symbol=signal['selected_pair'],
                                                 volume=float(signal.get('position_size', 0.1)),
                                                 order_type=direction,
@@ -4707,13 +4758,14 @@ elif st.session_state.current_page == "Trade Signal":
                                                 tp=target_val
                                             ))
                                             if success:
-                                                # Move from ready_to_order to order_placed
+                                                # Move from ready_to_order to order_placed WITH ORDER ID
                                                 st.session_state.ready_to_order = [s for s in
                                                                                    st.session_state.ready_to_order if
                                                                                    s['timestamp'] != signal[
                                                                                        'timestamp']]
                                                 st.session_state.order_placed.append({
                                                     **signal,
+                                                    'order_id': order_id,  # Store the order ID for status checking
                                                     'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                                     'order_status': 'PENDING',
                                                     'direction': direction
@@ -4789,6 +4841,10 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Position Size:** {order.get('position_size', 'N/A')} lots")
                             st.write(f"**Status:** {order.get('order_status', 'PENDING')}")
 
+                            # Show order ID if available
+                            if order.get('order_id'):
+                                st.write(f"**Order ID:** {order.get('order_id')}")
+
                         with col2:
                             entry_price = safe_float(order.get('entry_price'), 0.0)
                             st.write(f"**Entry Price:** {entry_price:.5f}")
@@ -4800,38 +4856,115 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**Order Time:** {order.get('order_time', 'N/A')}")
 
-                        # Check order status button
-                        col_check, col_move = st.columns(2)
-                        with col_check:
-                            if st.button("🔄 Check Status", key=f"check_{i}", use_container_width=True):
-                                # Simulate order fill for demo (replace with actual MetaApi status check)
-                                st.success("✅ Order filled! Moving to In Trade tab.")
-                                # Move to in_trade
-                                st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['timestamp'] != order['timestamp']]
-                                st.session_state.in_trade.append({
-                                    **order,
-                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                    'order_status': 'FILLED'
-                                })
-                                # Sync with Active Opps to update status to Order Completed
-                                sync_with_active_opps()
-                                st.rerun()
+                        # Check order status and cancel order buttons
+                        col_check, col_cancel = st.columns(2)
 
-                        with col_move:
-                            if st.button("✅ Mark as Filled", key=f"fill_{i}", type="primary", use_container_width=True):
-                                # Move to in_trade
-                                st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['timestamp'] != order['timestamp']]
-                                st.session_state.in_trade.append({
-                                    **order,
-                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                    'order_status': 'FILLED'
-                                })
-                                # Sync with Active Opps to update status to Order Completed
-                                sync_with_active_opps()
-                                st.success("Order moved to In Trade")
-                                st.rerun()
+                        with col_check:
+                            if st.button("🔄 Check Status via MetaApi", key=f"check_{i}", use_container_width=True):
+                                if order.get('order_id'):
+                                    import asyncio
+
+                                    with st.spinner("Checking order status..."):
+                                        status_info, error = asyncio.run(
+                                            check_order_status_metaapi(order.get('order_id'), order['selected_pair'])
+                                        )
+
+                                        if error:
+                                            st.error(f"❌ {error}")
+                                        elif status_info:
+                                            st.info(f"**Order Status:** {status_info['state']}")
+                                            st.info(f"**Filled Volume:** {status_info['filled_volume']}")
+                                            st.info(f"**Remaining Volume:** {status_info['remaining_volume']}")
+
+                                            # Auto-update order status in session state
+                                            if status_info['state'] == 'FILLED':
+                                                st.success("✅ Order filled! Moving to In Trade tab.")
+                                                # Move to in_trade
+                                                st.session_state.order_placed = [o for o in
+                                                                                 st.session_state.order_placed if
+                                                                                 o['timestamp'] != order['timestamp']]
+                                                st.session_state.in_trade.append({
+                                                    **order,
+                                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                                    'order_status': 'FILLED',
+                                                    'filled_volume': status_info['filled_volume']
+                                                })
+                                                # Sync with Active Opps to update status to Order Completed
+                                                sync_with_active_opps()
+                                                st.rerun()
+                                            elif status_info['state'] in ['CANCELED', 'EXPIRED']:
+                                                st.warning("⚠️ Order cancelled or expired. Removing from Order Placed.")
+                                                # Remove from order_placed
+                                                st.session_state.order_placed = [o for o in
+                                                                                 st.session_state.order_placed if
+                                                                                 o['timestamp'] != order['timestamp']]
+                                                # Optionally move back to ready_to_order if not filled
+                                                st.session_state.ready_to_order.append({
+                                                    **{k: v for k, v in order.items() if
+                                                       k not in ['order_id', 'order_time', 'order_status']},
+                                                    'status': 'Order Ready'
+                                                })
+                                                st.rerun()
+                                else:
+                                    st.warning("⚠️ No order ID found for this order")
+
+                        with col_cancel:
+                            if st.button("❌ Cancel Order", key=f"cancel_{i}", type="secondary",
+                                         use_container_width=True):
+                                if order.get('order_id'):
+                                    import asyncio
+
+                                    with st.spinner("Cancelling order..."):
+                                        success, message = asyncio.run(
+                                            cancel_order_metaapi(order.get('order_id'), order['selected_pair'])
+                                        )
+
+                                        if success:
+                                            st.success(message)
+                                            # Remove from order_placed and move back to ready_to_order
+                                            st.session_state.order_placed = [o for o in st.session_state.order_placed if
+                                                                             o['timestamp'] != order['timestamp']]
+                                            st.session_state.ready_to_order.append({
+                                                **{k: v for k, v in order.items() if
+                                                   k not in ['order_id', 'order_time', 'order_status']},
+                                                'status': 'Order Ready'
+                                            })
+                                            st.rerun()
+                                        else:
+                                            st.error(message)
+                                else:
+                                    st.warning("⚠️ No order ID found for this order")
+
+                        # Auto-check status on load (non-blocking)
+                        if st.session_state.metaapi_connected and order.get('order_id'):
+                            import asyncio
+
+
+                            # This runs in background without blocking the UI
+                            async def auto_check_order_status():
+                                try:
+                                    status_info, error = await check_order_status_metaapi(order.get('order_id'),
+                                                                                          order['selected_pair'])
+                                    if status_info and status_info['state'] == 'FILLED':
+                                        # Auto-move to in_trade if filled
+                                        st.session_state.order_placed = [o for o in st.session_state.order_placed if
+                                                                         o['timestamp'] != order['timestamp']]
+                                        st.session_state.in_trade.append({
+                                            **order,
+                                            'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                            'order_status': 'FILLED',
+                                            'filled_volume': status_info['filled_volume']
+                                        })
+                                        sync_with_active_opps()
+                                except:
+                                    pass  # Silent fail for background checks
+
+
+                            # Start background check (this won't block the UI)
+                            try:
+                                asyncio.create_task(auto_check_order_status())
+                            except:
+                                pass
 
         with tab3:
             st.subheader("✅ In Trade")

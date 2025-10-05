@@ -4231,41 +4231,6 @@ elif st.session_state.current_page == "Trade Signal":
 
         signals_df = pd.DataFrame(signals_data)
 
-        # Safely calculate direction counts
-        buy_signals = 0
-        sell_signals = 0
-        unknown_signals = 0
-
-        if 'direction' in signals_df.columns:
-            buy_signals = len(signals_df[signals_df['direction'] == 'buy'])
-            sell_signals = len(signals_df[signals_df['direction'] == 'sell'])
-            unknown_signals = len(signals_df[signals_df['direction'] == 'Unknown'])
-        else:
-            # If direction column doesn't exist, calculate for all signals
-            for signal in st.session_state.trade_signals:
-                direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-                if direction == 'buy':
-                    buy_signals += 1
-                elif direction == 'sell':
-                    sell_signals += 1
-                else:
-                    unknown_signals += 1
-
-        # Display summary statistics
-        col1, col2, col3, col4, col5 = st.columns(5)
-        with col1:
-            st.metric("Total Signals", len(signals_df))
-        with col2:
-            unique_pairs = signals_df['selected_pair'].nunique()
-            st.metric("Unique Pairs", unique_pairs)
-        with col3:
-            st.metric("Buy Signals", buy_signals)
-        with col4:
-            st.metric("Sell Signals", sell_signals)
-        with col5:
-            avg_position = signals_df['position_size'].mean() if 'position_size' in signals_df.columns else 0
-            st.metric("Avg Position Size", f"{avg_position:.2f}")
-
         # Display the dataframe with direction
         st.dataframe(signals_df, use_container_width=True)
 
@@ -4326,34 +4291,6 @@ elif st.session_state.current_page == "Trade Signal":
                 if signal.get('notes'):
                     st.write("---")
                     st.write(f"**Notes:** {signal.get('notes')}")
-
-        # Direction Summary
-        st.markdown("---")
-        st.subheader("Direction Summary")
-
-        col_sum1, col_sum2, col_sum3 = st.columns(3)
-        with col_sum1:
-            total_signals = len(signals_df)
-            buy_percentage = (buy_signals / total_signals * 100) if total_signals > 0 else 0
-            st.metric("Buy Signals", buy_signals,
-                      delta=f"{buy_percentage:.1f}%")
-        with col_sum2:
-            sell_percentage = (sell_signals / total_signals * 100) if total_signals > 0 else 0
-            st.metric("Sell Signals", sell_signals,
-                      delta=f"{sell_percentage:.1f}%")
-        with col_sum3:
-            unknown_percentage = (unknown_signals / total_signals * 100) if total_signals > 0 else 0
-            st.metric("Unknown", unknown_signals,
-                      delta=f"{unknown_percentage:.1f}%")
-
-        # Direction by Pair
-        if len(signals_df) > 0 and 'direction' in signals_df.columns:
-            st.subheader("Direction by Trading Pair")
-            try:
-                direction_by_pair = signals_df.groupby(['selected_pair', 'direction']).size().unstack(fill_value=0)
-                st.dataframe(direction_by_pair, use_container_width=True)
-            except Exception as e:
-                st.warning("Could not generate direction by pair analysis.")
 
         # Clear all signals button
         st.markdown("---")

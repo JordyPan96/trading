@@ -664,23 +664,24 @@ def create_nav_button(label, page, key):
 
 # Core Section
 st.sidebar.markdown("**Core**")
-create_nav_button("🏠 Home Dashboard", "Home", "nav_home")
-create_nav_button("💰 Account Overview", "Account Overview", "nav_account")
-create_nav_button("📈 Symbol Statistics", "Symbol Stats", "nav_symbol")
+create_nav_button("Home Dashboard", "Home", "nav_home")
+create_nav_button("Account Overview", "Account Overview", "nav_account")
+create_nav_button("Symbol Statistics", "Symbol Stats", "nav_symbol")
 
 st.sidebar.markdown("---")
 
 # Trading Section
 st.sidebar.markdown("**Trading**")
-create_nav_button("🎯 Risk Calculation", "Risk Calculation", "Risk_Calculation")
-create_nav_button("📋 Active Opportunities", "Active Opps", "Active_Opps")
+create_nav_button("Risk Calculation", "Risk Calculation", "Risk_Calculation")
+create_nav_button("Active Opportunities", "Active Opps", "Active_Opps")
+create_nav_button("Trade Signal", "Trade Signal", "Trade Signal")
 
 st.sidebar.markdown("---")
 
 # Analysis Section
 st.sidebar.markdown("**Analysis**")
-create_nav_button("📚 Trading Guidelines", "Guidelines", "Guidelines")
-create_nav_button("📊 Performance Stats", "Stats", "Stats")
+create_nav_button("Trading Guidelines", "Guidelines", "Guidelines")
+create_nav_button("Performance Stats", "Stats", "Stats")
 
 st.sidebar.markdown("---")
 
@@ -3936,6 +3937,8 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
 
+elif st.session_state.current_page == "Trade Signal":
+    st.write(test)
 
 elif st.session_state.current_page == "Stats":
 

@@ -4131,60 +4131,90 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # MT5 Connection Functions
-    def connect_to_mt5():
-        """Connect to MetaTrader 5"""
+    # MT5 Connection Functions with proper error handling
+    def initialize_mt5():
+        """Initialize MT5 connection with proper error handling"""
         try:
             import MetaTrader5 as mt5
 
-            # Initialize MT5 connection
-            if not mt5.initialize():
-                st.error(f"MT5 initialization failed: {mt5.last_error()}")
-                return False
+            # Check if already initialized
+            if mt5.initialize():
+                return True, "MT5 already initialized"
 
-            # You can add login credentials here if needed
-            # account = st.session_state.get('mt5_account', '')
-            # password = st.session_state.get('mt5_password', '')
-            # server = st.session_state.get('mt5_server', '')
+            # Try to initialize with common paths
+            paths = [
+                "C:/Program Files/MetaTrader 5/terminal64.exe",
+                "C:/Program Files (x86)/MetaTrader 5/terminal64.exe",
+                "C:/Program Files/MetaTrader 5/terminal.exe",
+                "C:/Program Files (x86)/MetaTrader 5/terminal.exe",
+            ]
 
-            # if account and password and server:
-            #     authorized = mt5.login(account, password=password, server=server)
-            #     if not authorized:
-            #         st.error(f"MT5 login failed: {mt5.last_error()}")
-            #         return False
+            for path in paths:
+                try:
+                    if mt5.initialize(path=path):
+                        st.session_state.mt5_initialized = True
+                        return True, f"MT5 initialized successfully at {path}"
+                except:
+                    continue
 
-            st.success("✅ Successfully connected to MetaTrader 5")
-            st.session_state.mt5_connected = True
-            return True
+            return False, "Could not initialize MT5. Please ensure MetaTrader 5 is installed and running."
 
         except ImportError:
-            st.error("MetaTrader5 package not installed. Please install it using: pip install MetaTrader5")
-            return False
+            return False, "MetaTrader5 package not installed. Please install: pip install MetaTrader5"
         except Exception as e:
-            st.error(f"MT5 connection error: {e}")
-            return False
+            return False, f"MT5 initialization error: {str(e)}"
 
 
-    def disconnect_from_mt5():
-        """Disconnect from MetaTrader 5"""
+    def connect_to_mt5_with_login():
+        """Connect to MT5 with login credentials"""
         try:
             import MetaTrader5 as mt5
-            mt5.shutdown()
-            st.session_state.mt5_connected = False
-            st.success("✅ Disconnected from MetaTrader 5")
-        except:
-            st.session_state.mt5_connected = False
-            st.success("✅ Disconnected from MetaTrader 5")
+
+            # Initialize first
+            initialized, message = initialize_mt5()
+            if not initialized:
+                return False, message
+
+            # Get login credentials from user
+            if 'mt5_account' not in st.session_state:
+                st.session_state.mt5_account = ""
+            if 'mt5_password' not in st.session_state:
+                st.session_state.mt5_password = ""
+            if 'mt5_server' not in st.session_state:
+                st.session_state.mt5_server = ""
+
+            # Login if credentials provided
+            if (st.session_state.mt5_account and
+                    st.session_state.mt5_password and
+                    st.session_state.mt5_server):
+
+                authorized = mt5.login(
+                    login=int(st.session_state.mt5_account),
+                    password=st.session_state.mt5_password,
+                    server=st.session_state.mt5_server
+                )
+
+                if authorized:
+                    st.session_state.mt5_connected = True
+                    return True, "Successfully connected and logged into MT5"
+                else:
+                    return False, f"MT5 login failed: {mt5.last_error()}"
+            else:
+                # Just initialize without login
+                st.session_state.mt5_connected = True
+                return True, "MT5 initialized (no login credentials provided)"
+
+        except Exception as e:
+            return False, f"Connection error: {str(e)}"
 
 
-    def place_mt5_order(signal):
-        """Place order in MetaTrader 5"""
+    def place_limit_order(signal):
+        """Place a limit order in MT5"""
         try:
             import MetaTrader5 as mt5
 
             if not mt5.initialize():
-                st.error("MT5 not initialized")
-                return False
+                return False, "MT5 not initialized"
 
             symbol = signal['selected_pair']
             direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
@@ -4193,22 +4223,21 @@ elif st.session_state.current_page == "Trade Signal":
             stop_loss = safe_float(signal.get('exit_price'), 0.0)
             take_profit = safe_float(signal.get('target_price'), 0.0)
 
-            # Determine order type
-            if direction == "buy":
-                order_type = mt5.ORDER_TYPE_BUY
-                sl = stop_loss
-                tp = take_profit
-            elif direction == "sell":
-                order_type = mt5.ORDER_TYPE_SELL
-                sl = stop_loss
-                tp = take_profit
-            else:
-                st.error("Cannot determine order direction")
-                return False
+            if direction == "Unknown":
+                return False, "Cannot determine order direction from prices"
 
-            # Prepare order request
+            # Prepare limit order request
+            if direction == "buy":
+                order_type = mt5.ORDER_TYPE_BUY_LIMIT
+                sl = stop_loss
+                tp = take_profit
+            else:  # sell
+                order_type = mt5.ORDER_TYPE_SELL_LIMIT
+                sl = stop_loss
+                tp = take_profit
+
             request = {
-                "action": mt5.TRADE_ACTION_DEAL,
+                "action": mt5.TRADE_ACTION_PENDING,
                 "symbol": symbol,
                 "volume": volume,
                 "type": order_type,
@@ -4217,7 +4246,7 @@ elif st.session_state.current_page == "Trade Signal":
                 "tp": tp,
                 "deviation": 10,
                 "magic": 234000,
-                "comment": f"Auto from Trade Signal",
+                "comment": "Limit order from Trade Signal",
                 "type_time": mt5.ORDER_TIME_GTC,
                 "type_filling": mt5.ORDER_FILLING_IOC,
             }
@@ -4225,40 +4254,117 @@ elif st.session_state.current_page == "Trade Signal":
             # Send order
             result = mt5.order_send(request)
             if result.retcode != mt5.TRADE_RETCODE_DONE:
-                st.error(f"Order failed: {result.retcode}")
-                return False
+                return False, f"Order failed: {result.retcode} - {result.comment}"
             else:
-                st.success(f"✅ Order placed successfully! Ticket: {result.order}")
-                return True
+                return True, f"Limit order placed successfully! Ticket: {result.order}"
 
         except Exception as e:
-            st.error(f"Order placement error: {e}")
-            return False
+            return False, f"Order placement error: {str(e)}"
 
 
-    def get_mt5_account_info():
-        """Get MT5 account information"""
+    def modify_order_stop_loss(order_ticket, new_sl, new_tp=None):
+        """Modify stop loss and take profit of an existing order"""
         try:
             import MetaTrader5 as mt5
 
             if not mt5.initialize():
-                return None
+                return False, "MT5 not initialized"
 
-            account_info = mt5.account_info()
-            if account_info is None:
-                return None
-
-            return {
-                'balance': account_info.balance,
-                'equity': account_info.equity,
-                'margin': account_info.margin,
-                'free_margin': account_info.margin_free,
-                'leverage': account_info.leverage,
-                'currency': account_info.currency,
-                'server': account_info.server
+            request = {
+                "action": mt5.TRADE_ACTION_SLTP,
+                "position": order_ticket,
+                "sl": new_sl,
+                "tp": new_tp,
             }
+
+            if new_tp is not None:
+                request["tp"] = new_tp
+
+            result = mt5.order_send(request)
+            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                return False, f"Modify failed: {result.retcode}"
+            else:
+                return True, "Stop loss modified successfully"
+
+        except Exception as e:
+            return False, f"Modify error: {str(e)}"
+
+
+    def get_open_orders():
+        """Get all open orders from MT5"""
+        try:
+            import MetaTrader5 as mt5
+
+            if not mt5.initialize():
+                return []
+
+            orders = mt5.orders_get()
+            if orders is None:
+                return []
+
+            order_list = []
+            for order in orders:
+                order_list.append({
+                    'ticket': order.ticket,
+                    'symbol': order.symbol,
+                    'type': order.type,
+                    'volume': order.volume_current,
+                    'price_open': order.price_open,
+                    'sl': order.sl,
+                    'tp': order.tp,
+                    'profit': order.profit,
+                    'comment': order.comment
+                })
+
+            return order_list
         except:
-            return None
+            return []
+
+
+    def close_order(order_ticket):
+        """Close an existing order"""
+        try:
+            import MetaTrader5 as mt5
+
+            if not mt5.initialize():
+                return False, "MT5 not initialized"
+
+            # Get order details first
+            order = mt5.orders_get(ticket=order_ticket)
+            if not order:
+                return False, "Order not found"
+
+            order = order[0]
+
+            # Prepare close request
+            if order.type == mt5.ORDER_TYPE_BUY or order.type == mt5.ORDER_TYPE_BUY_LIMIT:
+                close_type = mt5.ORDER_TYPE_SELL
+            else:
+                close_type = mt5.ORDER_TYPE_BUY
+
+            request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "position": order_ticket,
+                "symbol": order.symbol,
+                "volume": order.volume_current,
+                "type": close_type,
+                "price": mt5.symbol_info_tick(
+                    order.symbol).bid if close_type == mt5.ORDER_TYPE_SELL else mt5.symbol_info_tick(order.symbol).ask,
+                "deviation": 10,
+                "magic": 234000,
+                "comment": "Closed from Trade Signal",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+
+            result = mt5.order_send(request)
+            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                return False, f"Close failed: {result.retcode}"
+            else:
+                return True, "Order closed successfully"
+
+        except Exception as e:
+            return False, f"Close error: {str(e)}"
 
 
     # Add trade signal functions next
@@ -4298,6 +4404,12 @@ elif st.session_state.current_page == "Trade Signal":
     # Initialize MT5 connection state
     if 'mt5_connected' not in st.session_state:
         st.session_state.mt5_connected = False
+    if 'mt5_account' not in st.session_state:
+        st.session_state.mt5_account = ""
+    if 'mt5_password' not in st.session_state:
+        st.session_state.mt5_password = ""
+    if 'mt5_server' not in st.session_state:
+        st.session_state.mt5_server = ""
 
     # Load from Google Sheets on page load
     if not st.session_state.trade_signals:
@@ -4306,43 +4418,116 @@ elif st.session_state.current_page == "Trade Signal":
     # MT5 Connection Section
     st.subheader("MetaTrader 5 Connection")
 
+    # MT5 Login Form
+    with st.expander("MT5 Login Settings", expanded=not st.session_state.mt5_connected):
+        col_login1, col_login2, col_login3 = st.columns(3)
+
+        with col_login1:
+            st.session_state.mt5_account = st.text_input(
+                "Account Number",
+                value=st.session_state.mt5_account,
+                placeholder="1234567"
+            )
+
+        with col_login2:
+            st.session_state.mt5_password = st.text_input(
+                "Password",
+                value=st.session_state.mt5_password,
+                type="password",
+                placeholder="Your MT5 password"
+            )
+
+        with col_login3:
+            st.session_state.mt5_server = st.text_input(
+                "Server",
+                value=st.session_state.mt5_server,
+                placeholder="YourBrokerServer"
+            )
+
+    # MT5 Connection Buttons
     col_mt5_1, col_mt5_2, col_mt5_3 = st.columns(3)
 
     with col_mt5_1:
         if st.button("🔗 Connect to MT5", type="primary"):
-            connect_to_mt5()
+            success, message = connect_to_mt5_with_login()
+            if success:
+                st.success(message)
+            else:
+                st.error(message)
 
     with col_mt5_2:
         if st.button("🔌 Disconnect from MT5"):
-            disconnect_from_mt5()
+            try:
+                import MetaTrader5 as mt5
+
+                mt5.shutdown()
+            except:
+                pass
+            st.session_state.mt5_connected = False
+            st.success("Disconnected from MT5")
 
     with col_mt5_3:
-        if st.session_state.mt5_connected:
-            account_info = get_mt5_account_info()
-            if account_info:
-                st.metric("MT5 Status", "Connected",
-                          delta=f"Balance: {account_info['balance']:.2f} {account_info['currency']}")
-            else:
-                st.metric("MT5 Status", "Connected")
-        else:
-            st.metric("MT5 Status", "Disconnected")
+        status_color = "🟢" if st.session_state.mt5_connected else "🔴"
+        status_text = "Connected" if st.session_state.mt5_connected else "Disconnected"
+        st.metric("MT5 Status", f"{status_color} {status_text}")
 
-    # MT5 Account Info (if connected)
+    # Display Open Orders if connected
     if st.session_state.mt5_connected:
-        account_info = get_mt5_account_info()
-        if account_info:
-            col_acc1, col_acc2, col_acc3, col_acc4 = st.columns(4)
-            with col_acc1:
-                st.metric("Balance", f"{account_info['balance']:.2f}")
-            with col_acc2:
-                st.metric("Equity", f"{account_info['equity']:.2f}")
-            with col_acc3:
-                st.metric("Free Margin", f"{account_info['free_margin']:.2f}")
-            with col_acc4:
-                st.metric("Leverage", f"1:{account_info['leverage']}")
+        st.subheader("Open MT5 Orders")
+        open_orders = get_open_orders()
+
+        if open_orders:
+            orders_df = pd.DataFrame(open_orders)
+            st.dataframe(orders_df, use_container_width=True)
+
+            # Order Management
+            st.subheader("Order Management")
+            selected_order = st.selectbox(
+                "Select Order to Manage",
+                options=[f"{order['ticket']} - {order['symbol']}" for order in open_orders]
+            )
+
+            if selected_order:
+                order_ticket = int(selected_order.split(" - ")[0])
+                selected_order_data = next((order for order in open_orders if order['ticket'] == order_ticket), None)
+
+                if selected_order_data:
+                    col_manage1, col_manage2, col_manage3 = st.columns(3)
+
+                    with col_manage1:
+                        new_sl = st.number_input(
+                            "New Stop Loss",
+                            value=float(selected_order_data['sl']),
+                            format="%.5f"
+                        )
+
+                    with col_manage2:
+                        new_tp = st.number_input(
+                            "New Take Profit",
+                            value=float(selected_order_data['tp']),
+                            format="%.5f"
+                        )
+
+                    with col_manage3:
+                        if st.button("🔄 Modify SL/TP"):
+                            success, message = modify_order_stop_loss(order_ticket, new_sl, new_tp)
+                            if success:
+                                st.success(message)
+                            else:
+                                st.error(message)
+
+                        if st.button("❌ Close Order"):
+                            success, message = close_order(order_ticket)
+                            if success:
+                                st.success(message)
+                            else:
+                                st.error(message)
+        else:
+            st.info("No open orders found in MT5")
 
     st.markdown("---")
 
+    # Rest of the Trade Signals page continues...
     # Sync button
     col1, col2 = st.columns(2)
     with col1:
@@ -4413,8 +4598,7 @@ elif st.session_state.current_page == "Trade Signal":
         st.warning("🔒 These signals are managed in Active Opportunities. To modify them, go to the Active Opps page.")
 
         for i, signal in enumerate(st.session_state.trade_signals):
-            with st.expander(f"Signal {i + 1}: {signal['selected_pair']} - {signal['timestamp']}",
-                             expanded=True):  # Changed to expanded=True
+            with st.expander(f"Signal {i + 1}: {signal['selected_pair']} - {signal['timestamp']}", expanded=True):
                 col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                 with col1:
@@ -4458,22 +4642,20 @@ elif st.session_state.current_page == "Trade Signal":
                     st.markdown("---")
                     st.subheader("MT5 Trade Management")
 
-                    col_trade1, col_trade2, col_trade3 = st.columns(3)
+                    col_trade1, col_trade2 = st.columns(2)
 
                     with col_trade1:
-                        if st.button(f"📈 Place Order in MT5", key=f"place_order_{i}"):
-                            if place_mt5_order(signal):
-                                st.success("Order placed successfully!")
+                        if st.button(f"📈 Place Limit Order", key=f"place_limit_{i}", type="primary"):
+                            success, message = place_limit_order(signal)
+                            if success:
+                                st.success(message)
                             else:
-                                st.error("Failed to place order")
+                                st.error(message)
 
                     with col_trade2:
-                        if st.button(f"🔄 Modify Order", key=f"modify_order_{i}"):
-                            st.info("Modify order functionality coming soon...")
-
-                    with col_trade3:
-                        if st.button(f"❌ Close Order", key=f"close_order_{i}"):
-                            st.info("Close order functionality coming soon...")
+                        if st.button(f"🔄 Modify SL/TP", key=f"modify_sl_{i}"):
+                            # This would need order ticket to work properly
+                            st.info("Use the Order Management section above to modify existing orders")
 
                 # Display notes if any
                 if signal.get('notes'):

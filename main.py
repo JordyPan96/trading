@@ -4131,7 +4131,7 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # METAAPI Functions - CORRECTED ENDPOINTS
+    # METAAPI Functions - CORRECT API STRUCTURE
     def get_metaapi_config():
         """Get MetaApi configuration from secrets.toml"""
         try:
@@ -4139,6 +4139,11 @@ elif st.session_state.current_page == "Trade Signal":
             return metaapi_config
         except:
             return {}
+
+
+    def get_metaapi_base_url():
+        """Get the correct MetaApi base URL"""
+        return "https://mt-client-api-v1.london.agiliumtrade.ai"
 
 
     def test_metaapi_connection():
@@ -4152,9 +4157,9 @@ elif st.session_state.current_page == "Trade Signal":
             if not token:
                 return False, "❌ MetaApi token not configured"
 
-            # Test with the correct accounts endpoint
+            # Test with provisioning API first to check token validity
             response = requests.get(
-                "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
+                "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4173,15 +4178,16 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def get_metaapi_accounts():
-        """Get MetaApi account information"""
+        """Get MetaApi account information using Provisioning API"""
         try:
             import requests
 
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            # Use provisioning API to get accounts
             response = requests.get(
-                "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
+                "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4207,14 +4213,28 @@ elif st.session_state.current_page == "Trade Signal":
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            # Check if account is deployed, if not, deploy it
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}",
+                f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}",
                 headers={"auth-token": token},
                 timeout=10
             )
 
             if response.status_code == 200:
                 account_data = response.json()
+
+                # If account is not deployed, deploy it
+                if account_data.get('state') == 'UNDEPLOYED':
+                    deploy_response = requests.post(
+                        f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}/deploy",
+                        headers={"auth-token": token},
+                        timeout=30
+                    )
+                    if deploy_response.status_code == 200:
+                        return True, f"✅ Account deployed and connected: {account_data.get('name', account_id)}"
+                    else:
+                        return False, f"❌ Failed to deploy account: {deploy_response.text}"
+
                 return True, f"✅ Connected to account: {account_data.get('name', account_id)}"
             else:
                 return False, f"❌ Failed to connect to account: {response.text}"
@@ -4224,15 +4244,16 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def get_metaapi_symbols(account_id: str):
-        """Get available symbols from MetaApi account"""
+        """Get available symbols from MetaApi account using Client API"""
         try:
             import requests
 
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            base_url = get_metaapi_base_url()
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/symbols",
+                f"{base_url}/users/current/accounts/{account_id}/symbols",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4240,6 +4261,17 @@ elif st.session_state.current_page == "Trade Signal":
             if response.status_code == 200:
                 return response.json()
             else:
+                # Try alternative endpoint
+                try:
+                    response2 = requests.get(
+                        f"https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts/{account_id}/symbols",
+                        headers={"auth-token": token},
+                        timeout=10
+                    )
+                    if response2.status_code == 200:
+                        return response2.json()
+                except:
+                    pass
                 return []
         except:
             return []
@@ -4253,8 +4285,9 @@ elif st.session_state.current_page == "Trade Signal":
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            base_url = get_metaapi_base_url()
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/positions",
+                f"{base_url}/users/current/accounts/{account_id}/positions",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4267,44 +4300,6 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
-    def place_metaapi_trade(account_id: str, symbol: str, volume: float, order_type: str, sl: float = None,
-                            tp: float = None):
-        """Place a trade with MetaApi"""
-        try:
-            import requests
-
-            config = get_metaapi_config()
-            token = config.get("token", "")
-
-            # MetaApi trade structure
-            trade_data = {
-                "symbol": symbol,
-                "volume": volume,
-                "type": order_type.upper(),  # BUY or SELL
-            }
-
-            if sl:
-                trade_data["stopLoss"] = sl
-            if tp:
-                trade_data["takeProfit"] = tp
-
-            response = requests.post(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/trade",
-                headers={"auth-token": token},
-                json=trade_data,
-                timeout=30
-            )
-
-            if response.status_code == 200:
-                data = response.json()
-                return True, f"✅ Trade executed successfully (ID: {data.get('id', 'N/A')})"
-            else:
-                return False, f"❌ Trade failed: {response.text}"
-
-        except Exception as e:
-            return False, f"🔧 Trade error: {str(e)}"
-
-
     def get_account_information(account_id: str):
         """Get detailed account information"""
         try:
@@ -4313,8 +4308,9 @@ elif st.session_state.current_page == "Trade Signal":
             config = get_metaapi_config()
             token = config.get("token", "")
 
+            base_url = get_metaapi_base_url()
             response = requests.get(
-                f"https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts/{account_id}/account-information",
+                f"{base_url}/users/current/accounts/{account_id}/account-information",
                 headers={"auth-token": token},
                 timeout=10
             )
@@ -4325,6 +4321,47 @@ elif st.session_state.current_page == "Trade Signal":
                 return None
         except:
             return None
+
+
+    def place_metaapi_trade(account_id: str, symbol: str, volume: float, order_type: str, sl: float = None,
+                            tp: float = None):
+        """Place a trade with MetaApi"""
+        try:
+            import requests
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            base_url = get_metaapi_base_url()
+
+            # MetaApi trade structure
+            trade_data = {
+                "symbol": symbol,
+                "volume": volume,
+                "action": "ORDER_TYPE_BUY" if order_type.upper() == "BUY" else "ORDER_TYPE_SELL",
+                "type": "ORDER_TYPE_MARKET"
+            }
+
+            if sl:
+                trade_data["stopLoss"] = sl
+            if tp:
+                trade_data["takeProfit"] = tp
+
+            response = requests.post(
+                f"{base_url}/users/current/accounts/{account_id}/trade",
+                headers={"auth-token": token},
+                json=trade_data,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return True, f"✅ Trade executed successfully (ID: {data.get('numericId', data.get('id', 'N/A'))})"
+            else:
+                return False, f"❌ Trade failed: {response.text}"
+
+        except Exception as e:
+            return False, f"🔧 Trade error: {str(e)}"
 
 
     # Add trade signal functions next
@@ -4734,8 +4771,8 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Debug section
     with st.expander("🔧 Debug Tools", expanded=False):
-        def test_token_validity():
-            """Test if the token can fetch account data"""
+        def test_api_endpoints():
+            """Test various MetaApi endpoints"""
             try:
                 import requests
 
@@ -4744,32 +4781,31 @@ elif st.session_state.current_page == "Trade Signal":
 
                 st.write(f"Token length: {len(token)} characters")
 
-                # Test with correct endpoint
-                response = requests.get(
-                    "https://mt-client-api-v1.london.agiliumtrade.ai/api/accounts",
-                    headers={"auth-token": token},
-                    timeout=10
-                )
+                endpoints = [
+                    ("Provisioning API - Accounts",
+                     "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current/accounts"),
+                    ("Client API Base", "https://mt-client-api-v1.london.agiliumtrade.ai"),
+                ]
 
-                if response.status_code == 200:
-                    accounts_data = response.json()
-                    st.success("✅ Token is valid!")
-                    st.write(f"Found {len(accounts_data)} accounts")
-                    if accounts_data:
-                        st.write("First account:", accounts_data[0].get('name', 'Unknown'))
-                    return True
-                else:
-                    st.error(f"❌ Token validation failed: {response.status_code}")
-                    st.write(f"Response: {response.text}")
-                    return False
+                for name, endpoint in endpoints:
+                    try:
+                        if "accounts" in endpoint:
+                            response = requests.get(endpoint, headers={"auth-token": token}, timeout=10)
+                        else:
+                            response = requests.get(endpoint, headers={"auth-token": token}, timeout=5)
+
+                        st.write(f"**{name}**: {response.status_code}")
+                        if response.status_code != 200:
+                            st.write(f"Error: {response.text}")
+                    except Exception as e:
+                        st.write(f"**{name}**: ❌ {str(e)}")
 
             except Exception as e:
-                st.error(f"🔧 Token test error: {str(e)}")
-                return False
+                st.error(f"🔧 API test error: {str(e)}")
 
 
-        if st.button("Test Token & Accounts"):
-            test_token_validity()
+        if st.button("Test API Endpoints"):
+            test_api_endpoints()
 
         if st.button("Clear Session State"):
             st.session_state.metaapi_connected = False

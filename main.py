@@ -4102,6 +4102,42 @@ elif st.session_state.current_page == "Trade Signal":
     st.title("📡 Trade Signals")
 
 
+    def test_token_validity():
+        """Test if the token can fetch account data"""
+        try:
+            import requests
+            import json
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            # Test the token length
+            st.write(f"Token length: {len(token)} characters")
+
+            # Try to get user profile first (simpler endpoint)
+            response = requests.get(
+                "https://mt-provisioning-api-v1.agiliumtrade.ai/users/current",
+                headers={"auth-token": token},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                user_data = response.json()
+                st.success("✅ Token is valid!")
+                st.json(user_data)
+                return True
+            else:
+                st.error(f"❌ Token validation failed: {response.status_code}")
+                st.write(f"Response: {response.text}")
+                return False
+
+        except Exception as e:
+            st.error(f"🔧 Token test error: {str(e)}")
+            return False
+
+
+    test_token_validity()
+
     # Add helper function first
     def safe_float(value, default=0.0):
         """Safely convert value to float, handling None and string 'None'"""

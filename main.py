@@ -4367,36 +4367,76 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_with_active_opps():
-        """Sync trade signals with current Active Opps Order Ready records"""
+        """Sync trade signals with current Active Opps Order Ready records - ONE WAY SYNC"""
         try:
             # Load current workflow data to get Order Ready records
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
 
             if workflow_df is not None and not workflow_df.empty:
-                # Get Order Ready records
+                # Get Order Ready records from Active Opps
                 order_ready_records = workflow_df[workflow_df['status'] == 'Order Ready'].to_dict('records')
 
-                # Update session state
-                st.session_state.ready_to_order = []
+                # Get current timestamps from Order Ready records in Active Opps
+                current_order_ready_timestamps = {record.get('timestamp') for record in order_ready_records}
 
+                # ONLY remove from ready_to_order tab if records are deleted from Active Opps
+                # Don't touch order_placed or in_trade tabs - they are independent once moved
+                st.session_state.ready_to_order = [
+                    signal for signal in st.session_state.ready_to_order
+                    if signal.get('timestamp') in current_order_ready_timestamps
+                ]
+
+                # Add or update trade signals ONLY in ready_to_order for current Order Ready records
                 for record in order_ready_records:
-                    trade_signal = {
-                        'timestamp': record.get('timestamp'),
-                        'selected_pair': record.get('selected_pair'),
-                        'risk_multiplier': record.get('risk_multiplier'),
-                        'position_size': record.get('position_size'),
-                        'stop_pips': record.get('stop_pips'),
-                        'entry_price': record.get('entry_price'),
-                        'exit_price': record.get('exit_price'),
-                        'target_price': record.get('target_price'),
-                        'trend_position': record.get('trend_position', 'Not set'),
-                        'variances': record.get('Variances', 'Not set'),
-                        'status': 'Order Ready'
-                    }
-                    st.session_state.ready_to_order.append(trade_signal)
+                    timestamp = record.get('timestamp')
+
+                    # Check if this record exists in ready_to_order tab
+                    existing_in_ready = next(
+                        (s for s in st.session_state.ready_to_order if s.get('timestamp') == timestamp), None)
+
+                    # If record doesn't exist in ready_to_order, add it
+                    if not existing_in_ready:
+                        # But first check if it exists in order_placed or in_trade
+                        existing_in_placed = next(
+                            (o for o in st.session_state.order_placed if o.get('timestamp') == timestamp), None)
+                        existing_in_trade = next(
+                            (t for t in st.session_state.in_trade if t.get('timestamp') == timestamp), None)
+
+                        # Only add to ready_to_order if it's not already in order_placed or in_trade
+                        if not existing_in_placed and not existing_in_trade:
+                            trade_signal = {
+                                'timestamp': timestamp,
+                                'selected_pair': record.get('selected_pair'),
+                                'risk_multiplier': record.get('risk_multiplier'),
+                                'position_size': record.get('position_size'),
+                                'stop_pips': record.get('stop_pips'),
+                                'entry_price': record.get('entry_price'),
+                                'exit_price': record.get('exit_price'),
+                                'target_price': record.get('target_price'),
+                                'trend_position': record.get('trend_position', 'Not set'),
+                                'variances': record.get('Variances', 'Not set'),
+                                'status': 'Order Ready'
+                            }
+                            st.session_state.ready_to_order.append(trade_signal)
+                    # If record exists in ready_to_order but has been updated in Active Opps, update the data
+                    else:
+                        existing_in_ready.update({
+                            'selected_pair': record.get('selected_pair'),
+                            'risk_multiplier': record.get('risk_multiplier'),
+                            'position_size': record.get('position_size'),
+                            'stop_pips': record.get('stop_pips'),
+                            'entry_price': record.get('entry_price'),
+                            'exit_price': record.get('exit_price'),
+                            'target_price': record.get('target_price'),
+                            'trend_position': record.get('trend_position', 'Not set'),
+                            'variances': record.get('Variances', 'Not set')
+                        })
 
                 return True
-            return False
+            else:
+                # If no workflow data exists, clear only ready_to_order (not order_placed or in_trade)
+                st.session_state.ready_to_order = []
+                return True
 
         except Exception as e:
             st.error(f"Error syncing with Active Opps: {e}")

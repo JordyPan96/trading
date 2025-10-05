@@ -4131,130 +4131,129 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    # REST API Functions for MT5 Bridge
-    def get_api_config(environment="default"):
-        """Get API configuration from secrets.toml"""
+    # FASTAPI Functions for MT5 Connection
+    def get_fastapi_config():
+        """Get FastAPI configuration from secrets.toml"""
         try:
-            mt5_config = st.secrets.get("mt5_api", {})
-
-            if environment != "default" and environment in mt5_config:
-                return mt5_config[environment]
-            else:
-                return mt5_config
+            # Try to get from mt5_fastapi section first, then fallback to api section
+            fastapi_config = st.secrets.get("mt5_fastapi", {})
+            if not fastapi_config:
+                fastapi_config = st.secrets.get("api", {})
+            return fastapi_config
         except:
             return {}
 
 
-    def test_api_connection():
-        """Test connection to MT5 REST API"""
+    def test_fastapi_connection():
+        """Test connection to FastAPI backend"""
         try:
             import requests
 
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
 
-            if not base_url:
-                return False, "No API URL configured in secrets.toml"
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-
-            response = requests.get(f"{base_url}/health", headers=headers, timeout=10)
+            response = requests.get(f"{base_url}/health", timeout=10)
 
             if response.status_code == 200:
-                return True, "API connection successful"
+                data = response.json()
+                return True, f"FastAPI connection successful - MT5 Connected: {data.get('mt5_connected', False)}"
             else:
-                return False, f"API connection failed: {response.status_code} - {response.text}"
+                return False, f"FastAPI connection failed: {response.status_code} - {response.text}"
 
         except requests.exceptions.ConnectionError:
-            return False, "Cannot connect to API. Please ensure the MT5 REST API bridge is running."
+            return False, "Cannot connect to FastAPI backend. Please ensure the service is running on localhost:8000"
         except requests.exceptions.Timeout:
-            return False, "API connection timeout. Please check if the service is running."
+            return False, "FastAPI connection timeout. Please check if the service is running."
         except Exception as e:
-            return False, f"API connection error: {str(e)}"
+            return False, f"FastAPI connection error: {str(e)}"
 
 
-    def place_limit_order_via_api(signal):
-        """Place a limit order via REST API"""
+    def connect_to_mt5_via_fastapi(server, login, password):
+        """Connect to MT5 via FastAPI"""
         try:
             import requests
 
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
-            account = config.get("account", "")
-
-            if not base_url:
-                return False, "No API URL configured in secrets.toml"
-
-            direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-
-            if direction == "Unknown":
-                return False, "Cannot determine order direction from prices"
-
-            order_data = {
-                "symbol": signal['selected_pair'],
-                "order_type": "LIMIT",
-                "direction": direction.upper(),
-                "volume": float(signal.get('position_size', 0.1)),
-                "price": safe_float(signal.get('entry_price'), 0.0),
-                "stop_loss": safe_float(signal.get('exit_price'), 0.0),
-                "take_profit": safe_float(signal.get('target_price'), 0.0),
-                "comment": "From Trade Signal App",
-                "magic": 234000
-            }
-
-            if account:
-                order_data["account"] = account
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-            headers["Content-Type"] = "application/json"
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
 
             response = requests.post(
-                f"{base_url}/orders/limit",
-                json=order_data,
-                headers=headers,
+                f"{base_url}/connect",
+                json={
+                    "server": server,
+                    "login": login,
+                    "password": password
+                },
                 timeout=30
             )
 
             if response.status_code == 200:
-                result = response.json()
-                return True, f"Limit order placed successfully! Order ID: {result.get('order_id', 'N/A')}"
+                data = response.json()
+                return True, data.get("message", "Connected successfully")
             else:
-                return False, f"Order failed: {response.status_code} - {response.text}"
+                return False, f"Connection failed: {response.status_code} - {response.text}"
 
         except Exception as e:
-            return False, f"Order placement error: {str(e)}"
+            return False, f"Connection error: {str(e)}"
 
 
-    def get_open_orders_via_api():
-        """Get open orders via REST API"""
+    def disconnect_from_mt5_via_fastapi():
+        """Disconnect from MT5 via FastAPI"""
         try:
             import requests
 
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
-            account = config.get("account", "")
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
 
-            if not base_url:
-                return []
-
-            params = {}
-            if account:
-                params["account"] = account
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-
-            response = requests.get(
-                f"{base_url}/orders",
-                params=params,
-                headers=headers,
-                timeout=10
-            )
+            response = requests.post(f"{base_url}/disconnect", timeout=10)
 
             if response.status_code == 200:
-                return response.json().get("orders", [])
+                return True, "Disconnected successfully"
+            else:
+                return False, f"Disconnection failed: {response.status_code} - {response.text}"
+
+        except Exception as e:
+            return False, f"Disconnection error: {str(e)}"
+
+
+    def get_account_info_via_fastapi():
+        """Get account information via FastAPI"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            response = requests.get(f"{base_url}/account-info", timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    return data.get("account_info", {})
+                else:
+                    return None
+            else:
+                return None
+
+        except:
+            return None
+
+
+    def get_symbols_via_fastapi():
+        """Get available symbols via FastAPI"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            response = requests.get(f"{base_url}/symbols", timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    return data.get("symbols", [])
+                else:
+                    return []
             else:
                 return []
 
@@ -4262,107 +4261,63 @@ elif st.session_state.current_page == "Trade Signal":
             return []
 
 
-    def modify_order_sl_tp_via_api(order_id, new_sl, new_tp):
-        """Modify stop loss and take profit via REST API"""
+    def get_positions_via_fastapi():
+        """Get open positions via FastAPI"""
         try:
             import requests
 
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
 
-            if not base_url:
-                return False, "No API URL configured"
-
-            modify_data = {
-                "order_id": order_id,
-                "stop_loss": new_sl
-            }
-
-            if new_tp is not None:
-                modify_data["take_profit"] = new_tp
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-            headers["Content-Type"] = "application/json"
-
-            response = requests.put(
-                f"{base_url}/orders/modify",
-                json=modify_data,
-                headers=headers,
-                timeout=10
-            )
+            response = requests.get(f"{base_url}/positions", timeout=10)
 
             if response.status_code == 200:
-                return True, "Stop loss/take profit modified successfully"
+                data = response.json()
+                if data.get("status") == "success":
+                    return data.get("positions", [])
+                else:
+                    return []
             else:
-                return False, f"Modify failed: {response.status_code} - {response.text}"
-
-        except Exception as e:
-            return False, f"Modify error: {str(e)}"
-
-
-    def close_order_via_api(order_id):
-        """Close an order via REST API"""
-        try:
-            import requests
-
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
-
-            if not base_url:
-                return False, "No API URL configured"
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-
-            response = requests.delete(
-                f"{base_url}/orders/{order_id}",
-                headers=headers,
-                timeout=10
-            )
-
-            if response.status_code == 200:
-                return True, "Order closed successfully"
-            else:
-                return False, f"Close failed: {response.status_code} - {response.text}"
-
-        except Exception as e:
-            return False, f"Close error: {str(e)}"
-
-
-    def get_account_info_via_api():
-        """Get account information via REST API"""
-        try:
-            import requests
-
-            config = get_api_config()
-            base_url = config.get("base_url", "")
-            api_key = config.get("api_key", "")
-            account = config.get("account", "")
-
-            if not base_url:
-                return None
-
-            params = {}
-            if account:
-                params["account"] = account
-
-            headers = {"X-API-Key": api_key} if api_key else {}
-
-            response = requests.get(
-                f"{base_url}/account",
-                params=params,
-                headers=headers,
-                timeout=10
-            )
-
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return None
+                return []
 
         except:
-            return None
+            return []
+
+
+    def place_trade_via_fastapi(symbol, order_type, direction, volume, price, sl, tp, comment=""):
+        """Place a trade via FastAPI (you'll need to extend your FastAPI for this)"""
+        try:
+            import requests
+
+            config = get_fastapi_config()
+            base_url = config.get("backend_url", "http://localhost:8000")
+
+            # This endpoint would need to be added to your FastAPI
+            trade_data = {
+                "symbol": symbol,
+                "order_type": order_type,
+                "direction": direction,
+                "volume": volume,
+                "price": price,
+                "stop_loss": sl,
+                "take_profit": tp,
+                "comment": comment
+            }
+
+            response = requests.post(
+                f"{base_url}/place-trade",
+                json=trade_data,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return True, data.get("message", "Trade placed successfully")
+            else:
+                return False, f"Trade failed: {response.status_code} - {response.text}"
+
+        except Exception as e:
+            return False, f"Trade error: {str(e)}"
 
 
     # Add trade signal functions next
@@ -4399,120 +4354,160 @@ elif st.session_state.current_page == "Trade Signal":
     if 'trade_signals' not in st.session_state:
         st.session_state.trade_signals = []
 
-    if 'api_connected' not in st.session_state:
-        st.session_state.api_connected = False
+    if 'fastapi_connected' not in st.session_state:
+        st.session_state.fastapi_connected = False
+
+    if 'mt5_connected' not in st.session_state:
+        st.session_state.mt5_connected = False
 
     # Load from Google Sheets on page load
     if not st.session_state.trade_signals:
         st.session_state.trade_signals = load_trade_signals_from_sheets()
 
-    # REST API Connection Section
-    st.subheader("MT5 REST API Integration")
+    # FastAPI & MT5 Connection Section
+    st.subheader("FastAPI MT5 Integration")
 
-    col_api_1, col_api_2, col_api_3 = st.columns(3)
+    # Connection Status
+    col_status1, col_status2, col_status3 = st.columns(3)
 
-    with col_api_1:
-        if st.button("🔗 Connect to API", type="primary"):
-            success, message = test_api_connection()
+    with col_status1:
+        status_color_fastapi = "🟢" if st.session_state.fastapi_connected else "🔴"
+        status_text_fastapi = "Connected" if st.session_state.fastapi_connected else "Disconnected"
+        st.metric("FastAPI Status", f"{status_color_fastapi} {status_text_fastapi}")
+
+    with col_status2:
+        status_color_mt5 = "🟢" if st.session_state.mt5_connected else "🔴"
+        status_text_mt5 = "Connected" if st.session_state.mt5_connected else "Disconnected"
+        st.metric("MT5 Status", f"{status_color_mt5} {status_text_mt5}")
+
+    with col_status3:
+        if st.button("🔄 Check Connection"):
+            success, message = test_fastapi_connection()
             if success:
-                st.session_state.api_connected = True
+                st.session_state.fastapi_connected = True
+                # Check if MT5 is connected by getting account info
+                account_info = get_account_info_via_fastapi()
+                st.session_state.mt5_connected = account_info is not None
                 st.success(message)
             else:
+                st.session_state.fastapi_connected = False
+                st.session_state.mt5_connected = False
                 st.error(message)
 
-    with col_api_2:
-        if st.button("🔄 Refresh Connection"):
-            success, message = test_api_connection()
-            if success:
-                st.session_state.api_connected = True
-                st.success(message)
+    # MT5 Connection Form
+    with st.expander("🔐 MT5 Connection Settings", expanded=not st.session_state.mt5_connected):
+        col_conn1, col_conn2, col_conn3 = st.columns(3)
+
+        with col_conn1:
+            mt5_server = st.text_input("Server", value=st.secrets.get("mt5", {}).get("server", ""))
+            mt5_login = st.number_input("Login", value=st.secrets.get("mt5", {}).get("login", 0), step=1)
+
+        with col_conn2:
+            mt5_password = st.text_input("Password",
+                                         value=st.secrets.get("mt5", {}).get("password", ""),
+                                         type="password")
+            auto_connect = st.checkbox("Auto-connect on startup", value=True)
+
+        with col_conn3:
+            if st.session_state.mt5_connected:
+                if st.button("🔌 Disconnect MT5", type="secondary"):
+                    success, message = disconnect_from_mt5_via_fastapi()
+                    if success:
+                        st.session_state.mt5_connected = False
+                        st.success(message)
+                    else:
+                        st.error(message)
             else:
-                st.session_state.api_connected = False
-                st.error(message)
-
-    with col_api_3:
-        status_color = "🟢" if st.session_state.api_connected else "🔴"
-        status_text = "Connected" if st.session_state.api_connected else "Disconnected"
-        st.metric("API Status", f"{status_color} {status_text}")
+                if st.button("🔗 Connect to MT5", type="primary"):
+                    if mt5_server and mt5_login and mt5_password:
+                        success, message = connect_to_mt5_via_fastapi(mt5_server, int(mt5_login), mt5_password)
+                        if success:
+                            st.session_state.mt5_connected = True
+                            st.success(message)
+                        else:
+                            st.error(message)
+                    else:
+                        st.error("Please fill in all connection details")
 
     # Display configuration info
-    api_config = get_api_config()
-    if api_config.get("base_url"):
-        st.info(f"📋 Using API endpoint: {api_config.get('base_url')}")
+    fastapi_config = get_fastapi_config()
+    if fastapi_config.get("backend_url"):
+        st.info(f"📋 Using FastAPI endpoint: {fastapi_config.get('backend_url')}")
 
-    # Display Account Info and Open Orders if connected
-    if st.session_state.api_connected:
+    # Display Account Info and Open Positions if connected
+    if st.session_state.mt5_connected:
         # Account Information
-        account_info = get_account_info_via_api()
+        account_info = get_account_info_via_fastapi()
         if account_info:
+            st.subheader("Account Information")
             col_acc1, col_acc2, col_acc3, col_acc4 = st.columns(4)
             with col_acc1:
-                st.metric("Balance", f"{account_info.get('balance', 0):.2f}")
+                st.metric("Balance", f"${account_info.get('balance', 0):.2f}")
             with col_acc2:
-                st.metric("Equity", f"{account_info.get('equity', 0):.2f}")
+                st.metric("Equity", f"${account_info.get('equity', 0):.2f}")
             with col_acc3:
-                st.metric("Free Margin", f"{account_info.get('free_margin', 0):.2f}")
+                st.metric("Margin", f"${account_info.get('margin', 0):.2f}")
             with col_acc4:
-                st.metric("Leverage", f"1:{account_info.get('leverage', 0)}")
+                free_margin = account_info.get('equity', 0) - account_info.get('margin', 0)
+                st.metric("Free Margin", f"${free_margin:.2f}")
 
-        # Open Orders
-        st.subheader("Open Orders")
-        open_orders = get_open_orders_via_api()
+            # Additional account details
+            col_acc5, col_acc6, col_acc7 = st.columns(3)
+            with col_acc5:
+                st.write(f"**Account:** {account_info.get('login', 'N/A')}")
+            with col_acc6:
+                st.write(f"**Server:** {account_info.get('server', 'N/A')}")
+            with col_acc7:
+                st.write(f"**Leverage:** 1:{account_info.get('leverage', 'N/A')}")
 
-        if open_orders:
-            orders_df = pd.DataFrame(open_orders)
-            st.dataframe(orders_df, use_container_width=True)
+        # Open Positions
+        st.subheader("Open Positions")
+        open_positions = get_positions_via_fastapi()
 
-            # Order Management
-            if open_orders:
-                st.subheader("Order Management")
-                selected_order = st.selectbox(
-                    "Select Order to Manage",
-                    options=[f"{order.get('order_id', 'N/A')} - {order.get('symbol', 'N/A')}" for order in open_orders]
-                )
+        if open_positions:
+            positions_df = pd.DataFrame(open_positions)
 
-                if selected_order:
-                    order_id = selected_order.split(" - ")[0]
-                    selected_order_data = next(
-                        (order for order in open_orders if str(order.get('order_id')) == order_id), None)
+            # Calculate additional metrics
+            if 'profit' in positions_df.columns and 'volume' in positions_df.columns:
+                positions_df['profit_loss_pct'] = (positions_df['profit'] / positions_df['volume']) * 100
 
-                    if selected_order_data:
-                        col_manage1, col_manage2, col_manage3 = st.columns(3)
+            # Display metrics
+            total_profit = positions_df['profit'].sum() if 'profit' in positions_df.columns else 0
+            total_volume = positions_df['volume'].sum() if 'volume' in positions_df.columns else 0
 
-                        with col_manage1:
-                            new_sl = st.number_input(
-                                "New Stop Loss",
-                                value=float(selected_order_data.get('stop_loss', 0)),
-                                format="%.5f"
-                            )
+            col_pos1, col_pos2, col_pos3 = st.columns(3)
+            with col_pos1:
+                st.metric("Total Positions", len(open_positions))
+            with col_pos2:
+                st.metric("Total Profit/Loss", f"${total_profit:.2f}")
+            with col_pos3:
+                st.metric("Total Volume", f"{total_volume:.2f}")
 
-                        with col_manage2:
-                            new_tp = st.number_input(
-                                "New Take Profit",
-                                value=float(selected_order_data.get('take_profit', 0)),
-                                format="%.5f"
-                            )
-
-                        with col_manage3:
-                            if st.button("🔄 Modify SL/TP"):
-                                success, message = modify_order_sl_tp_via_api(order_id, new_sl, new_tp)
-                                if success:
-                                    st.success(message)
-                                else:
-                                    st.error(message)
-
-                            if st.button("❌ Close Order"):
-                                success, message = close_order_via_api(order_id)
-                                if success:
-                                    st.success(message)
-                                else:
-                                    st.error(message)
+            # Display positions table
+            st.dataframe(positions_df, use_container_width=True)
         else:
-            st.info("No open orders found")
+            st.info("No open positions found")
+
+        # Available Symbols
+        st.subheader("Available Symbols")
+        symbols = get_symbols_via_fastapi()
+        if symbols:
+            # Filter major pairs for display
+            major_pairs = [s for s in symbols if
+                           any(currency in s for currency in ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'XAU'])]
+            st.write(f"Found {len(symbols)} symbols ({len(major_pairs)} major pairs)")
+
+            # Display major pairs in a compact format
+            cols = st.columns(4)
+            for i, pair in enumerate(major_pairs[:20]):  # Show first 20 major pairs
+                with cols[i % 4]:
+                    st.code(pair)
+        else:
+            st.info("No symbols available")
 
     st.markdown("---")
 
-    # Rest of the Trade Signals page continues...
+    # Rest of your existing Trade Signals functionality...
     # Sync button
     col1, col2 = st.columns(2)
     with col1:
@@ -4608,10 +4603,8 @@ elif st.session_state.current_page == "Trade Signal":
                     target_price = safe_float(signal.get('target_price'), 0.0)
                     st.write(f"**Target Price:** {target_price:.5f}")
 
-                # Calculate and display Direction in regular black text
+                # Calculate and display Direction
                 direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-
-                # Display direction in regular black text like other fields
                 st.write(f"**Direction:** {direction.upper()}")
 
                 # Display price relationship explanation
@@ -4622,17 +4615,29 @@ elif st.session_state.current_page == "Trade Signal":
                     else:
                         st.write(f"**Stop Distance:** {price_difference * 10:.1f} pips")
 
-                # API Trade Management (if connected)
-                if st.session_state.api_connected:
+                # FastAPI Trade Execution (if connected)
+                if st.session_state.mt5_connected:
                     st.markdown("---")
-                    st.subheader("Trade Execution")
+                    st.subheader("Trade Execution via FastAPI")
 
-                    if st.button(f"📈 Place Limit Order via API", key=f"place_limit_{i}", type="primary"):
-                        success, message = place_limit_order_via_api(signal)
-                        if success:
-                            st.success(message)
-                        else:
-                            st.error(message)
+                    # You can add trade execution buttons here
+                    col_trade1, col_trade2 = st.columns(2)
+
+                    with col_trade1:
+                        if st.button(f"📈 Execute Trade", key=f"execute_{i}", type="primary"):
+                            # This would call your place_trade_via_fastapi function
+                            st.info("Trade execution feature would be implemented here")
+                            # Example:
+                            # success, message = place_trade_via_fastapi(
+                            #     symbol=signal['selected_pair'],
+                            #     order_type="LIMIT",
+                            #     direction=direction.upper(),
+                            #     volume=float(signal.get('position_size', 0.1)),
+                            #     price=safe_float(signal.get('entry_price'), 0.0),
+                            #     sl=safe_float(signal.get('exit_price'), 0.0),
+                            #     tp=safe_float(signal.get('target_price'), 0.0),
+                            #     comment=f"From Trade Signal: {signal.get('risk_multiplier', '')}"
+                            # )
 
                 # Display notes if any
                 if signal.get('notes'):

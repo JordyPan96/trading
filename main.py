@@ -5000,6 +5000,160 @@ elif st.session_state.current_page == "Trade Signal":
         asyncio.run(execute_trade_and_update(signal_index))
         st.rerun()
 
+        # NEW: BE Price calculation functions
+        def calculate_be_price_25r(entry_price, stop_loss, direction):
+            """
+            Calculate BE price at 2.5R (where we should automatically move to BE)
+            For BUY: BE = entry_price + 2.5 * abs(entry_price - stop_loss)
+            For SELL: BE = entry_price - 2.5 * abs(entry_price - stop_loss)
+            """
+            if entry_price <= 0 or stop_loss <= 0 or not direction:
+                return None
+
+            risk_amount = abs(entry_price - stop_loss)
+
+            if direction.lower() == 'buy':
+                be_price = entry_price + (2.5 * risk_amount)
+            elif direction.lower() == 'sell':
+                be_price = entry_price - (2.5 * risk_amount)
+            else:
+                return None
+
+            return round(be_price, 5)
+
+        def calculate_auto_be_sl_price(entry_price, direction, symbol):
+            """
+            Calculate the new SL price when moving to BE (5 pips for forex, $2 for gold)
+            For BUY: entry_price + 0.0005 (5 pips) for forex, entry_price + 2.0 for gold
+            For SELL: entry_price - 0.0005 (5 pips) for forex, entry_price - 2.0 for gold
+            """
+            if entry_price <= 0 or not direction:
+                return None
+
+            # Check if it's gold
+            is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+
+            if direction.lower() == 'buy':
+                if is_gold:
+                    return entry_price + 2.0  # $2 above entry for gold BUY
+                else:
+                    return entry_price + 0.0005  # 5 pips above entry for forex BUY
+            elif direction.lower() == 'sell':
+                if is_gold:
+                    return entry_price - 2.0  # $2 below entry for gold SELL
+                else:
+                    return entry_price - 0.0005  # 5 pips below entry for forex SELL
+            else:
+                return None
+
+        def should_move_to_auto_be(current_price, entry_price, stop_loss, direction, symbol):
+            """
+            Check if price reached 2.5R level and should automatically move to BE
+            """
+            be_trigger_price = calculate_be_price_25r(entry_price, stop_loss, direction)
+            if be_trigger_price is None:
+                return False
+
+            if direction.lower() == 'buy':
+                return current_price >= be_trigger_price
+            elif direction.lower() == 'sell':
+                return current_price <= be_trigger_price
+            else:
+                return False
+
+        async def auto_move_to_be(position_id, entry_price, direction, symbol):
+            """
+            Automatically move position to BE (5 pips for forex, $2 for gold)
+            """
+            try:
+                new_sl_price = calculate_auto_be_sl_price(entry_price, direction, symbol)
+                if new_sl_price is None:
+                    return False, "Could not calculate BE price"
+
+                from metaapi_cloud_sdk import MetaApi
+
+                config = get_metaapi_config()
+                token = config.get("token", "")
+                account_id = st.session_state.metaapi_account_id
+
+                if not token or not account_id:
+                    return False, "Token or account ID not configured"
+
+                api = MetaApi(token)
+                account = await api.metatrader_account_api.get_account(account_id)
+
+                if account.state != 'DEPLOYED':
+                    await account.deploy()
+                await account.wait_connected()
+
+                connection = account.get_rpc_connection()
+                await connection.connect()
+                await connection.wait_synchronized()
+
+                # Get current position details
+                positions = await connection.get_positions()
+                current_position = None
+                for pos in positions:
+                    if pos['id'] == position_id:
+                        current_position = pos
+                        break
+
+                if not current_position:
+                    await connection.close()
+                    return False, "❌ Position not found"
+
+                current_sl = current_position.get('stopLoss')
+                current_tp = current_position.get('takeProfit')
+                current_price = current_position.get('currentPrice')
+                position_type = current_position.get('type')
+
+                # Validate the new SL value
+                if new_sl_price <= 0:
+                    await connection.close()
+                    return False, "❌ Stop loss must be greater than 0"
+
+                # For BUY positions: SL should be below current price
+                if position_type == 'POSITION_TYPE_BUY' and new_sl_price >= current_price:
+                    await connection.close()
+                    return False, f"❌ For BUY positions, stop loss ({new_sl_price:.5f}) must be below current price ({current_price:.5f})"
+
+                # For SELL positions: SL should be above current price
+                if position_type == 'POSITION_TYPE_SELL' and new_sl_price <= current_price:
+                    await connection.close()
+                    return False, f"❌ For SELL positions, stop loss ({new_sl_price:.5f}) must be above current price ({current_price:.5f})"
+
+                # CORRECT USAGE: Keyword arguments with snake_case
+                if current_tp and current_tp > 0:
+                    # Modify both SL and TP
+                    await connection.modify_position(
+                        position_id,
+                        stop_loss=new_sl_price,
+                        take_profit=current_tp
+                    )
+                else:
+                    # Modify only SL
+                    await connection.modify_position(
+                        position_id,
+                        stop_loss=new_sl_price
+                    )
+
+                await connection.close()
+
+                # Determine the BE description
+                is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+                be_description = "5 pips" if not is_gold else "$2"
+
+                return True, f"✅ {symbol} - Auto BE activated! SL moved to entry + {be_description} for capital protection"
+
+            except Exception as e:
+                try:
+                    await connection.close()
+                except:
+                    pass
+                error_msg = str(e)
+                print(f"❌ Auto BE MetaApi error: {error_msg}")
+                return False, f"❌ Failed to auto move to BE: {error_msg}"
+
 
     # Handle action results
     if st.session_state.last_action:
@@ -5365,6 +5519,49 @@ elif st.session_state.current_page == "Trade Signal":
             if not st.session_state.open_positions:
                 st.info("No open positions found in MT5 account.")
             else:
+                # AUTO BE CHECK - Run this for all positions
+                auto_be_updates = []
+                for i, position in enumerate(st.session_state.open_positions):
+                    entry_price = safe_float(position.get('openPrice'), 0.0)
+                    current_sl = safe_float(position.get('stopLoss'), 0.0)
+                    current_price = safe_float(position.get('currentPrice'), 0.0)
+                    direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                    symbol = position['symbol']
+
+                    # Check if we should automatically move to BE
+                    if all([entry_price > 0, current_sl > 0, current_price > 0]):
+                        if should_move_to_auto_be(current_price, entry_price, current_sl, direction, symbol):
+                            auto_be_updates.append({
+                                'position_id': position['id'],
+                                'entry_price': entry_price,
+                                'direction': direction,
+                                'symbol': symbol
+                            })
+
+                # Execute auto BE updates
+                if auto_be_updates and st.session_state.metaapi_connected:
+                    import asyncio
+
+                    for update in auto_be_updates:
+                        success, message = asyncio.run(auto_move_to_be(
+                            update['position_id'],
+                            update['entry_price'],
+                            update['direction'],
+                            update['symbol']
+                        ))
+                        if success:
+                            st.success(f"🔄 {message}")
+                        else:
+                            st.error(f"❌ {message}")
+
+                    # Refresh positions after auto BE updates
+                    if auto_be_updates:
+                        positions, error = asyncio.run(quick_get_positions())
+                        if positions is not None:
+                            st.session_state.open_positions = positions
+                        st.rerun()
+
+                # Display each position
                 for i, position in enumerate(st.session_state.open_positions):
                     unique_key = generate_unique_key(i,
                                                      {'selected_pair': position['symbol'], 'timestamp': position['id']},
@@ -5385,8 +5582,8 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**P&L:** :{pnl_color}[${profit:.2f}]")
 
                         with col2:
-                            open_price = safe_float(position.get('openPrice'), 0.0)
-                            st.write(f"**Open Price:** {open_price:.5f}")
+                            entry_price = safe_float(position.get('openPrice'), 0.0)
+                            st.write(f"**Entry Price:** {entry_price:.5f}")
 
                             current_price = safe_float(position.get('currentPrice'), 0.0)
                             st.write(f"**Current Price:** {current_price:.5f}")
@@ -5398,9 +5595,31 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                        # MODIFY SL ONLY SECTION
+                        # NEW: BE Price field (simple display only)
                         st.markdown("---")
-                        st.subheader("🛠️ Modify Stop Loss Only")
+                        st.subheader("🎯 Break-even Management")
+
+                        # Calculate and display BE Price (2.5R level)
+                        direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                        current_sl = safe_float(position.get('stopLoss'), 0.0)
+                        be_trigger_price = calculate_be_price_25r(entry_price, current_sl, direction)
+
+                        if be_trigger_price:
+                            st.write(f"**BE Price (2.5R):** `{be_trigger_price:.5f}`")
+
+                            # Calculate what the new BE SL will be
+                            new_be_sl = calculate_auto_be_sl_price(entry_price, direction, position['symbol'])
+                            is_gold = any(gold_symbol in position['symbol'].upper() for gold_symbol in ['XAU', 'GOLD'])
+                            be_description = "5 pips" if not is_gold else "$2"
+
+                            if new_be_sl:
+                                st.write(f"**Auto BE SL:** `{new_be_sl:.5f}` (entry + {be_description})")
+                        else:
+                            st.write("**BE Price:** N/A")
+
+                        # MODIFY SL ONLY SECTION (keep your existing manual controls)
+                        st.markdown("---")
+                        st.subheader("🛠️ Manual Stop Loss Management")
 
                         col_sl, col_action = st.columns([1, 1])
 
@@ -5414,7 +5633,6 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_action:
-                            # Align the Update Stop Loss button with the input field
                             st.write("")  # Add some vertical spacing for alignment
                             st.write("")  # Add some vertical spacing for alignment
                             if st.button("💾 Update Stop Loss", key=f"update_{unique_key}", type="primary",
@@ -5436,7 +5654,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     else:
                                         st.error(message)
 
-                        # SET TO BREAK-EVEN BUTTON
+                        # MANUAL SET TO BREAK-EVEN BUTTON (updated logic)
                         col_be, col_be_action = st.columns([1, 1])
 
                         with col_be:
@@ -5449,27 +5667,27 @@ elif st.session_state.current_page == "Trade Signal":
 
                             if position_type == 'POSITION_TYPE_BUY':
                                 if is_gold:
-                                    be_price = open_price + 2.0  # $2 for gold buy
-                                    be_label = f"Break-even (Entry + $2): {be_price:.2f}"
+                                    be_price = entry_price + 2.0  # $2 above entry for gold buy
+                                    be_label = f"Manual BE (Entry + $2): {be_price:.2f}"
                                 else:
-                                    be_price = open_price + 0.0005  # 5 pips for forex buy
-                                    be_label = f"Break-even (Entry + 5 pips): {be_price:.5f}"
+                                    be_price = entry_price + 0.0005  # 5 pips above entry for forex buy
+                                    be_label = f"Manual BE (Entry + 5 pips): {be_price:.5f}"
                             elif position_type == 'POSITION_TYPE_SELL':
                                 if is_gold:
-                                    be_price = open_price - 2.0  # $2 for gold sell
-                                    be_label = f"Break-even (Entry - $2): {be_price:.2f}"
+                                    be_price = entry_price - 2.0  # $2 below entry for gold sell
+                                    be_label = f"Manual BE (Entry - $2): {be_price:.2f}"
                                 else:
-                                    be_price = open_price - 0.0005  # 5 pips for forex sell
-                                    be_label = f"Break-even (Entry - 5 pips): {be_price:.5f}"
+                                    be_price = entry_price - 0.0005  # 5 pips below entry for forex sell
+                                    be_label = f"Manual BE (Entry - 5 pips): {be_price:.5f}"
                             else:
-                                be_price = open_price
-                                be_label = "Break-even: Unknown position type"
+                                be_price = entry_price
+                                be_label = "Manual BE: Unknown position type"
 
                             st.info(be_label)
 
                         with col_be_action:
                             if st.button("🎯 Set to BE", key=f"be_{unique_key}", use_container_width=True,
-                                         help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
+                                         help="Manually set stop loss to break-even price (entry + 5 pips for forex BUY, entry - 5 pips for forex SELL, entry ± $2 for gold)"):
                                 import asyncio
 
                                 with st.spinner("Setting to break-even..."):

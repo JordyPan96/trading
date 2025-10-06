@@ -4716,10 +4716,10 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"Sync error: {str(e)}"
 
 
-    def update_workflow_status_in_sheets(timestamp, new_status):
-        """Update a specific record's status in Google Sheets workflow"""
+    def update_workflow_status_in_sheets(timestamp, new_status, instrument_name=None):
+        """Update a specific record's status in Google Sheets workflow using instrument name + timestamp for precise matching"""
         try:
-            print(f"🔄 Updating status for timestamp {timestamp} to {new_status}")
+            print(f"🔄 Updating status for {instrument_name} (timestamp: {timestamp}) to {new_status}")
 
             # Load current workflow data
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
@@ -4732,18 +4732,32 @@ elif st.session_state.current_page == "Trade Signal":
             workflow_df['timestamp'] = workflow_df['timestamp'].astype(str)
             timestamp_str = str(timestamp)
 
-            # Find and update the record
+            # Find and update the record - PRECISE MATCHING
             record_found = False
             for idx, record in workflow_df.iterrows():
-                if str(record['timestamp']) == timestamp_str:
+                record_timestamp = str(record['timestamp'])
+                record_instrument = record.get('selected_pair', '')
+
+                # Match by both timestamp AND instrument name for precise identification
+                if record_timestamp == timestamp_str and record_instrument == instrument_name:
                     workflow_df.at[idx, 'status'] = new_status
                     record_found = True
-                    print(f"✅ Found record: {record['selected_pair']} - updating status to {new_status}")
+                    print(f"✅ Found exact match: {record_instrument} - updating status to {new_status}")
                     break
 
             if not record_found:
-                print(f"❌ Record with timestamp {timestamp} not found in workflow")
-                return False, f"Record not found: {timestamp}"
+                print(f"❌ Record with timestamp {timestamp} and instrument {instrument_name} not found in workflow")
+                # Fallback: try to find by instrument only if timestamp fails
+                for idx, record in workflow_df.iterrows():
+                    record_instrument = record.get('selected_pair', '')
+                    if record_instrument == instrument_name and record.get('status') in ['Order Ready', 'Order Placed']:
+                        workflow_df.at[idx, 'status'] = new_status
+                        record_found = True
+                        print(f"✅ Found by instrument fallback: {record_instrument} - updating status to {new_status}")
+                        break
+
+            if not record_found:
+                return False, f"Record not found: {instrument_name} at {timestamp}"
 
             # Save updated data back to sheets
             print("💾 Saving updated workflow to Google Sheets...")
@@ -4751,7 +4765,7 @@ elif st.session_state.current_page == "Trade Signal":
 
             if success:
                 print("✅ Successfully updated workflow in Google Sheets")
-                return True, f"Updated status to {new_status}"
+                return True, f"Updated {instrument_name} status to {new_status}"
             else:
                 print("❌ Failed to save to Google Sheets")
                 return False, "Failed to save to cloud"
@@ -4774,8 +4788,8 @@ elif st.session_state.current_page == "Trade Signal":
 
             print(f"🔄 Moving {symbol} to Order Placed (timestamp: {timestamp})")
 
-            # First update the status in Google Sheets
-            success, message = update_workflow_status_in_sheets(timestamp, 'Order Placed')
+            # First update the status in Google Sheets WITH INSTRUMENT NAME
+            success, message = update_workflow_status_in_sheets(timestamp, 'Order Placed', symbol)
 
             if success:
                 # Only update local state after successful sheets update
@@ -4824,8 +4838,8 @@ elif st.session_state.current_page == "Trade Signal":
 
             print(f"🔄 Moving {symbol} to In Trade (timestamp: {timestamp})")
 
-            # First update the status in Google Sheets
-            success, message = update_workflow_status_in_sheets(timestamp, 'Order Filled')
+            # First update the status in Google Sheets WITH INSTRUMENT NAME
+            success, message = update_workflow_status_in_sheets(timestamp, 'Order Filled', symbol)
 
             if success:
                 # Only update local state after successful sheets update
@@ -4872,8 +4886,8 @@ elif st.session_state.current_page == "Trade Signal":
 
             print(f"🔄 Moving {symbol} back to Ready (timestamp: {timestamp})")
 
-            # First update the status in Google Sheets
-            success, message = update_workflow_status_in_sheets(timestamp, 'Order Ready')
+            # First update the status in Google Sheets WITH INSTRUMENT NAME
+            success, message = update_workflow_status_in_sheets(timestamp, 'Order Ready', symbol)
 
             if success:
                 # Only update local state after successful sheets update
@@ -4895,6 +4909,7 @@ elif st.session_state.current_page == "Trade Signal":
     def handle_delete_signal(signal_index, list_name):
         """Delete signal from any list"""
         try:
+            signal = None
             if list_name == 'ready_to_order':
                 signal = st.session_state.ready_to_order[signal_index]
                 st.session_state.ready_to_order.pop(signal_index)
@@ -4905,9 +4920,9 @@ elif st.session_state.current_page == "Trade Signal":
                 signal = st.session_state.in_trade[signal_index]
                 st.session_state.in_trade.pop(signal_index)
 
-            # Update status in Google Sheets to 'Speculation' when deleted
-            if 'signal' in locals():
-                update_workflow_status_in_sheets(signal['timestamp'], 'Speculation')
+            # Update status in Google Sheets to 'Speculation' when deleted WITH INSTRUMENT NAME
+            if signal:
+                update_workflow_status_in_sheets(signal['timestamp'], 'Speculation', signal['selected_pair'])
 
             st.session_state.last_action = f"deleted_{list_name}_{signal_index}"
             return True
@@ -5019,9 +5034,9 @@ elif st.session_state.current_page == "Trade Signal":
                     moved_count = quick_auto_move_filled_orders(positions)
                     if moved_count > 0:
                         print(f"✅ Auto-moved {moved_count} orders to In Trade")
-                        # Update Google Sheets for each moved order
+                        # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
-                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled')
+                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     st.session_state.open_positions = positions
                 st.session_state.auto_move_checked = True
             except Exception as e:
@@ -5078,9 +5093,9 @@ elif st.session_state.current_page == "Trade Signal":
                     st.session_state.open_positions = positions
                     if moved_count > 0:
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
-                        # Update Google Sheets for each moved order
+                        # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
-                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled')
+                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
 
@@ -5258,9 +5273,10 @@ elif st.session_state.current_page == "Trade Signal":
                                         positions, _ = asyncio.run(quick_get_positions())
                                         if positions:
                                             quick_auto_move_filled_orders(positions)
-                                            # Update Google Sheets
+                                            # Update Google Sheets WITH INSTRUMENT NAME
                                             for trade in st.session_state.in_trade[-1:]:
-                                                update_workflow_status_in_sheets(trade['timestamp'], 'Order Filled')
+                                                update_workflow_status_in_sheets(trade['timestamp'], 'Order Filled',
+                                                                                 trade['selected_pair'])
                                         st.rerun()
                                     elif status == 'NOT_FOUND':
                                         st.warning("⚠️ Order not found in MT5")

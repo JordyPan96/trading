@@ -4279,9 +4279,9 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Trade error: {str(e)}"
 
 
-    # CORRECTED ORDER STATUS CHECKING WITH RPC CONNECTION
+    # CORRECTED ORDER STATUS CHECKING WITH RPC CONNECTION (DICTIONARY ACCESS)
     async def find_order_by_parameters(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Find order in MT5 using RPC connection (correct way)"""
+        """Find order in MT5 using RPC connection with dictionary access"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4317,10 +4317,11 @@ elif st.session_state.current_page == "Trade Signal":
             # Look for matching order with relaxed matching
             for order in orders:
                 try:
-                    order_symbol = order.symbol
-                    order_open_price = order.openPrice
-                    order_volume = order.volume
-                    order_id = order.id
+                    # ✅ Use dictionary access, not dot notation
+                    order_symbol = order['symbol']
+                    order_open_price = order['openPrice']
+                    order_volume = order['volume']
+                    order_id = order['id']
 
                     # Skip if missing critical info
                     if not all([order_symbol, order_open_price, order_volume, order_id]):
@@ -4342,8 +4343,8 @@ elif st.session_state.current_page == "Trade Signal":
                             'symbol': order_symbol,
                             'open_price': order_open_price,
                             'volume': order_volume,
-                            'state': order.state,
-                            'type': order.type
+                            'state': order['state'],
+                            'type': order['type']
                         }, None
 
                 except Exception as e:
@@ -4361,7 +4362,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     async def cancel_order_in_mt5(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Cancel order in MT5 using RPC connection (correct way)"""
+        """Cancel order in MT5 using RPC connection"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4387,7 +4388,7 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # ✅ Cancel the order using RPC connection (correct way)
+            # ✅ Cancel the order using RPC connection
             try:
                 result = await connection.cancel_order(order_info['id'])
                 await connection.close()
@@ -4409,9 +4410,9 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Error cancelling order: {str(e)}"
 
 
-    # CORRECTED FAST ORDER CHECKING FUNCTION WITH RPC CONNECTION
+    # CORRECTED FAST ORDER CHECKING FUNCTION WITH DICTIONARY ACCESS
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
-        """Ultra-fast order check using RPC connection (correct way)"""
+        """Ultra-fast order check using RPC connection with dictionary access"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4442,19 +4443,21 @@ elif st.session_state.current_page == "Trade Signal":
 
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            # ✅ Quick orders check using RPC connection
+            # ✅ Quick orders check using RPC connection with dictionary access
             orders = await connection.get_orders()
             for order in orders:
-                if (order.symbol == formatted_symbol and
-                        abs(float(order.openPrice) - float(entry_price)) < 0.02):
+                # ✅ Use dictionary access, not dot notation
+                if (order['symbol'] == formatted_symbol and
+                        abs(float(order['openPrice']) - float(entry_price)) < 0.02):
                     await connection.close()
-                    return 'PENDING', order.id
+                    return 'PENDING', order['id']
 
-            # ✅ Quick positions check using RPC connection
+            # ✅ Quick positions check using RPC connection with dictionary access
             positions = await connection.get_positions()
             for position in positions:
-                if (position.symbol == formatted_symbol and
-                        abs(float(position.openPrice) - float(entry_price)) < 0.02):
+                # ✅ Use dictionary access, not dot notation
+                if (position['symbol'] == formatted_symbol and
+                        abs(float(position['openPrice']) - float(entry_price)) < 0.02):
                     await connection.close()
                     return 'FILLED', None
 
@@ -4470,7 +4473,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     async def quick_check_order_status(order):
-        """Fast order status check using RPC connection (correct way)"""
+        """Fast order status check using RPC connection with dictionary access"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4498,36 +4501,38 @@ elif st.session_state.current_page == "Trade Signal":
             volume = safe_float(order.get('position_size'), 0.1)
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            # ✅ Check orders using RPC connection
+            # ✅ Check orders using RPC connection with dictionary access
             orders = await connection.get_orders()
             order_found = False
             order_id = None
 
             for mt5_order in orders:
                 try:
-                    order_symbol = mt5_order.symbol
-                    order_open_price = mt5_order.openPrice
-                    order_volume = mt5_order.volume
+                    # ✅ Use dictionary access, not dot notation
+                    order_symbol = mt5_order['symbol']
+                    order_open_price = mt5_order['openPrice']
+                    order_volume = mt5_order['volume']
 
                     if (order_symbol == formatted_symbol and
                             order_open_price and order_volume and
                             abs(float(order_open_price) - float(entry_price)) < 0.01 and
                             abs(float(order_volume) - float(volume)) < 0.1):
                         order_found = True
-                        order_id = mt5_order.id
+                        order_id = mt5_order['id']
                         break
                 except:
                     continue
 
-            # ✅ Check positions using RPC connection if order not found
+            # ✅ Check positions using RPC connection with dictionary access if order not found
             position_found = False
             if not order_found:
                 positions = await connection.get_positions()
                 for position in positions:
                     try:
-                        position_symbol = position.symbol
-                        position_open_price = position.openPrice
-                        position_volume = position.volume
+                        # ✅ Use dictionary access, not dot notation
+                        position_symbol = position['symbol']
+                        position_open_price = position['openPrice']
+                        position_volume = position['volume']
 
                         if (position_symbol == formatted_symbol and
                                 position_open_price and position_volume and
@@ -4557,7 +4562,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # ADDITIONAL FUNCTION TO GET ALL ORDERS FOR DEBUGGING
     async def get_all_orders_debug():
-        """Get all orders for debugging purposes using RPC connection"""
+        """Get all orders for debugging purposes using RPC connection with dictionary access"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4583,13 +4588,14 @@ elif st.session_state.current_page == "Trade Signal":
 
             order_list = []
             for order in orders:
+                # ✅ Use dictionary access, not dot notation
                 order_list.append({
-                    'id': order.id,
-                    'symbol': order.symbol,
-                    'type': order.type,
-                    'state': order.state,
-                    'openPrice': order.openPrice,
-                    'volume': order.volume
+                    'id': order['id'],
+                    'symbol': order['symbol'],
+                    'type': order['type'],
+                    'state': order['state'],
+                    'openPrice': order['openPrice'],
+                    'volume': order['volume']
                 })
 
             await connection.close()

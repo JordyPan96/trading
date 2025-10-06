@@ -4515,8 +4515,9 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     # FIXED MODIFY POSITION FUNCTION - HANDLE NULL VALUES PROPERLY
+    # CORRECTED MODIFY POSITION FUNCTION - NO RETURN VALUE CHECK
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - FIXED VERSION"""
+        """Modify stop loss only for an open position - CORRECTED VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4546,24 +4547,22 @@ elif st.session_state.current_page == "Trade Signal":
                     current_tp = pos.get('takeProfit')
                     break
 
-            # Prepare modification data - handle None values properly
+            # Prepare modification data
             modification_data = {
-                'stopLoss': new_sl,
-                'comment': 'Modified SL via Trade Signal page'
+                'stopLoss': float(new_sl)
             }
 
-            # Only include takeProfit if it exists
+            # Only include takeProfit if it exists and is not None
             if current_tp is not None:
-                modification_data['takeProfit'] = current_tp
+                modification_data['takeProfit'] = float(current_tp)
 
-            result = await connection.modify_position(position_id, modification_data)
+            # This method doesn't return a value - it just completes if successful
+            await connection.modify_position(position_id, modification_data)
 
             await connection.close()
 
-            if result:
-                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
-            else:
-                return False, "❌ Failed to modify position"
+            # If we reach here, the modification was successful
+            return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
 
         except Exception as e:
             try:

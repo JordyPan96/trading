@@ -3301,6 +3301,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
 elif st.session_state.current_page == "Active Opps":
+    import streamlit as st
+    import pandas as pd
+    from datetime import datetime
+
     st.title("Saved Records")
 
     # Initialize session states
@@ -3316,6 +3320,8 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.current_stage = 'Speculation'
     if 'last_action' not in st.session_state:
         st.session_state.last_action = None
+    if 'last_sync_time' not in st.session_state:
+        st.session_state.last_sync_time = datetime.now()
 
 
     # Use your existing Google Sheets functions
@@ -3359,8 +3365,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Error saving workflow data: {e}")
             return False
 
-
-    # IN ACTIVE OPPS PAGE - REPLACE THE SYNC FUNCTION:
 
     def sync_with_trade_signals():
         """Two-way sync between Active Opps and Trade Signals - FIXED VERSION"""
@@ -3498,6 +3502,49 @@ elif st.session_state.current_page == "Active Opps":
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
 
 
+    # AUTO-RELOAD FUNCTION - CRITICAL FOR TWO-WAY SYNC
+    def check_and_reload_from_sheets():
+        """Check if Google Sheets has been updated by Trade Signals and reload if needed"""
+        try:
+            # Load current data from Google Sheets
+            current_sheets_data = load_workflow_from_sheets()
+            if current_sheets_data.empty:
+                return False
+
+            # Convert to comparable format
+            current_timestamps = {str(rec.get('timestamp')) for rec in st.session_state.saved_records}
+            sheets_timestamps = {str(rec.get('timestamp')) for rec in current_sheets_data.to_dict('records')}
+
+            # Check if data has changed
+            if current_timestamps != sheets_timestamps:
+                return True
+
+            # Also check if any statuses have changed
+            current_data_df = pd.DataFrame(st.session_state.saved_records)
+            if not current_data_df.empty and not current_sheets_data.empty:
+                merged = current_data_df.merge(current_sheets_data, on='timestamp', suffixes=('_current', '_sheets'))
+                if not merged.empty and 'status_current' in merged.columns and 'status_sheets' in merged.columns:
+                    status_changed = any(merged['status_current'] != merged['status_sheets'])
+                    if status_changed:
+                        return True
+
+            return False
+        except Exception as e:
+            print(f"Check reload error: {e}")
+            return False
+
+
+    # AUTO-RELOAD ON EVERY PAGE LOAD
+    should_reload = check_and_reload_from_sheets()
+    if should_reload:
+        with st.spinner("🔄 Reloading updated data from cloud..."):
+            workflow_data = load_workflow_from_sheets()
+            if not workflow_data.empty:
+                st.session_state.saved_records = workflow_data.to_dict('records')
+                sync_with_trade_signals()
+                st.session_state.last_sync_time = datetime.now()
+                st.success("✅ Data updated from cloud!")
+
     # INITIAL LOAD
     if not st.session_state.saved_records:
         with st.spinner("🔄 Loading data from cloud..."):
@@ -3526,6 +3573,31 @@ elif st.session_state.current_page == "Active Opps":
             st.success("✅ All records cleared successfully!")
 
         st.rerun()
+
+    # SYNC STATUS SECTION - ADDED FOR TWO-WAY SYNC
+    st.write("---")
+    col_sync1, col_sync2, col_sync3 = st.columns(3)
+
+    with col_sync1:
+        if st.button("🔄 Check for Updates", key="check_updates", use_container_width=True):
+            with st.spinner("Checking for updates..."):
+                workflow_data = load_workflow_from_sheets()
+                if not workflow_data.empty:
+                    st.session_state.saved_records = workflow_data.to_dict('records')
+                    sync_with_trade_signals()
+                    st.session_state.last_sync_time = datetime.now()
+                    st.success("✅ Data updated from cloud!")
+                    st.rerun()
+                else:
+                    st.info("No new data found")
+
+    with col_sync2:
+        if st.button("📤 View Trade Signals", key="view_signals", use_container_width=True):
+            st.session_state.current_page = "Trade Signal"
+            st.rerun()
+
+    with col_sync3:
+        st.write(f"**Last sync:** {st.session_state.last_sync_time.strftime('%H:%M:%S')}")
 
     # CSV Upload as fallback
     st.sidebar.markdown("---")

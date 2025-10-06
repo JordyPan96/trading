@@ -4501,6 +4501,8 @@ elif st.session_state.current_page == "Trade Signal":
     async def execute_trade_and_update(signal, direction):
         """Execute trade and update state immediately"""
         try:
+            print(f"🔄 Starting trade execution for {signal['selected_pair']}")
+
             success, message = await place_trade(
                 symbol=signal['selected_pair'],
                 volume=float(signal.get('position_size', 0.1)),
@@ -4510,21 +4512,41 @@ elif st.session_state.current_page == "Trade Signal":
                 tp=safe_float(signal.get('target_price'), 0.0)
             )
 
+            print(f"📊 Trade execution result: {success}, {message}")
+
             if success:
-                # Update session state immediately
-                st.session_state.ready_to_order = [s for s in st.session_state.ready_to_order if
-                                                   s['timestamp'] != signal['timestamp']]
-                st.session_state.order_placed.append({
+                print(f"🔄 Updating session state...")
+                print(
+                    f"📊 Before - Ready: {len(st.session_state.ready_to_order)}, Placed: {len(st.session_state.order_placed)}")
+
+                # Create new lists to ensure state updates
+                updated_ready_to_order = [s for s in st.session_state.ready_to_order if
+                                          s['timestamp'] != signal['timestamp']]
+                new_order_placed = st.session_state.order_placed + [{
                     **signal,
                     'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'order_status': 'PENDING',
                     'direction': direction
-                })
-                sync_with_active_opps()
+                }]
+
+                # Update session state
+                st.session_state.ready_to_order = updated_ready_to_order
+                st.session_state.order_placed = new_order_placed
+
+                print(
+                    f"📊 After - Ready: {len(st.session_state.ready_to_order)}, Placed: {len(st.session_state.order_placed)}")
+
+                # Sync with Active Opps
+                sync_result = sync_with_active_opps()
+                print(f"📊 Sync with Active Opps: {sync_result}")
+
+                print("🔄 Forcing UI refresh...")
+                st.rerun()
 
             return success, message
 
         except Exception as e:
+            print(f"❌ Trade execution error: {str(e)}")
             return False, f"Trade execution error: {str(e)}"
 
 

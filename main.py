@@ -4337,19 +4337,22 @@ elif st.session_state.current_page == "Trade Signal":
             return [], f"Quick position error: {str(e)}"
 
 
-    # QUICK AUTO-MOVE FUNCTION
+    # FIXED QUICK AUTO-MOVE FUNCTION
     def quick_auto_move_filled_orders(positions):
-        """Quick auto-move without async operations"""
+        """Quick auto-move with proper symbol matching for Pepperstone format"""
         try:
             if not st.session_state.order_placed or not positions:
                 return 0
 
             moved_count = 0
+            moved_details = []
 
             for order in st.session_state.order_placed[:]:
                 order_symbol = order['selected_pair']
                 order_volume = safe_float(order.get('position_size'), 0.1)
                 order_entry_price = safe_float(order.get('entry_price'), 0.0)
+
+                # Format the order symbol for Pepperstone comparison
                 formatted_order_symbol = format_symbol_for_pepperstone(order_symbol)
 
                 # Look for matching position
@@ -4358,22 +4361,46 @@ elif st.session_state.current_page == "Trade Signal":
                     position_volume = safe_float(position.get('volume'), 0.0)
                     position_open_price = safe_float(position.get('open_price'), 0.0)
 
-                    # Enhanced symbol matching (AUDUSD vs AUDUSD or AUDUSD vs AUDUSD.a)
-                    symbol_match = (
-                        position_symbol == order_symbol or
-                        position_symbol == formatted_order_symbol or
-                        position_symbol.replace('.a', '') == order_symbol.replace('.a', '') or
-                        position_symbol == order_symbol.replace('.a', '') or
-                        order_symbol == position_symbol.replace('.a', '')
-                    )
+                    # DEBUG: Print what we're comparing
+                    print(
+                        f"🔍 Comparing: Order '{order_symbol}' -> '{formatted_order_symbol}' vs Position '{position_symbol}'")
+                    print(f"   Volume: Order {order_volume} vs Position {position_volume}")
+                    print(f"   Price: Order {order_entry_price} vs Position {position_open_price}")
+
+                    # SIMPLIFIED SYMBOL MATCHING - Handle AUDUSD vs AUDUSD.a properly
+                    symbol_match = False
+
+                    # Case 1: Direct match (AUDUSD.a vs AUDUSD.a)
+                    if position_symbol == formatted_order_symbol:
+                        symbol_match = True
+                        print(f"   ✅ Direct symbol match: {position_symbol} == {formatted_order_symbol}")
+
+                    # Case 2: Position has .a but order doesn't (AUDUSD.a vs AUDUSD)
+                    elif position_symbol.endswith('.a') and position_symbol.replace('.a', '') == order_symbol:
+                        symbol_match = True
+                        print(f"   ✅ Symbol match with .a: {position_symbol} vs {order_symbol}")
+
+                    # Case 3: Order has .a but position doesn't (AUDUSD vs AUDUSD.a) - less common but possible
+                    elif order_symbol.endswith('.a') and order_symbol.replace('.a', '') == position_symbol:
+                        symbol_match = True
+                        print(f"   ✅ Symbol match order has .a: {order_symbol} vs {position_symbol}")
+
+                    # Case 4: Both without .a but match (AUDUSD vs AUDUSD)
+                    elif position_symbol == order_symbol:
+                        symbol_match = True
+                        print(f"   ✅ Exact symbol match: {position_symbol} == {order_symbol}")
 
                     # Volume matching (5.01 lots vs 5.01 lots)
                     volume_match = abs(position_volume - order_volume) < 0.01
+                    print(f"   Volume match: {volume_match} (diff: {abs(position_volume - order_volume)})")
 
-                    # Price matching
+                    # Price matching with reasonable tolerance
                     price_match = abs(position_open_price - order_entry_price) < 0.001
+                    print(f"   Price match: {price_match} (diff: {abs(position_open_price - order_entry_price)})")
 
                     if symbol_match and volume_match and price_match:
+                        print(f"   🎯 ALL MATCHES PASSED - Moving order to In Trade")
+
                         # Create trade record
                         trade_record = {
                             **order,
@@ -4391,12 +4418,33 @@ elif st.session_state.current_page == "Trade Signal":
                                                          o['timestamp'] != order['timestamp']]
                         st.session_state.in_trade.append(trade_record)
                         moved_count += 1
+                        moved_details.append(f"{order_symbol} ({order_volume} lots)")
                         break
+                    else:
+                        print(f"   ❌ No match: symbol={symbol_match}, volume={volume_match}, price={price_match}")
+
+            # Log results
+            if moved_count > 0:
+                print(f"✅ Auto-moved {moved_count} orders: {', '.join(moved_details)}")
+            else:
+                print(
+                    f"🔍 No orders moved. Checking {len(st.session_state.order_placed)} orders against {len(positions)} positions")
+                # Detailed debug info
+                if st.session_state.order_placed:
+                    print("📋 Orders in Order Placed:")
+                    for order in st.session_state.order_placed:
+                        print(f"   - {order['selected_pair']} {safe_float(order.get('position_size'), 0.0)} lots")
+                if positions:
+                    print("📊 Positions from MT5:")
+                    for position in positions:
+                        print(f"   - {position['symbol']} {safe_float(position.get('volume'), 0.0)} lots")
 
             return moved_count
 
         except Exception as e:
             print(f"❌ Quick auto-move error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return 0
 
 
@@ -4766,7 +4814,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Connection Management
     st.subheader("🔧 Connection Management")
-    col_conn1, col_conn2, col_conn3 = st.columns(3)
+    col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
 
     with col_conn1:
         if st.button("🔄 Quick Sync", type="primary", use_container_width=True):
@@ -4792,13 +4840,41 @@ elif st.session_state.current_page == "Trade Signal":
                 if error:
                     st.error(f"❌ {error}")
                 else:
+                    # AUTO-MOVE: Check for matching orders and move them automatically
                     moved_count = quick_auto_move_filled_orders(positions)
                     st.session_state.open_positions = positions
+
                     if moved_count > 0:
-                        st.success(f"✅ Found {len(positions)} positions, moved {moved_count} orders")
+                        st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
                     else:
-                        st.success(f"✅ Found {len(positions)} positions")
+                        st.warning(
+                            f"⚠️ Found {len(positions)} positions but no orders matched. Check console for details.")
             st.rerun()
+
+    with col_conn4:
+        if st.button("🐛 Debug Matching", type="secondary", use_container_width=True):
+            import asyncio
+
+            with st.spinner("Running debug match..."):
+                positions, error = asyncio.run(quick_get_positions())
+                if positions and st.session_state.order_placed:
+                    st.info("🔍 **Debug Match Results:**")
+                    st.write(f"Orders in 'Order Placed': {len(st.session_state.order_placed)}")
+                    st.write(f"Positions from MT5: {len(positions)}")
+
+                    for i, order in enumerate(st.session_state.order_placed[:3]):  # Show first 3
+                        with st.expander(f"Order {i + 1}: {order['selected_pair']} {order.get('position_size')} lots"):
+                            st.json(order)
+
+                    for i, position in enumerate(positions[:3]):  # Show first 3
+                        with st.expander(f"Position {i + 1}: {position['symbol']} {position['volume']} lots"):
+                            st.json(position)
+
+                    # Test the matching function
+                    moved_count = quick_auto_move_filled_orders(positions)
+                    st.write(f"Matched and moved: {moved_count} orders")
+                else:
+                    st.error("No positions or orders to debug")
 
     # Show connection status
     if st.session_state.metaapi_connected:
@@ -5098,7 +5174,8 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_action:
-                            if st.button("💾 Update Stop Loss", key=f"update_{i}", type="primary", use_container_width=True):
+                            if st.button("💾 Update Stop Loss", key=f"update_{i}", type="primary",
+                                         use_container_width=True):
                                 import asyncio
 
                                 with st.spinner("Updating stop loss..."):

@@ -4337,7 +4337,6 @@ elif st.session_state.current_page == "Trade Signal":
             return [], f"Quick position error: {str(e)}"
 
 
-    # SIMPLIFIED QUICK AUTO-MOVE FUNCTION - ONLY INSTRUMENT AND POSITION SIZE
     # UPDATED QUICK AUTO-MOVE FUNCTION - UPDATE ALL POSITION VALUES
     def quick_auto_move_filled_orders(positions):
         """Quick auto-move - only match instrument and position size, update all position values"""
@@ -4432,21 +4431,21 @@ elif st.session_state.current_page == "Trade Signal":
                     else:
                         print(f"   ❌ No match: symbol={symbol_match}, volume={volume_match}")
 
-                # Log results
-                if moved_count > 0:
-                    print(f"✅ Auto-moved {moved_count} orders: {', '.join(moved_details)}")
-                else:
-                    print(
-                        f"🔍 No orders moved. Checking {len(st.session_state.order_placed)} orders against {len(positions)} positions")
-                    # Detailed debug info
-                    if st.session_state.order_placed:
-                        print("📋 Orders in Order Placed:")
-                        for order in st.session_state.order_placed:
-                            print(f"   - {order['selected_pair']} {safe_float(order.get('position_size'), 0.0)} lots")
-                    if positions:
-                        print("📊 Positions from MT5:")
-                        for position in positions:
-                            print(f"   - {position['symbol']} {safe_float(position.get('volume'), 0.0)} lots")
+            # Log results
+            if moved_count > 0:
+                print(f"✅ Auto-moved {moved_count} orders: {', '.join(moved_details)}")
+            else:
+                print(
+                    f"🔍 No orders moved. Checking {len(st.session_state.order_placed)} orders against {len(positions)} positions")
+                # Detailed debug info
+                if st.session_state.order_placed:
+                    print("📋 Orders in Order Placed:")
+                    for order in st.session_state.order_placed:
+                        print(f"   - {order['selected_pair']} {safe_float(order.get('position_size'), 0.0)} lots")
+                if positions:
+                    print("📊 Positions from MT5:")
+                    for position in positions:
+                        print(f"   - {position['symbol']} {safe_float(position.get('volume'), 0.0)} lots")
 
             return moved_count
 
@@ -4515,9 +4514,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # MODIFY POSITION FUNCTION - UPDATED FOR SL ONLY
+    # FIXED MODIFY POSITION FUNCTION - HANDLE NULL VALUES PROPERLY
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position"""
+        """Modify stop loss only for an open position - FIXED VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4542,16 +4541,22 @@ elif st.session_state.current_page == "Trade Signal":
             # Get current position to preserve existing take profit
             positions = await connection.get_positions()
             current_tp = None
-            for position in positions:
-                if position['id'] == position_id:
-                    current_tp = position.get('takeProfit')
+            for pos in positions:
+                if pos['id'] == position_id:
+                    current_tp = pos.get('takeProfit')
                     break
 
-            result = await connection.modify_position(position_id, {
+            # Prepare modification data - handle None values properly
+            modification_data = {
                 'stopLoss': new_sl,
-                'takeProfit': current_tp,  # Keep existing TP
                 'comment': 'Modified SL via Trade Signal page'
-            })
+            }
+
+            # Only include takeProfit if it exists
+            if current_tp is not None:
+                modification_data['takeProfit'] = current_tp
+
+            result = await connection.modify_position(position_id, modification_data)
 
             await connection.close()
 
@@ -4823,7 +4828,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Connection Management
     st.subheader("🔧 Connection Management")
-    col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
+    col_conn1, col_conn2, col_conn3 = st.columns(3)
 
     with col_conn1:
         if st.button("🔄 Quick Sync", type="primary", use_container_width=True):
@@ -4859,31 +4864,6 @@ elif st.session_state.current_page == "Trade Signal":
                         st.warning(
                             f"⚠️ Found {len(positions)} positions but no orders matched. Check console for details.")
             st.rerun()
-
-    with col_conn4:
-        if st.button("🐛 Debug Matching", type="secondary", use_container_width=True):
-            import asyncio
-
-            with st.spinner("Running debug match..."):
-                positions, error = asyncio.run(quick_get_positions())
-                if positions and st.session_state.order_placed:
-                    st.info("🔍 **Debug Match Results:**")
-                    st.write(f"Orders in 'Order Placed': {len(st.session_state.order_placed)}")
-                    st.write(f"Positions from MT5: {len(positions)}")
-
-                    for i, order in enumerate(st.session_state.order_placed[:3]):  # Show first 3
-                        with st.expander(f"Order {i + 1}: {order['selected_pair']} {order.get('position_size')} lots"):
-                            st.json(order)
-
-                    for i, position in enumerate(positions[:3]):  # Show first 3
-                        with st.expander(f"Position {i + 1}: {position['symbol']} {position['volume']} lots"):
-                            st.json(position)
-
-                    # Test the matching function
-                    moved_count = quick_auto_move_filled_orders(positions)
-                    st.write(f"Matched and moved: {moved_count} orders")
-                else:
-                    st.error("No positions or orders to debug")
 
     # Show connection status
     if st.session_state.metaapi_connected:
@@ -5201,20 +5181,6 @@ elif st.session_state.current_page == "Trade Signal":
                                         st.rerun()
                                     else:
                                         st.error(message)
-
-                        # Auto-move check for matching orders
-                        if st.button("🔄 Check for Filled Orders", key=f"auto_move_{i}", use_container_width=True):
-                            import asyncio
-
-                            with st.spinner("Checking for filled orders..."):
-                                positions, error = asyncio.run(quick_get_positions())
-                                if positions:
-                                    moved_count = quick_auto_move_filled_orders(positions)
-                                    if moved_count > 0:
-                                        st.success(f"✅ Auto-moved {moved_count} orders to In Trade")
-                                        st.rerun()
-                                    else:
-                                        st.info("No matching orders found to move")
 
 elif st.session_state.current_page == "Stats":
 

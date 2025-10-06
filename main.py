@@ -4514,10 +4514,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # FIXED MODIFY POSITION FUNCTION - HANDLE NULL VALUES PROPERLY
-    # CORRECTED MODIFY POSITION FUNCTION - NO RETURN VALUE CHECK
+    # ENHANCED MODIFY POSITION FUNCTION WITH DEBUGGING
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - CORRECTED VERSION"""
+        """Modify stop loss only for an open position - ENHANCED DEBUG VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4528,10 +4527,14 @@ elif st.session_state.current_page == "Trade Signal":
             if not token or not account_id:
                 return False, "Token or account ID not configured"
 
+            print(f"🔄 Starting SL modification for position {position_id}")
+            print(f"   New SL value: {new_sl} (type: {type(new_sl)})")
+
             api = MetaApi(token)
             account = await api.metatrader_account_api.get_account(account_id)
 
             if account.state != 'DEPLOYED':
+                print("   Deploying account...")
                 await account.deploy()
             await account.wait_connected()
 
@@ -4539,32 +4542,45 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get current position to preserve existing take profit
+            # Get current position details for debugging
             positions = await connection.get_positions()
-            current_tp = None
+            current_position = None
             for pos in positions:
                 if pos['id'] == position_id:
-                    current_tp = pos.get('takeProfit')
+                    current_position = pos
                     break
 
-            # Prepare modification data
-            modification_data = {
-                'stopLoss': float(new_sl)
-            }
+            if not current_position:
+                await connection.close()
+                return False, "❌ Position not found"
 
-            # Only include takeProfit if it exists and is not None
-            if current_tp is not None:
-                modification_data['takeProfit'] = float(current_tp)
+            print(f"   Current position: {current_position['symbol']}")
+            print(f"   Current SL: {current_position.get('stopLoss')}")
+            print(f"   Current TP: {current_position.get('takeProfit')}")
 
-            # This method doesn't return a value - it just completes if successful
-            await connection.modify_position(position_id, modification_data)
+            # Try simple modification first
+            try:
+                print("   Attempting simple SL modification...")
+                result = await connection.modify_position(position_id, {
+                    'stopLoss': float(new_sl)
+                })
 
-            await connection.close()
+                await connection.close()
 
-            # If we reach here, the modification was successful
-            return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+                if result:
+                    print("   ✅ SL modification successful")
+                    return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+                else:
+                    print("   ❌ SL modification returned False")
+                    return False, "❌ Failed to modify position"
+
+            except Exception as simple_error:
+                print(f"   Simple modification failed: {str(simple_error)}")
+                await connection.close()
+                return False, f"❌ Simple modification failed: {str(simple_error)}"
 
         except Exception as e:
+            print(f"   General error: {str(e)}")
             try:
                 await connection.close()
             except:

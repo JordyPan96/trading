@@ -3167,6 +3167,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             # Check if Stop Loss is 0 or missing
                             if stop_pips is None or stop_pips == 0:
                                 st.error("Cannot add order: Stop Loss is required and cannot be 0!")
+                            elif (position_size<=0):
+                                st.error("Position size is required to be greater than 0")
                             else:
                                 # Check if maximum records reached (only for new records, not updates)
                                 existing_index = None

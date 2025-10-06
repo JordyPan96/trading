@@ -4079,28 +4079,34 @@ elif st.session_state.current_page == "Active Opps":
                                             'PROP_Pct': 0.0
                                         }
 
-                                        # Load current Trade.csv data
-                                        current_trade_data = load_data_from_sheets(sheet_name="Trade",
-                                                                                   worksheet_name="Trade.csv")
+                                        try:
+                                            # Load current Trade.csv data
+                                            current_trade_data = load_data_from_sheets(sheet_name="Trade",
+                                                                                       worksheet_name="Trade.csv")
 
-                                        if current_trade_data is not None:
-                                            # Ensure only the specified columns exist in current data
-                                            required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
-                                                                'POI', 'Strategy', 'Variance', 'Result', 'RR', 'PnL',
-                                                                'Withdrawal_Deposit', 'PROP_Pct']
+                                            if current_trade_data is not None and not current_trade_data.empty:
+                                                # Ensure only the specified columns exist in current data
+                                                required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
+                                                                    'POI', 'Strategy', 'Variance', 'Result', 'RR',
+                                                                    'PnL',
+                                                                    'Withdrawal_Deposit', 'PROP_Pct']
 
-                                            # Add missing columns if they don't exist
-                                            for col in required_columns:
-                                                if col not in current_trade_data.columns:
-                                                    current_trade_data[col] = None
+                                                # Add missing columns if they don't exist
+                                                for col in required_columns:
+                                                    if col not in current_trade_data.columns:
+                                                        current_trade_data[col] = None
 
-                                            # Keep only the required columns
-                                            current_trade_data = current_trade_data[required_columns]
+                                                # Keep only the required columns
+                                                current_trade_data = current_trade_data[required_columns]
 
-                                            # Append the new completed trade
-                                            new_trade_df = pd.DataFrame([completed_trade])
-                                            updated_trade_data = pd.concat([current_trade_data, new_trade_df],
-                                                                           ignore_index=True)
+                                                # Append the new completed trade
+                                                new_trade_df = pd.DataFrame([completed_trade])
+                                                updated_trade_data = pd.concat([current_trade_data, new_trade_df],
+                                                                               ignore_index=True)
+
+                                            else:
+                                                # If no existing trade data, create new with only specified columns
+                                                updated_trade_data = pd.DataFrame([completed_trade])
 
                                             # Save to Trade.csv worksheet
                                             success = save_data_to_sheets(updated_trade_data, sheet_name="Trade",
@@ -4116,24 +4122,11 @@ elif st.session_state.current_page == "Active Opps":
                                                 st.success("✅ Trade finalized and saved to trade history!")
                                                 st.rerun()
                                             else:
-                                                st.error("Failed to save to trade history")
-                                        else:
-                                            # If no existing trade data, create new with only specified columns
-                                            new_trade_df = pd.DataFrame([completed_trade])
-                                            success = save_data_to_sheets(new_trade_df, sheet_name="Trade",
-                                                                          worksheet_name="Trade.csv")
+                                                st.error("Failed to save to trade history - Google Sheets error")
 
-                                            if success:
-                                                # Remove from active opps
-                                                st.session_state.saved_records.pop(record_index)
-                                                # Save the updated workflow
-                                                save_workflow_to_sheets(st.session_state.saved_records)
-                                                # Sync trade signals after closing trade
-                                                sync_with_trade_signals()
-                                                st.success("✅ Trade finalized and saved to trade history!")
-                                                st.rerun()
-                                            else:
-                                                st.error("Failed to save to trade history")
+                                        except Exception as e:
+                                            st.error(f"Error saving trade history: {str(e)}")
+                                            st.info("Please check your Google Sheets connection and try again.")
                                 else:
                                     st.error("Please fill in all required fields")
 

@@ -4194,6 +4194,8 @@ elif st.session_state.current_page == "Trade Signal":
         st.session_state.auto_move_checked = False
     if 'last_action' not in st.session_state:
         st.session_state.last_action = None
+    if 'auto_be_checked' not in st.session_state:
+        st.session_state.auto_be_checked = False
 
 
     # Add helper function first
@@ -4239,6 +4241,170 @@ elif st.session_state.current_page == "Trade Signal":
             return f"{symbol}.a"
         else:
             return symbol
+
+
+    # NEW: BE Price calculation functions
+    def calculate_be_price_25r(entry_price, stop_loss, direction):
+        """
+        Calculate BE price at 2.5R (where we should automatically move to BE)
+        For BUY: BE = entry_price + 2.5 * abs(entry_price - stop_loss)
+        For SELL: BE = entry_price - 2.5 * abs(entry_price - stop_loss)
+        """
+        if entry_price <= 0 or stop_loss <= 0 or not direction:
+            return None
+
+        risk_amount = abs(entry_price - stop_loss)
+
+        if direction.lower() == 'buy':
+            be_price = entry_price + (2.5 * risk_amount)
+        elif direction.lower() == 'sell':
+            be_price = entry_price - (2.5 * risk_amount)
+        else:
+            return None
+
+        return round(be_price, 5)
+
+
+    def calculate_auto_be_sl_price(entry_price, direction, symbol):
+        """
+        Calculate the new SL price when moving to BE (5 pips for forex, $2 for gold)
+        For BUY: entry_price + 0.0005 (5 pips) for forex, entry_price + 2.0 for gold
+        For SELL: entry_price - 0.0005 (5 pips) for forex, entry_price - 2.0 for gold
+        """
+        if entry_price <= 0 or not direction:
+            return None
+
+        # Check if it's gold
+        is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+
+        if direction.lower() == 'buy':
+            if is_gold:
+                return entry_price + 2.0  # $2 above entry for gold BUY
+            else:
+                return entry_price + 0.0005  # 5 pips above entry for forex BUY
+        elif direction.lower() == 'sell':
+            if is_gold:
+                return entry_price - 2.0  # $2 below entry for gold SELL
+            else:
+                return entry_price - 0.0005  # 5 pips below entry for forex SELL
+        else:
+            return None
+
+
+    def should_move_to_auto_be(current_price, entry_price, stop_loss, direction, symbol):
+        """
+        Check if price reached 2.5R level and should automatically move to BE
+        For BUY: current_price >= entry_price + 2.5 * (entry_price - stop_loss)
+        For SELL: current_price <= entry_price - 2.5 * (stop_loss - entry_price)
+        """
+        if entry_price <= 0 or stop_loss <= 0 or current_price <= 0 or not direction:
+            return False
+
+        # Calculate 2.5R trigger price
+        risk_amount = abs(entry_price - stop_loss)
+
+        if direction.lower() == 'buy':
+            be_trigger_price = entry_price + (2.5 * risk_amount)
+            return current_price >= be_trigger_price
+        elif direction.lower() == 'sell':
+            be_trigger_price = entry_price - (2.5 * risk_amount)
+            return current_price <= be_trigger_price
+        else:
+            return False
+
+
+    async def auto_move_to_be(position_id, entry_price, direction, symbol):
+        """
+        Automatically move position to BE (5 pips for forex, $2 for gold)
+        """
+        try:
+            new_sl_price = calculate_auto_be_sl_price(entry_price, direction, symbol)
+            if new_sl_price is None:
+                return False, "Could not calculate BE price"
+
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return False, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Get current position details
+            positions = await connection.get_positions()
+            current_position = None
+            for pos in positions:
+                if pos['id'] == position_id:
+                    current_position = pos
+                    break
+
+            if not current_position:
+                await connection.close()
+                return False, "❌ Position not found"
+
+            current_sl = current_position.get('stopLoss')
+            current_tp = current_position.get('takeProfit')
+            current_price = current_position.get('currentPrice')
+            position_type = current_position.get('type')
+
+            # Validate the new SL value
+            if new_sl_price <= 0:
+                await connection.close()
+                return False, "❌ Stop loss must be greater than 0"
+
+            # For BUY positions: SL should be below current price
+            if position_type == 'POSITION_TYPE_BUY' and new_sl_price >= current_price:
+                await connection.close()
+                return False, f"❌ For BUY positions, stop loss ({new_sl_price:.5f}) must be below current price ({current_price:.5f})"
+
+            # For SELL positions: SL should be above current price
+            if position_type == 'POSITION_TYPE_SELL' and new_sl_price <= current_price:
+                await connection.close()
+                return False, f"❌ For SELL positions, stop loss ({new_sl_price:.5f}) must be above current price ({current_price:.5f})"
+
+            # CORRECT USAGE: Keyword arguments with snake_case
+            if current_tp and current_tp > 0:
+                # Modify both SL and TP
+                await connection.modify_position(
+                    position_id,
+                    stop_loss=new_sl_price,
+                    take_profit=current_tp
+                )
+            else:
+                # Modify only SL
+                await connection.modify_position(
+                    position_id,
+                    stop_loss=new_sl_price
+                )
+
+            await connection.close()
+
+            # Determine the BE description
+            is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+            be_description = "5 pips" if not is_gold else "$2"
+
+            return True, f"✅ {symbol} - Auto BE activated! SL moved to entry + {be_description} for capital protection"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            error_msg = str(e)
+            print(f"❌ Auto BE MetaApi error: {error_msg}")
+            return False, f"❌ Failed to auto move to BE: {error_msg}"
 
 
     # Generate unique key for each record
@@ -5000,160 +5166,6 @@ elif st.session_state.current_page == "Trade Signal":
         asyncio.run(execute_trade_and_update(signal_index))
         st.rerun()
 
-        # NEW: BE Price calculation functions
-        def calculate_be_price_25r(entry_price, stop_loss, direction):
-            """
-            Calculate BE price at 2.5R (where we should automatically move to BE)
-            For BUY: BE = entry_price + 2.5 * abs(entry_price - stop_loss)
-            For SELL: BE = entry_price - 2.5 * abs(entry_price - stop_loss)
-            """
-            if entry_price <= 0 or stop_loss <= 0 or not direction:
-                return None
-
-            risk_amount = abs(entry_price - stop_loss)
-
-            if direction.lower() == 'buy':
-                be_price = entry_price + (2.5 * risk_amount)
-            elif direction.lower() == 'sell':
-                be_price = entry_price - (2.5 * risk_amount)
-            else:
-                return None
-
-            return round(be_price, 5)
-
-        def calculate_auto_be_sl_price(entry_price, direction, symbol):
-            """
-            Calculate the new SL price when moving to BE (5 pips for forex, $2 for gold)
-            For BUY: entry_price + 0.0005 (5 pips) for forex, entry_price + 2.0 for gold
-            For SELL: entry_price - 0.0005 (5 pips) for forex, entry_price - 2.0 for gold
-            """
-            if entry_price <= 0 or not direction:
-                return None
-
-            # Check if it's gold
-            is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
-
-            if direction.lower() == 'buy':
-                if is_gold:
-                    return entry_price + 2.0  # $2 above entry for gold BUY
-                else:
-                    return entry_price + 0.0005  # 5 pips above entry for forex BUY
-            elif direction.lower() == 'sell':
-                if is_gold:
-                    return entry_price - 2.0  # $2 below entry for gold SELL
-                else:
-                    return entry_price - 0.0005  # 5 pips below entry for forex SELL
-            else:
-                return None
-
-        def should_move_to_auto_be(current_price, entry_price, stop_loss, direction, symbol):
-            """
-            Check if price reached 2.5R level and should automatically move to BE
-            """
-            be_trigger_price = calculate_be_price_25r(entry_price, stop_loss, direction)
-            if be_trigger_price is None:
-                return False
-
-            if direction.lower() == 'buy':
-                return current_price >= be_trigger_price
-            elif direction.lower() == 'sell':
-                return current_price <= be_trigger_price
-            else:
-                return False
-
-        async def auto_move_to_be(position_id, entry_price, direction, symbol):
-            """
-            Automatically move position to BE (5 pips for forex, $2 for gold)
-            """
-            try:
-                new_sl_price = calculate_auto_be_sl_price(entry_price, direction, symbol)
-                if new_sl_price is None:
-                    return False, "Could not calculate BE price"
-
-                from metaapi_cloud_sdk import MetaApi
-
-                config = get_metaapi_config()
-                token = config.get("token", "")
-                account_id = st.session_state.metaapi_account_id
-
-                if not token or not account_id:
-                    return False, "Token or account ID not configured"
-
-                api = MetaApi(token)
-                account = await api.metatrader_account_api.get_account(account_id)
-
-                if account.state != 'DEPLOYED':
-                    await account.deploy()
-                await account.wait_connected()
-
-                connection = account.get_rpc_connection()
-                await connection.connect()
-                await connection.wait_synchronized()
-
-                # Get current position details
-                positions = await connection.get_positions()
-                current_position = None
-                for pos in positions:
-                    if pos['id'] == position_id:
-                        current_position = pos
-                        break
-
-                if not current_position:
-                    await connection.close()
-                    return False, "❌ Position not found"
-
-                current_sl = current_position.get('stopLoss')
-                current_tp = current_position.get('takeProfit')
-                current_price = current_position.get('currentPrice')
-                position_type = current_position.get('type')
-
-                # Validate the new SL value
-                if new_sl_price <= 0:
-                    await connection.close()
-                    return False, "❌ Stop loss must be greater than 0"
-
-                # For BUY positions: SL should be below current price
-                if position_type == 'POSITION_TYPE_BUY' and new_sl_price >= current_price:
-                    await connection.close()
-                    return False, f"❌ For BUY positions, stop loss ({new_sl_price:.5f}) must be below current price ({current_price:.5f})"
-
-                # For SELL positions: SL should be above current price
-                if position_type == 'POSITION_TYPE_SELL' and new_sl_price <= current_price:
-                    await connection.close()
-                    return False, f"❌ For SELL positions, stop loss ({new_sl_price:.5f}) must be above current price ({current_price:.5f})"
-
-                # CORRECT USAGE: Keyword arguments with snake_case
-                if current_tp and current_tp > 0:
-                    # Modify both SL and TP
-                    await connection.modify_position(
-                        position_id,
-                        stop_loss=new_sl_price,
-                        take_profit=current_tp
-                    )
-                else:
-                    # Modify only SL
-                    await connection.modify_position(
-                        position_id,
-                        stop_loss=new_sl_price
-                    )
-
-                await connection.close()
-
-                # Determine the BE description
-                is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
-                be_description = "5 pips" if not is_gold else "$2"
-
-                return True, f"✅ {symbol} - Auto BE activated! SL moved to entry + {be_description} for capital protection"
-
-            except Exception as e:
-                try:
-                    await connection.close()
-                except:
-                    pass
-                error_msg = str(e)
-                print(f"❌ Auto BE MetaApi error: {error_msg}")
-                return False, f"❌ Failed to auto move to BE: {error_msg}"
-
 
     # Handle action results
     if st.session_state.last_action:
@@ -5264,7 +5276,8 @@ elif st.session_state.current_page == "Trade Signal":
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
-                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
+                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled',
+                                                             order['selected_pair'])
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
 

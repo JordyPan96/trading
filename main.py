@@ -3524,6 +3524,27 @@ elif st.session_state.current_page == "Active Opps":
         return success
 
 
+    def update_record_and_prices(original_index, updates, new_status=None):
+        """Update record fields and optionally change status with sync"""
+        # Update the specified fields
+        for key, value in updates.items():
+            st.session_state.saved_records[original_index][key] = value
+
+        # Update status if provided
+        if new_status:
+            st.session_state.saved_records[original_index]['status'] = new_status
+
+        # Save to cloud
+        success = save_workflow_to_sheets(st.session_state.saved_records)
+        if success:
+            # Sync with trade signals
+            if new_status:  # Only sync if status changed
+                sync_with_trade_signals()
+            return True
+        else:
+            return False
+
+
     # Helper function to safely convert record values to float
     def safe_float(value, default=0.0):
         """Safely convert value to float, handling None and string 'None'"""
@@ -3848,7 +3869,7 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"{current_stage.lower()}_target_{original_index}"
                             )
 
-                        # SPECULATION STAGE
+                        # SPECULATION STAGE - FIXED VERSION
                         if current_stage == 'Speculation':
                             # Calculate expected stop pips based on current entry/exit prices
                             expected_stop_pips = None
@@ -3894,7 +3915,7 @@ elif st.session_state.current_page == "Active Opps":
                             if not target_price_valid:
                                 st.error("Target price must be greater than 0 to move to Order Ready")
 
-                            # Action buttons for Speculation stage - UPDATED TO USE NEW SYNC FUNCTION
+                            # Action buttons for Speculation stage - FIXED TO USE NEW SYNC FUNCTION
                             col_update_only, col_move, col_delete = st.columns([1, 1, 1])
 
                             with col_update_only:
@@ -3904,11 +3925,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    for key, value in updates.items():
-                                        st.session_state.saved_records[original_index][key] = value
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    st.success("Record updated!")
-                                    st.rerun()
+                                    success = update_record_and_prices(original_index, updates)
+                                    if success:
+                                        st.success("Record updated!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update record")
 
                             with col_move:
                                 # Check if updating to active status would exceed the limit
@@ -3918,9 +3940,17 @@ elif st.session_state.current_page == "Active Opps":
                                     update_disabled = not all_required_fields_valid
                                     if st.button(f"Move to Order Ready", key=f"spec_move_{original_index}",
                                                  disabled=update_disabled):
-                                        success = update_record_status(original_index, 'Order Ready')
+                                        updates = {
+                                            'entry_price': new_entry_price,
+                                            'exit_price': new_exit_price,
+                                            'target_price': new_target_price
+                                        }
+                                        success = update_record_and_prices(original_index, updates, 'Order Ready')
                                         if success:
+                                            st.success("Record moved to Order Ready and synced!")
                                             st.rerun()
+                                        else:
+                                            st.error("Failed to move record to Order Ready")
 
                             with col_delete:
                                 if st.button(f"🗑️ Delete", key=f"spec_delete_{original_index}"):
@@ -3942,12 +3972,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    for key, value in updates.items():
-                                        st.session_state.saved_records[original_index][key] = value
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    sync_with_trade_signals()
-                                    st.success("Record updated and synced!")
-                                    st.rerun()
+                                    success = update_record_and_prices(original_index, updates)
+                                    if success:
+                                        st.success("Record updated and synced!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update record")
 
                             with col_move:
                                 if st.button(f"Move to Order Placed", key=f"ready_move_{original_index}"):
@@ -3975,12 +4005,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    for key, value in updates.items():
-                                        st.session_state.saved_records[original_index][key] = value
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    sync_with_trade_signals()
-                                    st.success("Record updated and synced!")
-                                    st.rerun()
+                                    success = update_record_and_prices(original_index, updates)
+                                    if success:
+                                        st.success("Record updated and synced!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update record")
 
                             with col_move:
                                 if st.button(f"Move to Order Filled", key=f"placed_move_{original_index}"):
@@ -4085,12 +4115,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'pnl': new_pnl,
                                         'poi': new_poi
                                     }
-                                    for key, value in updates.items():
-                                        st.session_state.saved_records[original_index][key] = value
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    sync_with_trade_signals()
-                                    st.success("Record updated and synced!")
-                                    st.rerun()
+                                    success = update_record_and_prices(original_index, updates)
+                                    if success:
+                                        st.success("Record updated and synced!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update record")
 
                             with col_close:
                                 if st.button(f"Finalize & Close Trade", key=f"filled_close_{original_index}",

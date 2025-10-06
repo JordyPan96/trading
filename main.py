@@ -4514,9 +4514,8 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # ENHANCED MODIFY POSITION FUNCTION WITH DEBUGGING
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - ENHANCED DEBUG VERSION"""
+        """Modify stop loss only for an open position - FIXED VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4527,14 +4526,10 @@ elif st.session_state.current_page == "Trade Signal":
             if not token or not account_id:
                 return False, "Token or account ID not configured"
 
-            print(f"🔄 Starting SL modification for position {position_id}")
-            print(f"   New SL value: {new_sl} (type: {type(new_sl)})")
-
             api = MetaApi(token)
             account = await api.metatrader_account_api.get_account(account_id)
 
             if account.state != 'DEPLOYED':
-                print("   Deploying account...")
                 await account.deploy()
             await account.wait_connected()
 
@@ -4542,7 +4537,7 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get current position details for debugging
+            # Get current position details
             positions = await connection.get_positions()
             current_position = None
             for pos in positions:
@@ -4554,33 +4549,32 @@ elif st.session_state.current_page == "Trade Signal":
                 await connection.close()
                 return False, "❌ Position not found"
 
-            print(f"   Current position: {current_position['symbol']}")
-            print(f"   Current SL: {current_position.get('stopLoss')}")
-            print(f"   Current TP: {current_position.get('takeProfit')}")
+            # Format the SL value properly - MetaApi often expects strings with exact precision
+            formatted_sl = f"{new_sl:.5f}"  # Format to 5 decimal places as string
 
-            # Try simple modification first
-            try:
-                print("   Attempting simple SL modification...")
-                result = await connection.modify_position(position_id, {
-                    'stopLoss': float(new_sl)
-                })
+            # Prepare modification data
+            modification_data = {
+                'stopLoss': formatted_sl
+            }
 
-                await connection.close()
+            # Only include takeProfit if it exists and format it properly too
+            if current_position.get('takeProfit') is not None:
+                current_tp = current_position['takeProfit']
+                modification_data['takeProfit'] = f"{current_tp:.5f}"
 
-                if result:
-                    print("   ✅ SL modification successful")
-                    return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
-                else:
-                    print("   ❌ SL modification returned False")
-                    return False, "❌ Failed to modify position"
+            print(f"🔧 Modifying position {position_id}")
+            print(f"   SL: {formatted_sl}")
+            print(f"   TP: {modification_data.get('takeProfit', 'None')}")
 
-            except Exception as simple_error:
-                print(f"   Simple modification failed: {str(simple_error)}")
-                await connection.close()
-                return False, f"❌ Simple modification failed: {str(simple_error)}"
+            # This method doesn't return a value - it just completes if successful
+            await connection.modify_position(position_id, modification_data)
+
+            await connection.close()
+
+            # If we reach here, the modification was successful
+            return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
 
         except Exception as e:
-            print(f"   General error: {str(e)}")
             try:
                 await connection.close()
             except:

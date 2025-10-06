@@ -4358,17 +4358,19 @@ elif st.session_state.current_page == "Trade Signal":
                     position_volume = safe_float(position.get('volume'), 0.0)
                     position_open_price = safe_float(position.get('open_price'), 0.0)
 
-                    # Quick symbol match
+                    # Enhanced symbol matching (AUDUSD vs AUDUSD or AUDUSD vs AUDUSD.a)
                     symbol_match = (
-                            position_symbol == order_symbol or
-                            position_symbol == formatted_order_symbol or
-                            position_symbol.replace('.a', '') == order_symbol.replace('.a', '')
+                        position_symbol == order_symbol or
+                        position_symbol == formatted_order_symbol or
+                        position_symbol.replace('.a', '') == order_symbol.replace('.a', '') or
+                        position_symbol == order_symbol.replace('.a', '') or
+                        order_symbol == position_symbol.replace('.a', '')
                     )
 
-                    # Quick volume match
+                    # Volume matching (5.01 lots vs 5.01 lots)
                     volume_match = abs(position_volume - order_volume) < 0.01
 
-                    # Quick price match
+                    # Price matching
                     price_match = abs(position_open_price - order_entry_price) < 0.001
 
                     if symbol_match and volume_match and price_match:
@@ -4456,9 +4458,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # MODIFY POSITION FUNCTION
-    async def modify_position_sl_tp(position_id: str, new_sl: float, new_tp: float):
-        """Modify stop loss and take profit for an open position"""
+    # MODIFY POSITION FUNCTION - UPDATED FOR SL ONLY
+    async def modify_position_sl(position_id: str, new_sl: float):
+        """Modify stop loss only for an open position"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4480,16 +4482,24 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
+            # Get current position to preserve existing take profit
+            positions = await connection.get_positions()
+            current_tp = None
+            for position in positions:
+                if position['id'] == position_id:
+                    current_tp = position.get('takeProfit')
+                    break
+
             result = await connection.modify_position(position_id, {
                 'stopLoss': new_sl,
-                'takeProfit': new_tp,
-                'comment': 'Modified via Trade Signal page'
+                'takeProfit': current_tp,  # Keep existing TP
+                'comment': 'Modified SL via Trade Signal page'
             })
 
             await connection.close()
 
             if result:
-                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}, TP: {new_tp:.5f}"
+                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
             else:
                 return False, "❌ Failed to modify position"
 
@@ -5072,11 +5082,11 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                        # MODIFY SL/TP SECTION
+                        # MODIFY SL ONLY SECTION - UPDATED
                         st.markdown("---")
-                        st.subheader("🛠️ Modify Position")
+                        st.subheader("🛠️ Modify Stop Loss Only")
 
-                        col_sl, col_tp, col_actions = st.columns([1, 1, 1])
+                        col_sl, col_action = st.columns([1, 1])
 
                         with col_sl:
                             new_sl = st.number_input(
@@ -5087,24 +5097,14 @@ elif st.session_state.current_page == "Trade Signal":
                                 key=f"sl_{i}"
                             )
 
-                        with col_tp:
-                            new_tp = st.number_input(
-                                "New Take Profit",
-                                value=tp_price if tp_price > 0 else open_price + 0.0020,
-                                step=0.0001,
-                                format="%.5f",
-                                key=f"tp_{i}"
-                            )
-
-                        with col_actions:
-                            if st.button("💾 Update SL/TP", key=f"update_{i}", type="primary", use_container_width=True):
+                        with col_action:
+                            if st.button("💾 Update Stop Loss", key=f"update_{i}", type="primary", use_container_width=True):
                                 import asyncio
 
-                                with st.spinner("Updating position..."):
-                                    success, message = asyncio.run(modify_position_sl_tp(
+                                with st.spinner("Updating stop loss..."):
+                                    success, message = asyncio.run(modify_position_sl(
                                         position['id'],
-                                        new_sl,
-                                        new_tp
+                                        new_sl
                                     ))
                                     if success:
                                         st.success(message)
@@ -5116,21 +5116,19 @@ elif st.session_state.current_page == "Trade Signal":
                                     else:
                                         st.error(message)
 
-                            if st.button("🔴 Close Position", key=f"close_pos_{i}", type="secondary",
-                                         use_container_width=True):
-                                import asyncio
+                        # Auto-move check for matching orders
+                        if st.button("🔄 Check for Filled Orders", key=f"auto_move_{i}", use_container_width=True):
+                            import asyncio
 
-                                with st.spinner("Closing position..."):
-                                    success, message = asyncio.run(close_position(position['id']))
-                                    if success:
-                                        st.success(message)
-                                        # Refresh positions
-                                        positions, error = asyncio.run(quick_get_positions())
-                                        if positions is not None:
-                                            st.session_state.open_positions = positions
+                            with st.spinner("Checking for filled orders..."):
+                                positions, error = asyncio.run(quick_get_positions())
+                                if positions:
+                                    moved_count = quick_auto_move_filled_orders(positions)
+                                    if moved_count > 0:
+                                        st.success(f"✅ Auto-moved {moved_count} orders to In Trade")
                                         st.rerun()
                                     else:
-                                        st.error(message)
+                                        st.info("No matching orders found to move")
 
 elif st.session_state.current_page == "Stats":
 
@@ -5647,4 +5645,3 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-

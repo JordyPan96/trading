@@ -4243,7 +4243,57 @@ elif st.session_state.current_page == "Trade Signal":
             return symbol
 
 
-    # NEW: BE Price calculation functions
+    # NEW: Historical extremes function
+    async def get_historical_extremes_since_open(connection, position):
+        """Get historical high (for buys) and low (for sells) since position open"""
+        try:
+            symbol = position['symbol']
+            open_time = position.get('open_time')
+            trade_type = position.get('type')  # POSITION_TYPE_BUY or POSITION_TYPE_SELL
+
+            if not open_time:
+                return None, "No open time"
+
+            # Convert open_time to datetime if it's a string
+            if isinstance(open_time, str):
+                open_time = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
+
+            # Get candles from open_time until now
+            candles = await connection.get_candles(
+                symbol=symbol,
+                timeframe='1m',
+                start_time=open_time,
+                limit=1000
+            )
+
+            if not candles:
+                return None, "No candle data"
+
+            if trade_type == 'POSITION_TYPE_BUY':
+                # For BUY positions, we care about historical HIGH since open
+                highs = [candle['high'] for candle in candles if candle['high'] is not None]
+                if highs:
+                    historical_high = max(highs)
+                    return historical_high, f"High since open: {historical_high:.5f}"
+                else:
+                    return None, "No high data"
+
+            elif trade_type == 'POSITION_TYPE_SELL':
+                # For SELL positions, we care about historical LOW since open
+                lows = [candle['low'] for candle in candles if candle['low'] is not None]
+                if lows:
+                    historical_low = min(lows)
+                    return historical_low, f"Low since open: {historical_low:.5f}"
+                else:
+                    return None, "No low data"
+            else:
+                return None, "Unknown position type"
+
+        except Exception as e:
+            return None, f"Error: {str(e)}"
+
+
+    # BE Price calculation functions
     def calculate_be_price_25r(entry_price, stop_loss, direction):
         """
         Calculate BE price at 2.5R (where we should automatically move to BE)
@@ -5534,22 +5584,61 @@ elif st.session_state.current_page == "Trade Signal":
             else:
                 # AUTO BE CHECK - Run this for all positions
                 auto_be_updates = []
-                for i, position in enumerate(st.session_state.open_positions):
-                    entry_price = safe_float(position.get('openPrice'), 0.0)
-                    current_sl = safe_float(position.get('stopLoss'), 0.0)
-                    current_price = safe_float(position.get('currentPrice'), 0.0)
-                    direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-                    symbol = position['symbol']
+                historical_extremes_data = {}
 
-                    # Check if we should automatically move to BE
-                    if all([entry_price > 0, current_sl > 0, current_price > 0]):
-                        if should_move_to_auto_be(current_price, entry_price, current_sl, direction, symbol):
-                            auto_be_updates.append({
-                                'position_id': position['id'],
-                                'entry_price': entry_price,
-                                'direction': direction,
-                                'symbol': symbol
-                            })
+                if st.session_state.metaapi_connected:
+                    import asyncio
+
+                    # Get historical extremes for all positions
+                    config = get_metaapi_config()
+                    token = config.get("token", "")
+                    account_id = st.session_state.metaapi_account_id
+
+                    if token and account_id:
+                        try:
+                            from metaapi_cloud_sdk import MetaApi
+
+                            api = MetaApi(token)
+                            account = await api.metatrader_account_api.get_account(account_id)
+
+                            if account.state != 'DEPLOYED':
+                                await account.deploy()
+                            await account.wait_connected()
+
+                            connection = account.get_rpc_connection()
+                            await connection.connect()
+                            await connection.wait_synchronized()
+
+                            for i, position in enumerate(st.session_state.open_positions):
+                                # Get historical extremes for this position
+                                extreme_value, extreme_message = await get_historical_extremes_since_open(connection,
+                                                                                                          position)
+                                historical_extremes_data[position['id']] = {
+                                    'value': extreme_value,
+                                    'message': extreme_message
+                                }
+
+                                # Check if we should automatically move to BE
+                                entry_price = safe_float(position.get('openPrice'), 0.0)
+                                current_sl = safe_float(position.get('stopLoss'), 0.0)
+                                current_price = safe_float(position.get('currentPrice'), 0.0)
+                                direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                                symbol = position['symbol']
+
+                                if all([entry_price > 0, current_sl > 0, current_price > 0]):
+                                    if should_move_to_auto_be(current_price, entry_price, current_sl, direction,
+                                                              symbol):
+                                        auto_be_updates.append({
+                                            'position_id': position['id'],
+                                            'entry_price': entry_price,
+                                            'direction': direction,
+                                            'symbol': symbol
+                                        })
+
+                            await connection.close()
+
+                        except Exception as e:
+                            st.error(f"❌ Historical data error: {str(e)}")
 
                 # Execute auto BE updates
                 if auto_be_updates and st.session_state.metaapi_connected:
@@ -5608,12 +5697,30 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                        # NEW: BE Price field (simple display only)
+                        # NEW: Historical Extreme Field
+                        st.markdown("---")
+                        st.subheader("📊 Historical Extreme Since Open")
+
+                        # Get historical extreme for this position
+                        extreme_data = historical_extremes_data.get(position['id'], {})
+                        extreme_value = extreme_data.get('value')
+                        extreme_message = extreme_data.get('message', 'Calculating...')
+
+                        direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+
+                        if extreme_value is not None:
+                            if direction == 'BUY':
+                                st.write(f"**Historical High Since Open:** `{extreme_value:.5f}`")
+                            else:
+                                st.write(f"**Historical Low Since Open:** `{extreme_value:.5f}`")
+                        else:
+                            st.write(f"**Historical Extreme:** {extreme_message}")
+
+                        # BE Price calculation and display
                         st.markdown("---")
                         st.subheader("🎯 Break-even Management")
 
                         # Calculate and display BE Price (2.5R level)
-                        direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
                         current_sl = safe_float(position.get('stopLoss'), 0.0)
                         be_trigger_price = calculate_be_price_25r(entry_price, current_sl, direction)
 
@@ -5630,7 +5737,7 @@ elif st.session_state.current_page == "Trade Signal":
                         else:
                             st.write("**BE Price:** N/A")
 
-                        # MODIFY SL ONLY SECTION (keep your existing manual controls)
+                        # MODIFY SL ONLY SECTION
                         st.markdown("---")
                         st.subheader("🛠️ Manual Stop Loss Management")
 
@@ -5639,7 +5746,7 @@ elif st.session_state.current_page == "Trade Signal":
                         with col_sl:
                             new_sl = st.number_input(
                                 "New Stop Loss",
-                                value=sl_price if sl_price > 0 else open_price - 0.0010,
+                                value=sl_price if sl_price > 0 else entry_price - 0.0010,
                                 step=0.0001,
                                 format="%.5f",
                                 key=f"sl_{unique_key}"
@@ -5667,7 +5774,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     else:
                                         st.error(message)
 
-                        # MANUAL SET TO BREAK-EVEN BUTTON (updated logic)
+                        # MANUAL SET TO BREAK-EVEN BUTTON
                         col_be, col_be_action = st.columns([1, 1])
 
                         with col_be:

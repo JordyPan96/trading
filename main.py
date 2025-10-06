@@ -4639,7 +4639,7 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Error closing position: {str(e)}"
 
 
-    # UPDATED SYNC FUNCTIONS FOR TRADE SIGNAL PAGE
+    # FIXED SYNC FUNCTIONS FOR TRADE SIGNAL PAGE
     def sync_from_active_opps():
         """Sync from Active Opps to Trade Signals - FIXED VERSION"""
         try:
@@ -4709,7 +4709,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_to_active_opps():
-        """Sync Trade Signal changes back to Active Opps - DEBUG VERSION"""
+        """Sync Trade Signal changes back to Active Opps - FIXED VERSION"""
         try:
             print("🔄 STARTING SYNC TO ACTIVE OPPS...")
 
@@ -4722,35 +4722,22 @@ elif st.session_state.current_page == "Trade Signal":
                 all_records = workflow_df.to_dict('records')
                 records_updated = 0
 
-                # DEBUG: Print current Trade Signal states
-                print(
-                    f"📋 Trade Signals - Ready: {len(st.session_state.ready_to_order)}, Placed: {len(st.session_state.order_placed)}, In Trade: {len(st.session_state.in_trade)}")
-
-                # Print all timestamps in Trade Signals
-                print("🕒 Trade Signal Timestamps:")
-                for i, ready in enumerate(st.session_state.ready_to_order):
-                    print(f"  Ready[{i}]: {ready['timestamp']} - {ready['selected_pair']}")
-                for i, placed in enumerate(st.session_state.order_placed):
-                    print(f"  Placed[{i}]: {placed['timestamp']} - {placed['selected_pair']}")
-                for i, trade in enumerate(st.session_state.in_trade):
-                    print(f"  Trade[{i}]: {trade['timestamp']} - {trade['selected_pair']}")
-
                 # Create mappings of timestamps to their NEW status in Trade Signals
                 status_mapping = {}
 
                 # Order Placed records should have status 'Order Placed'
                 for order in st.session_state.order_placed:
-                    status_mapping[order['timestamp']] = 'Order Placed'
+                    status_mapping[str(order['timestamp'])] = 'Order Placed'
                     print(f"  📌 Mapping {order['timestamp']} -> Order Placed")
 
                 # In Trade records should have status 'Order Filled'
                 for trade in st.session_state.in_trade:
-                    status_mapping[trade['timestamp']] = 'Order Filled'
+                    status_mapping[str(trade['timestamp'])] = 'Order Filled'
                     print(f"  📌 Mapping {trade['timestamp']} -> Order Filled")
 
                 # Ready to Order records should have status 'Order Ready'
                 for signal in st.session_state.ready_to_order:
-                    status_mapping[signal['timestamp']] = 'Order Ready'
+                    status_mapping[str(signal['timestamp'])] = 'Order Ready'
                     print(f"  📌 Mapping {signal['timestamp']} -> Order Ready")
 
                 # Update records based on the status mapping
@@ -4798,13 +4785,12 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed - WITH DEBUG"""
+        """Move signal from Ready to Order to Order Placed - WITH SYNC"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
 
-            print(f"🔍 DEBUG Moving signal: {signal['selected_pair']}")
-            print(f"🔍 DEBUG Signal timestamp: '{signal['timestamp']}'")
-            print(f"🔍 DEBUG Signal timestamp type: {type(signal['timestamp'])}")
+            print(f"🔍 Moving signal: {signal['selected_pair']}")
+            print(f"🔍 Signal timestamp: '{signal['timestamp']}'")
 
             # Remove from ready_to_order
             st.session_state.ready_to_order.pop(signal_index)
@@ -4827,7 +4813,6 @@ elif st.session_state.current_page == "Trade Signal":
             st.session_state.order_placed.append(new_order)
 
             print(f"🔄 Moving {signal['selected_pair']} from Ready to Order Placed")
-            print(f"🔍 DEBUG New order timestamp: '{new_order['timestamp']}'")
 
             # IMMEDIATELY sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
@@ -4850,7 +4835,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_to_in_trade(order_index):
-        """Move order from Order Placed to In Trade - IMPROVED VERSION"""
+        """Move order from Order Placed to In Trade - WITH SYNC"""
         try:
             order = st.session_state.order_placed[order_index]
 
@@ -4874,7 +4859,7 @@ elif st.session_state.current_page == "Trade Signal":
             }
             st.session_state.in_trade.append(new_trade)
 
-            print(f"🔄 Moving {order['selected_pair']} from Order Placed to In Trade in Trade Signal")
+            print(f"🔄 Moving {order['selected_pair']} from Order Placed to In Trade")
 
             # IMMEDIATELY sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
@@ -4884,6 +4869,9 @@ elif st.session_state.current_page == "Trade Signal":
                 return True
             else:
                 st.error(f"❌ {message}")
+                # Rollback if sync fails
+                st.session_state.order_placed.insert(order_index, order)
+                st.session_state.in_trade.pop()
                 return False
 
         except Exception as e:
@@ -4892,7 +4880,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_back_to_ready(order_index):
-        """Move order from Order Placed back to Ready to Order"""
+        """Move order from Order Placed back to Ready to Order - WITH SYNC"""
         try:
             order = st.session_state.order_placed[order_index]
             # Remove from order_placed
@@ -4905,14 +4893,18 @@ elif st.session_state.current_page == "Trade Signal":
             if success:
                 st.session_state.last_action = f"moved_back_to_ready_{order_index}"
                 return True
-            return False
+            else:
+                # Rollback if sync fails
+                st.session_state.order_placed.insert(order_index, order)
+                st.session_state.ready_to_order.pop()
+                return False
         except Exception as e:
             st.error(f"Move error: {e}")
             return False
 
 
     def handle_delete_signal(signal_index, list_name):
-        """Delete signal from any list"""
+        """Delete signal from any list - WITH SYNC"""
         try:
             if list_name == 'ready_to_order':
                 st.session_state.ready_to_order.pop(signal_index)
@@ -4987,13 +4979,13 @@ elif st.session_state.current_page == "Trade Signal":
         st.session_state.last_action = None
 
         if "moved_to_placed" in action:
-            st.success("✅ Moved to Order Placed and synced!")
+            st.success("✅ Moved to Order Placed and synced to Active Opps!")
         elif "moved_to_trade" in action:
-            st.success("✅ Moved to In Trade and synced!")
+            st.success("✅ Moved to In Trade and synced to Active Opps!")
         elif "moved_back_to_ready" in action:
-            st.success("✅ Moved back to Ready and synced!")
+            st.success("✅ Moved back to Ready and synced to Active Opps!")
         elif "deleted_" in action:
-            st.success("✅ Record deleted and synced!")
+            st.success("✅ Record deleted and synced to Active Opps!")
 
         st.rerun()
 
@@ -5027,6 +5019,8 @@ elif st.session_state.current_page == "Trade Signal":
                     moved_count = quick_auto_move_filled_orders(positions)
                     if moved_count > 0:
                         print(f"✅ Auto-moved {moved_count} orders to In Trade")
+                        # Sync the status changes to Active Opps
+                        sync_to_active_opps()
                     st.session_state.open_positions = positions
                 st.session_state.auto_move_checked = True
             except Exception as e:
@@ -5093,6 +5087,8 @@ elif st.session_state.current_page == "Trade Signal":
                     st.session_state.open_positions = positions
                     if moved_count > 0:
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
+                        # Sync the status changes to Active Opps
+                        sync_to_active_opps()
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
 
@@ -5264,6 +5260,7 @@ elif st.session_state.current_page == "Trade Signal":
                                         positions, _ = asyncio.run(quick_get_positions())
                                         if positions:
                                             quick_auto_move_filled_orders(positions)
+                                            sync_to_active_opps()
                                         st.rerun()
                                     elif status == 'NOT_FOUND':
                                         st.warning("⚠️ Order not found in MT5")
@@ -5320,7 +5317,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         with col_back:
                             if st.button("↩️ Back to Placed", key=f"back_{unique_key}", use_container_width=True):
-                                if handle_move_back_to_ready(i):  # This will move it back through the sync
+                                if handle_move_back_to_ready(i):
                                     st.rerun()
 
                         with col_delete:

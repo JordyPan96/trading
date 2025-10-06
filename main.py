@@ -3360,132 +3360,76 @@ elif st.session_state.current_page == "Active Opps":
             return False
 
 
-    # IMPROVED SYNC FUNCTION - PRESERVES EXISTING DATA
+    # IN ACTIVE OPPS PAGE - REPLACE THE SYNC FUNCTION:
+
     def sync_with_trade_signals():
-        """Improved sync that preserves existing trade signal data"""
+        """Two-way sync between Active Opps and Trade Signals - FIXED VERSION"""
         try:
-            # Get current timestamps from Active Opps
-            order_ready_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
-                                      r.get('status') == 'Order Ready'}
-            order_placed_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
-                                       r.get('status') == 'Order Placed'}
-            order_filled_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
-                                       r.get('status') == 'Order Filled'}
+            # Get ALL records from Active Opps (not just by status)
+            all_active_opps_records = {r['timestamp']: r for r in st.session_state.saved_records}
 
-            # Remove records that are no longer in the corresponding Active Opps status
-            st.session_state.ready_to_order = [
-                signal for signal in st.session_state.ready_to_order
-                if signal.get('timestamp') in order_ready_timestamps
-            ]
-            st.session_state.order_placed = [
-                order for order in st.session_state.order_placed
-                if order.get('timestamp') in order_placed_timestamps
-            ]
-            st.session_state.in_trade = [
-                trade for trade in st.session_state.in_trade
-                if trade.get('timestamp') in order_filled_timestamps
-            ]
+            # SYNC: Ready to Order - Include ALL Order Ready records
+            order_ready_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Ready']
 
-            # Add/update records from Active Opps
-            for record in st.session_state.saved_records:
-                timestamp = record['timestamp']
-                status = record.get('status')
+            # Clear and rebuild ready_to_order to ensure it matches Active Opps exactly
+            st.session_state.ready_to_order = []
+            for record in order_ready_records:
+                st.session_state.ready_to_order.append({
+                    'timestamp': record['timestamp'],
+                    'selected_pair': record['selected_pair'],
+                    'risk_multiplier': record['risk_multiplier'],
+                    'position_size': record['position_size'],
+                    'stop_pips': record['stop_pips'],
+                    'entry_price': record['entry_price'],
+                    'exit_price': record['exit_price'],
+                    'target_price': record['target_price'],
+                    'trend_position': record.get('trend_position', 'Not set'),
+                    'variances': record.get('Variances', 'Not set'),
+                    'status': 'Order Ready'
+                })
 
-                if status == 'Order Ready':
-                    # Check if already exists in ready_to_order
-                    existing_signal = next((s for s in st.session_state.ready_to_order if s['timestamp'] == timestamp),
-                                           None)
-                    if existing_signal:
-                        # Update existing
-                        existing_signal.update({
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'status': 'Order Ready'
-                        })
-                    else:
-                        # Add new
-                        st.session_state.ready_to_order.append({
-                            'timestamp': timestamp,
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'status': 'Order Ready'
-                        })
+            # SYNC: Order Placed - Include ALL Order Placed records
+            order_placed_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Placed']
 
-                elif status == 'Order Placed':
-                    # Check if already exists in order_placed
-                    existing_order = next((o for o in st.session_state.order_placed if o['timestamp'] == timestamp),
-                                          None)
-                    if existing_order:
-                        # Update existing
-                        existing_order.update({
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'status': 'Order Placed'
-                        })
-                    else:
-                        # Add new
-                        st.session_state.order_placed.append({
-                            'timestamp': timestamp,
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'order_status': 'PENDING',
-                            'status': 'Order Placed'
-                        })
+            # Clear and rebuild order_placed to ensure it matches Active Opps exactly
+            st.session_state.order_placed = []
+            for record in order_placed_records:
+                st.session_state.order_placed.append({
+                    'timestamp': record['timestamp'],
+                    'selected_pair': record['selected_pair'],
+                    'risk_multiplier': record['risk_multiplier'],
+                    'position_size': record['position_size'],
+                    'stop_pips': record['stop_pips'],
+                    'entry_price': record['entry_price'],
+                    'exit_price': record['exit_price'],
+                    'target_price': record['target_price'],
+                    'order_status': 'PENDING',
+                    'status': 'Order Placed'
+                })
 
-                elif status == 'Order Filled':
-                    # Check if already exists in in_trade
-                    existing_trade = next((t for t in st.session_state.in_trade if t['timestamp'] == timestamp), None)
-                    if existing_trade:
-                        # Update existing
-                        existing_trade.update({
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'status': 'Order Filled'
-                        })
-                    else:
-                        # Add new
-                        st.session_state.in_trade.append({
-                            'timestamp': timestamp,
-                            'selected_pair': record['selected_pair'],
-                            'risk_multiplier': record['risk_multiplier'],
-                            'position_size': record['position_size'],
-                            'stop_pips': record['stop_pips'],
-                            'entry_price': record['entry_price'],
-                            'exit_price': record['exit_price'],
-                            'target_price': record['target_price'],
-                            'order_status': 'FILLED',
-                            'status': 'Order Filled'
-                        })
+            # SYNC: In Trade - Include ALL Order Filled records
+            order_filled_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Filled']
 
-            return True
+            # Clear and rebuild in_trade to ensure it matches Active Opps exactly
+            st.session_state.in_trade = []
+            for record in order_filled_records:
+                st.session_state.in_trade.append({
+                    'timestamp': record['timestamp'],
+                    'selected_pair': record['selected_pair'],
+                    'risk_multiplier': record['risk_multiplier'],
+                    'position_size': record['position_size'],
+                    'stop_pips': record['stop_pips'],
+                    'entry_price': record['entry_price'],
+                    'exit_price': record['exit_price'],
+                    'target_price': record['target_price'],
+                    'order_status': 'FILLED',
+                    'status': 'Order Filled'
+                })
+
+            return True, "Sync completed successfully"
+
         except Exception as e:
-            st.error(f"Sync error: {e}")
-            return False
+            return False, f"Sync error: {str(e)}"
 
 
     # SIMPLE ACTION FUNCTIONS
@@ -4405,18 +4349,31 @@ elif st.session_state.current_page == "Trade Signal":
 
     # SIMPLE ACTION FUNCTIONS FOR TRADE SIGNAL
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed"""
+        """Move signal from Ready to Order to Order Placed - FIXED VERSION"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
+
             # Remove from ready_to_order
             st.session_state.ready_to_order.pop(signal_index)
-            # Add to order_placed with additional fields
-            signal['order_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            signal['order_status'] = 'PENDING'
-            signal['direction'] = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-            st.session_state.order_placed.append(signal)
 
-            # Sync back to Active Opps
+            # Add to order_placed as NEW record (don't update existing)
+            new_order = {
+                'timestamp': signal['timestamp'],
+                'selected_pair': signal['selected_pair'],
+                'risk_multiplier': signal['risk_multiplier'],
+                'position_size': signal['position_size'],
+                'stop_pips': signal['stop_pips'],
+                'entry_price': signal['entry_price'],
+                'exit_price': signal['exit_price'],
+                'target_price': signal['target_price'],
+                'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'order_status': 'PENDING',
+                'direction': calculate_direction(signal.get('entry_price'), signal.get('exit_price')),
+                'status': 'Order Placed'
+            }
+            st.session_state.order_placed.append(new_order)
+
+            # Sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
             if success:
                 st.session_state.last_action = f"moved_to_placed_{signal_index}"
@@ -4428,17 +4385,31 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_to_in_trade(order_index):
-        """Move order from Order Placed to In Trade"""
+        """Move order from Order Placed to In Trade - FIXED VERSION"""
         try:
             order = st.session_state.order_placed[order_index]
+
             # Remove from order_placed
             st.session_state.order_placed.pop(order_index)
-            # Add to in_trade with additional fields
-            order['fill_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            order['order_status'] = 'FILLED'
-            st.session_state.in_trade.append(order)
 
-            # Sync back to Active Opps
+            # Add to in_trade as NEW record (don't update existing)
+            new_trade = {
+                'timestamp': order['timestamp'],
+                'selected_pair': order['selected_pair'],
+                'risk_multiplier': order['risk_multiplier'],
+                'position_size': order['position_size'],
+                'stop_pips': order['stop_pips'],
+                'entry_price': order['entry_price'],
+                'exit_price': order['exit_price'],
+                'target_price': order['target_price'],
+                'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'order_status': 'FILLED',
+                'direction': order.get('direction', 'Unknown'),
+                'status': 'Order Filled'
+            }
+            st.session_state.in_trade.append(new_trade)
+
+            # Sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
             if success:
                 st.session_state.last_action = f"moved_to_trade_{order_index}"

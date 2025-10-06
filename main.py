@@ -4279,9 +4279,9 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Trade error: {str(e)}"
 
 
-    # OPTIMIZED ORDER STATUS CHECKING WITH METAAPI SDK
+    # CORRECTED ORDER STATUS CHECKING WITH METAAPI TRADE API
     async def find_order_by_parameters(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Find order in MT5 using MetaApi SDK with better matching"""
+        """Find order in MT5 using MetaApi Trade API (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4292,23 +4292,18 @@ elif st.session_state.current_page == "Trade Signal":
             if not token or not account_id:
                 return None, "Token or account ID not configured"
 
+            # Create API instance
             api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
 
-            if account.state != 'DEPLOYED':
-                await account.deploy()
-            await account.wait_connected()
-
-            connection = account.get_streaming_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            orders = await connection.get_orders()
+            # Get orders using Trade API (correct way)
+            orders = await api.trade_api.get_orders(account_id)
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
+            # Convert our parameters for comparison
             target_entry_price = float(entry_price)
             target_volume = float(volume)
 
+            # Look for matching order with relaxed matching
             for order in orders:
                 try:
                     order_symbol = order.get('symbol')
@@ -4316,18 +4311,20 @@ elif st.session_state.current_page == "Trade Signal":
                     order_volume = order.get('volume')
                     order_id = order.get('id')
 
+                    # Skip if missing critical info
                     if not all([order_symbol, order_open_price, order_volume, order_id]):
                         continue
 
+                    # Convert to proper types
                     order_open_price = float(order_open_price)
                     order_volume = float(order_volume)
 
+                    # Relaxed matching criteria
                     symbol_match = order_symbol == formatted_symbol
-                    price_match = abs(order_open_price - target_entry_price) < 0.01
-                    volume_match = abs(order_volume - target_volume) < 0.1
+                    price_match = abs(order_open_price - target_entry_price) < 0.01  # 1 pip tolerance
+                    volume_match = abs(order_volume - target_volume) < 0.1  # 0.1 lot tolerance
 
                     if symbol_match and price_match and volume_match:
-                        await connection.close()
                         return {
                             'id': order_id,
                             'symbol': order_symbol,
@@ -4336,23 +4333,22 @@ elif st.session_state.current_page == "Trade Signal":
                             'state': order.get('state'),
                             'type': order.get('type')
                         }, None
-                except:
+
+                except Exception as e:
                     continue
 
-            await connection.close()
             return None, f"No matching order found for {symbol} at {entry_price}"
 
         except Exception as e:
-            try:
-                await connection.close()
-            except:
-                pass
             return None, f"Error finding order: {str(e)}"
 
 
     async def cancel_order_in_mt5(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Cancel order in MT5 using MetaApi SDK with immediate feedback"""
+        """Cancel order in MT5 using MetaApi Trade API (correct way)"""
         try:
+            from metaapi_cloud_sdk import MetaApi
+
+            # First find the order
             order_info, error = await find_order_by_parameters(symbol, order_type, entry_price, volume)
             if error or not order_info:
                 return False, f"❌ {error or 'No matching order found'}"
@@ -4362,39 +4358,26 @@ elif st.session_state.current_page == "Trade Signal":
             account_id = st.session_state.metaapi_account_id
 
             api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
 
-            if account.state != 'DEPLOYED':
-                await account.deploy()
-            await account.wait_connected()
-
-            connection = account.get_streaming_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
+            # Cancel the order using Trade API (correct way)
             try:
-                result = await connection.cancel_order(order_info['id'])
-                await connection.close()
+                result = await api.trade_api.cancel_order(account_id, order_info['id'])
 
                 if result:
                     return True, f"✅ Order cancelled successfully (ID: {order_info['id']})"
                 else:
                     return False, "❌ Failed to cancel order in MT5"
+
             except Exception as e:
-                await connection.close()
                 return False, f"❌ Error during cancellation: {str(e)}"
 
         except Exception as e:
-            try:
-                await connection.close()
-            except:
-                pass
             return False, f"❌ Error cancelling order: {str(e)}"
 
 
-    # FAST ORDER CHECKING FUNCTION FOR UI RESPONSIVENESS
+    # CORRECTED FAST ORDER CHECKING FUNCTION
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
-        """Ultra-fast order check with minimal connection overhead"""
+        """Ultra-fast order check using MetaApi Trade API (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4406,45 +4389,131 @@ elif st.session_state.current_page == "Trade Signal":
                 return None, "No token configured"
 
             api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
 
-            if account.state != 'DEPLOYED':
-                return 'NOT_CONNECTED', None
-
-            connection = account.get_streaming_connection()
-            await connection.connect()
-
-            try:
-                await asyncio.wait_for(connection.wait_synchronized(), timeout=10)
-            except asyncio.TimeoutError:
-                await connection.close()
-                return 'TIMEOUT', None
-
+            # Get orders using Trade API (correct way)
+            orders = await api.trade_api.get_orders(account_id)
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            orders = await connection.get_orders()
+            # Quick orders check
             for order in orders:
                 if (order.get('symbol') == formatted_symbol and
                         abs(float(order.get('openPrice', 0)) - float(entry_price)) < 0.02):
-                    await connection.close()
                     return 'PENDING', order.get('id')
 
-            positions = await connection.get_positions()
+            # Get positions using Trade API (correct way)
+            positions = await api.trade_api.get_positions(account_id)
             for position in positions:
                 if (position.get('symbol') == formatted_symbol and
                         abs(float(position.get('openPrice', 0)) - float(entry_price)) < 0.02):
-                    await connection.close()
                     return 'FILLED', None
 
-            await connection.close()
             return 'NOT_FOUND', None
 
         except Exception as e:
-            try:
-                await connection.close()
-            except:
-                pass
             return None, f"Quick check error: {str(e)}"
+
+
+    async def quick_check_order_status(order):
+        """Fast order status check using MetaApi Trade API (correct way)"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return None, "Token or account ID not configured"
+
+            api = MetaApi(token)
+
+            symbol = order['selected_pair']
+            entry_price = safe_float(order.get('entry_price'), 0.0)
+            volume = safe_float(order.get('position_size'), 0.1)
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            # Get orders using Trade API (correct way)
+            orders = await api.trade_api.get_orders(account_id)
+            order_found = False
+            order_id = None
+
+            for mt5_order in orders:
+                try:
+                    order_symbol = mt5_order.get('symbol')
+                    order_open_price = mt5_order.get('openPrice')
+                    order_volume = mt5_order.get('volume')
+
+                    if (order_symbol == formatted_symbol and
+                            order_open_price and order_volume and
+                            abs(float(order_open_price) - float(entry_price)) < 0.01 and
+                            abs(float(order_volume) - float(volume)) < 0.1):
+                        order_found = True
+                        order_id = mt5_order.get('id')
+                        break
+                except:
+                    continue
+
+            # Check positions if order not found
+            position_found = False
+            if not order_found:
+                positions = await api.trade_api.get_positions(account_id)
+                for position in positions:
+                    try:
+                        position_symbol = position.get('symbol')
+                        position_open_price = position.get('openPrice')
+                        position_volume = position.get('volume')
+
+                        if (position_symbol == formatted_symbol and
+                                position_open_price and position_volume and
+                                abs(float(position_open_price) - float(entry_price)) < 0.01 and
+                                abs(float(position_volume) - float(volume)) < 0.1):
+                            position_found = True
+                            break
+                    except:
+                        continue
+
+            if order_found:
+                return 'PENDING', order_id
+            elif position_found:
+                return 'FILLED', None
+            else:
+                return 'NOT_FOUND', None
+
+        except Exception as e:
+            return None, f"Status check error: {str(e)}"
+
+
+    # ADDITIONAL FUNCTION TO GET ALL ORDERS FOR DEBUGGING
+    async def get_all_orders_debug():
+        """Get all orders for debugging purposes"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return None, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            orders = await api.trade_api.get_orders(account_id)
+
+            order_list = []
+            for order in orders:
+                order_list.append({
+                    'id': order.get('id'),
+                    'symbol': order.get('symbol'),
+                    'type': order.get('type'),
+                    'state': order.get('state'),
+                    'openPrice': order.get('openPrice'),
+                    'volume': order.get('volume')
+                })
+
+            return order_list, None
+
+        except Exception as e:
+            return None, f"Debug error: {str(e)}"
 
 
     # OPTIMIZED TRADE EXECUTION FUNCTION
@@ -4855,10 +4924,17 @@ elif st.session_state.current_page == "Trade Signal":
                                         st.rerun()
                                     elif status == 'NOT_FOUND':
                                         st.warning("⚠️ Order not found in MT5")
-                                    elif status == 'TIMEOUT':
-                                        st.warning("⏰ Check timed out - MT5 connection slow")
-                                    elif status == 'NOT_CONNECTED':
-                                        st.error("🔌 Not connected to MT5 account")
+                                        # Add debug button
+                                        if st.button("🐛 Debug Orders", key=f"debug_{i}"):
+                                            with st.spinner("Getting all orders..."):
+                                                all_orders, error = asyncio.run(get_all_orders_debug())
+                                                if error:
+                                                    st.error(f"Debug error: {error}")
+                                                else:
+                                                    st.write("All orders in MT5:")
+                                                    for ord in all_orders:
+                                                        st.write(
+                                                            f"- {ord['symbol']} | Price: {ord['openPrice']} | Volume: {ord['volume']} | State: {ord['state']}")
                                     else:
                                         st.error(f"❌ Check failed: {order_id}")
 

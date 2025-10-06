@@ -3710,11 +3710,12 @@ elif st.session_state.current_page == "Active Opps":
     order_ready_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
     order_placed_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Placed')
     order_filled_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Filled')
-    total_active_count = order_ready_count + order_placed_count + order_filled_count
+    # Only count Order Placed and Order Filled as active records (exclude Order Ready)
+    total_active_count = order_placed_count + order_filled_count
 
     # Display counts
     st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
-    st.write(f"**Active Records:** {total_active_count}/2")
+    st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
     st.write(
         f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
 
@@ -3911,7 +3912,7 @@ elif st.session_state.current_page == "Active Opps":
                                 if handle_move_record(record_index, 'Order Ready'):
                                     st.rerun()
                             if total_active_count >= 2:
-                                st.error("Max 2 active records reached")
+                                st.error("Max 2 active records reached (Order Placed + Order Filled)")
 
                         with col_delete:
                             if st.button("Delete", key=f"delete_{unique_key_base}"):

@@ -4312,7 +4312,7 @@ elif st.session_state.current_page == "Trade Signal":
             positions = await connection.get_positions()
             await connection.close()
 
-            # Format positions data quickly
+            # Format positions data quickly - USE CAMELCASE DIRECTLY FROM METAAPI
             formatted_positions = []
             for position in positions:
                 formatted_positions.append({
@@ -4320,10 +4320,10 @@ elif st.session_state.current_page == "Trade Signal":
                     'symbol': position['symbol'],
                     'type': position['type'],
                     'volume': position['volume'],
-                    'open_price': position['openPrice'],
-                    'current_price': position['currentPrice'],
-                    'stop_loss': position.get('stopLoss'),
-                    'take_profit': position.get('takeProfit'),
+                    'openPrice': position['openPrice'],
+                    'currentPrice': position['currentPrice'],
+                    'stopLoss': position.get('stopLoss'),
+                    'takeProfit': position.get('takeProfit'),
                     'profit': position.get('profit', 0)
                 })
 
@@ -4337,7 +4337,7 @@ elif st.session_state.current_page == "Trade Signal":
             return [], f"Quick position error: {str(e)}"
 
 
-    # UPDATED QUICK AUTO-MOVE FUNCTION - UPDATE ALL POSITION VALUES
+    # CORRECTED QUICK AUTO-MOVE FUNCTION - USING CORRECT METAAPI FIELD NAMES
     def quick_auto_move_filled_orders(positions):
         """Quick auto-move - only match instrument and position size, update all position values"""
         try:
@@ -4395,20 +4395,20 @@ elif st.session_state.current_page == "Trade Signal":
                     if symbol_match and volume_match:
                         print(f"   🎯 INSTRUMENT & VOLUME MATCHED - Moving order to In Trade")
 
-                        # Create trade record - UPDATE ALL VALUES FROM POSITION
+                        # Create trade record - UPDATE ALL VALUES FROM POSITION (using correct camelCase)
                         trade_record = {
                             **order,  # Keep original order data
                             'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'order_status': 'FILLED',
                             'position_id': position['id'],
-                            'current_price': position.get('current_price'),
-                            'current_sl': position.get('stop_loss'),
-                            'current_tp': position.get('take_profit'),
+                            'current_price': position.get('currentPrice'),
+                            'current_sl': position.get('stopLoss'),
+                            'current_tp': position.get('takeProfit'),
                             'profit': position.get('profit', 0),
-                            # UPDATE ALL VALUES FROM ACTUAL POSITION
-                            'entry_price': position.get('open_price'),  # Use actual filled price
-                            'exit_price': position.get('stop_loss'),  # Use actual stop loss from position
-                            'target_price': position.get('take_profit'),  # Use actual take profit from position
+                            # UPDATE ALL VALUES FROM ACTUAL POSITION (using correct camelCase)
+                            'entry_price': position.get('openPrice'),  # Use actual filled price
+                            'exit_price': position.get('stopLoss'),  # Use actual stop loss from position
+                            'target_price': position.get('takeProfit'),  # Use actual take profit from position
                             'direction': 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
                             # Use actual direction
                         }
@@ -4421,10 +4421,9 @@ elif st.session_state.current_page == "Trade Signal":
                         moved_details.append(f"{order_symbol} ({order_volume} lots)")
                         print(f"   ✅ Updated order with ALL position data:")
                         print(
-                            f"      Original Entry: {order.get('entry_price')} -> Actual: {position.get('open_price')}")
-                        print(f"      Original SL: {order.get('exit_price')} -> Actual: {position.get('stop_loss')}")
-                        print(
-                            f"      Original TP: {order.get('target_price')} -> Actual: {position.get('take_profit')}")
+                            f"      Original Entry: {order.get('entry_price')} -> Actual: {position.get('openPrice')}")
+                        print(f"      Original SL: {order.get('exit_price')} -> Actual: {position.get('stopLoss')}")
+                        print(f"      Original TP: {order.get('target_price')} -> Actual: {position.get('takeProfit')}")
                         print(
                             f"      Original Direction: {order.get('direction')} -> Actual: {trade_record['direction']}")
                         break
@@ -4514,8 +4513,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
+    # CORRECTED MODIFY POSITION FUNCTION - USING CORRECT FIELD NAMES
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - FIXED VERSION"""
+        """Modify stop loss only for an open position - CORRECTED VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4537,34 +4537,22 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get current position details
+            # Get current position to preserve existing take profit
             positions = await connection.get_positions()
-            current_position = None
+            current_tp = None
             for pos in positions:
                 if pos['id'] == position_id:
-                    current_position = pos
+                    current_tp = pos.get('takeProfit')
                     break
-
-            if not current_position:
-                await connection.close()
-                return False, "❌ Position not found"
-
-            # Format the SL value properly - MetaApi often expects strings with exact precision
-            formatted_sl = f"{new_sl:.5f}"  # Format to 5 decimal places as string
 
             # Prepare modification data
             modification_data = {
-                'stopLoss': formatted_sl
+                'stopLoss': float(new_sl)
             }
 
-            # Only include takeProfit if it exists and format it properly too
-            if current_position.get('takeProfit') is not None:
-                current_tp = current_position['takeProfit']
-                modification_data['takeProfit'] = f"{current_tp:.5f}"
-
-            print(f"🔧 Modifying position {position_id}")
-            print(f"   SL: {formatted_sl}")
-            print(f"   TP: {modification_data.get('takeProfit', 'None')}")
+            # Only include takeProfit if it exists and is not None
+            if current_tp is not None:
+                modification_data['takeProfit'] = float(current_tp)
 
             # This method doesn't return a value - it just completes if successful
             await connection.modify_position(position_id, modification_data)
@@ -5143,20 +5131,20 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**P&L:** :{pnl_color}[${profit:.2f}]")
 
                         with col2:
-                            open_price = safe_float(position.get('open_price'), 0.0)
+                            open_price = safe_float(position.get('openPrice'), 0.0)  # CORRECTED: openPrice
                             st.write(f"**Open Price:** {open_price:.5f}")
 
-                            current_price = safe_float(position.get('current_price'), 0.0)
+                            current_price = safe_float(position.get('currentPrice'), 0.0)  # CORRECTED: currentPrice
                             st.write(f"**Current Price:** {current_price:.5f}")
 
                         with col3:
-                            sl_price = safe_float(position.get('stop_loss'), 0.0)
-                            tp_price = safe_float(position.get('take_profit'), 0.0)
+                            sl_price = safe_float(position.get('stopLoss'), 0.0)  # CORRECTED: stopLoss
+                            tp_price = safe_float(position.get('takeProfit'), 0.0)  # CORRECTED: takeProfit
 
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                        # MODIFY SL ONLY SECTION - UPDATED
+                        # MODIFY SL ONLY SECTION
                         st.markdown("---")
                         st.subheader("🛠️ Modify Stop Loss Only")
 

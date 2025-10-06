@@ -4279,9 +4279,9 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Trade error: {str(e)}"
 
 
-    # CORRECTED ORDER STATUS CHECKING WITH METAAPI TRADE API
+    # CORRECTED ORDER STATUS CHECKING WITH RPC CONNECTION
     async def find_order_by_parameters(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Find order in MT5 using MetaApi Trade API (correct way)"""
+        """Find order in MT5 using RPC connection (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4292,11 +4292,22 @@ elif st.session_state.current_page == "Trade Signal":
             if not token or not account_id:
                 return None, "Token or account ID not configured"
 
-            # Create API instance
+            # Create API instance and get account
             api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
 
-            # Get orders using Trade API (correct way)
-            orders = await api.trade_api.get_orders(account_id)
+            # Ensure account is deployed and connected
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            # Get RPC connection for trading operations
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # ✅ Get orders using RPC connection (correct way)
+            orders = await connection.get_orders()
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
             # Convert our parameters for comparison
@@ -4306,10 +4317,10 @@ elif st.session_state.current_page == "Trade Signal":
             # Look for matching order with relaxed matching
             for order in orders:
                 try:
-                    order_symbol = order.get('symbol')
-                    order_open_price = order.get('openPrice')
-                    order_volume = order.get('volume')
-                    order_id = order.get('id')
+                    order_symbol = order.symbol
+                    order_open_price = order.openPrice
+                    order_volume = order.volume
+                    order_id = order.id
 
                     # Skip if missing critical info
                     if not all([order_symbol, order_open_price, order_volume, order_id]):
@@ -4325,26 +4336,32 @@ elif st.session_state.current_page == "Trade Signal":
                     volume_match = abs(order_volume - target_volume) < 0.1  # 0.1 lot tolerance
 
                     if symbol_match and price_match and volume_match:
+                        await connection.close()
                         return {
                             'id': order_id,
                             'symbol': order_symbol,
                             'open_price': order_open_price,
                             'volume': order_volume,
-                            'state': order.get('state'),
-                            'type': order.get('type')
+                            'state': order.state,
+                            'type': order.type
                         }, None
 
                 except Exception as e:
                     continue
 
+            await connection.close()
             return None, f"No matching order found for {symbol} at {entry_price}"
 
         except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
             return None, f"Error finding order: {str(e)}"
 
 
     async def cancel_order_in_mt5(symbol: str, order_type: str, entry_price: float, volume: float):
-        """Cancel order in MT5 using MetaApi Trade API (correct way)"""
+        """Cancel order in MT5 using RPC connection (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4358,10 +4375,22 @@ elif st.session_state.current_page == "Trade Signal":
             account_id = st.session_state.metaapi_account_id
 
             api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
 
-            # Cancel the order using Trade API (correct way)
+            # Ensure account is ready
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            # Get RPC connection for cancellation
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # ✅ Cancel the order using RPC connection (correct way)
             try:
-                result = await api.trade_api.cancel_order(account_id, order_info['id'])
+                result = await connection.cancel_order(order_info['id'])
+                await connection.close()
 
                 if result:
                     return True, f"✅ Order cancelled successfully (ID: {order_info['id']})"
@@ -4369,15 +4398,20 @@ elif st.session_state.current_page == "Trade Signal":
                     return False, "❌ Failed to cancel order in MT5"
 
             except Exception as e:
+                await connection.close()
                 return False, f"❌ Error during cancellation: {str(e)}"
 
         except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
             return False, f"❌ Error cancelling order: {str(e)}"
 
 
-    # CORRECTED FAST ORDER CHECKING FUNCTION
+    # CORRECTED FAST ORDER CHECKING FUNCTION WITH RPC CONNECTION
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
-        """Ultra-fast order check using MetaApi Trade API (correct way)"""
+        """Ultra-fast order check using RPC connection (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4389,32 +4423,54 @@ elif st.session_state.current_page == "Trade Signal":
                 return None, "No token configured"
 
             api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
 
-            # Get orders using Trade API (correct way)
-            orders = await api.trade_api.get_orders(account_id)
+            # Use existing connection if possible
+            if account.state != 'DEPLOYED':
+                return 'NOT_CONNECTED', None
+
+            # Get RPC connection
+            connection = account.get_rpc_connection()
+            await connection.connect()
+
+            # Very short timeout for quick checks
+            try:
+                await asyncio.wait_for(connection.wait_synchronized(), timeout=10)
+            except asyncio.TimeoutError:
+                await connection.close()
+                return 'TIMEOUT', None
+
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            # Quick orders check
+            # ✅ Quick orders check using RPC connection
+            orders = await connection.get_orders()
             for order in orders:
-                if (order.get('symbol') == formatted_symbol and
-                        abs(float(order.get('openPrice', 0)) - float(entry_price)) < 0.02):
-                    return 'PENDING', order.get('id')
+                if (order.symbol == formatted_symbol and
+                        abs(float(order.openPrice) - float(entry_price)) < 0.02):
+                    await connection.close()
+                    return 'PENDING', order.id
 
-            # Get positions using Trade API (correct way)
-            positions = await api.trade_api.get_positions(account_id)
+            # ✅ Quick positions check using RPC connection
+            positions = await connection.get_positions()
             for position in positions:
-                if (position.get('symbol') == formatted_symbol and
-                        abs(float(position.get('openPrice', 0)) - float(entry_price)) < 0.02):
+                if (position.symbol == formatted_symbol and
+                        abs(float(position.openPrice) - float(entry_price)) < 0.02):
+                    await connection.close()
                     return 'FILLED', None
 
+            await connection.close()
             return 'NOT_FOUND', None
 
         except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
             return None, f"Quick check error: {str(e)}"
 
 
     async def quick_check_order_status(order):
-        """Fast order status check using MetaApi Trade API (correct way)"""
+        """Fast order status check using RPC connection (correct way)"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4426,42 +4482,52 @@ elif st.session_state.current_page == "Trade Signal":
                 return None, "Token or account ID not configured"
 
             api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            # Quick connection - don't wait too long
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+
+            # Use RPC connection with shorter timeout
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized(timeout=30)
 
             symbol = order['selected_pair']
             entry_price = safe_float(order.get('entry_price'), 0.0)
             volume = safe_float(order.get('position_size'), 0.1)
             formatted_symbol = format_symbol_for_pepperstone(symbol)
 
-            # Get orders using Trade API (correct way)
-            orders = await api.trade_api.get_orders(account_id)
+            # ✅ Check orders using RPC connection
+            orders = await connection.get_orders()
             order_found = False
             order_id = None
 
             for mt5_order in orders:
                 try:
-                    order_symbol = mt5_order.get('symbol')
-                    order_open_price = mt5_order.get('openPrice')
-                    order_volume = mt5_order.get('volume')
+                    order_symbol = mt5_order.symbol
+                    order_open_price = mt5_order.openPrice
+                    order_volume = mt5_order.volume
 
                     if (order_symbol == formatted_symbol and
                             order_open_price and order_volume and
                             abs(float(order_open_price) - float(entry_price)) < 0.01 and
                             abs(float(order_volume) - float(volume)) < 0.1):
                         order_found = True
-                        order_id = mt5_order.get('id')
+                        order_id = mt5_order.id
                         break
                 except:
                     continue
 
-            # Check positions if order not found
+            # ✅ Check positions using RPC connection if order not found
             position_found = False
             if not order_found:
-                positions = await api.trade_api.get_positions(account_id)
+                positions = await connection.get_positions()
                 for position in positions:
                     try:
-                        position_symbol = position.get('symbol')
-                        position_open_price = position.get('openPrice')
-                        position_volume = position.get('volume')
+                        position_symbol = position.symbol
+                        position_open_price = position.openPrice
+                        position_volume = position.volume
 
                         if (position_symbol == formatted_symbol and
                                 position_open_price and position_volume and
@@ -4472,6 +4538,8 @@ elif st.session_state.current_page == "Trade Signal":
                     except:
                         continue
 
+            await connection.close()
+
             if order_found:
                 return 'PENDING', order_id
             elif position_found:
@@ -4480,12 +4548,16 @@ elif st.session_state.current_page == "Trade Signal":
                 return 'NOT_FOUND', None
 
         except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
             return None, f"Status check error: {str(e)}"
 
 
     # ADDITIONAL FUNCTION TO GET ALL ORDERS FOR DEBUGGING
     async def get_all_orders_debug():
-        """Get all orders for debugging purposes"""
+        """Get all orders for debugging purposes using RPC connection"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4497,22 +4569,37 @@ elif st.session_state.current_page == "Trade Signal":
                 return None, "Token or account ID not configured"
 
             api = MetaApi(token)
-            orders = await api.trade_api.get_orders(account_id)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            orders = await connection.get_orders()
 
             order_list = []
             for order in orders:
                 order_list.append({
-                    'id': order.get('id'),
-                    'symbol': order.get('symbol'),
-                    'type': order.get('type'),
-                    'state': order.get('state'),
-                    'openPrice': order.get('openPrice'),
-                    'volume': order.get('volume')
+                    'id': order.id,
+                    'symbol': order.symbol,
+                    'type': order.type,
+                    'state': order.state,
+                    'openPrice': order.openPrice,
+                    'volume': order.volume
                 })
 
+            await connection.close()
             return order_list, None
 
         except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
             return None, f"Debug error: {str(e)}"
 
 

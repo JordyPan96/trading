@@ -4199,6 +4199,7 @@ elif st.session_state.current_page == "Trade Signal":
     if 'historical_extremes_data' not in st.session_state:
         st.session_state.historical_extremes_data = {}
 
+
     # Add helper function first
     def safe_float(value, default=0.0):
         """Safely convert value to float, handling None and string 'None'"""
@@ -4208,6 +4209,7 @@ elif st.session_state.current_page == "Trade Signal":
             return float(value)
         except (ValueError, TypeError):
             return default
+
 
     def calculate_direction(entry_price, exit_price):
         """Calculate direction based on entry and exit prices"""
@@ -4225,6 +4227,7 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             return "Unknown"
 
+
     def format_symbol_for_pepperstone(symbol):
         """Add .a suffix to symbols for Pepperstone broker"""
         pepperstone_symbols = [
@@ -4241,15 +4244,13 @@ elif st.session_state.current_page == "Trade Signal":
         else:
             return symbol
 
-    # UPDATED: Historical extremes function with better error handling
-    async def get_historical_extremes_since_open(connection, position):
-        """Get historical high (for buys) and low (for sells) since position open"""
+
+    # CORRECTED: Historical extremes function using Market Data API
+    async def get_historical_extremes_since_open(metaapi, account_id, position):
+        """Get historical high (for buys) and low (for sells) since position open using Market Data API"""
         try:
             symbol = position['symbol']
             trade_type = position.get('type')  # POSITION_TYPE_BUY or POSITION_TYPE_SELL
-
-            # DEBUG: Let's see what fields we actually have in the position
-            print(f"🔍 Position fields: {list(position.keys())}")
 
             # Check for open_time in various possible field names
             open_time = None
@@ -4265,7 +4266,6 @@ elif st.session_state.current_page == "Trade Signal":
                 # If no open_time found, use current time minus 24 hours as fallback
                 open_time = datetime.now() - timedelta(hours=24)
                 print(f"⚠️ No open_time found, using fallback: {open_time}")
-                # return None, "Historical Extreme: No open time"
 
             # Convert open_time to datetime if it's a string
             if isinstance(open_time, str):
@@ -4281,13 +4281,18 @@ elif st.session_state.current_page == "Trade Signal":
                     # Use fallback
                     open_time = datetime.now() - timedelta(hours=24)
 
-            # Get candles from open_time until now
-            print(f"📊 Fetching candles for {symbol} from {open_time}")
-            candles = await connection.get_candles(
+            # Format time for API
+            start_time_str = open_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+
+            print(f"📊 Fetching candles for {symbol} from {start_time_str}")
+
+            # ✅ CORRECT: Use Market Data API to get candles
+            candles = await metaapi.market_data_api.get_candles(
+                account_id=account_id,
                 symbol=symbol,
-                timeframe='1m',
-                start_time=open_time,
-                limit=1000
+                timeframe='1m',  # 1-minute candles for precision
+                start_time=start_time_str,
+                limit=1000  # Maximum candles to fetch
             )
 
             if not candles:
@@ -4323,6 +4328,7 @@ elif st.session_state.current_page == "Trade Signal":
             print(f"❌ {error_msg}")
             return None, error_msg
 
+
     # BE Price calculation functions
     def calculate_be_price_25r(entry_price, stop_loss, direction):
         """
@@ -4343,6 +4349,7 @@ elif st.session_state.current_page == "Trade Signal":
             return None
 
         return round(be_price, 5)
+
 
     def calculate_auto_be_sl_price(entry_price, direction, symbol):
         """
@@ -4369,6 +4376,7 @@ elif st.session_state.current_page == "Trade Signal":
         else:
             return None
 
+
     def should_move_to_auto_be(current_price, entry_price, stop_loss, direction, symbol):
         """
         Check if price reached 2.5R level and should automatically move to BE
@@ -4389,6 +4397,7 @@ elif st.session_state.current_page == "Trade Signal":
             return current_price <= be_trigger_price
         else:
             return False
+
 
     async def auto_move_to_be(position_id, entry_price, direction, symbol):
         """
@@ -4483,12 +4492,14 @@ elif st.session_state.current_page == "Trade Signal":
             print(f"❌ Auto BE MetaApi error: {error_msg}")
             return False, f"❌ Failed to auto move to BE: {error_msg}"
 
+
     # Generate unique key for each record
     def generate_unique_key(record_index, record, field_name):
         """Generate truly unique key using index, pair, and timestamp"""
         pair = record['selected_pair'].replace('/', '_').replace(' ', '_')
         timestamp = record['timestamp'].replace(':', '_').replace(' ', '_').replace('-', '_').replace('.', '_')
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
+
 
     # METAAPI SDK Functions
     def get_metaapi_config():
@@ -4498,6 +4509,7 @@ elif st.session_state.current_page == "Trade Signal":
             return metaapi_config
         except:
             return {}
+
 
     async def get_metaapi_account():
         """Get MetaApi account instance"""
@@ -4516,6 +4528,7 @@ elif st.session_state.current_page == "Trade Signal":
         except Exception as e:
             return None, f"Error getting account: {str(e)}"
 
+
     async def test_metaapi_connection():
         """Test connection to MetaAPI - SIMPLIFIED"""
         try:
@@ -4530,6 +4543,7 @@ elif st.session_state.current_page == "Trade Signal":
             return True, "✅ Connected to MetaApi successfully (token is valid)"
         except Exception as e:
             return False, f"❌ MetaApi connection error: {str(e)}"
+
 
     async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
         """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
@@ -4574,6 +4588,7 @@ elif st.session_state.current_page == "Trade Signal":
             except:
                 pass
             return False, f"❌ Trade error: {str(e)}"
+
 
     async def quick_get_positions():
         """Quickly get positions without extensive synchronization"""
@@ -4639,6 +4654,7 @@ elif st.session_state.current_page == "Trade Signal":
             except:
                 pass
             return [], f"Quick position error: {str(e)}"
+
 
     def quick_auto_move_filled_orders(positions):
         """Quick auto-move - only match instrument and position size, update all position values"""
@@ -4719,6 +4735,7 @@ elif st.session_state.current_page == "Trade Signal":
             traceback.print_exc()
             return 0
 
+
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
         """Fast order check with minimal overhead"""
         try:
@@ -4774,6 +4791,7 @@ elif st.session_state.current_page == "Trade Signal":
             except:
                 pass
             return None, f"Quick check error: {str(e)}"
+
 
     async def modify_position_sl(position_id: str, new_sl: float):
         """Modify stop loss using correct MetaApi syntax with keyword arguments"""
@@ -4858,6 +4876,7 @@ elif st.session_state.current_page == "Trade Signal":
             print(f"❌ MetaApi error: {error_msg}")
             return False, f"❌ Failed to modify position: {error_msg}"
 
+
     async def close_position(position_id: str):
         """Close an open position"""
         try:
@@ -4895,6 +4914,7 @@ elif st.session_state.current_page == "Trade Signal":
             except:
                 pass
             return False, f"❌ Error closing position: {str(e)}"
+
 
     # FIXED SYNC FUNCTIONS - SIMPLIFIED AND MORE RELIABLE
     def sync_from_active_opps():
@@ -4971,6 +4991,7 @@ elif st.session_state.current_page == "Trade Signal":
             print(f"❌ Sync from Active Opps error: {str(e)}")
             return False, f"Sync error: {str(e)}"
 
+
     def update_workflow_status_in_sheets(timestamp, new_status, instrument_name=None):
         """Update a specific record's status in Google Sheets workflow using instrument name + timestamp for precise matching"""
         try:
@@ -5029,6 +5050,7 @@ elif st.session_state.current_page == "Trade Signal":
             print(f"❌ Update workflow status error: {str(e)}")
             return False, f"Update error: {str(e)}"
 
+
     def handle_move_to_order_placed(signal_index):
         """Move signal from Ready to Order to Order Placed - WITH DIRECT SHEETS UPDATE"""
         try:
@@ -5078,6 +5100,7 @@ elif st.session_state.current_page == "Trade Signal":
             traceback.print_exc()
             return False
 
+
     def handle_move_to_in_trade(order_index):
         """Move order from Order Placed to In Trade - WITH DIRECT SHEETS UPDATE"""
         try:
@@ -5125,6 +5148,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.error(f"❌ Move error: {e}")
             return False
 
+
     def handle_move_back_to_ready(order_index):
         """Move order from Order Placed back to Ready to Order - WITH DIRECT SHEETS UPDATE"""
         try:
@@ -5157,6 +5181,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.error(f"Move error: {e}")
             return False
 
+
     def handle_delete_signal(signal_index, list_name):
         """Delete signal from any list"""
         try:
@@ -5180,6 +5205,7 @@ elif st.session_state.current_page == "Trade Signal":
         except Exception as e:
             st.error(f"Delete error: {e}")
             return False
+
 
     # OPTIMIZED TRADE EXECUTION FUNCTION - UPDATED FOR DIRECT SYNC
     async def execute_trade_and_update(signal_index):
@@ -5228,15 +5254,17 @@ elif st.session_state.current_page == "Trade Signal":
             }
             return False, f"Trade execution error: {str(e)}"
 
+
     def execute_trade_immediate_ui(signal_index):
         """Handle trade execution with immediate UI update"""
         import asyncio
         asyncio.run(execute_trade_and_update(signal_index))
         st.rerun()
 
-    # NEW: Function to load historical extremes data
+
+    # CORRECTED: Function to load historical extremes data using Market Data API
     async def load_historical_extremes_for_positions():
-        """Load historical extremes data for all open positions"""
+        """Load historical extremes data for all open positions using Market Data API"""
         if not st.session_state.metaapi_connected or not st.session_state.open_positions:
             return
 
@@ -5250,18 +5278,19 @@ elif st.session_state.current_page == "Trade Signal":
         try:
             from metaapi_cloud_sdk import MetaApi
             api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
 
+            # Ensure account is connected
+            account = await api.metatrader_account_api.get_account(account_id)
             if account.state != 'DEPLOYED':
                 await account.deploy()
             await account.wait_connected()
 
+            # Get fresh position data with all fields
             connection = account.get_rpc_connection()
             await connection.connect()
             await connection.wait_synchronized()
-
-            # Get fresh position data with all fields
             fresh_positions = await connection.get_positions()
+            await connection.close()
 
             # Create a mapping of position_id to full position data
             position_map = {pos['id']: pos for pos in fresh_positions}
@@ -5271,7 +5300,8 @@ elif st.session_state.current_page == "Trade Signal":
                 if position_id in position_map:
                     # Use the fresh position data that has all fields
                     fresh_position = position_map[position_id]
-                    extreme_value, extreme_message = await get_historical_extremes_since_open(connection, fresh_position)
+                    extreme_value, extreme_message = await get_historical_extremes_since_open(api, account_id,
+                                                                                              fresh_position)
                     st.session_state.historical_extremes_data[position_id] = {
                         'value': extreme_value,
                         'message': extreme_message
@@ -5282,10 +5312,9 @@ elif st.session_state.current_page == "Trade Signal":
                         'message': 'Position not found in fresh data'
                     }
 
-            await connection.close()
-
         except Exception as e:
             print(f"❌ Historical extremes loading error: {str(e)}")
+
 
     # Handle action results
     if st.session_state.last_action:
@@ -5327,6 +5356,7 @@ elif st.session_state.current_page == "Trade Signal":
     if st.session_state.metaapi_connected and not st.session_state.auto_move_checked:
         import threading
 
+
         def background_auto_move():
             try:
                 positions, error = asyncio.run(quick_get_positions())
@@ -5346,6 +5376,7 @@ elif st.session_state.current_page == "Trade Signal":
             except Exception as e:
                 print(f"❌ Background auto-move error: {str(e)}")
                 st.session_state.auto_move_checked = True
+
 
         # Run in background thread to avoid blocking
         thread = threading.Thread(target=background_auto_move, daemon=True)
@@ -5385,6 +5416,7 @@ elif st.session_state.current_page == "Trade Signal":
         if st.button("🔄 Refresh Positions", key="refresh_positions", use_container_width=True):
             import asyncio
 
+
             async def refresh_positions_async():
                 positions, error = await quick_get_positions()
                 if error:
@@ -5405,6 +5437,7 @@ elif st.session_state.current_page == "Trade Signal":
                                                              order['selected_pair'])
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
+
 
             # Run the async function
             asyncio.run(refresh_positions_async())

@@ -4637,7 +4637,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_to_active_opps():
-        """Sync Trade Signal changes back to Active Opps"""
+        """Sync Trade Signal changes back to Active Opps - FIXED VERSION"""
         try:
             from your_main_app import load_data_from_sheets, save_data_to_sheets  # Import your existing functions
 
@@ -4648,59 +4648,67 @@ elif st.session_state.current_page == "Trade Signal":
                 # Convert to list of dictionaries for easier manipulation
                 all_records = workflow_df.to_dict('records')
 
+                # Create mappings of timestamps to their current status in Trade Signals
+                ready_timestamps = {signal['timestamp'] for signal in st.session_state.ready_to_order}
+                placed_timestamps = {order['timestamp'] for order in st.session_state.order_placed}
+                trade_timestamps = {trade['timestamp'] for trade in st.session_state.in_trade}
+
                 # Update records based on trade signals states
                 updated_records = []
+                records_updated = 0
 
                 for record in all_records:
                     timestamp = str(record.get('timestamp'))
+                    original_status = record.get('status')
+                    new_status = original_status
 
-                    # Check if record is in trade signals
-                    in_ready_to_order = any(
-                        signal.get('timestamp') == timestamp for signal in st.session_state.ready_to_order)
-                    in_order_placed = any(
-                        order.get('timestamp') == timestamp for order in st.session_state.order_placed)
-                    in_in_trade = any(trade.get('timestamp') == timestamp for trade in st.session_state.in_trade)
+                    # Determine new status based on which Trade Signal list the record is in
+                    if timestamp in trade_timestamps:
+                        new_status = 'Order Filled'
+                    elif timestamp in placed_timestamps:
+                        new_status = 'Order Placed'
+                    elif timestamp in ready_timestamps:
+                        new_status = 'Order Ready'
+                    else:
+                        # If not in any trade signal state but was in an active state, move back to Speculation
+                        if original_status in ['Order Ready', 'Order Placed', 'Order Filled']:
+                            new_status = 'Speculation'
 
-                    # Determine new status based on trade signals
-                    if in_in_trade:
-                        record['status'] = 'Order Filled'
-                    elif in_order_placed:
-                        record['status'] = 'Order Placed'
-                    elif in_ready_to_order:
-                        record['status'] = 'Order Ready'
-                    # If not in any trade signal state but was in an active state, move back to Speculation
-                    elif record['status'] in ['Order Ready', 'Order Placed', 'Order Filled']:
-                        record['status'] = 'Speculation'
+                    # Only update if status changed
+                    if new_status != original_status:
+                        record['status'] = new_status
+                        records_updated += 1
+                        print(f"🔄 Updating {record['selected_pair']} from {original_status} to {new_status}")
 
                     updated_records.append(record)
 
                 # Save updated records back to sheets
-                if updated_records:
+                if records_updated > 0:
                     success = save_data_to_sheets(pd.DataFrame(updated_records), sheet_name="Trade",
                                                   worksheet_name="Workflow")
                     if success:
-                        return True, "Sync to Active Opps completed successfully"
+                        return True, f"✅ Sync completed! Updated {records_updated} records in Active Opps"
                     else:
-                        return False, "Failed to save updated records to cloud"
+                        return False, "❌ Failed to save updated records to cloud"
                 else:
-                    return True, "No changes needed for sync"
+                    return True, "✅ No status changes needed for sync"
             else:
-                return False, "No workflow data found to sync with"
+                return False, "❌ No workflow data found to sync with"
 
         except Exception as e:
-            return False, f"Sync error: {str(e)}"
+            return False, f"❌ Sync error: {str(e)}"
 
 
     # SIMPLE ACTION FUNCTIONS FOR TRADE SIGNAL
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed - FIXED VERSION"""
+        """Move signal from Ready to Order to Order Placed - IMPROVED VERSION"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
 
             # Remove from ready_to_order
             st.session_state.ready_to_order.pop(signal_index)
 
-            # Add to order_placed as NEW record (don't update existing)
+            # Add to order_placed as NEW record
             new_order = {
                 'timestamp': signal['timestamp'],
                 'selected_pair': signal['selected_pair'],
@@ -4717,26 +4725,32 @@ elif st.session_state.current_page == "Trade Signal":
             }
             st.session_state.order_placed.append(new_order)
 
-            # Sync back to Active Opps to update the status
+            print(f"🔄 Moving {signal['selected_pair']} from Ready to Order Placed in Trade Signal")
+
+            # IMMEDIATELY sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
             if success:
                 st.session_state.last_action = f"moved_to_placed_{signal_index}"
+                print(f"✅ {message}")
                 return True
-            return False
+            else:
+                st.error(f"❌ {message}")
+                return False
+
         except Exception as e:
-            st.error(f"Move error: {e}")
+            st.error(f"❌ Move error: {e}")
             return False
 
 
     def handle_move_to_in_trade(order_index):
-        """Move order from Order Placed to In Trade - FIXED VERSION"""
+        """Move order from Order Placed to In Trade - IMPROVED VERSION"""
         try:
             order = st.session_state.order_placed[order_index]
 
             # Remove from order_placed
             st.session_state.order_placed.pop(order_index)
 
-            # Add to in_trade as NEW record (don't update existing)
+            # Add to in_trade as NEW record
             new_trade = {
                 'timestamp': order['timestamp'],
                 'selected_pair': order['selected_pair'],
@@ -4753,14 +4767,20 @@ elif st.session_state.current_page == "Trade Signal":
             }
             st.session_state.in_trade.append(new_trade)
 
-            # Sync back to Active Opps to update the status
+            print(f"🔄 Moving {order['selected_pair']} from Order Placed to In Trade in Trade Signal")
+
+            # IMMEDIATELY sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
             if success:
                 st.session_state.last_action = f"moved_to_trade_{order_index}"
+                print(f"✅ {message}")
                 return True
-            return False
+            else:
+                st.error(f"❌ {message}")
+                return False
+
         except Exception as e:
-            st.error(f"Move error: {e}")
+            st.error(f"❌ Move error: {e}")
             return False
 
 

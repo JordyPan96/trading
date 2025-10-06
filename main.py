@@ -3546,6 +3546,14 @@ elif st.session_state.current_page == "Active Opps":
             return default
 
 
+    # Generate unique key for each record
+    def generate_unique_key(record_index, record, field_name):
+        """Generate truly unique key using index, pair, and timestamp"""
+        pair = record['selected_pair'].replace('/', '_').replace(' ', '_')
+        timestamp = record['timestamp'].replace(':', '_').replace(' ', '_').replace('-', '_').replace('.', '_')
+        return f"{field_name}_{record_index}_{pair}_{timestamp}"
+
+
     # INITIAL LOAD
     if not st.session_state.saved_records:
         with st.spinner("🔄 Loading data from cloud..."):
@@ -3678,7 +3686,7 @@ elif st.session_state.current_page == "Active Opps":
     # Control buttons
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📥 Load from Cloud"):
+        if st.button("📥 Load from Cloud", key="load_cloud"):
             with st.spinner("Loading..."):
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
@@ -3690,7 +3698,7 @@ elif st.session_state.current_page == "Active Opps":
                     st.error("No data found")
 
     with col2:
-        if st.button("🔄 Sync Trade Signals"):
+        if st.button("🔄 Sync Trade Signals", key="sync_signals"):
             sync_with_trade_signals()
             st.session_state.last_action = "synced_signals"
             st.rerun()
@@ -3713,7 +3721,7 @@ elif st.session_state.current_page == "Active Opps":
                 key="export_csv"
             )
         else:
-            st.button("📤 Export CSV", disabled=True)
+            st.button("📤 Export CSV", disabled=True, key="export_disabled")
 
     if not st.session_state.saved_records:
         st.info(
@@ -3730,22 +3738,26 @@ elif st.session_state.current_page == "Active Opps":
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button(f"Speculation ({speculation_count})", use_container_width=True,
-                         type="primary" if st.session_state.current_stage == 'Speculation' else "secondary"):
+                         type="primary" if st.session_state.current_stage == 'Speculation' else "secondary",
+                         key="stage_speculation"):
                 st.session_state.current_stage = 'Speculation'
                 st.rerun()
         with col2:
             if st.button(f"Order Ready ({order_ready_count})", use_container_width=True,
-                         type="primary" if st.session_state.current_stage == 'Order Ready' else "secondary"):
+                         type="primary" if st.session_state.current_stage == 'Order Ready' else "secondary",
+                         key="stage_order_ready"):
                 st.session_state.current_stage = 'Order Ready'
                 st.rerun()
         with col3:
             if st.button(f"Order Placed ({order_placed_count})", use_container_width=True,
-                         type="primary" if st.session_state.current_stage == 'Order Placed' else "secondary"):
+                         type="primary" if st.session_state.current_stage == 'Order Placed' else "secondary",
+                         key="stage_order_placed"):
                 st.session_state.current_stage = 'Order Placed'
                 st.rerun()
         with col4:
             if st.button(f"Order Filled ({order_filled_count})", use_container_width=True,
-                         type="primary" if st.session_state.current_stage == 'Order Filled' else "secondary"):
+                         type="primary" if st.session_state.current_stage == 'Order Filled' else "secondary",
+                         key="stage_order_filled"):
                 st.session_state.current_stage = 'Order Filled'
                 st.rerun()
 
@@ -3774,11 +3786,11 @@ elif st.session_state.current_page == "Active Opps":
             st.info(f"No records in {st.session_state.current_stage.lower()} stage.")
         else:
             for record_index, record in stage_records:
+                # Generate unique keys for this record
+                unique_key_base = generate_unique_key(record_index, record, "")
+
                 with st.expander(f"Record {record_index + 1}: {record['selected_pair']} - {record['timestamp']}",
                                  expanded=False):
-                    # Create unique keys using timestamp to avoid conflicts
-                    timestamp_key = record['timestamp'].replace(':', '_').replace(' ', '_')
-
                     col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
                     with col1:
@@ -3792,7 +3804,7 @@ elif st.session_state.current_page == "Active Opps":
                             "Entry Price",
                             value=safe_float(record.get('entry_price'), 0.0),
                             format="%.5f",
-                            key=f"entry_{timestamp_key}"
+                            key=f"entry_{unique_key_base}"
                         )
 
                     with col3:
@@ -3800,7 +3812,7 @@ elif st.session_state.current_page == "Active Opps":
                             "Exit Price",
                             value=safe_float(record.get('exit_price'), 0.0),
                             format="%.5f",
-                            key=f"exit_{timestamp_key}"
+                            key=f"exit_{unique_key_base}"
                         )
 
                     with col4:
@@ -3808,7 +3820,7 @@ elif st.session_state.current_page == "Active Opps":
                             "Target Price",
                             value=safe_float(record.get('target_price'), 0.0),
                             format="%.5f",
-                            key=f"target_{timestamp_key}"
+                            key=f"target_{unique_key_base}"
                         )
 
                     # SPECULATION STAGE ACTIONS
@@ -3849,14 +3861,14 @@ elif st.session_state.current_page == "Active Opps":
                         col_update, col_move, col_delete = st.columns(3)
 
                         with col_update:
-                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                            if st.button("Update Record", key=f"update_{unique_key_base}"):
                                 if handle_update_record(record_index, entry_price, exit_price, target_price):
                                     st.rerun()
 
                         with col_move:
                             can_move = all_required_fields_valid and total_active_count < 2
                             if st.button("Move to Order Ready",
-                                         key=f"move_{timestamp_key}",
+                                         key=f"move_{unique_key_base}",
                                          disabled=not can_move):
                                 if handle_move_record(record_index, 'Order Ready'):
                                     st.rerun()
@@ -3864,7 +3876,7 @@ elif st.session_state.current_page == "Active Opps":
                                 st.error("Max 2 active records reached")
 
                         with col_delete:
-                            if st.button("Delete", key=f"delete_{timestamp_key}"):
+                            if st.button("Delete", key=f"delete_{unique_key_base}"):
                                 if handle_delete_record(record_index):
                                     st.rerun()
 
@@ -3873,17 +3885,17 @@ elif st.session_state.current_page == "Active Opps":
                         col_update, col_move, col_delete = st.columns(3)
 
                         with col_update:
-                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                            if st.button("Update Record", key=f"update_{unique_key_base}"):
                                 if handle_update_record(record_index, entry_price, exit_price, target_price):
                                     st.rerun()
 
                         with col_move:
-                            if st.button("Move to Order Placed", key=f"move_{timestamp_key}"):
+                            if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Placed'):
                                     st.rerun()
 
                         with col_delete:
-                            if st.button("Delete", key=f"delete_{timestamp_key}"):
+                            if st.button("Delete", key=f"delete_{unique_key_base}"):
                                 if handle_delete_record(record_index):
                                     st.rerun()
 
@@ -3892,17 +3904,17 @@ elif st.session_state.current_page == "Active Opps":
                         col_update, col_move, col_back = st.columns(3)
 
                         with col_update:
-                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                            if st.button("Update Record", key=f"update_{unique_key_base}"):
                                 if handle_update_record(record_index, entry_price, exit_price, target_price):
                                     st.rerun()
 
                         with col_move:
-                            if st.button("Move to Order Filled", key=f"move_{timestamp_key}"):
+                            if st.button("Move to Order Filled", key=f"move_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Filled'):
                                     st.rerun()
 
                         with col_back:
-                            if st.button("Back to Order Ready", key=f"back_{timestamp_key}"):
+                            if st.button("Back to Order Ready", key=f"back_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Ready'):
                                     st.rerun()
 
@@ -3917,7 +3929,7 @@ elif st.session_state.current_page == "Active Opps":
                                 "Result",
                                 options=result_options,
                                 index=0,
-                                key=f"filled_result_{timestamp_key}"
+                                key=f"result_{unique_key_base}"
                             )
 
                         with col6:
@@ -3926,7 +3938,7 @@ elif st.session_state.current_page == "Active Opps":
                                 "Direction",
                                 options=direction_options,
                                 index=0,
-                                key=f"filled_direction_{timestamp_key}"
+                                key=f"direction_{unique_key_base}"
                             )
 
                         with col7:
@@ -3935,7 +3947,7 @@ elif st.session_state.current_page == "Active Opps":
                                 value=0.0,
                                 step=0.01,
                                 format="%.2f",
-                                key=f"filled_rr_{timestamp_key}"
+                                key=f"rr_{unique_key_base}"
                             )
 
                         with col8:
@@ -3944,7 +3956,7 @@ elif st.session_state.current_page == "Active Opps":
                                 value=0.0,
                                 step=0.01,
                                 format="%.2f",
-                                key=f"filled_pnl_{timestamp_key}"
+                                key=f"pnl_{unique_key_base}"
                             )
 
                         # Additional required fields
@@ -3955,14 +3967,14 @@ elif st.session_state.current_page == "Active Opps":
                                 "POI",
                                 options=poi_options,
                                 index=0,
-                                key=f"filled_poi_{timestamp_key}"
+                                key=f"poi_{unique_key_base}"
                             )
 
                         with col10:
                             st.text_input(
                                 "Strategy",
                                 value=record['risk_multiplier'],
-                                key=f"filled_strategy_{timestamp_key}",
+                                key=f"strategy_{unique_key_base}",
                                 disabled=True
                             )
 
@@ -3980,7 +3992,7 @@ elif st.session_state.current_page == "Active Opps":
                         col_update_only, col_close, col_back = st.columns([1, 1, 1])
 
                         with col_update_only:
-                            if st.button("Update Record", key=f"filled_update_{timestamp_key}"):
+                            if st.button("Update Record", key=f"filled_update_{unique_key_base}"):
                                 # Update all fields including the new ones
                                 st.session_state.saved_records[record_index]['entry_price'] = entry_price
                                 st.session_state.saved_records[record_index]['exit_price'] = exit_price
@@ -3997,7 +4009,8 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                         with col_close:
-                            if st.button("Finalize & Close Trade", key=f"filled_close_{timestamp_key}", type="primary"):
+                            if st.button("Finalize & Close Trade", key=f"filled_close_{unique_key_base}",
+                                         type="primary"):
                                 # Validate required fields
                                 if (new_result and new_direction and new_poi and
                                         new_rr is not None and new_pnl is not None):
@@ -4086,13 +4099,13 @@ elif st.session_state.current_page == "Active Opps":
                                     st.error("Please fill in all required fields")
 
                         with col_back:
-                            if st.button("Back to Order Placed", key=f"filled_back_{timestamp_key}"):
+                            if st.button("Back to Order Placed", key=f"filled_back_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Placed'):
                                     st.rerun()
 
         # Clear all records button
         st.markdown("---")
-        if st.button("Clear All Records", type="secondary"):
+        if st.button("Clear All Records", type="secondary", key="clear_all"):
             st.session_state.saved_records = []
             st.session_state.ready_to_order = []
             st.session_state.order_placed = []

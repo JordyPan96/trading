@@ -4337,9 +4337,9 @@ elif st.session_state.current_page == "Trade Signal":
             return [], f"Quick position error: {str(e)}"
 
 
-    # FIXED QUICK AUTO-MOVE FUNCTION
+    # SIMPLIFIED QUICK AUTO-MOVE FUNCTION - ONLY INSTRUMENT AND POSITION SIZE
     def quick_auto_move_filled_orders(positions):
-        """Quick auto-move with proper symbol matching for Pepperstone format"""
+        """Quick auto-move - only match instrument and position size"""
         try:
             if not st.session_state.order_placed or not positions:
                 return 0
@@ -4350,7 +4350,6 @@ elif st.session_state.current_page == "Trade Signal":
             for order in st.session_state.order_placed[:]:
                 order_symbol = order['selected_pair']
                 order_volume = safe_float(order.get('position_size'), 0.1)
-                order_entry_price = safe_float(order.get('entry_price'), 0.0)
 
                 # Format the order symbol for Pepperstone comparison
                 formatted_order_symbol = format_symbol_for_pepperstone(order_symbol)
@@ -4359,15 +4358,13 @@ elif st.session_state.current_page == "Trade Signal":
                 for position in positions:
                     position_symbol = position['symbol']
                     position_volume = safe_float(position.get('volume'), 0.0)
-                    position_open_price = safe_float(position.get('open_price'), 0.0)
 
                     # DEBUG: Print what we're comparing
                     print(
                         f"🔍 Comparing: Order '{order_symbol}' -> '{formatted_order_symbol}' vs Position '{position_symbol}'")
                     print(f"   Volume: Order {order_volume} vs Position {position_volume}")
-                    print(f"   Price: Order {order_entry_price} vs Position {position_open_price}")
 
-                    # SIMPLIFIED SYMBOL MATCHING - Handle AUDUSD vs AUDUSD.a properly
+                    # SIMPLIFIED SYMBOL MATCHING - ONLY INSTRUMENT
                     symbol_match = False
 
                     # Case 1: Direct match (AUDUSD.a vs AUDUSD.a)
@@ -4390,27 +4387,28 @@ elif st.session_state.current_page == "Trade Signal":
                         symbol_match = True
                         print(f"   ✅ Exact symbol match: {position_symbol} == {order_symbol}")
 
-                    # Volume matching (5.01 lots vs 5.01 lots)
+                    # Volume matching ONLY (5.01 lots vs 5.01 lots)
                     volume_match = abs(position_volume - order_volume) < 0.01
                     print(f"   Volume match: {volume_match} (diff: {abs(position_volume - order_volume)})")
 
-                    # Price matching with reasonable tolerance
-                    price_match = abs(position_open_price - order_entry_price) < 0.001
-                    print(f"   Price match: {price_match} (diff: {abs(position_open_price - order_entry_price)})")
+                    # ONLY CHECK THESE TWO FIELDS - IGNORE DIRECTION AND PRICE
+                    if symbol_match and volume_match:
+                        print(f"   🎯 INSTRUMENT & VOLUME MATCHED - Moving order to In Trade")
 
-                    if symbol_match and volume_match and price_match:
-                        print(f"   🎯 ALL MATCHES PASSED - Moving order to In Trade")
-
-                        # Create trade record
+                        # Create trade record - UPDATE ALL VALUES FROM POSITION
                         trade_record = {
-                            **order,
+                            **order,  # Keep original order data
                             'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'order_status': 'FILLED',
                             'position_id': position['id'],
                             'current_price': position.get('current_price'),
                             'current_sl': position.get('stop_loss'),
                             'current_tp': position.get('take_profit'),
-                            'profit': position.get('profit', 0)
+                            'profit': position.get('profit', 0),
+                            # UPDATE entry price and direction from actual position
+                            'entry_price': position.get('open_price'),  # Use actual filled price
+                            'direction': 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                            # Use actual direction
                         }
 
                         # Move from Order Placed to In Trade
@@ -4419,9 +4417,14 @@ elif st.session_state.current_page == "Trade Signal":
                         st.session_state.in_trade.append(trade_record)
                         moved_count += 1
                         moved_details.append(f"{order_symbol} ({order_volume} lots)")
+                        print(f"   ✅ Updated order with position data:")
+                        print(
+                            f"      Original Entry: {order.get('entry_price')} -> Actual: {position.get('open_price')}")
+                        print(
+                            f"      Original Direction: {order.get('direction')} -> Actual: {trade_record['direction']}")
                         break
                     else:
-                        print(f"   ❌ No match: symbol={symbol_match}, volume={volume_match}, price={price_match}")
+                        print(f"   ❌ No match: symbol={symbol_match}, volume={volume_match}")
 
             # Log results
             if moved_count > 0:

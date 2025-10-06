@@ -4639,7 +4639,7 @@ elif st.session_state.current_page == "Trade Signal":
     def sync_to_active_opps():
         """Sync Trade Signal changes back to Active Opps - FIXED VERSION"""
         try:
-            from your_main_app import load_data_from_sheets, save_data_to_sheets  # Import your existing functions
+            
 
             # Load current workflow data
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")

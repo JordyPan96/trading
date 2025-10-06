@@ -4637,31 +4637,49 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_to_active_opps():
-        """Sync Trade Signal changes back to Active Opps - CORRECTED VERSION"""
+        """Sync Trade Signal changes back to Active Opps - DEBUG VERSION"""
         try:
+            print("🔄 STARTING SYNC TO ACTIVE OPPS...")
+
             # Load current workflow data from Google Sheets
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
+            print(f"📊 Loaded workflow data: {len(workflow_df) if workflow_df is not None else 0} records")
 
             if workflow_df is not None and not workflow_df.empty:
                 # Convert to list of dictionaries for easier manipulation
                 all_records = workflow_df.to_dict('records')
                 records_updated = 0
 
+                # DEBUG: Print current Trade Signal states
+                print(
+                    f"📋 Trade Signals - Ready: {len(st.session_state.ready_to_order)}, Placed: {len(st.session_state.order_placed)}, In Trade: {len(st.session_state.in_trade)}")
+
+                # Print all timestamps in Trade Signals
+                print("🕒 Trade Signal Timestamps:")
+                for i, ready in enumerate(st.session_state.ready_to_order):
+                    print(f"  Ready[{i}]: {ready['timestamp']} - {ready['selected_pair']}")
+                for i, placed in enumerate(st.session_state.order_placed):
+                    print(f"  Placed[{i}]: {placed['timestamp']} - {placed['selected_pair']}")
+                for i, trade in enumerate(st.session_state.in_trade):
+                    print(f"  Trade[{i}]: {trade['timestamp']} - {trade['selected_pair']}")
+
                 # Create mappings of timestamps to their NEW status in Trade Signals
-                # This is the key fix - we need to map what the NEW status should be
                 status_mapping = {}
 
                 # Order Placed records should have status 'Order Placed'
                 for order in st.session_state.order_placed:
                     status_mapping[order['timestamp']] = 'Order Placed'
+                    print(f"  📌 Mapping {order['timestamp']} -> Order Placed")
 
                 # In Trade records should have status 'Order Filled'
                 for trade in st.session_state.in_trade:
                     status_mapping[trade['timestamp']] = 'Order Filled'
+                    print(f"  📌 Mapping {trade['timestamp']} -> Order Filled")
 
                 # Ready to Order records should have status 'Order Ready'
                 for signal in st.session_state.ready_to_order:
                     status_mapping[signal['timestamp']] = 'Order Ready'
+                    print(f"  📌 Mapping {signal['timestamp']} -> Order Ready")
 
                 # Update records based on the status mapping
                 updated_records = []
@@ -4676,38 +4694,52 @@ elif st.session_state.current_page == "Trade Signal":
                     if new_status != original_status:
                         record['status'] = new_status
                         records_updated += 1
-                        print(f"🔄 Syncing {record['selected_pair']} from {original_status} to {new_status}")
+                        print(f"🔄 UPDATING: {record['selected_pair']} from {original_status} to {new_status}")
 
                     updated_records.append(record)
 
+                print(f"📝 Records to update: {records_updated}")
+
                 # Save updated records back to sheets
                 if records_updated > 0:
+                    print("💾 Saving updated records to Google Sheets...")
                     success = save_data_to_sheets(pd.DataFrame(updated_records), sheet_name="Trade",
                                                   worksheet_name="Workflow")
                     if success:
+                        print("✅ Successfully saved to Google Sheets")
                         return True, f"✅ Sync completed! Updated {records_updated} records in Active Opps"
                     else:
+                        print("❌ Failed to save to Google Sheets")
                         return False, "❌ Failed to save updated records to cloud"
                 else:
+                    print("ℹ️ No status changes needed for sync")
                     return True, "✅ No status changes needed for sync"
             else:
+                print("❌ No workflow data found")
                 return False, "❌ No workflow data found to sync with"
 
         except Exception as e:
+            print(f"❌ Sync error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False, f"❌ Sync error: {str(e)}"
 
 
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed - WITH PROPER SYNC"""
+        """Move signal from Ready to Order to Order Placed - WITH DEBUG"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
+
+            print(f"🔍 DEBUG Moving signal: {signal['selected_pair']}")
+            print(f"🔍 DEBUG Signal timestamp: '{signal['timestamp']}'")
+            print(f"🔍 DEBUG Signal timestamp type: {type(signal['timestamp'])}")
 
             # Remove from ready_to_order
             st.session_state.ready_to_order.pop(signal_index)
 
             # Add to order_placed as NEW record
             new_order = {
-                'timestamp': signal['timestamp'],
+                'timestamp': signal['timestamp'],  # Keep the same timestamp
                 'selected_pair': signal['selected_pair'],
                 'risk_multiplier': signal['risk_multiplier'],
                 'position_size': signal['position_size'],
@@ -4718,11 +4750,12 @@ elif st.session_state.current_page == "Trade Signal":
                 'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'order_status': 'PENDING',
                 'direction': calculate_direction(signal.get('entry_price'), signal.get('exit_price')),
-                'status': 'Order Placed'  # This is important!
+                'status': 'Order Placed'
             }
             st.session_state.order_placed.append(new_order)
 
-            print(f"🔄 Moving {signal['selected_pair']} from Ready to Order Placed in Trade Signal")
+            print(f"🔄 Moving {signal['selected_pair']} from Ready to Order Placed")
+            print(f"🔍 DEBUG New order timestamp: '{new_order['timestamp']}'")
 
             # IMMEDIATELY sync back to Active Opps to update the status
             success, message = sync_to_active_opps()
@@ -4739,6 +4772,8 @@ elif st.session_state.current_page == "Trade Signal":
 
         except Exception as e:
             st.error(f"❌ Move error: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
 

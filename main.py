@@ -4196,6 +4196,8 @@ elif st.session_state.current_page == "Trade Signal":
         st.session_state.last_action = None
     if 'auto_be_checked' not in st.session_state:
         st.session_state.auto_be_checked = False
+    if 'historical_extremes_data' not in st.session_state:
+        st.session_state.historical_extremes_data = {}
 
 
     # Add helper function first
@@ -5217,6 +5219,45 @@ elif st.session_state.current_page == "Trade Signal":
         st.rerun()
 
 
+    # NEW: Function to load historical extremes data
+    async def load_historical_extremes_for_positions():
+        """Load historical extremes data for all open positions"""
+        if not st.session_state.metaapi_connected or not st.session_state.open_positions:
+            return
+
+        config = get_metaapi_config()
+        token = config.get("token", "")
+        account_id = st.session_state.metaapi_account_id
+
+        if not token or not account_id:
+            return
+
+        try:
+            from metaapi_cloud_sdk import MetaApi
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            for position in st.session_state.open_positions:
+                extreme_value, extreme_message = await get_historical_extremes_since_open(connection, position)
+                st.session_state.historical_extremes_data[position['id']] = {
+                    'value': extreme_value,
+                    'message': extreme_message
+                }
+
+            await connection.close()
+
+        except Exception as e:
+            print(f"❌ Historical extremes loading error: {str(e)}")
+
+
     # Handle action results
     if st.session_state.last_action:
         action = st.session_state.last_action
@@ -5269,6 +5310,10 @@ elif st.session_state.current_page == "Trade Signal":
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     st.session_state.open_positions = positions
+
+                    # Load historical extremes for positions
+                    asyncio.run(load_historical_extremes_for_positions())
+
                 st.session_state.auto_move_checked = True
             except Exception as e:
                 print(f"❌ Background auto-move error: {str(e)}")
@@ -5322,6 +5367,10 @@ elif st.session_state.current_page == "Trade Signal":
                     # AUTO-MOVE: Check for matching orders and move them automatically
                     moved_count = quick_auto_move_filled_orders(positions)
                     st.session_state.open_positions = positions
+
+                    # Load historical extremes for new positions
+                    await load_historical_extremes_for_positions()
+
                     if moved_count > 0:
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
@@ -5584,61 +5633,22 @@ elif st.session_state.current_page == "Trade Signal":
             else:
                 # AUTO BE CHECK - Run this for all positions
                 auto_be_updates = []
-                historical_extremes_data = {}
+                for i, position in enumerate(st.session_state.open_positions):
+                    entry_price = safe_float(position.get('openPrice'), 0.0)
+                    current_sl = safe_float(position.get('stopLoss'), 0.0)
+                    current_price = safe_float(position.get('currentPrice'), 0.0)
+                    direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                    symbol = position['symbol']
 
-                if st.session_state.metaapi_connected:
-                    import asyncio
-
-                    # Get historical extremes for all positions
-                    config = get_metaapi_config()
-                    token = config.get("token", "")
-                    account_id = st.session_state.metaapi_account_id
-
-                    if token and account_id:
-                        try:
-                            from metaapi_cloud_sdk import MetaApi
-
-                            api = MetaApi(token)
-                            account = await api.metatrader_account_api.get_account(account_id)
-
-                            if account.state != 'DEPLOYED':
-                                await account.deploy()
-                            await account.wait_connected()
-
-                            connection = account.get_rpc_connection()
-                            await connection.connect()
-                            await connection.wait_synchronized()
-
-                            for i, position in enumerate(st.session_state.open_positions):
-                                # Get historical extremes for this position
-                                extreme_value, extreme_message = await get_historical_extremes_since_open(connection,
-                                                                                                          position)
-                                historical_extremes_data[position['id']] = {
-                                    'value': extreme_value,
-                                    'message': extreme_message
-                                }
-
-                                # Check if we should automatically move to BE
-                                entry_price = safe_float(position.get('openPrice'), 0.0)
-                                current_sl = safe_float(position.get('stopLoss'), 0.0)
-                                current_price = safe_float(position.get('currentPrice'), 0.0)
-                                direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-                                symbol = position['symbol']
-
-                                if all([entry_price > 0, current_sl > 0, current_price > 0]):
-                                    if should_move_to_auto_be(current_price, entry_price, current_sl, direction,
-                                                              symbol):
-                                        auto_be_updates.append({
-                                            'position_id': position['id'],
-                                            'entry_price': entry_price,
-                                            'direction': direction,
-                                            'symbol': symbol
-                                        })
-
-                            await connection.close()
-
-                        except Exception as e:
-                            st.error(f"❌ Historical data error: {str(e)}")
+                    # Check if we should automatically move to BE
+                    if all([entry_price > 0, current_sl > 0, current_price > 0]):
+                        if should_move_to_auto_be(current_price, entry_price, current_sl, direction, symbol):
+                            auto_be_updates.append({
+                                'position_id': position['id'],
+                                'entry_price': entry_price,
+                                'direction': direction,
+                                'symbol': symbol
+                            })
 
                 # Execute auto BE updates
                 if auto_be_updates and st.session_state.metaapi_connected:
@@ -5702,7 +5712,7 @@ elif st.session_state.current_page == "Trade Signal":
                         st.subheader("📊 Historical Extreme Since Open")
 
                         # Get historical extreme for this position
-                        extreme_data = historical_extremes_data.get(position['id'], {})
+                        extreme_data = st.session_state.historical_extremes_data.get(position['id'], {})
                         extreme_value = extreme_data.get('value')
                         extreme_message = extreme_data.get('message', 'Calculating...')
 

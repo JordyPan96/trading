@@ -4119,7 +4119,6 @@ elif st.session_state.current_page == "Active Opps":
                 st.warning("Records cleared locally but failed to save to cloud. Use CSV export to backup.")
             st.rerun()
 
-
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available
     try:
@@ -4307,7 +4306,7 @@ elif st.session_state.current_page == "Trade Signal":
             # Close connection after trade
             await connection.close()
 
-            return True, f"✅ Limit order placed successfully for {formatted_symbol}"
+            return True, f"✅ Order placed successfully"
 
         except Exception as e:
             # Try to close connection if it exists
@@ -4318,7 +4317,139 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Trade error: {str(e)}"
 
 
-    # SIMPLIFIED STATUS CHECKING - FOCUS ON GETTING IT WORKING FIRST
+    # ORDER CANCELLATION FUNCTIONS
+    async def find_order_by_parameters(symbol: str, order_type: str, entry_price: float, volume: float):
+        """Find order in MT5 by parameters with better matching"""
+        try:
+            account, error = await get_metaapi_account()
+            if error:
+                return None, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Get all pending orders
+            orders = await connection.get_orders()
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            # Look for matching order
+            for order in orders:
+                try:
+                    # Get order properties
+                    order_symbol = getattr(order, 'symbol', None)
+                    order_open_price = getattr(order, 'openPrice', getattr(order, 'open_price', None))
+                    order_volume = getattr(order, 'volume', None)
+                    order_id = getattr(order, 'id', None)
+                    order_state = getattr(order, 'state', None)
+
+                    # Skip if missing critical info
+                    if not all([order_symbol, order_open_price, order_volume, order_id]):
+                        continue
+
+                    # Convert to proper types
+                    order_open_price = float(order_open_price)
+                    order_volume = float(order_volume)
+
+                    # Check for match with reasonable tolerance
+                    symbol_match = order_symbol == formatted_symbol
+                    price_match = abs(order_open_price - float(entry_price)) < 0.001  # 0.1 pip tolerance
+                    volume_match = abs(order_volume - float(volume)) < 0.01  # 0.01 lot tolerance
+
+                    if symbol_match and price_match and volume_match:
+                        await connection.close()
+                        return {
+                            'id': order_id,
+                            'symbol': order_symbol,
+                            'open_price': order_open_price,
+                            'volume': order_volume,
+                            'state': order_state
+                        }, None
+
+                except Exception as e:
+                    continue
+
+            await connection.close()
+            return None, "No matching order found in MT5"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return None, f"Error finding order: {str(e)}"
+
+
+    async def cancel_order_in_mt5(symbol: str, order_type: str, entry_price: float, volume: float):
+        """Cancel order in MT5 by finding it first and then cancelling"""
+        try:
+            # First find the order
+            order_info, error = await find_order_by_parameters(symbol, order_type, entry_price, volume)
+            if error:
+                return False, f"❌ {error}"
+
+            if not order_info:
+                return False, "❌ No matching order found to cancel"
+
+            # Get account and connection for cancellation
+            account, error = await get_metaapi_account()
+            if error:
+                return False, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Cancel the order
+            try:
+                result = await connection.cancel_order(order_info['id'])
+                await connection.close()
+
+                if result:
+                    return True, f"✅ Order cancelled successfully"
+                else:
+                    return False, "❌ Failed to cancel order in MT5"
+
+            except Exception as e:
+                await connection.close()
+                return False, f"❌ Error during cancellation: {str(e)}"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return False, f"❌ Error cancelling order: {str(e)}"
+
+
+    async def cancel_order_direct(order_id: str):
+        """Cancel order directly by ID"""
+        try:
+            account, error = await get_metaapi_account()
+            if error:
+                return False, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            result = await connection.cancel_order(order_id)
+            await connection.close()
+
+            if result:
+                return True, f"✅ Order cancelled successfully"
+            else:
+                return False, f"❌ Failed to cancel order"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return False, f"❌ Error cancelling order: {str(e)}"
+
+
+    # STATUS CHECKING FUNCTIONS
     async def quick_check_order_status(order):
         """Fast order status check for a single order"""
         try:
@@ -4393,11 +4524,122 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Status check error: {str(e)}"
 
 
-    # SIMPLIFIED TRADE EXECUTION - IMMEDIATE FEEDBACK
+    async def check_all_orders_status():
+        """Check status of all orders in Order Placed tab"""
+        try:
+            if not st.session_state.order_placed:
+                return True, "No orders to check"
+
+            # Ensure connection first
+            success, message = await connect_metaapi_account()
+            if not success:
+                return False, f"Connection failed: {message}"
+
+            account, error = await get_metaapi_account()
+            if error:
+                return False, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Get all current orders and positions from MT5
+            mt5_orders = await connection.get_orders()
+            mt5_positions = await connection.get_positions()
+
+            await connection.close()
+
+            updates_made = 0
+
+            # Check each order in our Order Placed tab
+            for order in st.session_state.order_placed[:]:  # Use copy for safe iteration
+                try:
+                    symbol = order['selected_pair']
+                    entry_price = safe_float(order.get('entry_price'), 0.0)
+                    volume = safe_float(order.get('position_size'), 0.1)
+                    formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+                    # Check if filled (position exists)
+                    position_found = False
+                    for position in mt5_positions:
+                        try:
+                            position_symbol = getattr(position, 'symbol', None)
+                            position_open_price = getattr(position, 'openPrice', getattr(position, 'open_price', None))
+                            position_volume = getattr(position, 'volume', None)
+
+                            if not all([position_symbol, position_open_price, position_volume]):
+                                continue
+
+                            position_open_price = float(position_open_price)
+                            position_volume = float(position_volume)
+
+                            if (position_symbol == formatted_symbol and
+                                    abs(position_open_price - float(entry_price)) < 0.001 and
+                                    abs(position_volume - float(volume)) < 0.1):
+                                position_found = True
+                                break
+                        except:
+                            continue
+
+                    if position_found:
+                        # Fast move to in_trade
+                        st.session_state.order_placed.remove(order)
+                        st.session_state.in_trade.append({
+                            **order,
+                            'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'order_status': 'FILLED'
+                        })
+                        updates_made += 1
+                        continue
+
+                    # Check if still pending
+                    order_found = False
+                    for mt5_order in mt5_orders:
+                        try:
+                            order_symbol = getattr(mt5_order, 'symbol', None)
+                            order_open_price = getattr(mt5_order, 'openPrice', getattr(mt5_order, 'open_price', None))
+                            order_volume = getattr(mt5_order, 'volume', None)
+
+                            if not all([order_symbol, order_open_price, order_volume]):
+                                continue
+
+                            order_open_price = float(order_open_price)
+                            order_volume = float(order_volume)
+
+                            if (order_symbol == formatted_symbol and
+                                    abs(order_open_price - float(entry_price)) < 0.001 and
+                                    abs(order_volume - float(volume)) < 0.1):
+                                order_found = True
+                                break
+                        except:
+                            continue
+
+                    if not order_found and not position_found:
+                        # Order not found - cancelled or expired
+                        st.session_state.order_placed.remove(order)
+                        st.session_state.ready_to_order.append({
+                            **{k: v for k, v in order.items() if k not in ['order_time', 'order_status']},
+                            'status': 'Order Ready'
+                        })
+                        updates_made += 1
+
+                except Exception as e:
+                    continue
+
+            if updates_made > 0:
+                sync_with_active_opps()
+                return True, f"Updated {updates_made} orders"
+            else:
+                return True, "No status changes"
+
+        except Exception as e:
+            return False, f"Batch check error: {str(e)}"
+
+
+    # TRADE EXECUTION FUNCTION
     async def execute_trade_and_update(signal, direction):
         """Execute trade and update state immediately"""
         try:
-            formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])
             success, message = await place_trade(
                 symbol=signal['selected_pair'],
                 volume=float(signal.get('position_size', 0.1)),
@@ -4425,6 +4667,7 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"Trade execution error: {str(e)}"
 
 
+    # SYNC FUNCTIONS
     def quick_sync_with_active_opps():
         """Fast sync that only checks for essential changes"""
         try:
@@ -4476,60 +4719,6 @@ elif st.session_state.current_page == "Trade Signal":
 
         except Exception as e:
             return False, f"Sync error: {str(e)}"
-
-
-    # Add trade signal functions
-    def load_trade_signals_from_sheets():
-        """Load trade signals from Google Sheets"""
-        try:
-            df = load_data_from_sheets(sheet_name="Trade", worksheet_name="TradeSignals")
-            if df is not None and not df.empty:
-                # Clean numeric columns
-                numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size']
-                for col in numeric_columns:
-                    if col in df.columns:
-                        df[col] = df[col].replace('None', None)
-                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
-
-                # Calculate direction for each signal
-                if 'entry_price' in df.columns and 'exit_price' in df.columns:
-                    df['direction'] = df.apply(
-                        lambda row: calculate_direction(row['entry_price'], row['exit_price']),
-                        axis=1
-                    )
-                else:
-                    df['direction'] = "Unknown"
-
-                return df.to_dict('records')
-            return []
-        except Exception as e:
-            st.error(f"Error loading trade signals: {e}")
-            return []
-
-
-    def save_workflow_to_sheets(data):
-        """Save workflow data to Google Sheets - copied from Active Opps page"""
-        try:
-            # Convert records to DataFrame if it's a list
-            if isinstance(data, list):
-                data_to_save = pd.DataFrame(data)
-            else:
-                data_to_save = data.copy()
-
-            # Ensure all required columns exist
-            required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
-                                'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
-
-            for col in required_columns:
-                if col not in data_to_save.columns:
-                    data_to_save[col] = None
-
-            # Save using your existing function but specify the workflow worksheet
-            success = save_data_to_sheets(data_to_save, sheet_name="Trade", worksheet_name="Workflow")
-            return success
-        except Exception as e:
-            st.error(f"Error saving workflow data: {e}")
-            return False
 
 
     def sync_with_active_opps():
@@ -4619,9 +4808,6 @@ elif st.session_state.current_page == "Trade Signal":
         st.session_state.in_trade = []
 
     # Initialize trade execution states
-    if 'trade_execution_in_progress' not in st.session_state:
-        st.session_state.trade_execution_in_progress = False
-
     if 'last_trade_result' not in st.session_state:
         st.session_state.last_trade_result = None
 
@@ -4644,6 +4830,39 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             st.session_state.metaapi_connected = False
 
+    # AUTO-CHECK ALL ORDERS STATUS ON PAGE LOAD
+    if st.session_state.metaapi_connected and st.session_state.order_placed:
+        import asyncio
+
+        try:
+            # Run in background without blocking
+            async def auto_check():
+                success, message = await check_all_orders_status()
+                if success and "Updated" in message:
+                    st.session_state.auto_check_result = f"🔄 {message}"
+                elif success:
+                    st.session_state.auto_check_result = "✅ All orders up to date"
+                else:
+                    st.session_state.auto_check_result = f"❌ {message}"
+
+
+            # Start the async check
+            asyncio.run(auto_check())
+        except:
+            pass
+
+    # Show auto-check result if available
+    if 'auto_check_result' in st.session_state and st.session_state.auto_check_result:
+        result = st.session_state.auto_check_result
+        if "✅" in result or "🔄" in result:
+            st.success(st.session_state.auto_check_result)
+        else:
+            st.error(st.session_state.auto_check_result)
+        # Clear after showing
+        if st.button("Clear Message", key="clear_auto_check"):
+            st.session_state.auto_check_result = None
+            st.rerun()
+
     # Show last trade result if available
     if st.session_state.last_trade_result:
         result = st.session_state.last_trade_result
@@ -4658,7 +4877,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Connection Management
     st.subheader("🔧 Connection Management")
-    col_conn1, col_conn2, col_conn3 = st.columns(3)
+    col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
 
     with col_conn1:
         if st.button("🔄 Quick Sync", type="primary", use_container_width=True):
@@ -4674,7 +4893,7 @@ elif st.session_state.current_page == "Trade Signal":
         if st.button("📊 Check All Status", type="secondary", use_container_width=True):
             import asyncio
 
-            with st.spinner("Checking connection and order status..."):
+            with st.spinner("Checking all orders status..."):
                 # First test connection
                 success, message = asyncio.run(test_metaapi_connection())
                 if not success:
@@ -4682,26 +4901,56 @@ elif st.session_state.current_page == "Trade Signal":
                 elif not st.session_state.order_placed:
                     st.warning("⚠️ No orders to check")
                 else:
-                    # Check each order
-                    for i, order in enumerate(st.session_state.order_placed):
-                        status, error = asyncio.run(quick_check_order_status(order))
-                        if error:
-                            st.error(f"Order {i + 1}: {error}")
+                    # Check all orders
+                    success, message = asyncio.run(check_all_orders_status())
+                    if success:
+                        if "Updated" in message:
+                            st.success(f"✅ {message}")
                         else:
-                            st.info(f"Order {i + 1}: {status}")
-                            if status == 'FILLED':
-                                # Move to in_trade
-                                st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['timestamp'] != order['timestamp']]
-                                st.session_state.in_trade.append({
-                                    **order,
-                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                    'order_status': 'FILLED'
-                                })
-                                sync_with_active_opps()
+                            st.info(f"ℹ️ {message}")
+                    else:
+                        st.error(f"❌ {message}")
                     st.rerun()
 
     with col_conn3:
+        if st.button("🚫 Cancel All Orders", type="secondary", use_container_width=True):
+            if st.session_state.order_placed:
+                import asyncio
+
+                with st.spinner(f"Cancelling {len(st.session_state.order_placed)} orders in MT5..."):
+                    cancelled_count = 0
+                    failed_count = 0
+
+                    for order in st.session_state.order_placed[:]:
+                        success, message = asyncio.run(cancel_order_in_mt5(
+                            order['selected_pair'],
+                            order.get('direction', 'Unknown'),
+                            safe_float(order.get('entry_price'), 0.0),
+                            safe_float(order.get('position_size'), 0.1)
+                        ))
+
+                        if success:
+                            # Remove from order_placed
+                            st.session_state.order_placed.remove(order)
+                            st.session_state.ready_to_order.append({
+                                **{k: v for k, v in order.items() if k not in ['order_time', 'order_status']},
+                                'status': 'Order Ready'
+                            })
+                            cancelled_count += 1
+                        else:
+                            failed_count += 1
+                            st.error(f"Failed to cancel {order['selected_pair']}: {message}")
+
+                    if cancelled_count > 0:
+                        st.success(f"✅ Cancelled {cancelled_count} orders in MT5")
+                    if failed_count > 0:
+                        st.warning(f"⚠️ Failed to cancel {failed_count} orders")
+
+                    st.rerun()
+            else:
+                st.warning("No orders to cancel")
+
+    with col_conn4:
         if st.button("📊 View Active Opps", type="secondary", use_container_width=True):
             st.session_state.current_page = "Active Opps"
             st.rerun()
@@ -4868,63 +5117,60 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**Order Time:** {order.get('order_time', 'N/A')}")
 
-                        # Action buttons
-                        col_check, col_cancel, col_manual = st.columns(3)
+                        # Action buttons - REMOVED INDIVIDUAL CHECK STATUS BUTTON
+                        col_cancel, col_manual = st.columns(2)
 
-                        with col_check:
-                            if st.button("🔄 Check Status", key=f"check_{i}", use_container_width=True):
+                        with col_cancel:
+                            if st.button("❌ Cancel in MT5", key=f"cancel_{i}", type="secondary",
+                                         use_container_width=True):
                                 import asyncio
 
-                                with st.spinner("Checking order status..."):
+                                with st.spinner("Cancelling order in MT5..."):
                                     # First test connection
                                     success, message = asyncio.run(test_metaapi_connection())
                                     if not success:
                                         st.error(f"❌ Connection failed: {message}")
                                     else:
-                                        status, error = asyncio.run(quick_check_order_status(order))
-                                        if error:
-                                            st.error(f"❌ {error}")
-                                        else:
-                                            st.info(f"**MT5 Status:** {status}")
+                                        # Cancel order in MT5
+                                        success, message = asyncio.run(cancel_order_in_mt5(
+                                            order['selected_pair'],
+                                            order.get('direction', 'Unknown'),
+                                            safe_float(order.get('entry_price'), 0.0),
+                                            safe_float(order.get('position_size'), 0.1)
+                                        ))
 
-                                            if status == 'FILLED':
-                                                st.success("✅ Order filled! Moving to In Trade tab.")
-                                                # Move to in_trade
+                                        if success:
+                                            st.success(message)
+                                            # Remove from order_placed and move back to ready_to_order
+                                            st.session_state.order_placed = [o for o in st.session_state.order_placed if
+                                                                             o['timestamp'] != order['timestamp']]
+                                            st.session_state.ready_to_order.append({
+                                                **{k: v for k, v in order.items() if
+                                                   k not in ['order_time', 'order_status']},
+                                                'status': 'Order Ready'
+                                            })
+                                            st.rerun()
+                                        else:
+                                            st.error(message)
+                                            # Option: still allow local cancellation if MT5 cancellation fails
+                                            if st.button("Remove Locally Anyway", key=f"force_remove_{i}"):
                                                 st.session_state.order_placed = [o for o in
                                                                                  st.session_state.order_placed if
                                                                                  o['timestamp'] != order['timestamp']]
-                                                st.session_state.in_trade.append({
-                                                    **order,
-                                                    'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                                    'order_status': 'FILLED'
+                                                st.session_state.ready_to_order.append({
+                                                    **{k: v for k, v in order.items() if
+                                                       k not in ['order_time', 'order_status']},
+                                                    'status': 'Order Ready'
                                                 })
-                                                # Sync with Active Opps to update status to Order Completed
-                                                sync_with_active_opps()
+                                                st.success("Order removed locally (MT5 cancellation failed)")
                                                 st.rerun()
-                                            elif status == 'PENDING':
-                                                st.info("✅ Order still pending in MT5")
-                                            else:
-                                                st.warning("⚠️ Order not found in MT5 - it may take a moment to appear")
-
-                        with col_cancel:
-                            if st.button("❌ Cancel Order", key=f"cancel_{i}", type="secondary",
-                                         use_container_width=True):
-                                # Simple local cancellation for now
-                                st.session_state.order_placed = [o for o in st.session_state.order_placed if
-                                                                 o['timestamp'] != order['timestamp']]
-                                st.session_state.ready_to_order.append({
-                                    **{k: v for k, v in order.items() if k not in ['order_time', 'order_status']},
-                                    'status': 'Order Ready'
-                                })
-                                st.success("✅ Order cancelled locally - check MT5 manually if needed")
-                                st.rerun()
 
                         with col_manual:
                             if st.button("🗑️ Delete Record", key=f"delete_{i}", use_container_width=True):
-                                # Manual deletion
+                                # Manual deletion (local only)
                                 st.session_state.order_placed = [o for o in st.session_state.order_placed if
                                                                  o['timestamp'] != order['timestamp']]
-                                st.success("Record deleted from Order Placed")
+                                st.success("Record deleted locally from Order Placed")
                                 st.rerun()
 
         with tab3:

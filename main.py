@@ -4710,9 +4710,13 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_to_active_opps():
-        """Sync Trade Signal changes back to Active Opps - FIXED VERSION"""
+        """Sync Trade Signal changes back to Active Opps - WITH DEBUGGING"""
         try:
             print("🔄 STARTING SYNC TO ACTIVE OPPS...")
+            print(f"📊 Current state:")
+            print(f"  - Ready to Order: {len(st.session_state.ready_to_order)}")
+            print(f"  - Order Placed: {len(st.session_state.order_placed)}")
+            print(f"  - In Trade: {len(st.session_state.in_trade)}")
 
             # Load current workflow data from Google Sheets
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
@@ -4763,8 +4767,7 @@ elif st.session_state.current_page == "Trade Signal":
                 # Save updated records back to sheets
                 if records_updated > 0:
                     print("💾 Saving updated records to Google Sheets...")
-                    success = save_data_to_sheets(pd.DataFrame(updated_records), sheet_name="Trade",
-                                                  worksheet_name="Workflow")
+                    success = save_data_to_sheets(pd.DataFrame(updated_records), sheet_name="Trade", worksheet_name="Workflow")
                     if success:
                         print("✅ Successfully saved to Google Sheets")
                         return True, f"✅ Sync completed! Updated {records_updated} records in Active Opps"
@@ -4786,7 +4789,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed - WITH SYNC"""
+        """Move signal from Ready to Order to Order Placed - WITH SYNC AND DEBUGGING"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
 
@@ -4809,7 +4812,7 @@ elif st.session_state.current_page == "Trade Signal":
                 'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'order_status': 'PENDING',
                 'direction': calculate_direction(signal.get('entry_price'), signal.get('exit_price')),
-                'status': 'Order Placed'
+                'status': 'Order Placed'  # Explicit status for sync
             }
             st.session_state.order_placed.append(new_order)
 

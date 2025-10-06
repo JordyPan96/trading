@@ -3510,39 +3510,43 @@ elif st.session_state.current_page == "Active Opps":
 
     def update_record_status(original_index, new_status):
         """Update record status and sync with trade signals"""
-        st.session_state.saved_records[original_index]['status'] = new_status
-
-        # Auto-save to cloud
-        success = save_workflow_to_sheets(st.session_state.saved_records)
-        if success:
-            # Sync with trade signals
-            sync_with_trade_signals()
-            st.success(f"Record moved to {new_status} and synced!")
-        else:
-            st.warning("Record updated locally but failed to save to cloud.")
-
-        return success
-
-
-    def update_record_and_prices(original_index, updates, new_status=None):
-        """Update record fields and optionally change status with sync"""
-        # Update the specified fields
-        for key, value in updates.items():
-            st.session_state.saved_records[original_index][key] = value
-
-        # Update status if provided
-        if new_status:
+        try:
             st.session_state.saved_records[original_index]['status'] = new_status
 
-        # Save to cloud
-        success = save_workflow_to_sheets(st.session_state.saved_records)
-        if success:
-            # Sync with trade signals
-            if new_status:  # Only sync if status changed
+            # Auto-save to cloud
+            success = save_workflow_to_sheets(st.session_state.saved_records)
+            if success:
+                # Sync with trade signals
                 sync_with_trade_signals()
-            return True
-        else:
-            return False
+                return True, f"Record moved to {new_status} and synced!"
+            else:
+                return False, "Record updated locally but failed to save to cloud."
+        except Exception as e:
+            return False, f"Error updating record: {str(e)}"
+
+
+    def update_record_fields(original_index, updates, new_status=None):
+        """Update record fields and optionally change status with sync"""
+        try:
+            # Update the specified fields
+            for key, value in updates.items():
+                st.session_state.saved_records[original_index][key] = value
+
+            # Update status if provided
+            if new_status:
+                st.session_state.saved_records[original_index]['status'] = new_status
+
+            # Save to cloud
+            success = save_workflow_to_sheets(st.session_state.saved_records)
+            if success:
+                # Sync with trade signals if status changed
+                if new_status:
+                    sync_with_trade_signals()
+                return True, "Record updated successfully!"
+            else:
+                return False, "Failed to save record to cloud."
+        except Exception as e:
+            return False, f"Error updating record: {str(e)}"
 
 
     # Helper function to safely convert record values to float
@@ -3869,7 +3873,7 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"{current_stage.lower()}_target_{original_index}"
                             )
 
-                        # SPECULATION STAGE - FIXED VERSION
+                        # SPECULATION STAGE - FIXED WITH PROPER RERUN
                         if current_stage == 'Speculation':
                             # Calculate expected stop pips based on current entry/exit prices
                             expected_stop_pips = None
@@ -3915,7 +3919,7 @@ elif st.session_state.current_page == "Active Opps":
                             if not target_price_valid:
                                 st.error("Target price must be greater than 0 to move to Order Ready")
 
-                            # Action buttons for Speculation stage - FIXED TO USE NEW SYNC FUNCTION
+                            # Action buttons for Speculation stage - FIXED WITH IMMEDIATE RERUN
                             col_update_only, col_move, col_delete = st.columns([1, 1, 1])
 
                             with col_update_only:
@@ -3925,12 +3929,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    success = update_record_and_prices(original_index, updates)
+                                    success, message = update_record_fields(original_index, updates)
                                     if success:
-                                        st.success("Record updated!")
+                                        st.success(message)
                                         st.rerun()
                                     else:
-                                        st.error("Failed to update record")
+                                        st.error(message)
 
                             with col_move:
                                 # Check if updating to active status would exceed the limit
@@ -3945,24 +3949,27 @@ elif st.session_state.current_page == "Active Opps":
                                             'exit_price': new_exit_price,
                                             'target_price': new_target_price
                                         }
-                                        success = update_record_and_prices(original_index, updates, 'Order Ready')
+                                        success, message = update_record_fields(original_index, updates, 'Order Ready')
                                         if success:
-                                            st.success("Record moved to Order Ready and synced!")
+                                            st.success(message)
                                             st.rerun()
                                         else:
-                                            st.error("Failed to move record to Order Ready")
+                                            st.error(message)
 
                             with col_delete:
                                 if st.button(f"🗑️ Delete", key=f"spec_delete_{original_index}"):
                                     st.session_state.saved_records.pop(original_index)
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    sync_with_trade_signals()
-                                    st.success("Record deleted!")
-                                    st.rerun()
+                                    save_success = save_workflow_to_sheets(st.session_state.saved_records)
+                                    if save_success:
+                                        sync_with_trade_signals()
+                                        st.success("Record deleted and synced!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to delete record")
 
                         # ORDER READY STAGE
                         elif current_stage == 'Order Ready':
-                            # Action buttons for Order Ready stage - UPDATED TO USE NEW SYNC FUNCTION
+                            # Action buttons for Order Ready stage
                             col_update_only, col_move, col_delete = st.columns([1, 1, 1])
 
                             with col_update_only:
@@ -3972,26 +3979,32 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    success = update_record_and_prices(original_index, updates)
+                                    success, message = update_record_fields(original_index, updates)
                                     if success:
-                                        st.success("Record updated and synced!")
+                                        st.success(message)
                                         st.rerun()
                                     else:
-                                        st.error("Failed to update record")
+                                        st.error(message)
 
                             with col_move:
                                 if st.button(f"Move to Order Placed", key=f"ready_move_{original_index}"):
-                                    success = update_record_status(original_index, 'Order Placed')
+                                    success, message = update_record_status(original_index, 'Order Placed')
                                     if success:
+                                        st.success(message)
                                         st.rerun()
+                                    else:
+                                        st.error(message)
 
                             with col_delete:
                                 if st.button(f"🗑️ Delete", key=f"ready_delete_{original_index}"):
                                     st.session_state.saved_records.pop(original_index)
-                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                    sync_with_trade_signals()
-                                    st.success("Record deleted and synced!")
-                                    st.rerun()
+                                    save_success = save_workflow_to_sheets(st.session_state.saved_records)
+                                    if save_success:
+                                        sync_with_trade_signals()
+                                        st.success("Record deleted and synced!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to delete record")
 
                         # NEW: ORDER PLACED STAGE
                         elif current_stage == 'Order Placed':
@@ -4005,24 +4018,30 @@ elif st.session_state.current_page == "Active Opps":
                                         'exit_price': new_exit_price,
                                         'target_price': new_target_price
                                     }
-                                    success = update_record_and_prices(original_index, updates)
+                                    success, message = update_record_fields(original_index, updates)
                                     if success:
-                                        st.success("Record updated and synced!")
+                                        st.success(message)
                                         st.rerun()
                                     else:
-                                        st.error("Failed to update record")
+                                        st.error(message)
 
                             with col_move:
                                 if st.button(f"Move to Order Filled", key=f"placed_move_{original_index}"):
-                                    success = update_record_status(original_index, 'Order Filled')
+                                    success, message = update_record_status(original_index, 'Order Filled')
                                     if success:
+                                        st.success(message)
                                         st.rerun()
+                                    else:
+                                        st.error(message)
 
                             with col_delete:
                                 if st.button(f"Move Back to Order Ready", key=f"placed_back_{original_index}"):
-                                    success = update_record_status(original_index, 'Order Ready')
+                                    success, message = update_record_status(original_index, 'Order Ready')
                                     if success:
+                                        st.success(message)
                                         st.rerun()
+                                    else:
+                                        st.error(message)
 
                         # ORDER FILLED STAGE (was Order Completed)
                         else:
@@ -4115,12 +4134,12 @@ elif st.session_state.current_page == "Active Opps":
                                         'pnl': new_pnl,
                                         'poi': new_poi
                                     }
-                                    success = update_record_and_prices(original_index, updates)
+                                    success, message = update_record_fields(original_index, updates)
                                     if success:
-                                        st.success("Record updated and synced!")
+                                        st.success(message)
                                         st.rerun()
                                     else:
-                                        st.error("Failed to update record")
+                                        st.error(message)
 
                             with col_close:
                                 if st.button(f"Finalize & Close Trade", key=f"filled_close_{original_index}",
@@ -4215,9 +4234,12 @@ elif st.session_state.current_page == "Active Opps":
 
                             with col_delete:
                                 if st.button(f"Move Back to Order Placed", key=f"filled_back_{original_index}"):
-                                    success = update_record_status(original_index, 'Order Placed')
+                                    success, message = update_record_status(original_index, 'Order Placed')
                                     if success:
+                                        st.success(message)
                                         st.rerun()
+                                    else:
+                                        st.error(message)
 
         st.markdown("---")
 
@@ -4231,9 +4253,9 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.order_placed = []
                 st.session_state.in_trade = []
                 st.success("All records cleared and synced!")
+                st.rerun()
             else:
                 st.warning("Records cleared locally but failed to save to cloud.")
-            st.rerun()
 
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available

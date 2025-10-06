@@ -4637,48 +4637,46 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def sync_to_active_opps():
-        """Sync Trade Signal changes back to Active Opps - FIXED VERSION"""
+        """Sync Trade Signal changes back to Active Opps - CORRECTED VERSION"""
         try:
-            
-
-            # Load current workflow data
+            # Load current workflow data from Google Sheets
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
 
             if workflow_df is not None and not workflow_df.empty:
                 # Convert to list of dictionaries for easier manipulation
                 all_records = workflow_df.to_dict('records')
-
-                # Create mappings of timestamps to their current status in Trade Signals
-                ready_timestamps = {signal['timestamp'] for signal in st.session_state.ready_to_order}
-                placed_timestamps = {order['timestamp'] for order in st.session_state.order_placed}
-                trade_timestamps = {trade['timestamp'] for trade in st.session_state.in_trade}
-
-                # Update records based on trade signals states
-                updated_records = []
                 records_updated = 0
 
+                # Create mappings of timestamps to their NEW status in Trade Signals
+                # This is the key fix - we need to map what the NEW status should be
+                status_mapping = {}
+
+                # Order Placed records should have status 'Order Placed'
+                for order in st.session_state.order_placed:
+                    status_mapping[order['timestamp']] = 'Order Placed'
+
+                # In Trade records should have status 'Order Filled'
+                for trade in st.session_state.in_trade:
+                    status_mapping[trade['timestamp']] = 'Order Filled'
+
+                # Ready to Order records should have status 'Order Ready'
+                for signal in st.session_state.ready_to_order:
+                    status_mapping[signal['timestamp']] = 'Order Ready'
+
+                # Update records based on the status mapping
+                updated_records = []
                 for record in all_records:
                     timestamp = str(record.get('timestamp'))
                     original_status = record.get('status')
-                    new_status = original_status
 
-                    # Determine new status based on which Trade Signal list the record is in
-                    if timestamp in trade_timestamps:
-                        new_status = 'Order Filled'
-                    elif timestamp in placed_timestamps:
-                        new_status = 'Order Placed'
-                    elif timestamp in ready_timestamps:
-                        new_status = 'Order Ready'
-                    else:
-                        # If not in any trade signal state but was in an active state, move back to Speculation
-                        if original_status in ['Order Ready', 'Order Placed', 'Order Filled']:
-                            new_status = 'Speculation'
+                    # Get the new status from our mapping
+                    new_status = status_mapping.get(timestamp, original_status)
 
                     # Only update if status changed
                     if new_status != original_status:
                         record['status'] = new_status
                         records_updated += 1
-                        print(f"🔄 Updating {record['selected_pair']} from {original_status} to {new_status}")
+                        print(f"🔄 Syncing {record['selected_pair']} from {original_status} to {new_status}")
 
                     updated_records.append(record)
 
@@ -4699,9 +4697,8 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f"❌ Sync error: {str(e)}"
 
 
-    # SIMPLE ACTION FUNCTIONS FOR TRADE SIGNAL
     def handle_move_to_order_placed(signal_index):
-        """Move signal from Ready to Order to Order Placed - IMPROVED VERSION"""
+        """Move signal from Ready to Order to Order Placed - WITH PROPER SYNC"""
         try:
             signal = st.session_state.ready_to_order[signal_index]
 
@@ -4721,7 +4718,7 @@ elif st.session_state.current_page == "Trade Signal":
                 'order_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'order_status': 'PENDING',
                 'direction': calculate_direction(signal.get('entry_price'), signal.get('exit_price')),
-                'status': 'Order Placed'
+                'status': 'Order Placed'  # This is important!
             }
             st.session_state.order_placed.append(new_order)
 
@@ -4735,6 +4732,9 @@ elif st.session_state.current_page == "Trade Signal":
                 return True
             else:
                 st.error(f"❌ {message}")
+                # Rollback if sync fails
+                st.session_state.ready_to_order.insert(signal_index, signal)
+                st.session_state.order_placed.pop()
                 return False
 
         except Exception as e:

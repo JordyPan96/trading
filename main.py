@@ -3323,7 +3323,6 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
 
-
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""
@@ -3342,7 +3341,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error loading workflow data: {e}")
             return pd.DataFrame()
-
 
     def save_workflow_to_sheets(data):
         """Save workflow data to Google Sheets using existing functions"""
@@ -3364,7 +3362,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error saving workflow data: {e}")
             return False
-
 
     def sync_with_trade_signals():
         """Two-way sync between Active Opps and Trade Signals - FIXED VERSION"""
@@ -3435,7 +3432,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             return False, f"Sync error: {str(e)}"
 
-
     # SIMPLE ACTION FUNCTIONS
     def handle_update_record(record_index, entry_price, exit_price, target_price):
         """Handle record update"""
@@ -3453,7 +3449,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Update error: {e}")
             return False
 
-
     def handle_move_record(record_index, new_status):
         """Handle moving record to new status"""
         try:
@@ -3467,7 +3462,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Move error: {e}")
             return False
-
 
     def handle_delete_record(record_index):
         """Handle record deletion"""
@@ -3483,7 +3477,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Delete error: {e}")
             return False
 
-
     # Helper function
     def safe_float(value, default=0.0):
         if value is None or value == 'None' or value == '':
@@ -3493,14 +3486,12 @@ elif st.session_state.current_page == "Active Opps":
         except (ValueError, TypeError):
             return default
 
-
     # Generate unique key for each record
     def generate_unique_key(record_index, record, field_name):
         """Generate truly unique key using index, pair, and timestamp"""
         pair = record['selected_pair'].replace('/', '_').replace(' ', '_')
         timestamp = record['timestamp'].replace(':', '_').replace(' ', '_').replace('-', '_').replace('.', '_')
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
-
 
     # AUTO-RELOAD FUNCTION - CRITICAL FOR TWO-WAY SYNC
     def check_and_reload_from_sheets():
@@ -3532,7 +3523,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             print(f"Check reload error: {e}")
             return False
-
 
     # AUTO-RELOAD ON EVERY PAGE LOAD
     should_reload = check_and_reload_from_sheets()
@@ -3574,22 +3564,26 @@ elif st.session_state.current_page == "Active Opps":
 
         st.rerun()
 
-    # SYNC STATUS SECTION - ADDED FOR TWO-WAY SYNC
+    # SYNC STATUS SECTION - ENHANCED FOR TWO-WAY SYNC
     st.write("---")
     col_sync1, col_sync2, col_sync3 = st.columns(3)
 
     with col_sync1:
         if st.button("🔄 Check for Updates", key="check_updates", use_container_width=True):
             with st.spinner("Checking for updates..."):
-                workflow_data = load_workflow_from_sheets()
-                if not workflow_data.empty:
-                    st.session_state.saved_records = workflow_data.to_dict('records')
-                    sync_with_trade_signals()
-                    st.session_state.last_sync_time = datetime.now()
-                    st.success("✅ Data updated from cloud!")
-                    st.rerun()
+                should_reload = check_and_reload_from_sheets()
+                if should_reload:
+                    workflow_data = load_workflow_from_sheets()
+                    if not workflow_data.empty:
+                        st.session_state.saved_records = workflow_data.to_dict('records')
+                        sync_with_trade_signals()
+                        st.session_state.last_sync_time = datetime.now()
+                        st.success("✅ Data updated from cloud!")
+                        st.rerun()
+                    else:
+                        st.info("No data found in cloud")
                 else:
-                    st.info("No new data found")
+                    st.info("Data is already up to date")
 
     with col_sync2:
         if st.button("📤 View Trade Signals", key="view_signals", use_container_width=True):
@@ -3651,6 +3645,8 @@ elif st.session_state.current_page == "Active Opps":
                             st.session_state.saved_records = csv_records
                             # Sync trade signals after replacing data
                             sync_with_trade_signals()
+                            # Save to Google Sheets
+                            save_workflow_to_sheets(st.session_state.saved_records)
                             st.session_state.last_action = "loaded_data"
                             st.rerun()
 
@@ -3664,6 +3660,8 @@ elif st.session_state.current_page == "Active Opps":
                                 st.session_state.saved_records.extend(new_records)
                                 # Sync trade signals after merging data
                                 sync_with_trade_signals()
+                                # Save to Google Sheets
+                                save_workflow_to_sheets(st.session_state.saved_records)
                                 st.success(f"✅ Added {len(new_records)} new records from CSV!")
                                 st.rerun()
                             else:
@@ -3715,9 +3713,12 @@ elif st.session_state.current_page == "Active Opps":
 
     with col2:
         if st.button("🔄 Sync Trade Signals", key="sync_signals"):
-            sync_with_trade_signals()
-            st.session_state.last_action = "synced_signals"
-            st.rerun()
+            success, message = sync_with_trade_signals()
+            if success:
+                st.session_state.last_action = "synced_signals"
+                st.rerun()
+            else:
+                st.error(f"Sync failed: {message}")
 
     with col3:
         if st.session_state.saved_records:

@@ -3303,26 +3303,34 @@ elif st.session_state.current_page == "Risk Calculation":
 elif st.session_state.current_page == "Active Opps":
     st.title("Saved Records")
 
+    # Initialize session states
+    if 'saved_records' not in st.session_state:
+        st.session_state.saved_records = []
+    if 'ready_to_order' not in st.session_state:
+        st.session_state.ready_to_order = []
+    if 'order_placed' not in st.session_state:
+        st.session_state.order_placed = []
+    if 'in_trade' not in st.session_state:
+        st.session_state.in_trade = []
+    if 'current_stage' not in st.session_state:
+        st.session_state.current_stage = 'Speculation'
+    if 'last_action' not in st.session_state:
+        st.session_state.last_action = None
+
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""
         try:
-            # Use your existing load_data_from_sheets function but specify the workflow worksheet
             df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
             if df is not None and not df.empty:
-                # Convert timestamp to string for consistency
                 if 'timestamp' in df.columns:
                     df['timestamp'] = df['timestamp'].astype(str)
-
-                # Clean numeric columns - convert string 'None' to actual None/0.0
                 numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size']
                 for col in numeric_columns:
                     if col in df.columns:
-                        # Replace string 'None' with actual None, then convert to float
                         df[col] = df[col].replace('None', None)
                         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
-
                 return df
             return pd.DataFrame()
         except Exception as e:
@@ -3333,24 +3341,18 @@ elif st.session_state.current_page == "Active Opps":
     def save_workflow_to_sheets(data):
         """Save workflow data to Google Sheets using existing functions"""
         try:
-            # Convert records to DataFrame if it's a list
             if isinstance(data, list):
                 data_to_save = pd.DataFrame(data)
             else:
                 data_to_save = data.copy()
 
-            # Ensure all required columns exist
             required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                 'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
-
             for col in required_columns:
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
 
-            # Clean data using your existing function
             data_clean = clean_data_for_google_sheets(data_to_save)
-
-            # Save using your existing function but specify the workflow worksheet
             success = save_data_to_sheets(data_clean, sheet_name="Trade", worksheet_name="Workflow")
             return success
         except Exception as e:
@@ -3358,200 +3360,184 @@ elif st.session_state.current_page == "Active Opps":
             return False
 
 
-    # TWO-WAY SYNC FUNCTIONS
+    # IMPROVED SYNC FUNCTION - PRESERVES EXISTING DATA
     def sync_with_trade_signals():
-        """Two-way sync between Active Opps and Trade Signals"""
+        """Improved sync that preserves existing trade signal data"""
         try:
-            # Initialize trade signals session states if they don't exist
-            if 'ready_to_order' not in st.session_state:
-                st.session_state.ready_to_order = []
-            if 'order_placed' not in st.session_state:
-                st.session_state.order_placed = []
-            if 'in_trade' not in st.session_state:
-                st.session_state.in_trade = []
+            # Get current timestamps from Active Opps
+            order_ready_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
+                                      r.get('status') == 'Order Ready'}
+            order_placed_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
+                                       r.get('status') == 'Order Placed'}
+            order_filled_timestamps = {r['timestamp'] for r in st.session_state.saved_records if
+                                       r.get('status') == 'Order Filled'}
 
-            # SYNC 1: Order Ready (Active Opps) <-> Ready to Order (Trade Signal)
-            order_ready_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Ready']
-
-            # Update Trade Signal's ready_to_order from Active Opps
-            current_ready_timestamps = {r['timestamp'] for r in order_ready_records}
-
-            # Remove from ready_to_order if not in Active Opps Order Ready
+            # Remove records that are no longer in the corresponding Active Opps status
             st.session_state.ready_to_order = [
                 signal for signal in st.session_state.ready_to_order
-                if signal.get('timestamp') in current_ready_timestamps
+                if signal.get('timestamp') in order_ready_timestamps
             ]
-
-            # Add/update ready_to_order from Active Opps
-            for record in order_ready_records:
-                existing_signal = next((s for s in st.session_state.ready_to_order
-                                        if s.get('timestamp') == record['timestamp']), None)
-                if existing_signal:
-                    # Update existing signal
-                    existing_signal.update({
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'trend_position': record.get('trend_position', 'Not set'),
-                        'variances': record.get('Variances', 'Not set'),
-                        'status': 'Order Ready'
-                    })
-                else:
-                    # Add new signal
-                    st.session_state.ready_to_order.append({
-                        'timestamp': record['timestamp'],
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'trend_position': record.get('trend_position', 'Not set'),
-                        'variances': record.get('Variances', 'Not set'),
-                        'status': 'Order Ready'
-                    })
-
-            # SYNC 2: NEW - Order Placed (Active Opps) <-> Order Placed (Trade Signal)
-            order_placed_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Placed']
-
-            # Update Trade Signal's order_placed from Active Opps
-            current_placed_timestamps = {r['timestamp'] for r in order_placed_records}
-
-            # Remove from order_placed if not in Active Opps Order Placed
             st.session_state.order_placed = [
                 order for order in st.session_state.order_placed
-                if order.get('timestamp') in current_placed_timestamps
+                if order.get('timestamp') in order_placed_timestamps
             ]
-
-            # Add/update order_placed from Active Opps
-            for record in order_placed_records:
-                existing_order = next((o for o in st.session_state.order_placed
-                                       if o.get('timestamp') == record['timestamp']), None)
-                if existing_order:
-                    # Update existing order
-                    existing_order.update({
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'status': 'Order Placed'
-                    })
-                else:
-                    # Add new order with basic structure
-                    st.session_state.order_placed.append({
-                        'timestamp': record['timestamp'],
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'order_status': 'PENDING',
-                        'status': 'Order Placed'
-                    })
-
-            # SYNC 3: Order Filled (Active Opps) <-> In Trade (Trade Signal)
-            order_filled_records = [r for r in st.session_state.saved_records if r.get('status') == 'Order Filled']
-
-            # Update Trade Signal's in_trade from Active Opps
-            current_filled_timestamps = {r['timestamp'] for r in order_filled_records}
-
-            # Remove from in_trade if not in Active Opps Order Filled
             st.session_state.in_trade = [
                 trade for trade in st.session_state.in_trade
-                if trade.get('timestamp') in current_filled_timestamps
+                if trade.get('timestamp') in order_filled_timestamps
             ]
 
-            # Add/update in_trade from Active Opps
-            for record in order_filled_records:
-                existing_trade = next((t for t in st.session_state.in_trade
-                                       if t.get('timestamp') == record['timestamp']), None)
-                if existing_trade:
-                    # Update existing trade
-                    existing_trade.update({
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'status': 'Order Filled'
-                    })
-                else:
-                    # Add new trade
-                    st.session_state.in_trade.append({
-                        'timestamp': record['timestamp'],
-                        'selected_pair': record['selected_pair'],
-                        'risk_multiplier': record['risk_multiplier'],
-                        'position_size': record['position_size'],
-                        'stop_pips': record['stop_pips'],
-                        'entry_price': record['entry_price'],
-                        'exit_price': record['exit_price'],
-                        'target_price': record['target_price'],
-                        'order_status': 'FILLED',
-                        'status': 'Order Filled'
-                    })
+            # Add/update records from Active Opps
+            for record in st.session_state.saved_records:
+                timestamp = record['timestamp']
+                status = record.get('status')
 
-            return True, "Sync completed successfully"
+                if status == 'Order Ready':
+                    # Check if already exists in ready_to_order
+                    existing_signal = next((s for s in st.session_state.ready_to_order if s['timestamp'] == timestamp),
+                                           None)
+                    if existing_signal:
+                        # Update existing
+                        existing_signal.update({
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'status': 'Order Ready'
+                        })
+                    else:
+                        # Add new
+                        st.session_state.ready_to_order.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'status': 'Order Ready'
+                        })
 
+                elif status == 'Order Placed':
+                    # Check if already exists in order_placed
+                    existing_order = next((o for o in st.session_state.order_placed if o['timestamp'] == timestamp),
+                                          None)
+                    if existing_order:
+                        # Update existing
+                        existing_order.update({
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'status': 'Order Placed'
+                        })
+                    else:
+                        # Add new
+                        st.session_state.order_placed.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'order_status': 'PENDING',
+                            'status': 'Order Placed'
+                        })
+
+                elif status == 'Order Filled':
+                    # Check if already exists in in_trade
+                    existing_trade = next((t for t in st.session_state.in_trade if t['timestamp'] == timestamp), None)
+                    if existing_trade:
+                        # Update existing
+                        existing_trade.update({
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'status': 'Order Filled'
+                        })
+                    else:
+                        # Add new
+                        st.session_state.in_trade.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record['selected_pair'],
+                            'risk_multiplier': record['risk_multiplier'],
+                            'position_size': record['position_size'],
+                            'stop_pips': record['stop_pips'],
+                            'entry_price': record['entry_price'],
+                            'exit_price': record['exit_price'],
+                            'target_price': record['target_price'],
+                            'order_status': 'FILLED',
+                            'status': 'Order Filled'
+                        })
+
+            return True
         except Exception as e:
-            return False, f"Sync error: {str(e)}"
+            st.error(f"Sync error: {e}")
+            return False
 
 
-    def update_record_status(original_index, new_status):
-        """Update record status and sync with trade signals"""
+    # SIMPLE ACTION FUNCTIONS
+    def handle_update_record(record_index, entry_price, exit_price, target_price):
+        """Handle record update"""
         try:
-            st.session_state.saved_records[original_index]['status'] = new_status
+            st.session_state.saved_records[record_index]['entry_price'] = entry_price
+            st.session_state.saved_records[record_index]['exit_price'] = exit_price
+            st.session_state.saved_records[record_index]['target_price'] = target_price
 
-            # Auto-save to cloud
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
-                # Sync with trade signals
-                sync_with_trade_signals()
-                return True, f"Record moved to {new_status} and synced!"
-            else:
-                return False, "Record updated locally but failed to save to cloud."
+                st.session_state.last_action = f"updated_record_{record_index}"
+                return True
+            return False
         except Exception as e:
-            return False, f"Error updating record: {str(e)}"
+            st.error(f"Update error: {e}")
+            return False
 
 
-    def update_record_fields(original_index, updates, new_status=None):
-        """Update record fields and optionally change status with sync"""
+    def handle_move_record(record_index, new_status):
+        """Handle moving record to new status"""
         try:
-            # Update the specified fields
-            for key, value in updates.items():
-                st.session_state.saved_records[original_index][key] = value
-
-            # Update status if provided
-            if new_status:
-                st.session_state.saved_records[original_index]['status'] = new_status
-
-            # Save to cloud
+            st.session_state.saved_records[record_index]['status'] = new_status
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
-                # Sync with trade signals if status changed
-                if new_status:
-                    sync_with_trade_signals()
-                return True, "Record updated successfully!"
-            else:
-                return False, "Failed to save record to cloud."
+                sync_with_trade_signals()  # Sync after status change
+                st.session_state.last_action = f"moved_record_{record_index}_to_{new_status}"
+                return True
+            return False
         except Exception as e:
-            return False, f"Error updating record: {str(e)}"
+            st.error(f"Move error: {e}")
+            return False
 
 
-    # Helper function to safely convert record values to float
+    def handle_delete_record(record_index):
+        """Handle record deletion"""
+        try:
+            st.session_state.saved_records.pop(record_index)
+            success = save_workflow_to_sheets(st.session_state.saved_records)
+            if success:
+                sync_with_trade_signals()  # Sync after deletion
+                st.session_state.last_action = f"deleted_record_{record_index}"
+                return True
+            return False
+        except Exception as e:
+            st.error(f"Delete error: {e}")
+            return False
+
+
+    # Helper function
     def safe_float(value, default=0.0):
-        """Safely convert value to float, handling None and string 'None'"""
         if value is None or value == 'None' or value == '':
             return default
         try:
@@ -3560,34 +3546,34 @@ elif st.session_state.current_page == "Active Opps":
             return default
 
 
-    # INITIAL LOAD AND SYNC
-    if 'saved_records' not in st.session_state:
-        # First time loading the page - load from cloud with spinner
+    # INITIAL LOAD
+    if not st.session_state.saved_records:
         with st.spinner("🔄 Loading data from cloud..."):
             workflow_data = load_workflow_from_sheets()
             if not workflow_data.empty:
-                # Convert DataFrame back to list of dictionaries
                 st.session_state.saved_records = workflow_data.to_dict('records')
+                sync_with_trade_signals()
+                st.success("Workflow data loaded and synced!")
 
-                # Perform initial sync with trade signals
-                sync_success, sync_message = sync_with_trade_signals()
+    # Handle action results and force rerun
+    if st.session_state.last_action:
+        action = st.session_state.last_action
+        st.session_state.last_action = None
 
-                if sync_success:
-                    st.success("Workflow data loaded and synced with trade signals!")
-                else:
-                    st.warning(f"Data loaded but sync had issues: {sync_message}")
-            else:
-                # Initialize empty if no data exists in cloud
-                st.session_state.saved_records = []
-                st.info("No data found in cloud. You can upload a CSV backup below.")
+        if "updated_record" in action:
+            st.success("✅ Record updated successfully!")
+        elif "moved_record" in action:
+            st.success("✅ Record moved successfully!")
+        elif "deleted_record" in action:
+            st.success("✅ Record deleted successfully!")
+        elif "loaded_data" in action:
+            st.success("✅ Data loaded successfully!")
+        elif "synced_signals" in action:
+            st.success("✅ Trade signals synced successfully!")
+        elif "cleared_all" in action:
+            st.success("✅ All records cleared successfully!")
 
-    # Initialize trade signals session states if they don't exist
-    if 'ready_to_order' not in st.session_state:
-        st.session_state.ready_to_order = []
-    if 'order_placed' not in st.session_state:
-        st.session_state.order_placed = []
-    if 'in_trade' not in st.session_state:
-        st.session_state.in_trade = []
+        st.rerun()
 
     # CSV Upload as fallback
     st.sidebar.markdown("---")
@@ -3641,7 +3627,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.session_state.saved_records = csv_records
                             # Sync trade signals after replacing data
                             sync_with_trade_signals()
-                            st.success(f"✅ Replaced current data with {len(csv_records)} records from CSV!")
+                            st.session_state.last_action = "loaded_data"
                             st.rerun()
 
                     with col_merge:
@@ -3655,9 +3641,9 @@ elif st.session_state.current_page == "Active Opps":
                                 # Sync trade signals after merging data
                                 sync_with_trade_signals()
                                 st.success(f"✅ Added {len(new_records)} new records from CSV!")
+                                st.rerun()
                             else:
                                 st.info("No new records to add (all timestamps already exist)")
-                            st.rerun()
 
                     # Show preview of CSV data
                     with st.expander("📋 Preview CSV Data (first 5 rows)"):
@@ -3676,127 +3662,94 @@ elif st.session_state.current_page == "Active Opps":
                 st.code(
                     "selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
 
-    # Count current records by status (UPDATED FOR NEW STATUSES)
-    speculation_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Speculation')
-    order_ready_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Ready')
-    order_placed_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Placed')
-    order_filled_count = sum(1 for record in st.session_state.saved_records if record.get('status') == 'Order Filled')
+    # Count records by status
+    speculation_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Speculation')
+    order_ready_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
+    order_placed_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Placed')
+    order_filled_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Filled')
     total_active_count = order_ready_count + order_placed_count + order_filled_count
 
-    # Show current record counts
+    # Display counts
     st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
     st.write(f"**Active Records:** {total_active_count}/2")
     st.write(
         f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
 
-    # Manual sync buttons
-    col_sync1, col_sync2, col_export = st.columns(3)
-    with col_sync1:
+    # Control buttons
+    col1, col2, col3 = st.columns(3)
+    with col1:
         if st.button("📥 Load from Cloud"):
-            with st.spinner("Loading data from cloud..."):
+            with st.spinner("Loading..."):
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
                     st.session_state.saved_records = workflow_data.to_dict('records')
-                    # Sync with trade signals after loading data
-                    sync_success, sync_message = sync_with_trade_signals()
-                    if sync_success:
-                        st.success("Workflow data loaded and synced!")
-                    else:
-                        st.warning(f"Data loaded but sync had issues: {sync_message}")
+                    sync_with_trade_signals()
+                    st.session_state.last_action = "loaded_data"
                     st.rerun()
                 else:
-                    st.error("No workflow data found in cloud. Try uploading a CSV backup.")
+                    st.error("No data found")
 
-    with col_sync2:
-        if st.button("🔄 Sync with Trade Signals", type="primary"):
-            with st.spinner("Syncing with trade signals..."):
-                sync_success, sync_message = sync_with_trade_signals()
-                if sync_success:
-                    st.success("✅ Sync completed successfully!")
-                else:
-                    st.error(f"❌ Sync failed: {sync_message}")
-                st.rerun()
+    with col2:
+        if st.button("🔄 Sync Trade Signals"):
+            sync_with_trade_signals()
+            st.session_state.last_action = "synced_signals"
+            st.rerun()
 
-    with col_export:
-        # Export current data to CSV
+    with col3:
         if st.session_state.saved_records:
             csv_data = pd.DataFrame(st.session_state.saved_records)
-
-            # Ensure we export with the correct column order
             column_order = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                             'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
-
-            # Reorder columns and fill any missing ones
             for col in column_order:
                 if col not in csv_data.columns:
                     csv_data[col] = None
-
             csv_data = csv_data[column_order]
-
             csv = csv_data.to_csv(index=False)
             st.download_button(
-                label="📤 Export to CSV",
-                data=csv,
-                file_name=f"workflow_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                mime="text/csv",
-                help="Download current workflow data as CSV backup",
+                "📤 Export CSV",
+                csv,
+                f"workflow_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                "text/csv",
                 key="export_csv"
             )
         else:
-            st.button("📤 Export to CSV", disabled=True, help="No data to export", key="export_disabled")
+            st.button("📤 Export CSV", disabled=True)
 
     if not st.session_state.saved_records:
         st.info(
             "No records saved yet. Go to Risk Calculation page and save some records, or upload a CSV backup above.")
     else:
-        # Convert records to DataFrame for nice display
+        # Display all records
         records_df = pd.DataFrame(st.session_state.saved_records)
         st.dataframe(records_df, use_container_width=True)
 
-        # WORKFLOW VISUALIZATION - UPDATED FOR 4 STAGES
+        # WORKFLOW VISUALIZATION
         st.markdown("---")
         st.subheader("Workflow Stages")
 
-        # Create clickable stage headers using columns - NOW 4 STAGES
         col1, col2, col3, col4 = st.columns(4)
-
         with col1:
-            # Initialize session state for current stage if not exists
-            if 'current_stage' not in st.session_state:
-                st.session_state.current_stage = 'Speculation'
-
-            # Make Speculation clickable
-            if st.button(f"Speculation ({speculation_count})",
-                         use_container_width=True,
+            if st.button(f"Speculation ({speculation_count})", use_container_width=True,
                          type="primary" if st.session_state.current_stage == 'Speculation' else "secondary"):
                 st.session_state.current_stage = 'Speculation'
                 st.rerun()
-
         with col2:
-            # Make Order Ready clickable
-            if st.button(f"Order Ready ({order_ready_count})",
-                         use_container_width=True,
+            if st.button(f"Order Ready ({order_ready_count})", use_container_width=True,
                          type="primary" if st.session_state.current_stage == 'Order Ready' else "secondary"):
                 st.session_state.current_stage = 'Order Ready'
                 st.rerun()
-
         with col3:
-            # NEW: Make Order Placed clickable
-            if st.button(f"Order Placed ({order_placed_count})",
-                         use_container_width=True,
+            if st.button(f"Order Placed ({order_placed_count})", use_container_width=True,
                          type="primary" if st.session_state.current_stage == 'Order Placed' else "secondary"):
                 st.session_state.current_stage = 'Order Placed'
                 st.rerun()
-
         with col4:
-            # CHANGED: Make Order Filled clickable (was Order Completed)
-            if st.button(f"Order Filled ({order_filled_count})",
-                         use_container_width=True,
+            if st.button(f"Order Filled ({order_filled_count})", use_container_width=True,
                          type="primary" if st.session_state.current_stage == 'Order Filled' else "secondary"):
                 st.session_state.current_stage = 'Order Filled'
                 st.rerun()
 
-        # Progress bars below the clickable headers
+        # Progress bars
         st.markdown("<br>", unsafe_allow_html=True)
         col_prog1, col_prog2, col_prog3, col_prog4 = st.columns(4)
         with col_prog1:
@@ -3809,453 +3762,344 @@ elif st.session_state.current_page == "Active Opps":
             st.progress(order_filled_count / max(len(st.session_state.saved_records), 1))
 
         st.markdown("---")
+        st.subheader(f"{st.session_state.current_stage} Stage")
 
-        # Display records based on selected stage - UPDATED FOR NEW STAGES
-        current_stage = st.session_state.current_stage
-        st.subheader(f"{current_stage} Stage")
-
-        # Get records for the current stage
-        if current_stage == 'Speculation':
-            stage_records = [record for record in st.session_state.saved_records if
-                             record.get('status') == 'Speculation']
-        elif current_stage == 'Order Ready':
-            stage_records = [record for record in st.session_state.saved_records if
-                             record.get('status') == 'Order Ready']
-        elif current_stage == 'Order Placed':  # NEW SECTION
-            stage_records = [record for record in st.session_state.saved_records if
-                             record.get('status') == 'Order Placed']
-        else:  # Order Filled (was Order Completed)
-            stage_records = [record for record in st.session_state.saved_records if
-                             record.get('status') == 'Order Filled']
+        # Filter records for current stage
+        stage_records = [
+            (i, record) for i, record in enumerate(st.session_state.saved_records)
+            if record.get('status') == st.session_state.current_stage
+        ]
 
         if not stage_records:
-            st.info(f"No records in {current_stage.lower()} stage.")
+            st.info(f"No records in {st.session_state.current_stage.lower()} stage.")
         else:
-            for i, record in enumerate(stage_records):
-                # Find the original index in the main records list
-                original_index = next((idx for idx, r in enumerate(st.session_state.saved_records) if
-                                       r['timestamp'] == record['timestamp']), None)
+            for record_index, record in stage_records:
+                with st.expander(f"Record {record_index + 1}: {record['selected_pair']} - {record['timestamp']}",
+                                 expanded=False):
+                    # Create unique keys using timestamp to avoid conflicts
+                    timestamp_key = record['timestamp'].replace(':', '_').replace(' ', '_')
 
-                if original_index is not None:
-                    with st.expander(f"Record {original_index + 1}: {record['selected_pair']} - {record['timestamp']}",
-                                     expanded=False):
+                    col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
 
-                        # Common fields for all stages
-                        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+                    with col1:
+                        st.write(f"**Pair:** {record['selected_pair']}")
+                        st.write(f"**Strategy:** {record['risk_multiplier']}")
+                        st.write(f"**Position Size:** {record['position_size']}")
+                        st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
 
-                        with col1:
-                            st.write(f"**Pair:** {record['selected_pair']}")
-                            st.write(f"**Strategy:** {record['risk_multiplier']}")
-                            st.write(f"**Position Size:** {record['position_size']}")
-                            st.write(f"**Current Stop Pips:** {record.get('stop_pips', 'None')}")
+                    with col2:
+                        entry_price = st.number_input(
+                            "Entry Price",
+                            value=safe_float(record.get('entry_price'), 0.0),
+                            format="%.5f",
+                            key=f"entry_{timestamp_key}"
+                        )
 
-                        with col2:
-                            new_entry_price = st.number_input(
-                                "Entry Price",
-                                value=safe_float(record.get('entry_price'), 0.0),
-                                format="%.5f",
-                                key=f"{current_stage.lower()}_entry_{original_index}"
-                            )
+                    with col3:
+                        exit_price = st.number_input(
+                            "Exit Price",
+                            value=safe_float(record.get('exit_price'), 0.0),
+                            format="%.5f",
+                            key=f"exit_{timestamp_key}"
+                        )
 
-                        with col3:
-                            new_exit_price = st.number_input(
-                                "Exit Price",
-                                value=safe_float(record.get('exit_price'), 0.0),
-                                format="%.5f",
-                                key=f"{current_stage.lower()}_exit_{original_index}"
-                            )
+                    with col4:
+                        target_price = st.number_input(
+                            "Target Price",
+                            value=safe_float(record.get('target_price'), 0.0),
+                            format="%.5f",
+                            key=f"target_{timestamp_key}"
+                        )
 
-                        with col4:
-                            new_target_price = st.number_input(
-                                "Target Price",
-                                value=safe_float(record.get('target_price'), 0.0),
-                                format="%.5f",
-                                key=f"{current_stage.lower()}_target_{original_index}"
-                            )
-
-                        # SPECULATION STAGE - FIXED WITH PROPER RERUN
-                        if current_stage == 'Speculation':
-                            # Calculate expected stop pips based on current entry/exit prices
-                            expected_stop_pips = None
-                            if new_entry_price != 0 and new_exit_price != 0:
-                                if record['selected_pair'] == 'XAUUSD':
-                                    # For gold, use absolute difference
-                                    expected_stop_pips = abs(new_exit_price - new_entry_price)
+                    # SPECULATION STAGE ACTIONS
+                    if st.session_state.current_stage == 'Speculation':
+                        # Calculate expected stop pips
+                        expected_stop_pips = None
+                        if entry_price != 0 and exit_price != 0:
+                            if record['selected_pair'] == 'XAUUSD':
+                                expected_stop_pips = abs(exit_price - entry_price)
+                            else:
+                                price_diff = abs(exit_price - entry_price)
+                                if any(currency in record['selected_pair'] for currency in ['JPY', 'XAU']):
+                                    pip_size = 0.01
                                 else:
-                                    # For forex pairs, calculate pips properly regardless of price level
-                                    # Forex pairs: 1 pip = 0.0001 for most pairs, 0.01 for JPY pairs
-                                    price_diff = abs(new_exit_price - new_entry_price)
+                                    pip_size = 0.0001
+                                expected_stop_pips = price_diff / pip_size
 
-                                    # Determine pip size based on currency pair
-                                    if any(currency in record['selected_pair'] for currency in ['JPY', 'XAU']):
-                                        # JPY pairs and Gold: 1 pip = 0.01
-                                        pip_size = 0.01
+                        # Show validation if stop pips don't match
+                        current_stop_pips = record.get('stop_pips')
+                        if expected_stop_pips is not None and current_stop_pips is not None:
+                            if abs(expected_stop_pips - current_stop_pips) > 0.1:
+                                st.error(
+                                    f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
+
+                        # Check required fields
+                        entry_price_valid = entry_price > 0
+                        exit_price_valid = exit_price > 0
+                        target_price_valid = target_price > 0
+                        all_required_fields_valid = entry_price_valid and exit_price_valid and target_price_valid
+
+                        if not entry_price_valid:
+                            st.error("Entry price must be > 0 to move to Order Ready")
+                        if not exit_price_valid:
+                            st.error("Exit price must be > 0 to move to Order Ready")
+                        if not target_price_valid:
+                            st.error("Target price must be > 0 to move to Order Ready")
+
+                        col_update, col_move, col_delete = st.columns(3)
+
+                        with col_update:
+                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                                if handle_update_record(record_index, entry_price, exit_price, target_price):
+                                    st.rerun()
+
+                        with col_move:
+                            can_move = all_required_fields_valid and total_active_count < 2
+                            if st.button("Move to Order Ready",
+                                         key=f"move_{timestamp_key}",
+                                         disabled=not can_move):
+                                if handle_move_record(record_index, 'Order Ready'):
+                                    st.rerun()
+                            if total_active_count >= 2:
+                                st.error("Max 2 active records reached")
+
+                        with col_delete:
+                            if st.button("Delete", key=f"delete_{timestamp_key}"):
+                                if handle_delete_record(record_index):
+                                    st.rerun()
+
+                    # ORDER READY STAGE ACTIONS
+                    elif st.session_state.current_stage == 'Order Ready':
+                        col_update, col_move, col_delete = st.columns(3)
+
+                        with col_update:
+                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                                if handle_update_record(record_index, entry_price, exit_price, target_price):
+                                    st.rerun()
+
+                        with col_move:
+                            if st.button("Move to Order Placed", key=f"move_{timestamp_key}"):
+                                if handle_move_record(record_index, 'Order Placed'):
+                                    st.rerun()
+
+                        with col_delete:
+                            if st.button("Delete", key=f"delete_{timestamp_key}"):
+                                if handle_delete_record(record_index):
+                                    st.rerun()
+
+                    # ORDER PLACED STAGE ACTIONS
+                    elif st.session_state.current_stage == 'Order Placed':
+                        col_update, col_move, col_back = st.columns(3)
+
+                        with col_update:
+                            if st.button("Update Record", key=f"update_{timestamp_key}"):
+                                if handle_update_record(record_index, entry_price, exit_price, target_price):
+                                    st.rerun()
+
+                        with col_move:
+                            if st.button("Move to Order Filled", key=f"move_{timestamp_key}"):
+                                if handle_move_record(record_index, 'Order Filled'):
+                                    st.rerun()
+
+                        with col_back:
+                            if st.button("Back to Order Ready", key=f"back_{timestamp_key}"):
+                                if handle_move_record(record_index, 'Order Ready'):
+                                    st.rerun()
+
+                    # ORDER FILLED STAGE ACTIONS
+                    else:
+                        # Additional fields for Order Filled stage
+                        col5, col6, col7, col8 = st.columns(4)
+
+                        with col5:
+                            result_options = ["BE", "Loss", "Win"]
+                            new_result = st.selectbox(
+                                "Result",
+                                options=result_options,
+                                index=0,
+                                key=f"filled_result_{timestamp_key}"
+                            )
+
+                        with col6:
+                            direction_options = ["buy", "sell"]
+                            new_direction = st.selectbox(
+                                "Direction",
+                                options=direction_options,
+                                index=0,
+                                key=f"filled_direction_{timestamp_key}"
+                            )
+
+                        with col7:
+                            new_rr = st.number_input(
+                                "RR",
+                                value=0.0,
+                                step=0.01,
+                                format="%.2f",
+                                key=f"filled_rr_{timestamp_key}"
+                            )
+
+                        with col8:
+                            new_pnl = st.number_input(
+                                "PnL",
+                                value=0.0,
+                                step=0.01,
+                                format="%.2f",
+                                key=f"filled_pnl_{timestamp_key}"
+                            )
+
+                        # Additional required fields
+                        col9, col10 = st.columns(2)
+                        with col9:
+                            poi_options = ["Weekly", "2_Daily"]
+                            new_poi = st.selectbox(
+                                "POI",
+                                options=poi_options,
+                                index=0,
+                                key=f"filled_poi_{timestamp_key}"
+                            )
+
+                        with col10:
+                            st.text_input(
+                                "Strategy",
+                                value=record['risk_multiplier'],
+                                key=f"filled_strategy_{timestamp_key}",
+                                disabled=True
+                            )
+
+                        # Display existing Trend Position and Variance (read-only)
+                        st.write("---")
+                        col_info1, col_info2 = st.columns(2)
+                        with col_info1:
+                            existing_trend_position = record.get('trend_position', 'Not set')
+                            st.write(f"**Trend Position:** {existing_trend_position}")
+                        with col_info2:
+                            existing_variance = record.get('Variances', 'Not set')
+                            st.write(f"**Variance:** {existing_variance}")
+
+                        # Action buttons for Order Filled stage
+                        col_update_only, col_close, col_back = st.columns([1, 1, 1])
+
+                        with col_update_only:
+                            if st.button("Update Record", key=f"filled_update_{timestamp_key}"):
+                                # Update all fields including the new ones
+                                st.session_state.saved_records[record_index]['entry_price'] = entry_price
+                                st.session_state.saved_records[record_index]['exit_price'] = exit_price
+                                st.session_state.saved_records[record_index]['target_price'] = target_price
+                                st.session_state.saved_records[record_index]['result'] = new_result
+                                st.session_state.saved_records[record_index]['direction'] = new_direction
+                                st.session_state.saved_records[record_index]['rr'] = new_rr
+                                st.session_state.saved_records[record_index]['pnl'] = new_pnl
+                                st.session_state.saved_records[record_index]['poi'] = new_poi
+
+                                success = save_workflow_to_sheets(st.session_state.saved_records)
+                                if success:
+                                    st.session_state.last_action = f"updated_record_{record_index}"
+                                    st.rerun()
+
+                        with col_close:
+                            if st.button("Finalize & Close Trade", key=f"filled_close_{timestamp_key}", type="primary"):
+                                # Validate required fields
+                                if (new_result and new_direction and new_poi and
+                                        new_rr is not None and new_pnl is not None):
+
+                                    # Get existing Trend Position and Variance from the record
+                                    existing_trend_position = record.get('trend_position')
+                                    existing_variance = record.get('Variances')
+
+                                    # Validate that we have the required existing values
+                                    if not existing_trend_position or not existing_variance:
+                                        st.error(
+                                            "Missing Trend Position or Variance data from original record. Cannot close trade.")
                                     else:
-                                        # Most forex pairs: 1 pip = 0.0001
-                                        pip_size = 0.0001
-
-                                    # Calculate pips
-                                    expected_stop_pips = price_diff / pip_size
-
-                            # Show validation message if stop pips don't match
-                            current_stop_pips = record.get('stop_pips')
-                            if expected_stop_pips is not None and current_stop_pips is not None:
-                                # Allow small rounding differences (0.1 pip tolerance)
-                                if abs(expected_stop_pips - current_stop_pips) > 0.1:
-                                    st.error(
-                                        f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected from prices: {expected_stop_pips:.2f}")
-
-                            # Check if all required fields are filled for moving to Order Ready
-                            entry_price_valid = new_entry_price > 0
-                            exit_price_valid = new_exit_price > 0
-                            target_price_valid = new_target_price > 0
-                            all_required_fields_valid = entry_price_valid and exit_price_valid and target_price_valid
-
-                            # Show validation messages
-                            if not entry_price_valid:
-                                st.error("Entry price must be greater than 0 to move to Order Ready")
-                            if not exit_price_valid:
-                                st.error("Exit price must be greater than 0 to move to Order Ready")
-                            if not target_price_valid:
-                                st.error("Target price must be greater than 0 to move to Order Ready")
-
-                            # Action buttons for Speculation stage - FIXED WITH IMMEDIATE RERUN
-                            col_update_only, col_move, col_delete = st.columns([1, 1, 1])
-
-                            with col_update_only:
-                                if st.button(f"Update Record", key=f"spec_update_only_{original_index}"):
-                                    updates = {
-                                        'entry_price': new_entry_price,
-                                        'exit_price': new_exit_price,
-                                        'target_price': new_target_price
-                                    }
-                                    success, message = update_record_fields(original_index, updates)
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-                            with col_move:
-                                # Check if updating to active status would exceed the limit
-                                if total_active_count >= 2:
-                                    st.error("Maximum of 2 active records reached! Cannot move to Order Ready.")
-                                else:
-                                    update_disabled = not all_required_fields_valid
-                                    if st.button(f"Move to Order Ready", key=f"spec_move_{original_index}",
-                                                 disabled=update_disabled):
-                                        updates = {
-                                            'entry_price': new_entry_price,
-                                            'exit_price': new_exit_price,
-                                            'target_price': new_target_price
+                                        # Create the completed trade record with specified fields
+                                        completed_trade = {
+                                            'Date': datetime.now().strftime("%Y-%m-%d"),
+                                            'Symbol': record['selected_pair'],
+                                            'Direction': new_direction,
+                                            'Trend Position': existing_trend_position,
+                                            'POI': new_poi,
+                                            'Strategy': record['risk_multiplier'],
+                                            'Variance': existing_variance,
+                                            'Result': new_result,
+                                            'RR': new_rr,
+                                            'PnL': new_pnl,
+                                            'Withdrawal_Deposit': 0.0,
+                                            'PROP_Pct': 0.0
                                         }
-                                        success, message = update_record_fields(original_index, updates, 'Order Ready')
-                                        if success:
-                                            st.success(message)
-                                            st.rerun()
-                                        else:
-                                            st.error(message)
 
-                            with col_delete:
-                                if st.button(f"🗑️ Delete", key=f"spec_delete_{original_index}"):
-                                    st.session_state.saved_records.pop(original_index)
-                                    save_success = save_workflow_to_sheets(st.session_state.saved_records)
-                                    if save_success:
-                                        sync_with_trade_signals()
-                                        st.success("Record deleted and synced!")
-                                        st.rerun()
-                                    else:
-                                        st.error("Failed to delete record")
+                                        # Load current Trade.csv data
+                                        current_trade_data = load_data_from_sheets(sheet_name="Trade",
+                                                                                   worksheet_name="Trade.csv")
 
-                        # ORDER READY STAGE
-                        elif current_stage == 'Order Ready':
-                            # Action buttons for Order Ready stage
-                            col_update_only, col_move, col_delete = st.columns([1, 1, 1])
+                                        if current_trade_data is not None:
+                                            # Ensure only the specified columns exist in current data
+                                            required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
+                                                                'POI', 'Strategy', 'Variance', 'Result', 'RR', 'PnL',
+                                                                'Withdrawal_Deposit', 'PROP_Pct']
 
-                            with col_update_only:
-                                if st.button(f"Update Record", key=f"ready_update_only_{original_index}"):
-                                    updates = {
-                                        'entry_price': new_entry_price,
-                                        'exit_price': new_exit_price,
-                                        'target_price': new_target_price
-                                    }
-                                    success, message = update_record_fields(original_index, updates)
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
+                                            # Add missing columns if they don't exist
+                                            for col in required_columns:
+                                                if col not in current_trade_data.columns:
+                                                    current_trade_data[col] = None
 
-                            with col_move:
-                                if st.button(f"Move to Order Placed", key=f"ready_move_{original_index}"):
-                                    success, message = update_record_status(original_index, 'Order Placed')
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
+                                            # Keep only the required columns
+                                            current_trade_data = current_trade_data[required_columns]
 
-                            with col_delete:
-                                if st.button(f"🗑️ Delete", key=f"ready_delete_{original_index}"):
-                                    st.session_state.saved_records.pop(original_index)
-                                    save_success = save_workflow_to_sheets(st.session_state.saved_records)
-                                    if save_success:
-                                        sync_with_trade_signals()
-                                        st.success("Record deleted and synced!")
-                                        st.rerun()
-                                    else:
-                                        st.error("Failed to delete record")
+                                            # Append the new completed trade
+                                            new_trade_df = pd.DataFrame([completed_trade])
+                                            updated_trade_data = pd.concat([current_trade_data, new_trade_df],
+                                                                           ignore_index=True)
 
-                        # NEW: ORDER PLACED STAGE
-                        elif current_stage == 'Order Placed':
-                            # Action buttons for Order Placed stage
-                            col_update_only, col_move, col_delete = st.columns([1, 1, 1])
+                                            # Save to Trade.csv worksheet
+                                            success = save_data_to_sheets(updated_trade_data, sheet_name="Trade",
+                                                                          worksheet_name="Trade.csv")
 
-                            with col_update_only:
-                                if st.button(f"Update Record", key=f"placed_update_only_{original_index}"):
-                                    updates = {
-                                        'entry_price': new_entry_price,
-                                        'exit_price': new_exit_price,
-                                        'target_price': new_target_price
-                                    }
-                                    success, message = update_record_fields(original_index, updates)
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-                            with col_move:
-                                if st.button(f"Move to Order Filled", key=f"placed_move_{original_index}"):
-                                    success, message = update_record_status(original_index, 'Order Filled')
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-                            with col_delete:
-                                if st.button(f"Move Back to Order Ready", key=f"placed_back_{original_index}"):
-                                    success, message = update_record_status(original_index, 'Order Ready')
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-                        # ORDER FILLED STAGE (was Order Completed)
-                        else:
-                            # Additional fields for Order Filled stage
-                            col5, col6, col7, col8 = st.columns(4)
-
-                            with col5:
-                                # Result dropdown
-                                result_options = ["BE", "Loss", "Win"]
-                                new_result = st.selectbox(
-                                    "Result",
-                                    options=result_options,
-                                    index=0,
-                                    key=f"filled_result_{original_index}"
-                                )
-
-                            with col6:
-                                # Direction dropdown
-                                direction_options = ["buy", "sell"]
-                                new_direction = st.selectbox(
-                                    "Direction",
-                                    options=direction_options,
-                                    index=0,
-                                    key=f"filled_direction_{original_index}"
-                                )
-
-                            with col7:
-                                # RR input
-                                new_rr = st.number_input(
-                                    "RR",
-                                    value=0.0,
-                                    step=0.01,
-                                    format="%.2f",
-                                    key=f"filled_rr_{original_index}"
-                                )
-
-                            with col8:
-                                # PnL input
-                                new_pnl = st.number_input(
-                                    "PnL",
-                                    value=0.0,
-                                    step=0.01,
-                                    format="%.2f",
-                                    key=f"filled_pnl_{original_index}"
-                                )
-
-                            # Additional required fields
-                            col9, col10 = st.columns(2)
-                            with col9:
-                                # POI dropdown
-                                poi_options = ["Weekly", "2_Daily"]
-                                new_poi = st.selectbox(
-                                    "POI",
-                                    options=poi_options,
-                                    index=0,
-                                    key=f"filled_poi_{original_index}"
-                                )
-
-                            with col10:
-                                # Strategy (pre-filled from record)
-                                st.text_input(
-                                    "Strategy",
-                                    value=record['risk_multiplier'],
-                                    key=f"filled_strategy_{original_index}",
-                                    disabled=True
-                                )
-
-                            # Display existing Trend Position and Variance (read-only)
-                            st.write("---")
-                            col_info1, col_info2 = st.columns(2)
-                            with col_info1:
-                                existing_trend_position = record.get('trend_position', 'Not set')
-                                st.write(f"**Trend Position:** {existing_trend_position}")
-                            with col_info2:
-                                existing_variance = record.get('Variances', 'Not set')
-                                st.write(f"**Variance:** {existing_variance}")
-
-                            # Action buttons for Order Filled stage
-                            col_update_only, col_close, col_delete = st.columns([1, 1, 1])
-
-                            with col_update_only:
-                                if st.button(f"Update Record", key=f"filled_update_only_{original_index}"):
-                                    updates = {
-                                        'entry_price': new_entry_price,
-                                        'exit_price': new_exit_price,
-                                        'target_price': new_target_price,
-                                        'result': new_result,
-                                        'direction': new_direction,
-                                        'rr': new_rr,
-                                        'pnl': new_pnl,
-                                        'poi': new_poi
-                                    }
-                                    success, message = update_record_fields(original_index, updates)
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-                            with col_close:
-                                if st.button(f"Finalize & Close Trade", key=f"filled_close_{original_index}",
-                                             type="primary"):
-                                    # Validate required fields
-                                    if (new_result and new_direction and new_poi and
-                                            new_rr is not None and new_pnl is not None):
-
-                                        # Get existing Trend Position and Variance from the record
-                                        existing_trend_position = record.get('trend_position')
-                                        existing_variance = record.get('Variances')
-
-                                        # Validate that we have the required existing values
-                                        if not existing_trend_position or not existing_variance:
-                                            st.error(
-                                                "Missing Trend Position or Variance data from original record. Cannot close trade.")
-                                        else:
-                                            # Create the completed trade record with specified fields
-                                            completed_trade = {
-                                                'Date': datetime.now().strftime("%Y-%m-%d"),  # YYYY-MM-DD format
-                                                'Symbol': record['selected_pair'],
-                                                'Direction': new_direction,
-                                                'Trend Position': existing_trend_position,  # Use existing value
-                                                'POI': new_poi,
-                                                'Strategy': record['risk_multiplier'],
-                                                'Variance': existing_variance,  # Use existing value
-                                                'Result': new_result,
-                                                'RR': new_rr,
-                                                'PnL': new_pnl,
-                                                'Withdrawal_Deposit': 0.0,  # Default 0
-                                                'PROP_Pct': 0.0  # Default 0
-                                            }
-
-                                            # Load current Trade.csv data
-                                            current_trade_data = load_data_from_sheets(sheet_name="Trade",
-                                                                                       worksheet_name="Trade.csv")
-
-                                            if current_trade_data is not None:
-                                                # Ensure only the specified columns exist in current data
-                                                required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
-                                                                    'POI', 'Strategy',
-                                                                    'Variance', 'Result', 'RR', 'PnL',
-                                                                    'Withdrawal_Deposit', 'PROP_Pct']
-
-                                                # Add missing columns if they don't exist
-                                                for col in required_columns:
-                                                    if col not in current_trade_data.columns:
-                                                        current_trade_data[col] = None
-
-                                                # Keep only the required columns
-                                                current_trade_data = current_trade_data[required_columns]
-
-                                                # Append the new completed trade
-                                                new_trade_df = pd.DataFrame([completed_trade])
-                                                updated_trade_data = pd.concat([current_trade_data, new_trade_df],
-                                                                               ignore_index=True)
-
-                                                # Save to Trade.csv worksheet
-                                                success = save_data_to_sheets(updated_trade_data, sheet_name="Trade",
-                                                                              worksheet_name="Trade.csv")
-
-                                                if success:
-                                                    # Remove from active opps
-                                                    st.session_state.saved_records.pop(original_index)
-                                                    # Save the updated workflow
-                                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                                    # Sync trade signals after closing trade
-                                                    sync_with_trade_signals()
-                                                    st.success("✅ Trade finalized and saved to trade history!")
-                                                    st.rerun()
-                                                else:
-                                                    st.error("Failed to save to trade history")
+                                            if success:
+                                                # Remove from active opps
+                                                st.session_state.saved_records.pop(record_index)
+                                                # Save the updated workflow
+                                                save_workflow_to_sheets(st.session_state.saved_records)
+                                                # Sync trade signals after closing trade
+                                                sync_with_trade_signals()
+                                                st.success("✅ Trade finalized and saved to trade history!")
+                                                st.rerun()
                                             else:
-                                                # If no existing trade data, create new with only specified columns
-                                                new_trade_df = pd.DataFrame([completed_trade])
-                                                success = save_data_to_sheets(new_trade_df, sheet_name="Trade",
-                                                                              worksheet_name="Trade.csv")
+                                                st.error("Failed to save to trade history")
+                                        else:
+                                            # If no existing trade data, create new with only specified columns
+                                            new_trade_df = pd.DataFrame([completed_trade])
+                                            success = save_data_to_sheets(new_trade_df, sheet_name="Trade",
+                                                                          worksheet_name="Trade.csv")
 
-                                                if success:
-                                                    # Remove from active opps
-                                                    st.session_state.saved_records.pop(original_index)
-                                                    # Save the updated workflow
-                                                    save_workflow_to_sheets(st.session_state.saved_records)
-                                                    # Sync trade signals after closing trade
-                                                    sync_with_trade_signals()
-                                                    st.success("✅ Trade finalized and saved to trade history!")
-                                                    st.rerun()
-                                                else:
-                                                    st.error("Failed to save to trade history")
-                                    else:
-                                        st.error("Please fill in all required fields")
+                                            if success:
+                                                # Remove from active opps
+                                                st.session_state.saved_records.pop(record_index)
+                                                # Save the updated workflow
+                                                save_workflow_to_sheets(st.session_state.saved_records)
+                                                # Sync trade signals after closing trade
+                                                sync_with_trade_signals()
+                                                st.success("✅ Trade finalized and saved to trade history!")
+                                                st.rerun()
+                                            else:
+                                                st.error("Failed to save to trade history")
+                                else:
+                                    st.error("Please fill in all required fields")
 
-                            with col_delete:
-                                if st.button(f"Move Back to Order Placed", key=f"filled_back_{original_index}"):
-                                    success, message = update_record_status(original_index, 'Order Placed')
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
+                        with col_back:
+                            if st.button("Back to Order Placed", key=f"filled_back_{timestamp_key}"):
+                                if handle_move_record(record_index, 'Order Placed'):
+                                    st.rerun()
 
+        # Clear all records button
         st.markdown("---")
-
-        # Option to clear all records
         if st.button("Clear All Records", type="secondary"):
             st.session_state.saved_records = []
-            success = save_workflow_to_sheets([])
-            if success:
-                # Also clear trade signals
-                st.session_state.ready_to_order = []
-                st.session_state.order_placed = []
-                st.session_state.in_trade = []
-                st.success("All records cleared and synced!")
-                st.rerun()
-            else:
-                st.warning("Records cleared locally but failed to save to cloud.")
+            st.session_state.ready_to_order = []
+            st.session_state.order_placed = []
+            st.session_state.in_trade = []
+            save_workflow_to_sheets([])
+            st.session_state.last_action = "cleared_all"
+            st.rerun()
 
 elif st.session_state.current_page == "Trade Signal":
     # Install MetaApi SDK if not available

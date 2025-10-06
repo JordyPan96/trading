@@ -4194,10 +4194,6 @@ elif st.session_state.current_page == "Trade Signal":
         st.session_state.auto_move_checked = False
     if 'last_action' not in st.session_state:
         st.session_state.last_action = None
-    if 'auto_be_checked' not in st.session_state:
-        st.session_state.auto_be_checked = False
-    if 'historical_extremes_data' not in st.session_state:
-        st.session_state.historical_extremes_data = {}
 
 
     # Add helper function first
@@ -4243,254 +4239,6 @@ elif st.session_state.current_page == "Trade Signal":
             return f"{symbol}.a"
         else:
             return symbol
-
-
-    # CORRECTED: Historical extremes function using Market Data API
-    async def get_historical_extremes_since_open(metaapi, account_id, position):
-        """Get historical high (for buys) and low (for sells) since position open using Market Data API"""
-        try:
-            symbol = position['symbol']
-            trade_type = position.get('type')  # POSITION_TYPE_BUY or POSITION_TYPE_SELL
-
-            # Check for open_time in various possible field names
-            open_time = None
-            possible_time_fields = ['open_time', 'openTime', 'time', 'timestamp']
-
-            for field in possible_time_fields:
-                if field in position and position[field]:
-                    open_time = position[field]
-                    print(f"✅ Found open_time in field '{field}': {open_time}")
-                    break
-
-            if not open_time:
-                # If no open_time found, use current time minus 24 hours as fallback
-                open_time = datetime.now() - timedelta(hours=24)
-                print(f"⚠️ No open_time found, using fallback: {open_time}")
-
-            # Convert open_time to datetime if it's a string
-            if isinstance(open_time, str):
-                try:
-                    # Handle ISO format with Z timezone
-                    if open_time.endswith('Z'):
-                        open_time = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
-                    else:
-                        open_time = datetime.fromisoformat(open_time)
-                    print(f"✅ Converted open_time to datetime: {open_time}")
-                except Exception as e:
-                    print(f"❌ Failed to parse open_time '{open_time}': {e}")
-                    # Use fallback
-                    open_time = datetime.now() - timedelta(hours=24)
-
-            # Format time for API
-            start_time_str = open_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-
-            print(f"📊 Fetching candles for {symbol} from {start_time_str}")
-
-            # ✅ CORRECT: Use Market Data API to get candles
-            candles = await metaapi.market_data_api.get_candles(
-                account_id=account_id,
-                symbol=symbol,
-                timeframe='1m',  # 1-minute candles for precision
-                start_time=start_time_str,
-                limit=1000  # Maximum candles to fetch
-            )
-
-            if not candles:
-                print(f"❌ No candle data found for {symbol}")
-                return None, "No candle data"
-
-            print(f"✅ Got {len(candles)} candles for {symbol}")
-
-            if trade_type == 'POSITION_TYPE_BUY':
-                # For BUY positions, we care about historical HIGH since open
-                highs = [candle['high'] for candle in candles if candle['high'] is not None]
-                if highs:
-                    historical_high = max(highs)
-                    print(f"📈 Historical high for {symbol}: {historical_high}")
-                    return historical_high, f"High since open: {historical_high:.5f}"
-                else:
-                    return None, "No high data"
-
-            elif trade_type == 'POSITION_TYPE_SELL':
-                # For SELL positions, we care about historical LOW since open
-                lows = [candle['low'] for candle in candles if candle['low'] is not None]
-                if lows:
-                    historical_low = min(lows)
-                    print(f"📉 Historical low for {symbol}: {historical_low}")
-                    return historical_low, f"Low since open: {historical_low:.5f}"
-                else:
-                    return None, "No low data"
-            else:
-                return None, "Unknown position type"
-
-        except Exception as e:
-            error_msg = f"Error calculating extremes: {str(e)}"
-            print(f"❌ {error_msg}")
-            return None, error_msg
-
-
-    # BE Price calculation functions
-    def calculate_be_price_25r(entry_price, stop_loss, direction):
-        """
-        Calculate BE price at 2.5R (where we should automatically move to BE)
-        For BUY: BE = entry_price + 2.5 * abs(entry_price - stop_loss)
-        For SELL: BE = entry_price - 2.5 * abs(entry_price - stop_loss)
-        """
-        if entry_price <= 0 or stop_loss <= 0 or not direction:
-            return None
-
-        risk_amount = abs(entry_price - stop_loss)
-
-        if direction.lower() == 'buy':
-            be_price = entry_price + (2.5 * risk_amount)
-        elif direction.lower() == 'sell':
-            be_price = entry_price - (2.5 * risk_amount)
-        else:
-            return None
-
-        return round(be_price, 5)
-
-
-    def calculate_auto_be_sl_price(entry_price, direction, symbol):
-        """
-        Calculate the new SL price when moving to BE (5 pips for forex, $2 for gold)
-        For BUY: entry_price + 0.0005 (5 pips) for forex, entry_price + 2.0 for gold
-        For SELL: entry_price - 0.0005 (5 pips) for forex, entry_price - 2.0 for gold
-        """
-        if entry_price <= 0 or not direction:
-            return None
-
-        # Check if it's gold
-        is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
-
-        if direction.lower() == 'buy':
-            if is_gold:
-                return entry_price + 2.0  # $2 above entry for gold BUY
-            else:
-                return entry_price + 0.0005  # 5 pips above entry for forex BUY
-        elif direction.lower() == 'sell':
-            if is_gold:
-                return entry_price - 2.0  # $2 below entry for gold SELL
-            else:
-                return entry_price - 0.0005  # 5 pips below entry for forex SELL
-        else:
-            return None
-
-
-    def should_move_to_auto_be(current_price, entry_price, stop_loss, direction, symbol):
-        """
-        Check if price reached 2.5R level and should automatically move to BE
-        For BUY: current_price >= entry_price + 2.5 * (entry_price - stop_loss)
-        For SELL: current_price <= entry_price - 2.5 * (stop_loss - entry_price)
-        """
-        if entry_price <= 0 or stop_loss <= 0 or current_price <= 0 or not direction:
-            return False
-
-        # Calculate 2.5R trigger price
-        risk_amount = abs(entry_price - stop_loss)
-
-        if direction.lower() == 'buy':
-            be_trigger_price = entry_price + (2.5 * risk_amount)
-            return current_price >= be_trigger_price
-        elif direction.lower() == 'sell':
-            be_trigger_price = entry_price - (2.5 * risk_amount)
-            return current_price <= be_trigger_price
-        else:
-            return False
-
-
-    async def auto_move_to_be(position_id, entry_price, direction, symbol):
-        """
-        Automatically move position to BE (5 pips for forex, $2 for gold)
-        """
-        try:
-            new_sl_price = calculate_auto_be_sl_price(entry_price, direction, symbol)
-            if new_sl_price is None:
-                return False, "Could not calculate BE price"
-
-            from metaapi_cloud_sdk import MetaApi
-
-            config = get_metaapi_config()
-            token = config.get("token", "")
-            account_id = st.session_state.metaapi_account_id
-
-            if not token or not account_id:
-                return False, "Token or account ID not configured"
-
-            api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
-
-            if account.state != 'DEPLOYED':
-                await account.deploy()
-            await account.wait_connected()
-
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            # Get current position details
-            positions = await connection.get_positions()
-            current_position = None
-            for pos in positions:
-                if pos['id'] == position_id:
-                    current_position = pos
-                    break
-
-            if not current_position:
-                await connection.close()
-                return False, "❌ Position not found"
-
-            current_sl = current_position.get('stopLoss')
-            current_tp = current_position.get('takeProfit')
-            current_price = current_position.get('currentPrice')
-            position_type = current_position.get('type')
-
-            # Validate the new SL value
-            if new_sl_price <= 0:
-                await connection.close()
-                return False, "❌ Stop loss must be greater than 0"
-
-            # For BUY positions: SL should be below current price
-            if position_type == 'POSITION_TYPE_BUY' and new_sl_price >= current_price:
-                await connection.close()
-                return False, f"❌ For BUY positions, stop loss ({new_sl_price:.5f}) must be below current price ({current_price:.5f})"
-
-            # For SELL positions: SL should be above current price
-            if position_type == 'POSITION_TYPE_SELL' and new_sl_price <= current_price:
-                await connection.close()
-                return False, f"❌ For SELL positions, stop loss ({new_sl_price:.5f}) must be above current price ({current_price:.5f})"
-
-            # CORRECT USAGE: Keyword arguments with snake_case
-            if current_tp and current_tp > 0:
-                # Modify both SL and TP
-                await connection.modify_position(
-                    position_id,
-                    stop_loss=new_sl_price,
-                    take_profit=current_tp
-                )
-            else:
-                # Modify only SL
-                await connection.modify_position(
-                    position_id,
-                    stop_loss=new_sl_price
-                )
-
-            await connection.close()
-
-            # Determine the BE description
-            is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
-            be_description = "5 pips" if not is_gold else "$2"
-
-            return True, f"✅ {symbol} - Auto BE activated! SL moved to entry + {be_description} for capital protection"
-
-        except Exception as e:
-            try:
-                await connection.close()
-            except:
-                pass
-            error_msg = str(e)
-            print(f"❌ Auto BE MetaApi error: {error_msg}")
-            return False, f"❌ Failed to auto move to BE: {error_msg}"
 
 
     # Generate unique key for each record
@@ -4620,15 +4368,6 @@ elif st.session_state.current_page == "Trade Signal":
                 return [], "Connection timeout"
 
             positions = await connection.get_positions()
-
-            # DEBUG: Print position structure to see what fields we have
-            if positions:
-                print("🔍 POSITION DATA STRUCTURE:")
-                for i, pos in enumerate(positions[:1]):  # Just first position
-                    print(f"Position {i} keys: {list(pos.keys())}")
-                    for key, value in pos.items():
-                        print(f"  {key}: {value}")
-
             await connection.close()
 
             # Format positions data quickly - USE CAMELCASE DIRECTLY FROM METAAPI
@@ -5262,60 +5001,6 @@ elif st.session_state.current_page == "Trade Signal":
         st.rerun()
 
 
-    # CORRECTED: Function to load historical extremes data using Market Data API
-    async def load_historical_extremes_for_positions():
-        """Load historical extremes data for all open positions using Market Data API"""
-        if not st.session_state.metaapi_connected or not st.session_state.open_positions:
-            return
-
-        config = get_metaapi_config()
-        token = config.get("token", "")
-        account_id = st.session_state.metaapi_account_id
-
-        if not token or not account_id:
-            return
-
-        try:
-            from metaapi_cloud_sdk import MetaApi
-            api = MetaApi(token)
-
-            # Ensure account is connected
-            account = await api.metatrader_account_api.get_account(account_id)
-            if account.state != 'DEPLOYED':
-                await account.deploy()
-            await account.wait_connected()
-
-            # Get fresh position data with all fields
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-            fresh_positions = await connection.get_positions()
-            await connection.close()
-
-            # Create a mapping of position_id to full position data
-            position_map = {pos['id']: pos for pos in fresh_positions}
-
-            for position in st.session_state.open_positions:
-                position_id = position['id']
-                if position_id in position_map:
-                    # Use the fresh position data that has all fields
-                    fresh_position = position_map[position_id]
-                    extreme_value, extreme_message = await get_historical_extremes_since_open(api, account_id,
-                                                                                              fresh_position)
-                    st.session_state.historical_extremes_data[position_id] = {
-                        'value': extreme_value,
-                        'message': extreme_message
-                    }
-                else:
-                    st.session_state.historical_extremes_data[position_id] = {
-                        'value': None,
-                        'message': 'Position not found in fresh data'
-                    }
-
-        except Exception as e:
-            print(f"❌ Historical extremes loading error: {str(e)}")
-
-
     # Handle action results
     if st.session_state.last_action:
         action = st.session_state.last_action
@@ -5368,10 +5053,6 @@ elif st.session_state.current_page == "Trade Signal":
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     st.session_state.open_positions = positions
-
-                    # Load historical extremes for positions
-                    asyncio.run(load_historical_extremes_for_positions())
-
                 st.session_state.auto_move_checked = True
             except Exception as e:
                 print(f"❌ Background auto-move error: {str(e)}")
@@ -5425,16 +5106,11 @@ elif st.session_state.current_page == "Trade Signal":
                     # AUTO-MOVE: Check for matching orders and move them automatically
                     moved_count = quick_auto_move_filled_orders(positions)
                     st.session_state.open_positions = positions
-
-                    # Load historical extremes for new positions
-                    await load_historical_extremes_for_positions()
-
                     if moved_count > 0:
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
-                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled',
-                                                             order['selected_pair'])
+                            update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
 
@@ -5689,49 +5365,6 @@ elif st.session_state.current_page == "Trade Signal":
             if not st.session_state.open_positions:
                 st.info("No open positions found in MT5 account.")
             else:
-                # AUTO BE CHECK - Run this for all positions
-                auto_be_updates = []
-                for i, position in enumerate(st.session_state.open_positions):
-                    entry_price = safe_float(position.get('openPrice'), 0.0)
-                    current_sl = safe_float(position.get('stopLoss'), 0.0)
-                    current_price = safe_float(position.get('currentPrice'), 0.0)
-                    direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-                    symbol = position['symbol']
-
-                    # Check if we should automatically move to BE
-                    if all([entry_price > 0, current_sl > 0, current_price > 0]):
-                        if should_move_to_auto_be(current_price, entry_price, current_sl, direction, symbol):
-                            auto_be_updates.append({
-                                'position_id': position['id'],
-                                'entry_price': entry_price,
-                                'direction': direction,
-                                'symbol': symbol
-                            })
-
-                # Execute auto BE updates
-                if auto_be_updates and st.session_state.metaapi_connected:
-                    import asyncio
-
-                    for update in auto_be_updates:
-                        success, message = asyncio.run(auto_move_to_be(
-                            update['position_id'],
-                            update['entry_price'],
-                            update['direction'],
-                            update['symbol']
-                        ))
-                        if success:
-                            st.success(f"🔄 {message}")
-                        else:
-                            st.error(f"❌ {message}")
-
-                    # Refresh positions after auto BE updates
-                    if auto_be_updates:
-                        positions, error = asyncio.run(quick_get_positions())
-                        if positions is not None:
-                            st.session_state.open_positions = positions
-                        st.rerun()
-
-                # Display each position
                 for i, position in enumerate(st.session_state.open_positions):
                     unique_key = generate_unique_key(i,
                                                      {'selected_pair': position['symbol'], 'timestamp': position['id']},
@@ -5752,8 +5385,8 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**P&L:** :{pnl_color}[${profit:.2f}]")
 
                         with col2:
-                            entry_price = safe_float(position.get('openPrice'), 0.0)
-                            st.write(f"**Entry Price:** {entry_price:.5f}")
+                            open_price = safe_float(position.get('openPrice'), 0.0)
+                            st.write(f"**Open Price:** {open_price:.5f}")
 
                             current_price = safe_float(position.get('currentPrice'), 0.0)
                             st.write(f"**Current Price:** {current_price:.5f}")
@@ -5765,62 +5398,23 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
 
-                        # NEW: Historical Extreme Field
-                        st.markdown("---")
-                        st.subheader("📊 Historical Extreme Since Open")
-
-                        # Get historical extreme for this position
-                        extreme_data = st.session_state.historical_extremes_data.get(position['id'], {})
-                        extreme_value = extreme_data.get('value')
-                        extreme_message = extreme_data.get('message', 'Calculating...')
-
-                        direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-
-                        if extreme_value is not None:
-                            if direction == 'BUY':
-                                st.write(f"**Historical High Since Open:** `{extreme_value:.5f}`")
-                            else:
-                                st.write(f"**Historical Low Since Open:** `{extreme_value:.5f}`")
-                        else:
-                            st.write(f"**Historical Extreme:** {extreme_message}")
-
-                        # BE Price calculation and display
-                        st.markdown("---")
-                        st.subheader("🎯 Break-even Management")
-
-                        # Calculate and display BE Price (2.5R level)
-                        current_sl = safe_float(position.get('stopLoss'), 0.0)
-                        be_trigger_price = calculate_be_price_25r(entry_price, current_sl, direction)
-
-                        if be_trigger_price:
-                            st.write(f"**BE Price (2.5R):** `{be_trigger_price:.5f}`")
-
-                            # Calculate what the new BE SL will be
-                            new_be_sl = calculate_auto_be_sl_price(entry_price, direction, position['symbol'])
-                            is_gold = any(gold_symbol in position['symbol'].upper() for gold_symbol in ['XAU', 'GOLD'])
-                            be_description = "5 pips" if not is_gold else "$2"
-
-                            if new_be_sl:
-                                st.write(f"**Auto BE SL:** `{new_be_sl:.5f}` (entry + {be_description})")
-                        else:
-                            st.write("**BE Price:** N/A")
-
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")
-                        st.subheader("🛠️ Manual Stop Loss Management")
+                        st.subheader("🛠️ Modify Stop Loss Only")
 
                         col_sl, col_action = st.columns([1, 1])
 
                         with col_sl:
                             new_sl = st.number_input(
                                 "New Stop Loss",
-                                value=sl_price if sl_price > 0 else entry_price - 0.0010,
+                                value=sl_price if sl_price > 0 else open_price - 0.0010,
                                 step=0.0001,
                                 format="%.5f",
                                 key=f"sl_{unique_key}"
                             )
 
                         with col_action:
+                            # Align the Update Stop Loss button with the input field
                             st.write("")  # Add some vertical spacing for alignment
                             st.write("")  # Add some vertical spacing for alignment
                             if st.button("💾 Update Stop Loss", key=f"update_{unique_key}", type="primary",
@@ -5842,7 +5436,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     else:
                                         st.error(message)
 
-                        # MANUAL SET TO BREAK-EVEN BUTTON
+                        # SET TO BREAK-EVEN BUTTON
                         col_be, col_be_action = st.columns([1, 1])
 
                         with col_be:
@@ -5855,27 +5449,27 @@ elif st.session_state.current_page == "Trade Signal":
 
                             if position_type == 'POSITION_TYPE_BUY':
                                 if is_gold:
-                                    be_price = entry_price + 2.0  # $2 above entry for gold buy
-                                    be_label = f"Manual BE (Entry + $2): {be_price:.2f}"
+                                    be_price = open_price + 2.0  # $2 for gold buy
+                                    be_label = f"Break-even (Entry + $2): {be_price:.2f}"
                                 else:
-                                    be_price = entry_price + 0.0005  # 5 pips above entry for forex buy
-                                    be_label = f"Manual BE (Entry + 5 pips): {be_price:.5f}"
+                                    be_price = open_price + 0.0005  # 5 pips for forex buy
+                                    be_label = f"Break-even (Entry + 5 pips): {be_price:.5f}"
                             elif position_type == 'POSITION_TYPE_SELL':
                                 if is_gold:
-                                    be_price = entry_price - 2.0  # $2 below entry for gold sell
-                                    be_label = f"Manual BE (Entry - $2): {be_price:.2f}"
+                                    be_price = open_price - 2.0  # $2 for gold sell
+                                    be_label = f"Break-even (Entry - $2): {be_price:.2f}"
                                 else:
-                                    be_price = entry_price - 0.0005  # 5 pips below entry for forex sell
-                                    be_label = f"Manual BE (Entry - 5 pips): {be_price:.5f}"
+                                    be_price = open_price - 0.0005  # 5 pips for forex sell
+                                    be_label = f"Break-even (Entry - 5 pips): {be_price:.5f}"
                             else:
-                                be_price = entry_price
-                                be_label = "Manual BE: Unknown position type"
+                                be_price = open_price
+                                be_label = "Break-even: Unknown position type"
 
                             st.info(be_label)
 
                         with col_be_action:
                             if st.button("🎯 Set to BE", key=f"be_{unique_key}", use_container_width=True,
-                                         help="Manually set stop loss to break-even price (entry + 5 pips for forex BUY, entry - 5 pips for forex SELL, entry ± $2 for gold)"):
+                                         help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
                                 import asyncio
 
                                 with st.spinner("Setting to break-even..."):

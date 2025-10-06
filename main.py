@@ -1897,6 +1897,10 @@ elif st.session_state.current_page == "Risk Calculation":
     if 'saved_selections' not in st.session_state:
         st.session_state.saved_selections = {}
 
+    # Initialize saved_records if not exists
+    if 'saved_records' not in st.session_state:
+        st.session_state.saved_records = []
+
     #st.title("Risk Calculation")
     next_risk = 0
     if st.session_state.uploaded_data is not None:
@@ -2085,13 +2089,53 @@ elif st.session_state.current_page == "Risk Calculation":
             st.table(result_df)
             next_risk = base_risk
 
+        # Google Sheets integration functions
+        def save_workflow_to_sheets(data):
+            """Save workflow data to Google Sheets"""
+            try:
+                if isinstance(data, list):
+                    data_to_save = pd.DataFrame(data)
+                else:
+                    data_to_save = data.copy()
 
+                required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
+                                    'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+                for col in required_columns:
+                    if col not in data_to_save.columns:
+                        data_to_save[col] = None
 
+                data_clean = clean_data_for_google_sheets(data_to_save)
+                success = save_data_to_sheets(data_clean, sheet_name="Trade", worksheet_name="Workflow")
+                return success
+            except Exception as e:
+                st.error(f"Error saving workflow data: {e}")
+                return False
 
+        def load_workflow_from_sheets():
+            """Load workflow data from Google Sheets"""
+            try:
+                df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
+                if df is not None and not df.empty:
+                    if 'timestamp' in df.columns:
+                        df['timestamp'] = df['timestamp'].astype(str)
+                    numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size']
+                    for col in numeric_columns:
+                        if col in df.columns:
+                            df[col] = df[col].replace('None', None)
+                            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
+                    return df
+                return pd.DataFrame()
+            except Exception as e:
+                st.error(f"Error loading workflow data: {e}")
+                return pd.DataFrame()
 
-
-
-
+        # Load existing records from Google Sheets on page load
+        if not st.session_state.saved_records:
+            with st.spinner("Loading existing records from cloud..."):
+                workflow_data = load_workflow_from_sheets()
+                if not workflow_data.empty:
+                    st.session_state.saved_records = workflow_data.to_dict('records')
+                    st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
 
         #st.subheader("Risk Calculation")
 
@@ -3149,18 +3193,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         container.metric(entry_title, entry_text)
                         container.metric(SL_title, SL_text)
                         container.metric(exit_title, exit_text)
-                        #container.markdown("<div style='height:-2000px;'></div>", unsafe_allow_html=True)
-
-                        #entry_price = st.number_input("Entry Price", value=0.0, format="%.5f")
-                        #exit_price = st.number_input("Exit Price", value=0.0, format="%.5f")
-                        #target_price = st.number_input("Target Price", value=0.0, format="%.5f")
-
-
-
 
                         # Determine if button should be disabled
                         add_order_disabled = False
-
 
                         if st.button("💾 Add Order", type="secondary", use_container_width=False,
                                      disabled=add_order_disabled):
@@ -3184,7 +3219,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 else:
                                     # Create a record with timestamp and all selections
                                     record = {
-                                        'timestamp': datetime.now().strftime("%Y-%m-%d"),
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # More detailed timestamp
                                         'selected_pair': selected_pair,
                                         'trend_position': trend_position,
                                         'POI': POI,
@@ -3197,54 +3232,36 @@ elif st.session_state.current_page == "Risk Calculation":
                                         'final_risk': final_risk,
                                         'position_size': position_size,
                                         'position_size_propfirm': position_size_propfirm,
-                                        #'entry_price': entry_price,
-                                        #'exit_price': exit_price,
-
+                                        'entry_price': 0.0,  # Default values
+                                        'exit_price': 0.0,
+                                        'target_price': 0.0,
                                         'status': 'Speculation'  # Default status
                                     }
 
                                     if existing_index is not None:
                                         # Replace existing record (this doesn't count against the limit)
                                         st.session_state.saved_records[existing_index] = record
-                                        st.success("Successfully Updated Order!")
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Updated Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order updated locally but failed to save to cloud!")
                                     else:
                                         # Add new record
                                         st.session_state.saved_records.append(record)
-                                        st.success("Successfully Added Order!")
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Added Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order added locally but failed to save to cloud!")
 
-                        #container.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)
                     elif(risk_multiplier == "2_BNR" or risk_multiplier =="2_BNR_TPF"):
-                        #with container:
-
-
-
-                            #def small_metric(title, value):
-                                #return st.markdown(f"""
-                                       # <div style="text-align: left; padding: 0px;">
-                                            #<div style="font-size: 13px; color: black; margin-bottom: 2px;">{title}</div>
-                                           # <div style="font-size: 35px; color: black; font-weight: light;">{value}</div>
-                                       # </div>
-                                        #""", unsafe_allow_html=True)
-
                         container.metric(SL_title, SL_text)
                         container.metric(entry_title, entry_text)
-
-
-
                         container.metric(exit_title, exit_text)
-                        #container.metric("Test","Test")
-                        #st.markdown("<div style='height:5px;'></div>", unsafe_allow_html=True)
-
-                        #entry_price = st.number_input("Entry Price", value=0.0, format="%.5f")
-                        #exit_price = st.number_input("Exit Price", value=0.0, format="%.5f")
-                        #target_price = st.number_input("Target Price", value=0.0, format="%.5f")
-
-
-
 
                         # Determine if button should be disabled
                         add_order_disabled = False
-
 
                         if st.button("💾 Add Order", type="secondary", use_container_width=False,
                                      disabled=add_order_disabled):
@@ -3266,7 +3283,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 else:
                                     # Create a record with timestamp and all selections
                                     record = {
-                                        'timestamp': datetime.now().strftime("%Y-%m-%d"),
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # More detailed timestamp
                                         'selected_pair': selected_pair,
                                         'trend_position': trend_position,
                                         'POI': POI,
@@ -3279,27 +3296,29 @@ elif st.session_state.current_page == "Risk Calculation":
                                         'final_risk': final_risk,
                                         'position_size': position_size,
                                         'position_size_propfirm': position_size_propfirm,
-                                        #'entry_price': entry_price,
-                                        #'exit_price': exit_price,
-
+                                        'entry_price': 0.0,  # Default values
+                                        'exit_price': 0.0,
+                                        'target_price': 0.0,
                                         'status': 'Speculation'  # Default status
                                     }
 
                                     if existing_index is not None:
                                         # Replace existing record (this doesn't count against the limit)
                                         st.session_state.saved_records[existing_index] = record
-                                        st.success("Successfully Updated Order!")
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Updated Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order updated locally but failed to save to cloud!")
                                     else:
                                         # Add new record
                                         st.session_state.saved_records.append(record)
-                                        st.success("Successfully Added Order!")
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Added Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order added locally but failed to save to cloud!")
                         st.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)
-
-
-
-
-
-            #container.metric("test", get_live_rate("USDJPY"))
 
 
 elif st.session_state.current_page == "Active Opps":

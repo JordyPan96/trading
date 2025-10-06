@@ -4513,9 +4513,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # FIXED MODIFY POSITION FUNCTION - HANDLES ZERO TAKE PROFIT
+    # DEBUG MODIFY POSITION FUNCTION - FIND EXACT FORMAT
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - FIXED VERSION"""
+        """Modify stop loss only - DEBUG VERSION TO FIND EXACT FORMAT"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4555,45 +4555,46 @@ elif st.session_state.current_page == "Trade Signal":
             current_price = current_position.get('currentPrice')
             position_type = current_position.get('type')
 
-            print(f"🔧 Modifying position {position_id} ({symbol})")
-            print(f"   Current SL: {current_sl}, New SL: {new_sl}")
-            print(f"   Current TP: {current_tp}")
-            print(f"   Current Price: {current_price}")
-            print(f"   Position Type: {position_type}")
+            print(f"🔧 DEBUG: Current position details:")
+            print(f"   Symbol: {symbol}")
+            print(f"   Type: {position_type}")
+            print(f"   Current SL: {current_sl} (type: {type(current_sl)})")
+            print(f"   Current TP: {current_tp} (type: {type(current_tp)})")
+            print(f"   Current Price: {current_price} (type: {type(current_price)})")
+            print(f"   New SL: {new_sl} (type: {type(new_sl)})")
 
-            # Validate the new SL value
-            if new_sl <= 0:
-                await connection.close()
-                return False, "❌ Stop loss must be greater than 0"
+            # Test different formats
+            test_cases = [
+                {"name": "Float", "stopLoss": float(new_sl)},
+                {"name": "String", "stopLoss": str(new_sl)},
+                {"name": "Rounded Float", "stopLoss": round(new_sl, 5)},
+                {"name": "Formatted String", "stopLoss": f"{new_sl:.5f}"},
+            ]
 
-            # For BUY positions: SL should be below current price
-            if position_type == 'POSITION_TYPE_BUY' and new_sl >= current_price:
-                await connection.close()
-                return False, f"❌ For BUY positions, stop loss ({new_sl:.5f}) must be below current price ({current_price:.5f})"
+            # Add takeProfit only if it exists and is valid
+            for i, test_case in enumerate(test_cases):
+                modification_data = test_case.copy()
+                del modification_data["name"]  # Remove the name key
 
-            # For SELL positions: SL should be above current price
-            if position_type == 'POSITION_TYPE_SELL' and new_sl <= current_price:
-                await connection.close()
-                return False, f"❌ For SELL positions, stop loss ({new_sl:.5f}) must be above current price ({current_price:.5f})"
+                # Only include takeProfit if it's valid
+                if current_tp is not None and current_tp > 0:
+                    modification_data['takeProfit'] = current_tp
 
-            # Handle the case where Take Profit is 0 (which means no TP set)
-            # MetaApi might not accept 0 as a valid takeProfit value
-            modification_data = {'stopLoss': new_sl}
+                print(f"   Testing format {i + 1}: {test_case['name']} - {modification_data}")
 
-            # Only include takeProfit if it's a valid non-zero value
-            if current_tp is not None and current_tp > 0:
-                modification_data['takeProfit'] = current_tp
-                print(f"   Including TP: {current_tp}")
-            else:
-                print("   No valid Take Profit found, modifying SL only")
+                try:
+                    await connection.modify_position(position_id, modification_data)
+                    await connection.close()
+                    print(f"   ✅ SUCCESS with format: {test_case['name']}")
+                    return True, f"✅ Position updated - SL: {new_sl:.5f}"
+                except Exception as format_error:
+                    print(f"   ❌ FAILED with format {test_case['name']}: {str(format_error)}")
+                    # Reconnect for next attempt
+                    await connection.connect()
+                    await connection.wait_synchronized()
 
-            print(f"   Final modification data: {modification_data}")
-
-            # Try the modification
-            await connection.modify_position(position_id, modification_data)
             await connection.close()
-
-            return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            return False, "❌ All format attempts failed"
 
         except Exception as e:
             try:

@@ -5399,6 +5399,9 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_action:
+                            # Align the Update Stop Loss button with the input field
+                            st.write("")  # Add some vertical spacing for alignment
+                            st.write("")  # Add some vertical spacing for alignment
                             if st.button("💾 Update Stop Loss", key=f"update_{unique_key}", type="primary",
                                          use_container_width=True):
                                 import asyncio
@@ -5407,6 +5410,57 @@ elif st.session_state.current_page == "Trade Signal":
                                     success, message = asyncio.run(modify_position_sl(
                                         position['id'],
                                         new_sl
+                                    ))
+                                    if success:
+                                        st.success(message)
+                                        # Refresh positions
+                                        positions, error = asyncio.run(quick_get_positions())
+                                        if positions is not None:
+                                            st.session_state.open_positions = positions
+                                        st.rerun()
+                                    else:
+                                        st.error(message)
+
+                        # SET TO BREAK-EVEN BUTTON
+                        col_be, col_be_action = st.columns([1, 1])
+
+                        with col_be:
+                            # Determine the break-even price based on instrument type and position type
+                            position_type = position.get('type', '')
+                            symbol = position['symbol']
+
+                            # Check if it's a gold instrument
+                            is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+
+                            if position_type == 'POSITION_TYPE_BUY':
+                                if is_gold:
+                                    be_price = open_price + 2.0  # $2 for gold buy
+                                    be_label = f"Break-even (Entry + $2): {be_price:.2f}"
+                                else:
+                                    be_price = open_price + 0.0005  # 5 pips for forex buy
+                                    be_label = f"Break-even (Entry + 5 pips): {be_price:.5f}"
+                            elif position_type == 'POSITION_TYPE_SELL':
+                                if is_gold:
+                                    be_price = open_price - 2.0  # $2 for gold sell
+                                    be_label = f"Break-even (Entry - $2): {be_price:.2f}"
+                                else:
+                                    be_price = open_price - 0.0005  # 5 pips for forex sell
+                                    be_label = f"Break-even (Entry - 5 pips): {be_price:.5f}"
+                            else:
+                                be_price = open_price
+                                be_label = "Break-even: Unknown position type"
+
+                            st.info(be_label)
+
+                        with col_be_action:
+                            if st.button("🎯 Set to BE", key=f"be_{unique_key}", use_container_width=True,
+                                         help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
+                                import asyncio
+
+                                with st.spinner("Setting to break-even..."):
+                                    success, message = asyncio.run(modify_position_sl(
+                                        position['id'],
+                                        be_price
                                     ))
                                     if success:
                                         st.success(message)

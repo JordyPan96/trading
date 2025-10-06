@@ -4338,8 +4338,9 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     # SIMPLIFIED QUICK AUTO-MOVE FUNCTION - ONLY INSTRUMENT AND POSITION SIZE
+    # UPDATED QUICK AUTO-MOVE FUNCTION - UPDATE ALL POSITION VALUES
     def quick_auto_move_filled_orders(positions):
-        """Quick auto-move - only match instrument and position size"""
+        """Quick auto-move - only match instrument and position size, update all position values"""
         try:
             if not st.session_state.order_placed or not positions:
                 return 0
@@ -4405,8 +4406,10 @@ elif st.session_state.current_page == "Trade Signal":
                             'current_sl': position.get('stop_loss'),
                             'current_tp': position.get('take_profit'),
                             'profit': position.get('profit', 0),
-                            # UPDATE entry price and direction from actual position
+                            # UPDATE ALL VALUES FROM ACTUAL POSITION
                             'entry_price': position.get('open_price'),  # Use actual filled price
+                            'exit_price': position.get('stop_loss'),  # Use actual stop loss from position
+                            'target_price': position.get('take_profit'),  # Use actual take profit from position
                             'direction': 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
                             # Use actual direction
                         }
@@ -4417,30 +4420,33 @@ elif st.session_state.current_page == "Trade Signal":
                         st.session_state.in_trade.append(trade_record)
                         moved_count += 1
                         moved_details.append(f"{order_symbol} ({order_volume} lots)")
-                        print(f"   ✅ Updated order with position data:")
+                        print(f"   ✅ Updated order with ALL position data:")
                         print(
                             f"      Original Entry: {order.get('entry_price')} -> Actual: {position.get('open_price')}")
+                        print(f"      Original SL: {order.get('exit_price')} -> Actual: {position.get('stop_loss')}")
+                        print(
+                            f"      Original TP: {order.get('target_price')} -> Actual: {position.get('take_profit')}")
                         print(
                             f"      Original Direction: {order.get('direction')} -> Actual: {trade_record['direction']}")
                         break
                     else:
                         print(f"   ❌ No match: symbol={symbol_match}, volume={volume_match}")
 
-            # Log results
-            if moved_count > 0:
-                print(f"✅ Auto-moved {moved_count} orders: {', '.join(moved_details)}")
-            else:
-                print(
-                    f"🔍 No orders moved. Checking {len(st.session_state.order_placed)} orders against {len(positions)} positions")
-                # Detailed debug info
-                if st.session_state.order_placed:
-                    print("📋 Orders in Order Placed:")
-                    for order in st.session_state.order_placed:
-                        print(f"   - {order['selected_pair']} {safe_float(order.get('position_size'), 0.0)} lots")
-                if positions:
-                    print("📊 Positions from MT5:")
-                    for position in positions:
-                        print(f"   - {position['symbol']} {safe_float(position.get('volume'), 0.0)} lots")
+                # Log results
+                if moved_count > 0:
+                    print(f"✅ Auto-moved {moved_count} orders: {', '.join(moved_details)}")
+                else:
+                    print(
+                        f"🔍 No orders moved. Checking {len(st.session_state.order_placed)} orders against {len(positions)} positions")
+                    # Detailed debug info
+                    if st.session_state.order_placed:
+                        print("📋 Orders in Order Placed:")
+                        for order in st.session_state.order_placed:
+                            print(f"   - {order['selected_pair']} {safe_float(order.get('position_size'), 0.0)} lots")
+                    if positions:
+                        print("📊 Positions from MT5:")
+                        for position in positions:
+                            print(f"   - {position['symbol']} {safe_float(position.get('volume'), 0.0)} lots")
 
             return moved_count
 

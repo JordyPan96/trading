@@ -4513,9 +4513,9 @@ elif st.session_state.current_page == "Trade Signal":
             return None, f"Quick check error: {str(e)}"
 
 
-    # CORRECTED MODIFY POSITION FUNCTION - USING CORRECT FIELD NAMES
+    # ROBUST MODIFY POSITION FUNCTION - HANDLES DIFFERENT SCENARIOS
     async def modify_position_sl(position_id: str, new_sl: float):
-        """Modify stop loss only for an open position - CORRECTED VERSION"""
+        """Modify stop loss only for an open position - ROBUST VERSION"""
         try:
             from metaapi_cloud_sdk import MetaApi
 
@@ -4537,30 +4537,101 @@ elif st.session_state.current_page == "Trade Signal":
             await connection.connect()
             await connection.wait_synchronized()
 
-            # Get current position to preserve existing take profit
+            # Get current position details
             positions = await connection.get_positions()
-            current_tp = None
+            current_position = None
             for pos in positions:
                 if pos['id'] == position_id:
-                    current_tp = pos.get('takeProfit')
+                    current_position = pos
                     break
 
-            # Prepare modification data
-            modification_data = {
-                'stopLoss': float(new_sl)
-            }
+            if not current_position:
+                await connection.close()
+                return False, "❌ Position not found"
 
-            # Only include takeProfit if it exists and is not None
-            if current_tp is not None:
-                modification_data['takeProfit'] = float(current_tp)
+            symbol = current_position['symbol']
+            current_sl = current_position.get('stopLoss')
+            current_tp = current_position.get('takeProfit')
+            current_price = current_position.get('currentPrice')
+            position_type = current_position.get('type')
 
-            # This method doesn't return a value - it just completes if successful
-            await connection.modify_position(position_id, modification_data)
+            print(f"🔧 Modifying position {position_id} ({symbol})")
+            print(f"   Current SL: {current_sl}, New SL: {new_sl}")
+            print(f"   Current TP: {current_tp}")
+            print(f"   Current Price: {current_price}")
+            print(f"   Position Type: {position_type}")
+
+            # Validate the new SL value
+            if new_sl <= 0:
+                await connection.close()
+                return False, "❌ Stop loss must be greater than 0"
+
+            # For BUY positions: SL should be below current price
+            if position_type == 'POSITION_TYPE_BUY' and new_sl >= current_price:
+                await connection.close()
+                return False, f"❌ For BUY positions, stop loss ({new_sl:.5f}) must be below current price ({current_price:.5f})"
+
+            # For SELL positions: SL should be above current price
+            if position_type == 'POSITION_TYPE_SELL' and new_sl <= current_price:
+                await connection.close()
+                return False, f"❌ For SELL positions, stop loss ({new_sl:.5f}) must be above current price ({current_price:.5f})"
+
+            # Try different modification approaches
+
+            # Approach 1: Simple modification with only stopLoss
+            try:
+                print("   Trying Approach 1: Simple stopLoss modification")
+                await connection.modify_position(position_id, {
+                    'stopLoss': new_sl
+                })
+                await connection.close()
+                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            except Exception as e1:
+                print(f"   Approach 1 failed: {str(e1)}")
+
+            # Approach 2: Include takeProfit if it exists
+            try:
+                print("   Trying Approach 2: With takeProfit")
+                modification_data = {'stopLoss': new_sl}
+                if current_tp is not None:
+                    modification_data['takeProfit'] = current_tp
+
+                await connection.modify_position(position_id, modification_data)
+                await connection.close()
+                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            except Exception as e2:
+                print(f"   Approach 2 failed: {str(e2)}")
+
+            # Approach 3: Try with string values
+            try:
+                print("   Trying Approach 3: String values")
+                modification_data = {'stopLoss': str(new_sl)}
+                if current_tp is not None:
+                    modification_data['takeProfit'] = str(current_tp)
+
+                await connection.modify_position(position_id, modification_data)
+                await connection.close()
+                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            except Exception as e3:
+                print(f"   Approach 3 failed: {str(e3)}")
+
+            # Approach 4: Try with exact precision (5 decimal places)
+            try:
+                print("   Trying Approach 4: Exact precision")
+                formatted_sl = round(new_sl, 5)
+                modification_data = {'stopLoss': formatted_sl}
+                if current_tp is not None:
+                    formatted_tp = round(current_tp, 5)
+                    modification_data['takeProfit'] = formatted_tp
+
+                await connection.modify_position(position_id, modification_data)
+                await connection.close()
+                return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            except Exception as e4:
+                print(f"   Approach 4 failed: {str(e4)}")
 
             await connection.close()
-
-            # If we reach here, the modification was successful
-            return True, f"✅ Position {position_id} updated - SL: {new_sl:.5f}"
+            return False, f"❌ All modification approaches failed. Last error: {str(e4)}"
 
         except Exception as e:
             try:

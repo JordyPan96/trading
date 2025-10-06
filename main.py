@@ -4161,130 +4161,474 @@ elif st.session_state.current_page == "Trade Signal":
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
 
 
+    # METAAPI SDK Functions
+    def get_metaapi_config():
+        """Get MetaApi configuration from secrets.toml"""
+        try:
+            metaapi_config = st.secrets.get("metaapi", {})
+            return metaapi_config
+        except:
+            return {}
+
+
+    async def get_metaapi_account():
+        """Get MetaApi account instance"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return None, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+            return account, None
+        except Exception as e:
+            return None, f"Error getting account: {str(e)}"
+
+
+    async def test_metaapi_connection():
+        """Test connection to MetaAPI - SIMPLIFIED"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+            config = get_metaapi_config()
+            token = config.get("token", "")
+
+            if not token:
+                return False, "❌ MetaApi token not configured"
+
+            api = MetaApi(token)
+            return True, "✅ Connected to MetaApi successfully (token is valid)"
+        except Exception as e:
+            return False, f"❌ MetaApi connection error: {str(e)}"
+
+
+    async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
+        """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
+        try:
+            account, error = await get_metaapi_account()
+            if error:
+                return False, error
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            if sl is None or tp is None:
+                await connection.close()
+                return False, "❌ Stop loss and take profit are mandatory"
+
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            if order_type.upper() == "BUY":
+                result = await connection.create_limit_buy_order(
+                    formatted_symbol,
+                    volume,
+                    entry_price,
+                    stop_loss=sl,
+                    take_profit=tp
+                )
+            else:
+                result = await connection.create_limit_sell_order(
+                    formatted_symbol,
+                    volume,
+                    entry_price,
+                    stop_loss=sl,
+                    take_profit=tp
+                )
+
+            await connection.close()
+            return True, f"✅ Order placed successfully"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return False, f"❌ Trade error: {str(e)}"
+
+
+    async def quick_get_positions():
+        """Quickly get positions without extensive synchronization"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return None, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            # Quick check - don't deploy if not ready
+            if account.state != 'DEPLOYED':
+                return [], None
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+
+            # Quick sync with short timeout
+            try:
+                await asyncio.wait_for(connection.wait_synchronized(), timeout=5)
+            except asyncio.TimeoutError:
+                await connection.close()
+                return [], "Connection timeout"
+
+            positions = await connection.get_positions()
+            await connection.close()
+
+            # Format positions data quickly - USE CAMELCASE DIRECTLY FROM METAAPI
+            formatted_positions = []
+            for position in positions:
+                formatted_positions.append({
+                    'id': position['id'],
+                    'symbol': position['symbol'],
+                    'type': position['type'],
+                    'volume': position['volume'],
+                    'openPrice': position['openPrice'],
+                    'currentPrice': position['currentPrice'],
+                    'stopLoss': position.get('stopLoss'),
+                    'takeProfit': position.get('takeProfit'),
+                    'profit': position.get('profit', 0)
+                })
+
+            return formatted_positions, None
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return [], f"Quick position error: {str(e)}"
+
+
+    def quick_auto_move_filled_orders(positions):
+        """Quick auto-move - only match instrument and position size, update all position values"""
+        try:
+            if not st.session_state.order_placed or not positions:
+                return 0
+
+            moved_count = 0
+            moved_details = []
+
+            for order in st.session_state.order_placed[:]:
+                order_symbol = order['selected_pair']
+                order_volume = safe_float(order.get('position_size'), 0.1)
+
+                # Format the order symbol for Pepperstone comparison
+                formatted_order_symbol = format_symbol_for_pepperstone(order_symbol)
+
+                # Look for matching position
+                for position in positions:
+                    position_symbol = position['symbol']
+                    position_volume = safe_float(position.get('volume'), 0.0)
+
+                    # SIMPLIFIED SYMBOL MATCHING - ONLY INSTRUMENT
+                    symbol_match = False
+
+                    # Case 1: Direct match (AUDUSD.a vs AUDUSD.a)
+                    if position_symbol == formatted_order_symbol:
+                        symbol_match = True
+
+                    # Case 2: Position has .a but order doesn't (AUDUSD.a vs AUDUSD)
+                    elif position_symbol.endswith('.a') and position_symbol.replace('.a', '') == order_symbol:
+                        symbol_match = True
+
+                    # Case 3: Order has .a but position doesn't (AUDUSD vs AUDUSD.a) - less common but possible
+                    elif order_symbol.endswith('.a') and order_symbol.replace('.a', '') == position_symbol:
+                        symbol_match = True
+
+                    # Case 4: Both without .a but match (AUDUSD vs AUDUSD)
+                    elif position_symbol == order_symbol:
+                        symbol_match = True
+
+                    # Volume matching ONLY (5.01 lots vs 5.01 lots)
+                    volume_match = abs(position_volume - order_volume) < 0.01
+
+                    # ONLY CHECK THESE TWO FIELDS - IGNORE DIRECTION AND PRICE
+                    if symbol_match and volume_match:
+                        # Create trade record - UPDATE ALL VALUES FROM POSITION (using correct camelCase)
+                        trade_record = {
+                            **order,  # Keep original order data
+                            'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'order_status': 'FILLED',
+                            'position_id': position['id'],
+                            'current_price': position.get('currentPrice'),
+                            'current_sl': position.get('stopLoss'),
+                            'current_tp': position.get('takeProfit'),
+                            'profit': position.get('profit', 0),
+                            # UPDATE ALL VALUES FROM ACTUAL POSITION (using correct camelCase)
+                            'entry_price': position.get('openPrice'),  # Use actual filled price
+                            'exit_price': position.get('stopLoss'),  # Use actual stop loss from position
+                            'target_price': position.get('takeProfit'),  # Use actual take profit from position
+                            'direction': 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                            # Use actual direction
+                        }
+
+                        # Move from Order Placed to In Trade
+                        st.session_state.order_placed = [o for o in st.session_state.order_placed if
+                                                         o['timestamp'] != order['timestamp']]
+                        st.session_state.in_trade.append(trade_record)
+                        moved_count += 1
+                        moved_details.append(f"{order_symbol} ({order_volume} lots)")
+                        break
+
+            return moved_count
+
+        except Exception as e:
+            print(f"❌ Quick auto-move error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return 0
+
+
+    async def fast_order_check(symbol: str, entry_price: float, volume: float):
+        """Fast order check with minimal overhead"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token:
+                return None, "No token configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                return 'NOT_CONNECTED', None
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+
+            try:
+                await asyncio.wait_for(connection.wait_synchronized(), timeout=5)
+            except asyncio.TimeoutError:
+                await connection.close()
+                return 'TIMEOUT', None
+
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            # Quick orders check
+            orders = await connection.get_orders()
+            for order in orders:
+                if (order['symbol'] == formatted_symbol and
+                        abs(float(order['openPrice']) - float(entry_price)) < 0.02):
+                    await connection.close()
+                    return 'PENDING', order['id']
+
+            # Quick positions check
+            positions = await connection.get_positions()
+            for position in positions:
+                if (position['symbol'] == formatted_symbol and
+                        abs(float(position['openPrice']) - float(entry_price)) < 0.02 and
+                        abs(float(position['volume']) - float(volume)) < 0.01):
+                    await connection.close()
+                    return 'FILLED', position['id']
+
+            await connection.close()
+            return 'NOT_FOUND', None
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return None, f"Quick check error: {str(e)}"
+
+
+    async def modify_position_sl(position_id: str, new_sl: float):
+        """Modify stop loss using correct MetaApi syntax with keyword arguments"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return False, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            # Get current position details
+            positions = await connection.get_positions()
+            current_position = None
+            for pos in positions:
+                if pos['id'] == position_id:
+                    current_position = pos
+                    break
+
+            if not current_position:
+                await connection.close()
+                return False, "❌ Position not found"
+
+            symbol = current_position['symbol']
+            current_sl = current_position.get('stopLoss')
+            current_tp = current_position.get('takeProfit')
+            current_price = current_position.get('currentPrice')
+            position_type = current_position.get('type')
+
+            # Validate the new SL value
+            if new_sl <= 0:
+                await connection.close()
+                return False, "❌ Stop loss must be greater than 0"
+
+            # For BUY positions: SL should be below current price
+            if position_type == 'POSITION_TYPE_BUY' and new_sl >= current_price:
+                await connection.close()
+                return False, f"❌ For BUY positions, stop loss ({new_sl:.5f}) must be below current price ({current_price:.5f})"
+
+            # For SELL positions: SL should be above current price
+            if position_type == 'POSITION_TYPE_SELL' and new_sl <= current_price:
+                await connection.close()
+                return False, f"❌ For SELL positions, stop loss ({new_sl:.5f}) must be above current price ({current_price:.5f})"
+
+            # CORRECT USAGE: Keyword arguments with snake_case
+            if current_tp and current_tp > 0:
+                # Modify both SL and TP
+                await connection.modify_position(
+                    position_id,
+                    stop_loss=new_sl,
+                    take_profit=current_tp
+                )
+            else:
+                # Modify only SL
+                await connection.modify_position(
+                    position_id,
+                    stop_loss=new_sl
+                )
+
+            await connection.close()
+            return True, f"✅ {symbol} - Stop loss updated to {new_sl:.5f}"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            error_msg = str(e)
+            print(f"❌ MetaApi error: {error_msg}")
+            return False, f"❌ Failed to modify position: {error_msg}"
+
+
+    async def close_position(position_id: str):
+        """Close an open position"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return False, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            result = await connection.close_position(position_id)
+            await connection.close()
+
+            if result:
+                return True, f"✅ Position {position_id} closed successfully"
+            else:
+                return False, "❌ Failed to close position"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return False, f"❌ Error closing position: {str(e)}"
+
+
     # UPDATED SYNC FUNCTIONS FOR TRADE SIGNAL PAGE
     def sync_from_active_opps():
-        """Sync from Active Opps to Trade Signals - PRESERVES EXISTING DATA"""
+        """Sync from Active Opps to Trade Signals - FIXED VERSION"""
         try:
             # Load current workflow data
             from your_main_app import load_data_from_sheets  # Import your existing function
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
 
             if workflow_df is not None and not workflow_df.empty:
-                # Get current timestamps from Active Opps
-                order_ready_timestamps = set(
-                    workflow_df[workflow_df['status'] == 'Order Ready']['timestamp'].astype(str))
-                order_placed_timestamps = set(
-                    workflow_df[workflow_df['status'] == 'Order Placed']['timestamp'].astype(str))
-                order_filled_timestamps = set(
-                    workflow_df[workflow_df['status'] == 'Order Filled']['timestamp'].astype(str))
+                # Convert to list of dictionaries
+                all_records = workflow_df.to_dict('records')
 
-                # Remove records that are no longer in Active Opps
-                st.session_state.ready_to_order = [
-                    signal for signal in st.session_state.ready_to_order
-                    if signal.get('timestamp') in order_ready_timestamps
-                ]
-                st.session_state.order_placed = [
-                    order for order in st.session_state.order_placed
-                    if order.get('timestamp') in order_placed_timestamps
-                ]
-                st.session_state.in_trade = [
-                    trade for trade in st.session_state.in_trade
-                    if trade.get('timestamp') in order_filled_timestamps
-                ]
+                # CLEAR AND REBUILD ALL LISTS - This ensures exact match with Active Opps
+                st.session_state.ready_to_order = []
+                st.session_state.order_placed = []
+                st.session_state.in_trade = []
 
-                # Add/update records from Active Opps
-                for _, record in workflow_df.iterrows():
+                # Populate from Active Opps data - ADD ALL RECORDS, DON'T FILTER BY EXISTING
+                for record in all_records:
                     timestamp = str(record.get('timestamp'))
                     status = record.get('status')
 
                     if status == 'Order Ready':
-                        existing_signal = next(
-                            (s for s in st.session_state.ready_to_order if s.get('timestamp') == timestamp), None)
-                        if existing_signal:
-                            # Update existing
-                            existing_signal.update({
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'status': 'Order Ready'
-                            })
-                        else:
-                            # Add new
-                            st.session_state.ready_to_order.append({
-                                'timestamp': timestamp,
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'status': 'Order Ready'
-                            })
+                        st.session_state.ready_to_order.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record.get('selected_pair'),
+                            'risk_multiplier': record.get('risk_multiplier'),
+                            'position_size': record.get('position_size'),
+                            'stop_pips': record.get('stop_pips'),
+                            'entry_price': record.get('entry_price'),
+                            'exit_price': record.get('exit_price'),
+                            'target_price': record.get('target_price'),
+                            'status': 'Order Ready'
+                        })
 
                     elif status == 'Order Placed':
-                        existing_order = next(
-                            (o for o in st.session_state.order_placed if o.get('timestamp') == timestamp), None)
-                        if existing_order:
-                            # Update existing
-                            existing_order.update({
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'status': 'Order Placed'
-                            })
-                        else:
-                            # Add new
-                            st.session_state.order_placed.append({
-                                'timestamp': timestamp,
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'order_status': 'PENDING',
-                                'status': 'Order Placed'
-                            })
+                        st.session_state.order_placed.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record.get('selected_pair'),
+                            'risk_multiplier': record.get('risk_multiplier'),
+                            'position_size': record.get('position_size'),
+                            'stop_pips': record.get('stop_pips'),
+                            'entry_price': record.get('entry_price'),
+                            'exit_price': record.get('exit_price'),
+                            'target_price': record.get('target_price'),
+                            'order_status': 'PENDING',
+                            'status': 'Order Placed'
+                        })
 
                     elif status == 'Order Filled':
-                        existing_trade = next((t for t in st.session_state.in_trade if t.get('timestamp') == timestamp),
-                                              None)
-                        if existing_trade:
-                            # Update existing
-                            existing_trade.update({
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'status': 'Order Filled'
-                            })
-                        else:
-                            # Add new
-                            st.session_state.in_trade.append({
-                                'timestamp': timestamp,
-                                'selected_pair': record.get('selected_pair'),
-                                'risk_multiplier': record.get('risk_multiplier'),
-                                'position_size': record.get('position_size'),
-                                'stop_pips': record.get('stop_pips'),
-                                'entry_price': record.get('entry_price'),
-                                'exit_price': record.get('exit_price'),
-                                'target_price': record.get('target_price'),
-                                'order_status': 'FILLED',
-                                'status': 'Order Filled'
-                            })
+                        st.session_state.in_trade.append({
+                            'timestamp': timestamp,
+                            'selected_pair': record.get('selected_pair'),
+                            'risk_multiplier': record.get('risk_multiplier'),
+                            'position_size': record.get('position_size'),
+                            'stop_pips': record.get('stop_pips'),
+                            'entry_price': record.get('entry_price'),
+                            'exit_price': record.get('exit_price'),
+                            'target_price': record.get('target_price'),
+                            'order_status': 'FILLED',
+                            'status': 'Order Filled'
+                        })
 
                 return True, f"Synced {len(st.session_state.ready_to_order)} ready, {len(st.session_state.order_placed)} placed, {len(st.session_state.in_trade)} filled"
             return True, "No Active Opps data found"
@@ -4461,98 +4805,6 @@ elif st.session_state.current_page == "Trade Signal":
             return False
 
 
-    # [KEEP ALL YOUR EXISTING METAAPI FUNCTIONS EXACTLY AS THEY ARE]
-    # METAAPI SDK Functions (all your existing functions remain unchanged)
-    def get_metaapi_config():
-        """Get MetaApi configuration from secrets.toml"""
-        try:
-            metaapi_config = st.secrets.get("metaapi", {})
-            return metaapi_config
-        except:
-            return {}
-
-
-    async def get_metaapi_account():
-        """Get MetaApi account instance"""
-        try:
-            from metaapi_cloud_sdk import MetaApi
-            config = get_metaapi_config()
-            token = config.get("token", "")
-            account_id = st.session_state.metaapi_account_id
-
-            if not token or not account_id:
-                return None, "Token or account ID not configured"
-
-            api = MetaApi(token)
-            account = await api.metatrader_account_api.get_account(account_id)
-            return account, None
-        except Exception as e:
-            return None, f"Error getting account: {str(e)}"
-
-
-    async def test_metaapi_connection():
-        """Test connection to MetaAPI - SIMPLIFIED"""
-        try:
-            from metaapi_cloud_sdk import MetaApi
-            config = get_metaapi_config()
-            token = config.get("token", "")
-
-            if not token:
-                return False, "❌ MetaApi token not configured"
-
-            api = MetaApi(token)
-            return True, "✅ Connected to MetaApi successfully (token is valid)"
-        except Exception as e:
-            return False, f"❌ MetaApi connection error: {str(e)}"
-
-
-    async def place_trade(symbol: str, volume: float, order_type: str, entry_price: float, sl: float, tp: float):
-        """Place a LIMIT trade with MetaApi - SL and TP are MANDATORY"""
-        try:
-            account, error = await get_metaapi_account()
-            if error:
-                return False, error
-
-            connection = account.get_rpc_connection()
-            await connection.connect()
-            await connection.wait_synchronized()
-
-            if sl is None or tp is None:
-                await connection.close()
-                return False, "❌ Stop loss and take profit are mandatory"
-
-            formatted_symbol = format_symbol_for_pepperstone(symbol)
-
-            if order_type.upper() == "BUY":
-                result = await connection.create_limit_buy_order(
-                    formatted_symbol,
-                    volume,
-                    entry_price,
-                    stop_loss=sl,
-                    take_profit=tp
-                )
-            else:
-                result = await connection.create_limit_sell_order(
-                    formatted_symbol,
-                    volume,
-                    entry_price,
-                    stop_loss=sl,
-                    take_profit=tp
-                )
-
-            await connection.close()
-            return True, f"✅ Order placed successfully"
-
-        except Exception as e:
-            try:
-                await connection.close()
-            except:
-                pass
-            return False, f"❌ Trade error: {str(e)}"
-
-
-    # [KEEP ALL YOUR OTHER METAAPI FUNCTIONS: quick_get_positions, quick_auto_move_filled_orders, fast_order_check, modify_position_sl, close_position]
-
     # OPTIMIZED TRADE EXECUTION FUNCTION - UPDATED FOR SYNC
     async def execute_trade_and_update(signal_index):
         """Execute trade and update state immediately - WITH SYNC"""
@@ -4636,6 +4888,29 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             st.session_state.metaapi_connected = False
 
+    # QUICK AUTO-MOVE ON PAGE LOAD (NON-BLOCKING)
+    if st.session_state.metaapi_connected and not st.session_state.auto_move_checked:
+        import threading
+
+
+        def background_auto_move():
+            try:
+                positions, error = asyncio.run(quick_get_positions())
+                if positions:
+                    moved_count = quick_auto_move_filled_orders(positions)
+                    if moved_count > 0:
+                        print(f"✅ Auto-moved {moved_count} orders to In Trade")
+                    st.session_state.open_positions = positions
+                st.session_state.auto_move_checked = True
+            except Exception as e:
+                print(f"❌ Background auto-move error: {str(e)}")
+                st.session_state.auto_move_checked = True
+
+
+        # Run in background thread to avoid blocking
+        thread = threading.Thread(target=background_auto_move, daemon=True)
+        thread.start()
+
     # Show last trade result if available
     if st.session_state.last_trade_result:
         result = st.session_state.last_trade_result
@@ -4680,8 +4955,9 @@ elif st.session_state.current_page == "Trade Signal":
         if st.button("🔄 Refresh Positions", key="refresh_positions", use_container_width=True):
             import asyncio
 
-            with st.spinner("Quick refreshing positions..."):
-                positions, error = asyncio.run(quick_get_positions())
+
+            async def refresh_positions_async():
+                positions, error = await quick_get_positions()
                 if error:
                     st.error(f"❌ {error}")
                 else:
@@ -4692,7 +4968,11 @@ elif st.session_state.current_page == "Trade Signal":
                         st.success(f"✅ Found {len(positions)} positions, auto-moved {moved_count} orders to In Trade")
                     else:
                         st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
-                st.rerun()
+
+
+            # Run the async function
+            asyncio.run(refresh_positions_async())
+            st.rerun()
 
     # Show connection status
     if st.session_state.metaapi_connected:

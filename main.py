@@ -4224,6 +4224,27 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
+    def calculate_be_price(entry_price, exit_price, direction):
+        """Calculate BE Price at 2.5R"""
+        try:
+            entry = safe_float(entry_price, 0.0)
+            exit_val = safe_float(exit_price, 0.0)
+
+            if entry == 0 or exit_val == 0:
+                return 0.0
+
+            distance = abs(entry - exit_val)
+
+            if direction == "BUY":
+                return entry + (distance * 2.5)
+            elif direction == "SELL":
+                return entry - (distance * 2.5)
+            else:
+                return 0.0
+        except:
+            return 0.0
+
+
     def format_symbol_for_pepperstone(symbol):
         """Add .a suffix to symbols for Pepperstone broker"""
         pepperstone_symbols = [
@@ -5395,8 +5416,13 @@ elif st.session_state.current_page == "Trade Signal":
                             sl_price = safe_float(position.get('stopLoss'), 0.0)
                             tp_price = safe_float(position.get('takeProfit'), 0.0)
 
+                            # Calculate BE Price
+                            direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+                            be_price = calculate_be_price(open_price, sl_price, direction)
+
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
+                            st.write(f"**BE Price (2.5R):** {be_price:.5f}")
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")

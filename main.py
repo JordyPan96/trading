@@ -5517,7 +5517,7 @@ elif st.session_state.current_page == "Stats":
 
     if st.session_state.uploaded_data is not None:
         def highlight_summary(row):
-            return ['background-color: lightyellow; font-weight: bold' if row['Month'] == 'Total' else '' for _ in row]
+            return ['background-color: ; font-weight: bold' if row['Month'] == 'Total' else '' for _ in row]
 
         df = st.session_state.uploaded_data
         df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')

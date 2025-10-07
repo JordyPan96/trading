@@ -5807,11 +5807,12 @@ elif st.session_state.current_page == "Trade Signal":
 
                             # Calculate BE Price
                             direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-                            be_price = calculate_be_price(open_price, sl_price, direction)
+                            if 'be_price' not in st.session_state:
+                                st.session_state.be_price = calculate_be_price(open_price, sl_price, direction)
 
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
-                            st.write(f"**BE Price (2.5R):** {be_price:.5f}")
+                            st.write(f"**BE Price (2.5R):** {st.session_state.be_price:.5f}")
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")

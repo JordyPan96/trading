@@ -3654,7 +3654,7 @@ elif st.session_state.current_page == "Active Opps":
 
     # SYNC STATUS SECTION - ENHANCED FOR TWO-WAY SYNC
     st.write("---")
-    col_sync1, col_sync2, col_sync3 = st.columns(3)
+    col_sync1, col_sync2, col_sync3, col_sync4 = st.columns(4)  # Changed to 4 columns
 
     with col_sync1:
         if st.button(" Check for Updates", key="check_updates", use_container_width=True):
@@ -3674,11 +3674,16 @@ elif st.session_state.current_page == "Active Opps":
                     st.info("Data is already up to date")
 
     with col_sync2:
+        if st.button(" Add New Speculation", key="add_new_spec", use_container_width=True):
+            st.session_state.current_page = "Risk Calculation"
+            st.rerun()
+
+    with col_sync3:
         if st.button(" View Trade Signals", key="view_signals", use_container_width=True):
             st.session_state.current_page = "Trade Signal"
             st.rerun()
 
-    with col_sync3:
+    with col_sync4:
         st.write(f"**Last sync:** {st.session_state.last_sync_time.strftime('%H:%M:%S')}")
 
     # CSV Upload as fallback

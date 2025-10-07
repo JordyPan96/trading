@@ -2136,7 +2136,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
                     st.session_state.saved_records = workflow_data.to_dict('records')
-                    st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
+                    #st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
 
         #st.subheader("Risk Calculation")
 

@@ -4185,9 +4185,9 @@ elif st.session_state.current_page == "Active Opps":
                         if matching_trade:
                             if final_direction != "Unknown":
                                 st.success(
-                                    f"✓ Direction automatically set to: {final_direction.upper()} (from trade data)")
+                                    f"Synced with In Trade Signal")
                             else:
-                                st.warning("⚠ Waiting for direction data from trade...")
+                                st.warning("Waiting for direction data from trade...")
                         else:
                             st.info("ℹ No matching trade found. Direction will update when trade is detected.")
 

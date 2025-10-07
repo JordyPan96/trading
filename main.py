@@ -4150,14 +4150,8 @@ elif st.session_state.current_page == "Active Opps":
                         final_target_price = safe_float(
                             st.session_state.saved_records[record_index].get('target_price'), 0.0)
 
-                        # KEEP ORIGINAL DESIGN - JUST REPLACE FIELDS WITH SYNCED VALUES
-                        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-
-                        with col1:
-                            st.write(f"**Pair:** {record['selected_pair']}")
-                            st.write(f"**Strategy:** {record['risk_multiplier']}")
-                            st.write(f"**Position Size:** {record['position_size']}")
-                            st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
+                        # JUST SHOW THE PRICE FIELDS - BASIC INFO IS ALREADY DISPLAYED ABOVE
+                        col2, col3, col4 = st.columns(3)
 
                         with col2:
                             # REPLACED: Entry Price with disabled field showing synced value
@@ -4166,7 +4160,7 @@ elif st.session_state.current_page == "Active Opps":
                                 "Entry Price",
                                 value=f"{entry_display:.5f}" if isinstance(entry_display,
                                                                            (int, float)) else entry_display,
-                                key=f"entry_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
+                                key=f"entry_filled_{unique_key_base}",
                                 disabled=True,
                                 help="Actual filled price from trade execution"
                             )
@@ -4177,7 +4171,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.text_input(
                                 "Exit Price",
                                 value=f"{exit_display:.5f}" if isinstance(exit_display, (int, float)) else exit_display,
-                                key=f"exit_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
+                                key=f"exit_filled_{unique_key_base}",
                                 disabled=True,
                                 help="Actual stop loss from trade execution"
                             )
@@ -4189,7 +4183,7 @@ elif st.session_state.current_page == "Active Opps":
                                 "Target Price",
                                 value=f"{target_display:.5f}" if isinstance(target_display,
                                                                             (int, float)) else target_display,
-                                key=f"target_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
+                                key=f"target_filled_{unique_key_base}",
                                 disabled=True,
                                 help="Actual take profit from trade execution"
                             )
@@ -4267,7 +4261,7 @@ elif st.session_state.current_page == "Active Opps":
                         # Show auto-update status
                         if matching_trade:
                             if final_direction != "Unknown" and final_entry_price > 0:
-                                st.success(f"✓ Auto-synced with trade data")
+                                st.success(f"Auto-synced with trade data")
                             else:
                                 st.warning("⚠ Waiting for trade execution data...")
                         else:

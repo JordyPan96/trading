@@ -5011,7 +5011,17 @@ elif st.session_state.current_page == "Trade Signal":
             if success:
                 # Only update local state after successful sheets update
                 st.session_state.order_placed.pop(order_index)
-                st.session_state.ready_to_order.append(order)
+
+                # Create a new order object with updated status (CRITICAL FIX)
+                updated_order = order.copy()
+                updated_order['status'] = 'Order Ready'  # Update the status field
+                # Remove any order-specific fields that shouldn't be in ready status
+                if 'order_status' in updated_order:
+                    del updated_order['order_status']
+                if 'order_time' in updated_order:
+                    del updated_order['order_time']
+
+                st.session_state.ready_to_order.append(updated_order)
 
                 st.session_state.last_action = f"moved_back_to_ready_{order_index}"
 

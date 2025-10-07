@@ -3922,7 +3922,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER READY STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Ready':
-                        col_update, col_move, col_spec, col_delete = st.columns(4)  # Changed to 4 columns
+                        col_update, col_spec, col_move, col_delete = st.columns(4)  # Changed to 4 columns
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):

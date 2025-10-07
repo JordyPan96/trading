@@ -4196,6 +4196,18 @@ elif st.session_state.current_page == "Trade Signal":
     if 'last_action' not in st.session_state:
         st.session_state.last_action = None
 
+    # RESET ALL CONFIRMATION STATES WHEN PAGE LOADS
+    if 'confirmation_states_reset' not in st.session_state:
+        # Clear any existing confirmation states
+        keys_to_remove = []
+        for key in st.session_state.keys():
+            if key.startswith('confirm_execute_'):
+                keys_to_remove.append(key)
+
+        for key in keys_to_remove:
+            del st.session_state[key]
+
+        st.session_state.confirmation_states_reset = True
 
     # Add helper function first
     def safe_float(value, default=0.0):
@@ -5280,15 +5292,24 @@ elif st.session_state.current_page == "Trade Signal":
 
                                     if st.session_state.get(confirm_key, False):
                                         # Show confirmation button
-                                        if st.button(
-                                                f"CONFIRM {direction} ORDER",
-                                                key=f"confirm_{unique_key}",
-                                                type="primary",
-                                                use_container_width=True,
-                                        ):
-                                            execute_trade_immediate_ui(i)
-                                            # Reset confirmation state
-                                            st.session_state[confirm_key] = False
+                                        col_confirm1, col_confirm2 = st.columns([2, 1])
+                                        with col_confirm1:
+                                            if st.button(
+                                                    f"CONFIRM {direction} ORDER",
+                                                    key=f"confirm_{unique_key}",
+                                                    type="primary",
+                                                    use_container_width=True,
+                                            ):
+                                                execute_trade_immediate_ui(i)
+                                        with col_confirm2:
+                                            if st.button(
+                                                    "✕ Cancel",
+                                                    key=f"cancel_{unique_key}",
+                                                    type="secondary",
+                                                    use_container_width=True,
+                                            ):
+                                                st.session_state[confirm_key] = False
+                                                st.rerun()
                                     else:
                                         # Show initial execute button
                                         if st.button(

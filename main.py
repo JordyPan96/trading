@@ -850,7 +850,7 @@ if st.session_state.current_page == "Home":
             st.session_state.symbol_stats_computed = False
 
     # Show data management options only on Home page
-    with st.sidebar.expander("📁 Cloud Data Management", expanded=True):
+    with st.sidebar.expander("Cloud Data Management", expanded=True):
         st.subheader("Google Sheets Storage")
 
         col1, col2 = st.columns(2)
@@ -3616,7 +3616,7 @@ elif st.session_state.current_page == "Active Opps":
 
     # CSV Upload as fallback
     st.sidebar.markdown("---")
-    with st.sidebar.expander("📁 CSV Backup", expanded=False):
+    with st.sidebar.expander("CSV Backup", expanded=False):
         st.subheader("Upload Workflow Backup")
         uploaded_workflow_file = st.file_uploader("Upload Workflow CSV", type=['csv'], key="workflow_uploader")
 

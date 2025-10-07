@@ -4201,7 +4201,7 @@ elif st.session_state.current_page == "Trade Signal":
         # Clear any existing confirmation states
         keys_to_remove = []
         for key in st.session_state.keys():
-            if key.startswith('confirm_execute_'):
+            if key.startswith('confirm_execute_') or key.startswith('confirm_back_ready_'):
                 keys_to_remove.append(key)
 
         for key in keys_to_remove:
@@ -5434,18 +5434,35 @@ elif st.session_state.current_page == "Trade Signal":
                                     st.rerun()
 
                         with col_back:
-                            if st.button("Back to Ready", key=f"back_ready_{unique_key}", use_container_width=True):
-                                import asyncio
+                            # Generate unique confirmation key for back to ready
+                            back_confirm_key = f"confirm_back_ready_{unique_key}"
 
-                                # Show confirmation dialog for cancellation
-                                if st.session_state.get(f"confirm_cancel_{unique_key}", False):
-                                    if handle_move_back_to_ready(i):
-                                        st.session_state[f"confirm_cancel_{unique_key}"] = False
+                            if st.session_state.get(back_confirm_key, False):
+                                # Show confirmation buttons
+                                col_confirm_back1, col_confirm_back2 = st.columns(2)
+                                with col_confirm_back1:
+                                    if st.button(
+                                            "CONFIRM Cancel Order",
+                                            key=f"confirm_back_{unique_key}",
+                                            type="primary",
+                                            use_container_width=True,
+                                    ):
+                                        if handle_move_back_to_ready(i):
+                                            st.session_state[back_confirm_key] = False
+                                            st.rerun()
+                                with col_confirm_back2:
+                                    if st.button(
+                                            "✕ Keep Order",
+                                            key=f"keep_order_{unique_key}",
+                                            type="secondary",
+                                            use_container_width=True,
+                                    ):
+                                        st.session_state[back_confirm_key] = False
                                         st.rerun()
-                                else:
-                                    st.session_state[f"confirm_cancel_{unique_key}"] = True
-                                    st.warning(
-                                        f" This will cancel the pending order for {order['selected_pair']} in MT5. Click again to confirm.")
+                            else:
+                                if st.button("Back to Ready", key=f"back_ready_{unique_key}", use_container_width=True):
+                                    st.session_state[back_confirm_key] = True
+                                    st.rerun()
 
         with tab3:
             st.subheader(" In Trade")

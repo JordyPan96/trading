@@ -510,7 +510,7 @@ def get_google_sheets_client():
 
         # Option 1: Check for GitHub Actions secrets (environment variables)
         if all(key in os.environ for key in ['GCP_TYPE', 'GCP_PRIVATE_KEY', 'GCP_CLIENT_EMAIL']):
-            st.sidebar.info("🔧 Using GitHub Actions secrets")
+            st.sidebar.info(" Using GitHub Actions secrets")
             creds_dict = {
                 "type": os.environ['GCP_TYPE'],
                 "project_id": os.environ.get('GCP_PROJECT_ID', ''),
@@ -526,7 +526,7 @@ def get_google_sheets_client():
 
         # Option 2: Check for Streamlit secrets (secrets.toml)
         elif "gcp_service_account" in st.secrets:
-            st.sidebar.info("🔧 Using Streamlit secrets")
+            st.sidebar.info(" Using Streamlit secrets")
             creds_dict = st.secrets["gcp_service_account"]
 
         else:

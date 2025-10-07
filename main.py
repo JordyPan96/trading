@@ -3922,7 +3922,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER READY STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Ready':
-                        col_update, col_move, col_delete = st.columns(3)
+                        col_update, col_move, col_spec, col_delete = st.columns(4)  # Changed to 4 columns
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):
@@ -3932,6 +3932,11 @@ elif st.session_state.current_page == "Active Opps":
                         with col_move:
                             if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Placed'):
+                                    st.rerun()
+
+                        with col_spec:  # NEW: Move to Speculation button
+                            if st.button("↩️ Move to Speculation", key=f"move_spec_{unique_key_base}"):
+                                if handle_move_record(record_index, 'Speculation'):
                                     st.rerun()
 
                         with col_delete:
@@ -5358,7 +5363,7 @@ elif st.session_state.current_page == "Trade Signal":
                         if formatted_symbol != signal['selected_pair']:
                             st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
 
-                        
+
 
         with tab2:
             st.subheader(" Order Placed")

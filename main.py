@@ -5577,13 +5577,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         st.success(" This trade is now in Active Opps as 'Order Filled'")
 
-                        # REMOVED: col_close, col_back, col_delete columns and buttons
-                        # Only keep the Delete button if needed, or remove all buttons
-                        col_delete = st.columns(1)[0]
-                        with col_delete:
-                            if st.button(" Delete", key=f"delete_trade_{unique_key}", use_container_width=True):
-                                if handle_delete_signal(i, 'in_trade'):
-                                    st.rerun()
+                        
 
         with tab4:
             st.subheader(" Open Positions")

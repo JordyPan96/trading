@@ -3935,7 +3935,7 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                         with col_spec:  # NEW: Move to Speculation button
-                            if st.button("↩️ Move to Speculation", key=f"move_spec_{unique_key_base}"):
+                            if st.button("Move to Speculation", key=f"move_spec_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Speculation'):
                                     st.rerun()
 

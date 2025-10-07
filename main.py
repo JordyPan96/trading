@@ -3954,28 +3954,38 @@ elif st.session_state.current_page == "Active Opps":
                         st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
 
                     with col2:
-                        entry_price = st.number_input(
-                            "Entry Price",
-                            value=safe_float(record.get('entry_price'), 0.0),
-                            format="%.5f",
-                            key=f"entry_{unique_key_base}"
-                        )
+                        if st.session_state.current_stage != 'Order Filled':
+                            entry_price = st.number_input(
+                                "Entry Price",
+                                value=safe_float(record.get('entry_price'), 0.0),
+                                format="%.5f",
+                                key=f"entry_{unique_key_base}"
+                            )
+                        else:
+                            # For Order Filled stage, we'll show the disabled version later
+                            st.write("")  # Empty space to maintain layout
 
                     with col3:
-                        exit_price = st.number_input(
-                            "Exit Price",
-                            value=safe_float(record.get('exit_price'), 0.0),
-                            format="%.5f",
-                            key=f"exit_{unique_key_base}"
-                        )
+                        if st.session_state.current_stage != 'Order Filled':
+                            exit_price = st.number_input(
+                                "Exit Price",
+                                value=safe_float(record.get('exit_price'), 0.0),
+                                format="%.5f",
+                                key=f"exit_{unique_key_base}"
+                            )
+                        else:
+                            st.write("")  # Empty space to maintain layout
 
                     with col4:
-                        target_price = st.number_input(
-                            "Target Price",
-                            value=safe_float(record.get('target_price'), 0.0),
-                            format="%.5f",
-                            key=f"target_{unique_key_base}"
-                        )
+                        if st.session_state.current_stage != 'Order Filled':
+                            target_price = st.number_input(
+                                "Target Price",
+                                value=safe_float(record.get('target_price'), 0.0),
+                                format="%.5f",
+                                key=f"target_{unique_key_base}"
+                            )
+                        else:
+                            st.write("")  # Empty space to maintain layout
 
                     # SPECULATION STAGE ACTIONS
                     if st.session_state.current_stage == 'Speculation':
@@ -4133,9 +4143,12 @@ elif st.session_state.current_page == "Active Opps":
 
                         # Use the actual values (either from matching trade or existing record)
                         final_direction = st.session_state.saved_records[record_index].get('direction', 'Unknown')
-                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'), 0.0)
-                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'), 0.0)
-                        final_target_price = safe_float(st.session_state.saved_records[record_index].get('target_price'), 0.0)
+                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'),
+                                                       0.0)
+                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'),
+                                                      0.0)
+                        final_target_price = safe_float(
+                            st.session_state.saved_records[record_index].get('target_price'), 0.0)
 
                         # KEEP ORIGINAL DESIGN - JUST REPLACE FIELDS WITH SYNCED VALUES
                         col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
@@ -4151,7 +4164,8 @@ elif st.session_state.current_page == "Active Opps":
                             entry_display = final_entry_price if final_entry_price > 0 else "Waiting for fill..."
                             st.text_input(
                                 "Entry Price",
-                                value=f"{entry_display:.5f}" if isinstance(entry_display, (int, float)) else entry_display,
+                                value=f"{entry_display:.5f}" if isinstance(entry_display,
+                                                                           (int, float)) else entry_display,
                                 key=f"entry_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Actual filled price from trade execution"
@@ -4173,7 +4187,8 @@ elif st.session_state.current_page == "Active Opps":
                             target_display = final_target_price if final_target_price > 0 else "Waiting for fill..."
                             st.text_input(
                                 "Target Price",
-                                value=f"{target_display:.5f}" if isinstance(target_display, (int, float)) else target_display,
+                                value=f"{target_display:.5f}" if isinstance(target_display,
+                                                                            (int, float)) else target_display,
                                 key=f"target_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Actual take profit from trade execution"
@@ -4314,7 +4329,8 @@ elif st.session_state.current_page == "Active Opps":
                                             if current_trade_data is not None and not current_trade_data.empty:
                                                 # Ensure only the specified columns exist in current data
                                                 required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
-                                                                    'POI', 'Strategy', 'Variance', 'Result', 'RR', 'PnL',
+                                                                    'POI', 'Strategy', 'Variance', 'Result', 'RR',
+                                                                    'PnL',
                                                                     'Withdrawal_Deposit', 'PROP_Pct']
 
                                                 # Add missing columns if they don't exist

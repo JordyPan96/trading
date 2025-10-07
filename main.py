@@ -3258,7 +3258,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                             st.error("Order added locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button
-                        if st.button("📋 View Active Opps", use_container_width=True):
+                        if st.button("View Active Opps", use_container_width=True):
                             st.session_state.current_page = "Active Opps"
                             st.rerun()
 
@@ -3384,7 +3384,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         # Add View Active Opps button below the Add Order button
 
-                        if st.button("📋 View Active Opps", use_container_width=True):
+                        if st.button("View Active Opps", use_container_width=True):
                             st.session_state.current_page = "Active Opps"
 
                             st.rerun()

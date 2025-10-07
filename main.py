@@ -4360,6 +4360,60 @@ elif st.session_state.current_page == "Trade Signal":
             return False, f" Trade error: {str(e)}"
 
 
+    async def cancel_pending_order(symbol: str, entry_price: float):
+        """Cancel a pending limit order in MT5"""
+        try:
+            from metaapi_cloud_sdk import MetaApi
+
+            config = get_metaapi_config()
+            token = config.get("token", "")
+            account_id = st.session_state.metaapi_account_id
+
+            if not token or not account_id:
+                return False, "Token or account ID not configured"
+
+            api = MetaApi(token)
+            account = await api.metatrader_account_api.get_account(account_id)
+
+            if account.state != 'DEPLOYED':
+                await account.deploy()
+            await account.wait_connected()
+
+            connection = account.get_rpc_connection()
+            await connection.connect()
+            await connection.wait_synchronized()
+
+            formatted_symbol = format_symbol_for_pepperstone(symbol)
+
+            # Get all pending orders
+            orders = await connection.get_orders()
+
+            # Find the specific limit order to cancel
+            order_to_cancel = None
+            for order in orders:
+                if (order['symbol'] == formatted_symbol and
+                        abs(float(order['openPrice']) - float(
+                            entry_price)) < 0.0001):  # Small tolerance for price matching
+                    order_to_cancel = order
+                    break
+
+            if order_to_cancel:
+                # Cancel the order
+                result = await connection.cancel_order(order_to_cancel['id'])
+                await connection.close()
+                return True, f"Order cancelled successfully: {symbol} at {entry_price}"
+            else:
+                await connection.close()
+                return False, f"No pending order found for {symbol} at {entry_price}"
+
+        except Exception as e:
+            try:
+                await connection.close()
+            except:
+                pass
+            return False, f"Error cancelling order: {str(e)}"
+
+
     async def quick_get_positions():
         """Quickly get positions without extensive synchronization"""
         try:
@@ -4911,7 +4965,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def handle_move_back_to_ready(order_index):
-        """Move order from Order Placed back to Ready to Order - WITH DIRECT SHEETS UPDATE"""
+        """Move order from Order Placed back to Ready to Order - WITH ORDER CANCELLATION"""
         try:
             if order_index >= len(st.session_state.order_placed):
                 st.error("Invalid order index")
@@ -4920,10 +4974,18 @@ elif st.session_state.current_page == "Trade Signal":
             order = st.session_state.order_placed[order_index]
             timestamp = order['timestamp']
             symbol = order['selected_pair']
+            entry_price = safe_float(order.get('entry_price'), 0.0)
 
-            print(f" Moving {symbol} back to Ready (timestamp: {timestamp})")
+            print(f" Moving {symbol} back to Ready and cancelling order (timestamp: {timestamp})")
 
-            # First update the status in Google Sheets WITH INSTRUMENT NAME
+            # First cancel the order in MT5
+            import asyncio
+            cancellation_success, cancellation_message = asyncio.run(cancel_pending_order(symbol, entry_price))
+
+            if not cancellation_success:
+                st.warning(f"Order cancellation warning: {cancellation_message}. Continuing with status update...")
+
+            # Then update the status in Google Sheets WITH INSTRUMENT NAME
             success, message = update_workflow_status_in_sheets(timestamp, 'Order Ready', symbol)
 
             if success:
@@ -4932,6 +4994,12 @@ elif st.session_state.current_page == "Trade Signal":
                 st.session_state.ready_to_order.append(order)
 
                 st.session_state.last_action = f"moved_back_to_ready_{order_index}"
+
+                if cancellation_success:
+                    st.success(f"Order cancelled in MT5 and moved back to Ready: {symbol}")
+                else:
+                    st.success(f"Moved back to Ready (order may still be pending in MT5): {symbol}")
+
                 print(f" Successfully moved {symbol} back to Ready")
                 return True
             else:
@@ -5129,7 +5197,8 @@ elif st.session_state.current_page == "Trade Signal":
                     moved_count = quick_auto_move_filled_orders(positions)
                     st.session_state.open_positions = positions
                     if moved_count > 0:
-                        st.success(f" Found {len(positions)} open positions, auto-moved {moved_count} orders to In Trade")
+                        st.success(
+                            f" Found {len(positions)} open positions, auto-moved {moved_count} orders to In Trade")
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
@@ -5149,7 +5218,7 @@ elif st.session_state.current_page == "Trade Signal":
     if st.session_state.metaapi_connected:
         st.success(" Connected to Trading Account - Ready for trading")
     else:
-        st.warning("⚠ Not Connected to Trading Account - Trades will not execute")
+        st.warning("Not Connected to Trading Account - Trades will not execute")
 
     st.info(" Status changes are automatically saved to Active Opps workflow")
 
@@ -5214,9 +5283,9 @@ elif st.session_state.current_page == "Trade Signal":
                                     ):
                                         execute_trade_immediate_ui(i)
                                 else:
-                                    st.warning("⚠️ Cannot execute - missing required price parameters")
+                                    st.warning(" Cannot execute - missing required price parameters")
                             else:
-                                st.warning("🔒 Not connected to trading account")
+                                st.warning(" Not connected to trading account")
 
                         col2, col3, col4 = st.columns([1, 1, 1])
 
@@ -5316,7 +5385,7 @@ elif st.session_state.current_page == "Trade Signal":
                                                                                  trade['selected_pair'])
                                         st.rerun()
                                     elif status == 'NOT_FOUND':
-                                        st.warning("⚠️ Order not found in MT5")
+                                        st.warning(" Order not found in MT5")
                                     else:
                                         st.error(f" Check failed: {order_id}")
 
@@ -5327,8 +5396,17 @@ elif st.session_state.current_page == "Trade Signal":
 
                         with col_back:
                             if st.button("Back to Ready", key=f"back_ready_{unique_key}", use_container_width=True):
-                                if handle_move_back_to_ready(i):
-                                    st.rerun()
+                                import asyncio
+
+                                # Show confirmation dialog for cancellation
+                                if st.session_state.get(f"confirm_cancel_{unique_key}", False):
+                                    if handle_move_back_to_ready(i):
+                                        st.session_state[f"confirm_cancel_{unique_key}"] = False
+                                        st.rerun()
+                                else:
+                                    st.session_state[f"confirm_cancel_{unique_key}"] = True
+                                    st.warning(
+                                        f" This will cancel the pending order for {order['selected_pair']} in MT5. Click again to confirm.")
 
         with tab3:
             st.subheader(" In Trade")
@@ -5427,7 +5505,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")
-                        st.subheader("🛠️ Modify Stop Loss Only")
+                        st.subheader("🛠 Modify Stop Loss Only")
 
                         col_sl, col_action = st.columns([1, 1])
 

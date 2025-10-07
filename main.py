@@ -5239,7 +5239,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     st.metric("R:R Ratio", f"1:{reward_ratio:.2f}")
 
                         direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-                        direction_color = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
+                        direction_color = "" if direction == "BUY" else "" if direction == "SELL" else ""
                         st.write(f"**Direction:** {direction_color} {direction}")
 
                         formatted_symbol = format_symbol_for_pepperstone(signal['selected_pair'])

@@ -3198,72 +3198,70 @@ elif st.session_state.current_page == "Risk Calculation":
                         # Determine if button should be disabled
                         add_order_disabled = False
 
-                        col_add, col_view = st.columns(2)
+                        if st.button(" Add Order", type="secondary", use_container_width=True,
+                                     disabled=add_order_disabled):
+                            # Check if Stop Loss is 0 or missing
+                            if stop_pips is None or stop_pips == 0:
+                                st.error("Cannot add order: Stop Loss is required and cannot be 0!")
+                            elif (position_size <= 0):
+                                st.error("Position size is required to be greater than 0")
+                            else:
+                                # Check if maximum records reached (only for new records, not updates)
+                                existing_index = None
+                                for i, existing_record in enumerate(st.session_state.saved_records):
+                                    if existing_record['selected_pair'] == selected_pair:
+                                        existing_index = i
+                                        break
 
-                        with col_add:
-                            if st.button(" Add Order", type="secondary", use_container_width=True,
-                                         disabled=add_order_disabled):
-                                # Check if Stop Loss is 0 or missing
-                                if stop_pips is None or stop_pips == 0:
-                                    st.error("Cannot add order: Stop Loss is required and cannot be 0!")
-                                elif (position_size <= 0):
-                                    st.error("Position size is required to be greater than 0")
+                                # If it's a new record (not updating existing) and we're at max capacity
+                                if existing_index is None and len(st.session_state.saved_records) >= 5:
+                                    st.error(
+                                        "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
                                 else:
-                                    # Check if maximum records reached (only for new records, not updates)
-                                    existing_index = None
-                                    for i, existing_record in enumerate(st.session_state.saved_records):
-                                        if existing_record['selected_pair'] == selected_pair:
-                                            existing_index = i
-                                            break
+                                    # Create a record with timestamp and all selections
+                                    record = {
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        # More detailed timestamp
+                                        'selected_pair': selected_pair,
+                                        'trend_position': trend_position,
+                                        'POI': POI,
+                                        'cross_fib': cross_fib,
+                                        'HH_LL': HH_LL,
+                                        'risk_multiplier': risk_multiplier,
+                                        'Variances': Variances,
+                                        'stop_pips': stop_pips,
+                                        'within_61': within_61,
+                                        'final_risk': final_risk,
+                                        'position_size': position_size,
+                                        'position_size_propfirm': position_size_propfirm,
+                                        'entry_price': 0.0,  # Default values
+                                        'exit_price': 0.0,
+                                        'target_price': 0.0,
+                                        'status': 'Speculation'  # Default status
+                                    }
 
-                                    # If it's a new record (not updating existing) and we're at max capacity
-                                    if existing_index is None and len(st.session_state.saved_records) >= 5:
-                                        st.error(
-                                            "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
-                                    else:
-                                        # Create a record with timestamp and all selections
-                                        record = {
-                                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                            # More detailed timestamp
-                                            'selected_pair': selected_pair,
-                                            'trend_position': trend_position,
-                                            'POI': POI,
-                                            'cross_fib': cross_fib,
-                                            'HH_LL': HH_LL,
-                                            'risk_multiplier': risk_multiplier,
-                                            'Variances': Variances,
-                                            'stop_pips': stop_pips,
-                                            'within_61': within_61,
-                                            'final_risk': final_risk,
-                                            'position_size': position_size,
-                                            'position_size_propfirm': position_size_propfirm,
-                                            'entry_price': 0.0,  # Default values
-                                            'exit_price': 0.0,
-                                            'target_price': 0.0,
-                                            'status': 'Speculation'  # Default status
-                                        }
-
-                                        if existing_index is not None:
-                                            # Replace existing record (this doesn't count against the limit)
-                                            st.session_state.saved_records[existing_index] = record
-                                            # SAVE TO GOOGLE SHEETS
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
-                                                st.success("Successfully Updated Order and Saved to Cloud!")
-                                            else:
-                                                st.error("Order updated locally but failed to save to cloud!")
+                                    if existing_index is not None:
+                                        # Replace existing record (this doesn't count against the limit)
+                                        st.session_state.saved_records[existing_index] = record
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Updated Order and Saved to Cloud!")
                                         else:
-                                            # Add new record
-                                            st.session_state.saved_records.append(record)
-                                            # SAVE TO GOOGLE SHEETS
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
-                                                st.success("Successfully Added Order and Saved to Cloud!")
-                                            else:
-                                                st.error("Order added locally but failed to save to cloud!")
+                                            st.error("Order updated locally but failed to save to cloud!")
+                                    else:
+                                        # Add new record
+                                        st.session_state.saved_records.append(record)
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Added Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order added locally but failed to save to cloud!")
 
-                        with col_view:
-                            if st.button("📋 View Active Opps", type="primary", use_container_width=True):
-                                st.session_state.current_page = "Active Opps"
-                                st.rerun()
+                        # Add View Active Opps button below the Add Order button
+                        if st.button("📋 View Active Opps", use_container_width=True):
+                            st.session_state.current_page = "Active Opps"
+                            st.rerun()
+
 
 
                     elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
@@ -3278,122 +3276,118 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         add_order_disabled = False
 
-                        col_add, col_view = st.columns(2)
+                        if st.button(" Add Order", type="secondary", use_container_width=True,
 
-                        with col_add:
+                                     disabled=add_order_disabled):
 
-                            if st.button(" Add Order", type="secondary", use_container_width=True,
+                            # Check if Stop Loss is 0 or missing
 
-                                         disabled=add_order_disabled):
+                            if stop_pips is None or stop_pips == 0:
 
-                                # Check if Stop Loss is 0 or missing
+                                st.error("Cannot add order: Stop Loss is required and cannot be 0!")
 
-                                if stop_pips is None or stop_pips == 0:
+                            else:
 
-                                    st.error("Cannot add order: Stop Loss is required and cannot be 0!")
+                                # Check if maximum records reached (only for new records, not updates)
+
+                                existing_index = None
+
+                                for i, existing_record in enumerate(st.session_state.saved_records):
+
+                                    if existing_record['selected_pair'] == selected_pair:
+                                        existing_index = i
+
+                                        break
+
+                                # If it's a new record (not updating existing) and we're at max capacity
+
+                                if existing_index is None and len(st.session_state.saved_records) >= 5:
+
+                                    st.error(
+
+                                        "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
 
                                 else:
 
-                                    # Check if maximum records reached (only for new records, not updates)
+                                    # Create a record with timestamp and all selections
 
-                                    existing_index = None
+                                    record = {
 
-                                    for i, existing_record in enumerate(st.session_state.saved_records):
+                                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        # More detailed timestamp
 
-                                        if existing_record['selected_pair'] == selected_pair:
-                                            existing_index = i
+                                        'selected_pair': selected_pair,
 
-                                            break
+                                        'trend_position': trend_position,
 
-                                    # If it's a new record (not updating existing) and we're at max capacity
+                                        'POI': POI,
 
-                                    if existing_index is None and len(st.session_state.saved_records) >= 5:
+                                        'cross_fib': cross_fib,
 
-                                        st.error(
+                                        'HH_LL': HH_LL,
 
-                                            "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                        'risk_multiplier': risk_multiplier,
 
-                                    else:
+                                        'Variances': Variances,
 
-                                        # Create a record with timestamp and all selections
+                                        'stop_pips': stop_pips,
 
-                                        record = {
+                                        'within_61': within_61,
 
-                                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                            # More detailed timestamp
+                                        'final_risk': final_risk,
 
-                                            'selected_pair': selected_pair,
+                                        'position_size': position_size,
 
-                                            'trend_position': trend_position,
+                                        'position_size_propfirm': position_size_propfirm,
 
-                                            'POI': POI,
+                                        'entry_price': 0.0,  # Default values
 
-                                            'cross_fib': cross_fib,
+                                        'exit_price': 0.0,
 
-                                            'HH_LL': HH_LL,
+                                        'target_price': 0.0,
 
-                                            'risk_multiplier': risk_multiplier,
+                                        'status': 'Speculation'  # Default status
 
-                                            'Variances': Variances,
+                                    }
 
-                                            'stop_pips': stop_pips,
+                                    if existing_index is not None:
 
-                                            'within_61': within_61,
+                                        # Replace existing record (this doesn't count against the limit)
 
-                                            'final_risk': final_risk,
+                                        st.session_state.saved_records[existing_index] = record
 
-                                            'position_size': position_size,
+                                        # SAVE TO GOOGLE SHEETS
 
-                                            'position_size_propfirm': position_size_propfirm,
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
 
-                                            'entry_price': 0.0,  # Default values
-
-                                            'exit_price': 0.0,
-
-                                            'target_price': 0.0,
-
-                                            'status': 'Speculation'  # Default status
-
-                                        }
-
-                                        if existing_index is not None:
-
-                                            # Replace existing record (this doesn't count against the limit)
-
-                                            st.session_state.saved_records[existing_index] = record
-
-                                            # SAVE TO GOOGLE SHEETS
-
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
-
-                                                st.success("Successfully Updated Order and Saved to Cloud!")
-
-                                            else:
-
-                                                st.error("Order updated locally but failed to save to cloud!")
+                                            st.success("Successfully Updated Order and Saved to Cloud!")
 
                                         else:
 
-                                            # Add new record
+                                            st.error("Order updated locally but failed to save to cloud!")
 
-                                            st.session_state.saved_records.append(record)
+                                    else:
 
-                                            # SAVE TO GOOGLE SHEETS
+                                        # Add new record
 
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
+                                        st.session_state.saved_records.append(record)
 
-                                                st.success("Successfully Added Order and Saved to Cloud!")
+                                        # SAVE TO GOOGLE SHEETS
 
-                                            else:
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
 
-                                                st.error("Order added locally but failed to save to cloud!")
+                                            st.success("Successfully Added Order and Saved to Cloud!")
 
-                        with col_view:
+                                        else:
 
-                            if st.button("📋 View Active Opps", type="primary", use_container_width=True):
-                                st.session_state.current_page = "Active Opps"
+                                            st.error("Order added locally but failed to save to cloud!")
 
-                                st.rerun()
+                        # Add View Active Opps button below the Add Order button
+
+                        if st.button("📋 View Active Opps", use_container_width=True):
+                            st.session_state.current_page = "Active Opps"
+
+                            st.rerun()
 
                         st.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)
 

@@ -687,17 +687,17 @@ st.sidebar.markdown("---")
 
 # Tools Section
 st.sidebar.markdown("**Tools**")
-create_nav_button("✅ Entry Model Check", "Entry Criteria Check", "Entry_Criteria_Check")
+create_nav_button("Entry Model Check", "Entry Criteria Check", "Entry_Criteria_Check")
 
 # Session Management (Always show in sidebar)
-with st.sidebar.expander("⚙️ Session Management"):
+with st.sidebar.expander("⚙Session Management"):
     st.write(f"Current page: `{st.session_state.current_page}`")
     if st.session_state.uploaded_data is not None:
         st.write(f"Data: {len(st.session_state.uploaded_data)} rows")
         if st.session_state.cloud_data_loaded:
-            st.write("📍 Source: Cloud Storage")
+            st.write("Source: Cloud Storage")
         else:
-            st.write("📍 Source: Local Upload")
+            st.write("Source: Local Upload")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -4157,7 +4157,7 @@ elif st.session_state.current_page == "Trade Signal":
         st.error("MetaApi SDK not installed. Please add 'metaapi-cloud-sdk' to requirements.txt")
         st.stop()
 
-    st.title("📡 Trade Signals")
+    st.title("Trade Signals")
 
     # Add CSS for responsive UI
     st.markdown("""
@@ -5096,7 +5096,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.rerun()
 
     # UPDATED Connection Management
-    st.subheader("🔧 Connection Management")
+    st.subheader("Connection Management")
     col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
 
     with col_conn1:
@@ -5155,11 +5155,11 @@ elif st.session_state.current_page == "Trade Signal":
     st.markdown("---")
 
     # UPDATED Trade Signals Display Section
-    st.subheader("🎯 Active Trade Signals")
+    st.subheader("Active Trade Signals")
 
     if not st.session_state.ready_to_order and not st.session_state.order_placed and not st.session_state.in_trade and not st.session_state.open_positions:
         st.info("""
-        ## 📭 No Active Trade Signals
+        ## No Active Trade Signals
 
         **How to get started:**
         1. **Add signals** in the Active Opportunities page by moving orders to **'Order Ready'**

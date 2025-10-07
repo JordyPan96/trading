@@ -5484,8 +5484,6 @@ elif st.session_state.current_page == "Trade Signal":
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
-                    elif updated_count > 0:
-                        st.success(f" Updated direction for {updated_count} existing trades")
                     elif positions:
                         st.info(f" Found {len(positions)} open positions")
                     else:

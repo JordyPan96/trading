@@ -5500,18 +5500,9 @@ elif st.session_state.current_page == "Trade Signal":
 
                         st.success(" This trade is now in Active Opps as 'Order Filled'")
 
-                        col_close, col_back, col_delete = st.columns(3)
-                        with col_close:
-                            if st.button(" Close Trade", key=f"close_{unique_key}", type="primary",
-                                         use_container_width=True):
-                                if handle_delete_signal(i, 'in_trade'):
-                                    st.rerun()
-
-                        with col_back:
-                            if st.button(" Back to Placed", key=f"back_{unique_key}", use_container_width=True):
-                                if handle_move_back_to_ready(i):
-                                    st.rerun()
-
+                        # REMOVED: col_close, col_back, col_delete columns and buttons
+                        # Only keep the Delete button if needed, or remove all buttons
+                        col_delete = st.columns(1)[0]
                         with col_delete:
                             if st.button(" Delete", key=f"delete_trade_{unique_key}", use_container_width=True):
                                 if handle_delete_signal(i, 'in_trade'):
@@ -5666,7 +5657,7 @@ elif st.session_state.current_page == "Trade Signal":
                                 col_confirm_be1, col_confirm_be2 = st.columns(2)
                                 with col_confirm_be1:
                                     confirm_clicked = st.button(
-                                        "⚠️ CONFIRM Set to BE",
+                                        "CONFIRM Set to BE",
                                         key=f"confirm_be_btn_{i}",
                                         type="primary",
                                         use_container_width=True,

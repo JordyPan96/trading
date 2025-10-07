@@ -3946,7 +3946,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER PLACED STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Placed':
-                        col_update, col_move, col_back = st.columns(3)
+                        col_update, col_back , col_move  = st.columns(3)
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):

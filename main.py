@@ -4140,6 +4140,8 @@ elif st.session_state.current_page == "Active Opps":
                         final_target_price = safe_float(
                             st.session_state.saved_records[record_index].get('target_price'), 0.0)
 
+                        # REMOVED THE EXISTING PRICE INPUT FIELDS (col2, col3, col4)
+
                         # Additional fields for Order Filled stage
                         col5, col6, col7, col8 = st.columns(4)
 
@@ -4277,7 +4279,7 @@ elif st.session_state.current_page == "Active Opps":
                         col_sync, col_update_only, col_back, col_close = st.columns([1, 1, 1, 1])
 
                         with col_sync:
-                            if st.button("Sync Now", key=f"sync_{unique_key_base}",
+                            if st.button("🔄 Sync Now", key=f"sync_{unique_key_base}",
                                          help="Force sync with latest trade data"):
                                 # Clear any cached matching to force fresh sync
                                 matching_trade = None

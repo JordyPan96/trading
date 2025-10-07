@@ -1183,7 +1183,7 @@ if st.session_state.current_page == "Home":
 
             # Quick stats
             if len(grid_response['data']) < len(current_data):
-                st.success(f"🔍 Filter active: Showing {len(grid_response['data'])} of {len(current_data)} rows")
+                st.success(f" Filter active: Showing {len(grid_response['data'])} of {len(current_data)} rows")
             else:
                 st.info(" Showing complete dataset")
 
@@ -3694,7 +3694,7 @@ elif st.session_state.current_page == "Active Opps":
                         st.dataframe(workflow_csv_data.head())
 
                     # Show data quality info
-                    with st.expander("🔍 Data Quality Check"):
+                    with st.expander(" Data Quality Check"):
                         st.write(f"**Total records:** {len(csv_records)}")
                         st.write(f"**Unique pairs:** {workflow_csv_data['selected_pair'].nunique()}")
                         st.write(f"**Records with entry price > 0:** {(workflow_csv_data['entry_price'] > 0).sum()}")
@@ -5330,7 +5330,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     st.rerun()
 
         with tab2:
-            st.subheader("⏳ Order Placed")
+            st.subheader(" Order Placed")
             st.info("Orders that have been placed but not yet filled.")
 
             if not st.session_state.order_placed:
@@ -5339,7 +5339,7 @@ elif st.session_state.current_page == "Trade Signal":
                 for i, order in enumerate(st.session_state.order_placed):
                     unique_key = generate_unique_key(i, order, "placed")
 
-                    with st.expander(f"⏳ {order['selected_pair']} | {order.get('order_time', 'N/A')}", expanded=False):
+                    with st.expander(f" {order['selected_pair']} | {order.get('order_time', 'N/A')}", expanded=False):
                         col1, col2, col3 = st.columns([2, 1, 1])
 
                         with col1:

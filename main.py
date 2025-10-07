@@ -3954,38 +3954,28 @@ elif st.session_state.current_page == "Active Opps":
                         st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
 
                     with col2:
-                        if st.session_state.current_stage != 'Order Filled':
-                            entry_price = st.number_input(
-                                "Entry Price",
-                                value=safe_float(record.get('entry_price'), 0.0),
-                                format="%.5f",
-                                key=f"entry_{unique_key_base}"
-                            )
-                        else:
-                            # For Order Filled stage, we'll show the disabled version later
-                            st.write("")  # Empty space to maintain layout
+                        entry_price = st.number_input(
+                            "Entry Price",
+                            value=safe_float(record.get('entry_price'), 0.0),
+                            format="%.5f",
+                            key=f"entry_{unique_key_base}"
+                        )
 
                     with col3:
-                        if st.session_state.current_stage != 'Order Filled':
-                            exit_price = st.number_input(
-                                "Exit Price",
-                                value=safe_float(record.get('exit_price'), 0.0),
-                                format="%.5f",
-                                key=f"exit_{unique_key_base}"
-                            )
-                        else:
-                            st.write("")  # Empty space to maintain layout
+                        exit_price = st.number_input(
+                            "Exit Price",
+                            value=safe_float(record.get('exit_price'), 0.0),
+                            format="%.5f",
+                            key=f"exit_{unique_key_base}"
+                        )
 
                     with col4:
-                        if st.session_state.current_stage != 'Order Filled':
-                            target_price = st.number_input(
-                                "Target Price",
-                                value=safe_float(record.get('target_price'), 0.0),
-                                format="%.5f",
-                                key=f"target_{unique_key_base}"
-                            )
-                        else:
-                            st.write("")  # Empty space to maintain layout
+                        target_price = st.number_input(
+                            "Target Price",
+                            value=safe_float(record.get('target_price'), 0.0),
+                            format="%.5f",
+                            key=f"target_{unique_key_base}"
+                        )
 
                     # SPECULATION STAGE ACTIONS
                     if st.session_state.current_stage == 'Speculation':
@@ -4094,100 +4084,6 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER FILLED STAGE ACTIONS
                     else:
-                        # AUTO-UPDATE ALL FIELDS FROM IN TRADE DATA
-                        # Look for matching record in in_trade session state
-                        matching_trade = None
-                        for trade in st.session_state.get('in_trade', []):
-                            if (trade.get('selected_pair') == record['selected_pair'] and
-                                    trade.get('timestamp') == record['timestamp']):
-                                matching_trade = trade
-                                break
-
-                        # If found matching trade, update all fields and save to Google Sheets
-                        if matching_trade:
-                            needs_save = False
-
-                            # Update direction
-                            current_direction = record.get('direction', 'Unknown')
-                            actual_direction = matching_trade.get('direction', 'Unknown')
-                            if actual_direction != current_direction:
-                                st.session_state.saved_records[record_index]['direction'] = actual_direction
-                                needs_save = True
-
-                            # Update entry price
-                            current_entry = safe_float(record.get('entry_price'), 0.0)
-                            actual_entry = safe_float(matching_trade.get('entry_price'), 0.0)
-                            if abs(current_entry - actual_entry) > 0.00001 and actual_entry > 0:
-                                st.session_state.saved_records[record_index]['entry_price'] = actual_entry
-                                needs_save = True
-
-                            # Update exit price (stop loss)
-                            current_exit = safe_float(record.get('exit_price'), 0.0)
-                            actual_exit = safe_float(matching_trade.get('exit_price'), 0.0)
-                            if abs(current_exit - actual_exit) > 0.00001 and actual_exit > 0:
-                                st.session_state.saved_records[record_index]['exit_price'] = actual_exit
-                                needs_save = True
-
-                            # Update target price (take profit)
-                            current_target = safe_float(record.get('target_price'), 0.0)
-                            actual_target = safe_float(matching_trade.get('target_price'), 0.0)
-                            if abs(current_target - actual_target) > 0.00001 and actual_target > 0:
-                                st.session_state.saved_records[record_index]['target_price'] = actual_target
-                                needs_save = True
-
-                            # Save to Google Sheets if any updates were made
-                            if needs_save:
-                                success = save_workflow_to_sheets(st.session_state.saved_records)
-                                if success:
-                                    st.rerun()
-
-                        # Use the actual values (either from matching trade or existing record)
-                        final_direction = st.session_state.saved_records[record_index].get('direction', 'Unknown')
-                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'),
-                                                       0.0)
-                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'),
-                                                      0.0)
-                        final_target_price = safe_float(
-                            st.session_state.saved_records[record_index].get('target_price'), 0.0)
-
-                        # JUST SHOW THE PRICE FIELDS - BASIC INFO IS ALREADY DISPLAYED ABOVE
-                        col2, col3, col4 = st.columns(3)
-
-                        with col2:
-                            # REPLACED: Entry Price with disabled field showing synced value
-                            entry_display = final_entry_price if final_entry_price > 0 else "Waiting for fill..."
-                            st.text_input(
-                                "Entry Price",
-                                value=f"{entry_display:.5f}" if isinstance(entry_display,
-                                                                           (int, float)) else entry_display,
-                                key=f"entry_filled_{unique_key_base}",
-                                disabled=True,
-                                help="Actual filled price from trade execution"
-                            )
-
-                        with col3:
-                            # REPLACED: Exit Price with disabled field showing synced value
-                            exit_display = final_exit_price if final_exit_price > 0 else "Waiting for fill..."
-                            st.text_input(
-                                "Exit Price",
-                                value=f"{exit_display:.5f}" if isinstance(exit_display, (int, float)) else exit_display,
-                                key=f"exit_filled_{unique_key_base}",
-                                disabled=True,
-                                help="Actual stop loss from trade execution"
-                            )
-
-                        with col4:
-                            # REPLACED: Target Price with disabled field showing synced value
-                            target_display = final_target_price if final_target_price > 0 else "Waiting for fill..."
-                            st.text_input(
-                                "Target Price",
-                                value=f"{target_display:.5f}" if isinstance(target_display,
-                                                                            (int, float)) else target_display,
-                                key=f"target_filled_{unique_key_base}",
-                                disabled=True,
-                                help="Actual take profit from trade execution"
-                            )
-
                         # Additional fields for Order Filled stage
                         col5, col6, col7, col8 = st.columns(4)
 
@@ -4201,14 +4097,12 @@ elif st.session_state.current_page == "Active Opps":
                             )
 
                         with col6:
-                            # DISABLED DIRECTION FIELD - Auto-updated from In Trade data
-                            direction_display = final_direction if final_direction != "Unknown" else "Waiting for trade data..."
-                            st.text_input(
+                            direction_options = ["buy", "sell"]
+                            new_direction = st.selectbox(
                                 "Direction",
-                                value=direction_display,
-                                key=f"direction_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
-                                disabled=True,
-                                help="Direction is automatically updated from actual trade data"
+                                options=direction_options,
+                                index=0,
+                                key=f"direction_{unique_key_base}"
                             )
 
                         with col7:
@@ -4233,27 +4127,12 @@ elif st.session_state.current_page == "Active Opps":
                         col9, col10 = st.columns(2)
                         with col9:
                             poi_options = ["Weekly", "2_Daily"]
-
-                            # Get existing POI value from record and map to dropdown options
-                            existing_poi = record.get('poi', '')
-                            poi_display = "Weekly"  # Default
-
-                            if existing_poi == "Weekly Structure" or existing_poi == "Weekly":
-                                poi_display = "Weekly"
-                            elif existing_poi == "Two_Daily Structure" or existing_poi == "2_Daily":
-                                poi_display = "2_Daily"
-                            elif existing_poi in poi_options:
-                                poi_display = existing_poi
-
-                            st.text_input(
+                            new_poi = st.selectbox(
                                 "POI",
-                                value=poi_display,
-                                key=f"poi_{unique_key_base}",
-                                disabled=True,
-                                help="POI is set from the original record"
+                                options=poi_options,
+                                index=0,
+                                key=f"poi_{unique_key_base}"
                             )
-                            # Store the value for the record
-                            new_poi = poi_display
 
                         with col10:
                             st.text_input(
@@ -4273,22 +4152,17 @@ elif st.session_state.current_page == "Active Opps":
                             existing_variance = record.get('Variances', 'Not set')
                             st.write(f"**Variance:** {existing_variance}")
 
-                        # Show auto-update status
-                        if matching_trade:
-                            if final_direction != "Unknown" and final_entry_price > 0:
-                                st.success(f"Auto-synced with trade signal")
-                            else:
-                                st.warning("Waiting for trade execution data...")
-                        else:
-                            st.info("ℹ No matching trade found. Prices will update when trade is detected.")
-
                         # Action buttons for Order Filled stage
                         col_update_only, col_back, col_close = st.columns([1, 1, 1])
 
                         with col_update_only:
-                            if st.button("Update Analysis", key=f"filled_update_{unique_key_base}"):
-                                # Update only the user-editable fields (prices are auto-synced)
+                            if st.button("Update Record", key=f"filled_update_{unique_key_base}"):
+                                # Update all fields including the new ones
+                                st.session_state.saved_records[record_index]['entry_price'] = entry_price
+                                st.session_state.saved_records[record_index]['exit_price'] = exit_price
+                                st.session_state.saved_records[record_index]['target_price'] = target_price
                                 st.session_state.saved_records[record_index]['result'] = new_result
+                                st.session_state.saved_records[record_index]['direction'] = new_direction
                                 st.session_state.saved_records[record_index]['rr'] = new_rr
                                 st.session_state.saved_records[record_index]['pnl'] = new_pnl
                                 st.session_state.saved_records[record_index]['poi'] = new_poi
@@ -4302,7 +4176,7 @@ elif st.session_state.current_page == "Active Opps":
                             if st.button("Finalize & Close Trade", key=f"filled_close_{unique_key_base}",
                                          type="primary"):
                                 # Validate required fields
-                                if (new_result and final_direction and new_poi and
+                                if (new_result and new_direction and new_poi and
                                         new_rr is not None and new_pnl is not None):
 
                                     # Get existing Trend Position and Variance from the record
@@ -4318,7 +4192,7 @@ elif st.session_state.current_page == "Active Opps":
                                         completed_trade = {
                                             'Date': datetime.now().strftime("%Y-%m-%d"),
                                             'Symbol': record['selected_pair'],
-                                            'Direction': final_direction,  # Use the auto-updated direction
+                                            'Direction': new_direction,
                                             'Trend Position': existing_trend_position,
                                             'POI': new_poi,
                                             'Strategy': record['risk_multiplier'],

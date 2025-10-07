@@ -5275,13 +5275,31 @@ elif st.session_state.current_page == "Trade Signal":
                                     direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
                                     button_text = f" Execute {direction} Order"
 
-                                    if st.button(
-                                            button_text,
-                                            key=f"execute_{unique_key}",
-                                            type="primary",
-                                            use_container_width=True,
-                                    ):
-                                        execute_trade_immediate_ui(i)
+                                    # Generate unique confirmation key
+                                    confirm_key = f"confirm_execute_{unique_key}"
+
+                                    if st.session_state.get(confirm_key, False):
+                                        # Show confirmation button
+                                        if st.button(
+                                                f"CONFIRM {direction} ORDER",
+                                                key=f"confirm_{unique_key}",
+                                                type="primary",
+                                                use_container_width=True,
+                                        ):
+                                            execute_trade_immediate_ui(i)
+                                            # Reset confirmation state
+                                            st.session_state[confirm_key] = False
+                                    else:
+                                        # Show initial execute button
+                                        if st.button(
+                                                button_text,
+                                                key=f"execute_{unique_key}",
+                                                type="secondary",
+                                                use_container_width=True,
+                                        ):
+                                            # Set confirmation state
+                                            st.session_state[confirm_key] = True
+                                            st.rerun()
                                 else:
                                     st.warning(" Cannot execute - missing required price parameters")
                             else:

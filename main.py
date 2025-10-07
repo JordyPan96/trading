@@ -5404,10 +5404,10 @@ elif st.session_state.current_page == "Trade Signal":
     if not st.session_state.ready_to_order and not st.session_state.order_placed and not st.session_state.in_trade:
         with st.spinner(" Quick syncing from Active Opps..."):
             success, message = sync_from_active_opps()
-            if success:
-                st.success(f"")
-            else:
+            if not success:
                 st.error(f"{message}")
+           
+
 
     # Auto-connect to MetaApi account
     if not st.session_state.metaapi_connected:

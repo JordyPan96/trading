@@ -4276,9 +4276,9 @@ elif st.session_state.current_page == "Active Opps":
                         # Show auto-update status
                         if matching_trade:
                             if final_direction != "Unknown" and final_entry_price > 0:
-                                st.success(f"Auto-synced with trade data")
+                                st.success(f"Auto-synced with trade signal")
                             else:
-                                st.warning("⚠ Waiting for trade execution data...")
+                                st.warning("Waiting for trade execution data...")
                         else:
                             st.info("ℹ No matching trade found. Prices will update when trade is detected.")
 

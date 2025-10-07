@@ -3946,7 +3946,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER PLACED STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Placed':
-                        col_update, col_back , col_move  = st.columns(3)
+                        col_update, col_back , col_move, col_delete = st.columns(4)
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):
@@ -3961,6 +3961,11 @@ elif st.session_state.current_page == "Active Opps":
                         with col_back:
                             if st.button("Back to Order Ready", key=f"back_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Order Ready'):
+                                    st.rerun()
+
+                        with col_delete:  # NEW: Delete button
+                            if st.button("Delete", key=f"delete_{unique_key_base}"):
+                                if handle_delete_record(record_index):
                                     st.rerun()
 
                     # ORDER FILLED STAGE ACTIONS

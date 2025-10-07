@@ -5546,7 +5546,7 @@ elif st.session_state.current_page == "Trade Signal":
 
         with tab1:
             st.subheader(" Ready to Order")
-            st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
+            #st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
 
             if not st.session_state.ready_to_order:
                 st.info("No signals ready for ordering.")

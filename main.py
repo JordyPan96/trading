@@ -4084,10 +4084,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER FILLED STAGE ACTIONS
                     else:
-                        # AUTO-UPDATE DIRECTION FROM IN TRADE DATA
-                        # First, try to find matching In Trade record from Trade Signals page
-                        current_direction = record.get('direction', 'Unknown')
-
+                        # AUTO-UPDATE ALL FIELDS FROM IN TRADE DATA
                         # Look for matching record in in_trade session state
                         matching_trade = None
                         for trade in st.session_state.get('in_trade', []):
@@ -4096,18 +4093,52 @@ elif st.session_state.current_page == "Active Opps":
                                 matching_trade = trade
                                 break
 
-                        # If found matching trade, update direction
+                        # If found matching trade, update all fields and save to Google Sheets
                         if matching_trade:
+                            needs_save = False
+
+                            # Update direction
+                            current_direction = record.get('direction', 'Unknown')
                             actual_direction = matching_trade.get('direction', 'Unknown')
                             if actual_direction != current_direction:
-                                # Update the direction in the saved record
                                 st.session_state.saved_records[record_index]['direction'] = actual_direction
-                                # Save to Google Sheets
-                                save_workflow_to_sheets(st.session_state.saved_records)
-                                st.rerun()
+                                needs_save = True
 
-                        # Use the actual direction (either from matching trade or existing record)
+                            # Update entry price
+                            current_entry = safe_float(record.get('entry_price'), 0.0)
+                            actual_entry = safe_float(matching_trade.get('entry_price'), 0.0)
+                            if abs(current_entry - actual_entry) > 0.00001 and actual_entry > 0:
+                                st.session_state.saved_records[record_index]['entry_price'] = actual_entry
+                                needs_save = True
+
+                            # Update exit price (stop loss)
+                            current_exit = safe_float(record.get('exit_price'), 0.0)
+                            actual_exit = safe_float(matching_trade.get('exit_price'), 0.0)
+                            if abs(current_exit - actual_exit) > 0.00001 and actual_exit > 0:
+                                st.session_state.saved_records[record_index]['exit_price'] = actual_exit
+                                needs_save = True
+
+                            # Update target price (take profit)
+                            current_target = safe_float(record.get('target_price'), 0.0)
+                            actual_target = safe_float(matching_trade.get('target_price'), 0.0)
+                            if abs(current_target - actual_target) > 0.00001 and actual_target > 0:
+                                st.session_state.saved_records[record_index]['target_price'] = actual_target
+                                needs_save = True
+
+                            # Save to Google Sheets if any updates were made
+                            if needs_save:
+                                success = save_workflow_to_sheets(st.session_state.saved_records)
+                                if success:
+                                    st.rerun()
+
+                        # Use the actual values (either from matching trade or existing record)
                         final_direction = st.session_state.saved_records[record_index].get('direction', 'Unknown')
+                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'),
+                                                       0.0)
+                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'),
+                                                      0.0)
+                        final_target_price = safe_float(
+                            st.session_state.saved_records[record_index].get('target_price'), 0.0)
 
                         # Additional fields for Order Filled stage
                         col5, col6, col7, col8 = st.columns(4)
@@ -4131,8 +4162,6 @@ elif st.session_state.current_page == "Active Opps":
                                 disabled=True,  # Disable user editing
                                 help="Direction is automatically updated from actual trade data"
                             )
-                            # Hidden field to store the actual direction value
-                            st.session_state.saved_records[record_index]['direction'] = final_direction
 
                         with col7:
                             new_rr = st.number_input(
@@ -4152,7 +4181,51 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"pnl_{unique_key_base}"
                             )
 
-                        # Additional required fields
+                        # DISABLED PRICE FIELDS - Auto-updated from In Trade data
+                        st.write("---")
+                        st.subheader("Trade Execution Details (Auto-synced)")
+
+                        col_price1, col_price2, col_price3 = st.columns(3)
+
+                        with col_price1:
+                            # DISABLED ENTRY PRICE
+                            entry_display = final_entry_price if final_entry_price > 0 else "Waiting for fill..."
+                            st.text_input(
+                                "Entry Price",
+                                value=f"{entry_display:.5f}" if isinstance(entry_display,
+                                                                           (int, float)) else entry_display,
+                                key=f"entry_filled_{unique_key_base}",
+                                disabled=True,
+                                help="Actual filled price from trade execution"
+                            )
+
+                        with col_price2:
+                            # DISABLED EXIT PRICE (Stop Loss)
+                            exit_display = final_exit_price if final_exit_price > 0 else "Waiting for fill..."
+                            st.text_input(
+                                "Stop Loss",
+                                value=f"{exit_display:.5f}" if isinstance(exit_display, (int, float)) else exit_display,
+                                key=f"exit_filled_{unique_key_base}",
+                                disabled=True,
+                                help="Actual stop loss from trade execution"
+                            )
+
+                        with col_price3:
+                            # DISABLED TARGET PRICE (Take Profit)
+                            target_display = final_target_price if final_target_price > 0 else "Waiting for fill..."
+                            st.text_input(
+                                "Take Profit",
+                                value=f"{target_display:.5f}" if isinstance(target_display,
+                                                                            (int, float)) else target_display,
+                                key=f"target_filled_{unique_key_base}",
+                                disabled=True,
+                                help="Actual take profit from trade execution"
+                            )
+
+                        # Additional required fields (user editable)
+                        st.write("---")
+                        st.subheader("Trade Analysis (User Editable)")
+
                         col9, col10 = st.columns(2)
                         with col9:
                             poi_options = ["Weekly", "2_Daily"]
@@ -4183,25 +4256,62 @@ elif st.session_state.current_page == "Active Opps":
 
                         # Show auto-update status
                         if matching_trade:
+                            update_status = []
                             if final_direction != "Unknown":
-                                st.success(
-                                    f"Synced with In Trade Signal")
+                                update_status.append(f"Direction: {final_direction.upper()}")
+                            if final_entry_price > 0:
+                                update_status.append(f"Entry: {final_entry_price:.5f}")
+                            if final_exit_price > 0:
+                                update_status.append(f"SL: {final_exit_price:.5f}")
+                            if final_target_price > 0:
+                                update_status.append(f"TP: {final_target_price:.5f}")
+
+                            if update_status:
+                                st.success(f"✓ Auto-synced: {', '.join(update_status)}")
                             else:
-                                st.warning("Waiting for direction data from trade...")
+                                st.warning("⚠ Waiting for trade execution data...")
                         else:
-                            st.info("ℹ No matching trade found. Direction will update when trade is detected.")
+                            st.info("ℹ No matching trade found. Prices will update when trade is detected.")
 
                         # Action buttons for Order Filled stage
-                        col_update_only, col_back, col_close = st.columns([1, 1, 1])
+                        col_sync, col_update_only, col_back, col_close = st.columns([1, 1, 1, 1])
+
+                        with col_sync:
+                            if st.button("Sync Now", key=f"sync_{unique_key_base}",
+                                         help="Force sync with latest trade data"):
+                                # Clear any cached matching to force fresh sync
+                                matching_trade = None
+                                for trade in st.session_state.get('in_trade', []):
+                                    if (trade.get('selected_pair') == record['selected_pair'] and
+                                            trade.get('timestamp') == record['timestamp']):
+                                        matching_trade = trade
+                                        break
+
+                                if matching_trade:
+                                    # Force update all fields
+                                    st.session_state.saved_records[record_index]['direction'] = matching_trade.get(
+                                        'direction', final_direction)
+                                    st.session_state.saved_records[record_index]['entry_price'] = safe_float(
+                                        matching_trade.get('entry_price'), final_entry_price)
+                                    st.session_state.saved_records[record_index]['exit_price'] = safe_float(
+                                        matching_trade.get('exit_price'), final_exit_price)
+                                    st.session_state.saved_records[record_index]['target_price'] = safe_float(
+                                        matching_trade.get('target_price'), final_target_price)
+
+                                    # Save to Google Sheets
+                                    success = save_workflow_to_sheets(st.session_state.saved_records)
+                                    if success:
+                                        st.success("✓ Synced with latest trade data and saved to cloud!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to save to cloud")
+                                else:
+                                    st.warning("No matching trade found to sync with")
 
                         with col_update_only:
-                            if st.button("Update Record", key=f"filled_update_{unique_key_base}"):
-                                # Update all fields including the new ones (except direction - it's auto-updated)
-                                st.session_state.saved_records[record_index]['entry_price'] = entry_price
-                                st.session_state.saved_records[record_index]['exit_price'] = exit_price
-                                st.session_state.saved_records[record_index]['target_price'] = target_price
+                            if st.button("Update Analysis", key=f"filled_update_{unique_key_base}"):
+                                # Update only the user-editable fields (prices are auto-synced)
                                 st.session_state.saved_records[record_index]['result'] = new_result
-                                # Direction is NOT updated here - it's auto-updated from trade data
                                 st.session_state.saved_records[record_index]['rr'] = new_rr
                                 st.session_state.saved_records[record_index]['pnl'] = new_pnl
                                 st.session_state.saved_records[record_index]['poi'] = new_poi
@@ -4216,7 +4326,8 @@ elif st.session_state.current_page == "Active Opps":
                                          type="primary"):
                                 # Validate required fields
                                 if (new_result and final_direction and new_poi and
-                                        new_rr is not None and new_pnl is not None):
+                                        new_rr is not None and new_pnl is not None and
+                                        final_entry_price > 0 and final_exit_price > 0 and final_target_price > 0):
 
                                     # Get existing Trend Position and Variance from the record
                                     existing_trend_position = record.get('trend_position')
@@ -4292,7 +4403,8 @@ elif st.session_state.current_page == "Active Opps":
                                             st.error(f"Error saving trade history: {str(e)}")
                                             st.info("Please check your Google Sheets connection and try again.")
                                 else:
-                                    st.error("Please fill in all required fields")
+                                    st.error(
+                                        "Please ensure all trade execution data is available and required fields are filled")
 
                         with col_back:
                             if st.button("Back to Order Placed", key=f"filled_back_{unique_key_base}"):

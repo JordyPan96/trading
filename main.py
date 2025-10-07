@@ -5395,7 +5395,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**Order Time:** {order.get('order_time', 'N/A')}")
 
-                        col_check, col_move, col_back = st.columns(3)
+                        col_check, col_back = st.columns(2)  # REMOVED col_move - now only 2 columns
 
                         with col_check:
                             if st.button(" Quick Check", key=f"check_{unique_key}", use_container_width=True):
@@ -5425,10 +5425,7 @@ elif st.session_state.current_page == "Trade Signal":
                                     else:
                                         st.error(f" Check failed: {order_id}")
 
-                        with col_move:
-                            if st.button("Move to In Trade", key=f"move_trade_{unique_key}", use_container_width=True):
-                                if handle_move_to_in_trade(i):
-                                    st.rerun()
+                        # REMOVED: col_move section with "Move to In Trade" button
 
                         with col_back:
                             # Generate unique confirmation key for back to ready

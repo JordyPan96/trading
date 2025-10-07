@@ -1554,7 +1554,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             'background-color: lightpink' if x['Total_PnL'] < 0 else
                             'background-color: lightblue' if x['Total_PnL'] > 0 else
                             'background-color: lightgreen' if x['Target'] == 'Completed' else
-                            'background-color: black' if x['Target'] == 'In Progress' else
+                            'background-color: ' if x['Target'] == 'In Progress' else
                             'background-color: lightgray' if x['Symbol'] == 'SUMMARY' else
                             '' for _ in x], axis=1),
                             use_container_width=True,

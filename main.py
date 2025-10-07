@@ -5403,6 +5403,10 @@ elif st.session_state.current_page == "Trade Signal":
                 else:
                     # AUTO-MOVE: Check for matching orders and move them automatically
                     moved_count = quick_auto_move_filled_orders(positions)
+
+                    # UPDATE: Also update directions for existing In Trade records
+                    updated_count = update_existing_in_trade_directions(positions)
+
                     st.session_state.open_positions = positions
                     if moved_count > 0:
                         st.success(
@@ -5410,8 +5414,12 @@ elif st.session_state.current_page == "Trade Signal":
                         # Update Google Sheets for each moved order WITH INSTRUMENT NAME
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
+                    elif updated_count > 0:
+                        st.success(f" Updated direction for {updated_count} existing trades")
+                    elif positions:
+                        st.info(f" Found {len(positions)} open positions")
                     else:
-                        st.warning(f" Found {len(positions)} open positions")
+                        st.info(" No open positions found")
 
 
             # Run the async function

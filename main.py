@@ -26,6 +26,8 @@ from google.oauth2.service_account import Credentials
 
 # Configure page
 st.set_page_config(layout="wide")
+
+
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
 def clean_data_for_google_sheets(df):
@@ -182,6 +184,7 @@ def clean_data_for_calculations(df):
 
     return df_clean
 
+
 def clean_trading_data(df):
     """Clean and convert data types for trading data"""
     if df is None or df.empty:
@@ -212,6 +215,7 @@ def clean_trading_data(df):
 
     return df_clean
 
+
 # Calculate metrics
 def calculate_metrics_2(data):
     if data.empty:
@@ -233,7 +237,6 @@ def calculate_metrics_2(data):
     return metrics
 
 
-
 def calculate_next_risk_percentage(trades, ending_balance):
     base_risk = 0.02  # 2%
     total_gain = trades['PnL'].sum()
@@ -249,16 +252,15 @@ def calculate_next_risk_percentage(trades, ending_balance):
         float: Risk percentage (capped at 1.5%).
         """
 
-
-
-    if(total_gain>0):
-        cumulative_gain = round(total_gain/ending_balance*100,2)
+    if (total_gain > 0):
+        cumulative_gain = round(total_gain / ending_balance * 100, 2)
         current_risk = base_risk
-        word = str(cumulative_gain) + "%" + " / $"+str(total_gain)
+        word = str(cumulative_gain) + "%" + " / $" + str(total_gain)
     else:
         current_risk = base_risk
         word = "Need Gains for the Month"
-    return current_risk , word, total_gain
+    return current_risk, word, total_gain
+
 
 def calculate_strategy_grade(winrate, num_trades):
     """Determine the strategy grade based on winrate and number of trades"""
@@ -285,18 +287,17 @@ def calculate_strategy_grade_static(strategy_name):
     strategy_grades = {
         # 1 Touch - fib>percentage>wick
 
-        '1_BNR': ("A", 0.91), # Fib + wick/ob
-        "1_BNR_TPF": ("A", 1.0), #wick/ob
+        '1_BNR': ("A", 0.91),  # Fib + wick/ob
+        "1_BNR_TPF": ("A", 1.0),  # wick/ob
 
         # 2 Touch fib>wick>percentage
 
-        "2_BNR": ("A", 1.1), # Fib + wick/ob
-        "2_BNR_TPF": ("A", 1.2), #Fake out or wick/ob
+        "2_BNR": ("A", 1.1),  # Fib + wick/ob
+        "2_BNR_TPF": ("A", 1.2),  # Fake out or wick/ob
 
         # 3 Touch  wick>percentage>fib
 
-        #"3_BNR_TPF": ("A", 1), # Fib + wick/ob + 50% outside of discount zone
-
+        # "3_BNR_TPF": ("A", 1), # Fib + wick/ob + 50% outside of discount zone
 
     }
 
@@ -307,6 +308,7 @@ def calculate_strategy_grade_static(strategy_name):
 
     # Return None if strategy not found
     return None, None
+
 
 def set_sect_grup(pair_name):
     """
@@ -330,29 +332,29 @@ def set_sect_grup(pair_name):
 def analyze_strategy(group):
     """Calculate metrics for each strategy group"""
 
-    filtered_group = group[group['Result']!="BE"]
+    filtered_group = group[group['Result'] != "BE"]
     wins = (filtered_group['Result'] == "Win").sum()
     total_no_be = len(filtered_group)
 
     total = len(group)
-    if(wins<=0):
+    if (wins <= 0):
         winrate = 0
     else:
         winrate = (wins / total_no_be) * 100 if total > 0 else 0
-    #avg_return = group['PnL'].mean()
+    # avg_return = group['PnL'].mean()
 
-    win_group = group[group['Result']=="Win"]
-    if(len(win_group)<=0):
+    win_group = group[group['Result'] == "Win"]
+    if (len(win_group) <= 0):
         avg_win_rr = 0
     else:
-        avg_win_rr = win_group['RR'].sum()/len(win_group)
+        avg_win_rr = win_group['RR'].sum() / len(win_group)
 
     total_return = group['PnL'].sum()
 
-    #if(len(group)<20):
+    # if(len(group)<20):
     grade, multiplier = calculate_strategy_grade_static(group.name)
-    #else:
-    #grade, multiplier = calculate_strategy_grade(winrate, total_no_be)
+    # else:
+    # grade, multiplier = calculate_strategy_grade(winrate, total_no_be)
 
     return pd.Series({
         'Win Rate (%)': winrate,
@@ -380,7 +382,6 @@ def calculate_be_rate(len_be, len_df):
 
 
 def styled_metric(label, value, delta=None, label_size="20px", value_size="16px"):
-
     html = f"""
     <div style="
         background-color: #f8f9fa;
@@ -402,8 +403,8 @@ def styled_metric(label, value, delta=None, label_size="20px", value_size="16px"
     """
     st.markdown(html, unsafe_allow_html=True)
 
-def styled_metric_value(value, delta=None, label_size="20px", value_size="16px"):
 
+def styled_metric_value(value, delta=None, label_size="20px", value_size="16px"):
     html = f"""
     <div style="
         background-color: #f8f9fa;
@@ -520,7 +521,8 @@ def get_google_sheets_client():
                 "client_id": os.environ.get('GCP_CLIENT_ID', ''),
                 "auth_uri": os.environ.get('GCP_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
                 "token_uri": os.environ.get('GCP_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
-                "auth_provider_x509_cert_url": os.environ.get('GCP_AUTH_PROVIDER_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
+                "auth_provider_x509_cert_url": os.environ.get('GCP_AUTH_PROVIDER_CERT_URL',
+                                                              'https://www.googleapis.com/oauth2/v1/certs'),
                 "client_x509_cert_url": os.environ.get('GCP_CLIENT_CERT_URL', '')
             }
 
@@ -1219,7 +1221,7 @@ elif st.session_state.current_page == "Account Overview":
             current_balance = df['equity'].iloc[-1]
 
         df['Peak'] = df['equity'].cummax()
-        df['Drawdown'] = (df['equity'] - df['Peak'])/starting_capital
+        df['Drawdown'] = (df['equity'] - df['Peak']) / starting_capital
         total_return = df['equity'].iloc[-1] / abs(df['equity'].iloc[0]) if abs(df['equity'].iloc[0]) > 0 else 0
         max_drawdown = df['Drawdown'].min()
         sharpe_ratio = df['Returns'].mean() / df['Returns'].std() * np.sqrt(252) if 'Returns' in df.columns and df[
@@ -1293,7 +1295,7 @@ elif st.session_state.current_page == "Account Overview":
 
         # Performance Metrics2
         col1, col2, col3, col4, col5 = st.columns(5)
-        #col1.metric("Net Trade PNL", f"${df['PnL'].sum():.2f}")
+        # col1.metric("Net Trade PNL", f"${df['PnL'].sum():.2f}")
         col1.metric("Longest Losing Streak", f"{longest_losing_streak}")
         col2.metric("Max Drawdown", f"{max_drawdown:.2%}")
         col3.metric("Total R Gain including BE", f"{df['RR'].sum():.2f}")
@@ -1357,8 +1359,8 @@ elif st.session_state.current_page == "Symbol Stats":
 
             with tab1:
                 base_risk = 0.02
-                base_risk_money = starting_capital*base_risk
-                base_risk_money_multi = base_risk*100
+                base_risk_money = starting_capital * base_risk
+                base_risk_money_multi = base_risk * 100
                 # Overall Symbol Performance
                 st.header("Overall Symbol Performance")
 
@@ -1433,10 +1435,9 @@ elif st.session_state.current_page == "Symbol Stats":
                     lambda x: symbol_groups[x]['target']
                 )
 
-
                 # ADD TARGET $ COLUMN - Calculate target in dollars using base_risk_money
                 symbol_performance['Target_$'] = symbol_performance['Target_Pct'].apply(
-                    lambda target_pct: round((base_risk_money * (target_pct / 100) * 100)/base_risk_money_multi,2)
+                    lambda target_pct: round((base_risk_money * (target_pct / 100) * 100) / base_risk_money_multi, 2)
                 ).round(2)
 
                 # ADD ACTUAL $ COLUMN - Calculate difference between Target_$ and Total_PnL
@@ -1475,7 +1476,7 @@ elif st.session_state.current_page == "Symbol Stats":
                 }, index=['PROP'])
 
                 # Add PROP row to the performance dataframe
-                #symbol_performance = pd.concat([symbol_performance, prop_row])
+                # symbol_performance = pd.concat([symbol_performance, prop_row])
 
                 # CREATE THE DICTIONARY TO STORE GROUP PERFORMANCE GAP DATA
                 group_performance_gap = {}
@@ -1486,9 +1487,9 @@ elif st.session_state.current_page == "Symbol Stats":
                         actual_pct_gain = symbol_performance.loc[group_name, 'Yearly_Pct_Gain']
                         target_pct = symbol_performance.loc[group_name, 'Target_Pct']
                         # Calculate gap between actual percentage gain and target percentage
-                        gap_pct = (target_pct - actual_pct_gain)*1.07
+                        gap_pct = (target_pct - actual_pct_gain) * 1.07
                         # Convert percentage gap to dollar amount
-                        gap_dollar = round((gap_pct / 100) * starting_capital,0)
+                        gap_dollar = round((gap_pct / 100) * starting_capital, 0)
                         group_performance_gap[group_name] = gap_dollar
 
                 # Add PROP data to the dictionary
@@ -1520,12 +1521,15 @@ elif st.session_state.current_page == "Symbol Stats":
                     'Profit_Factor': [symbol_performance_no_prop['Profit_Factor'].mean()],
                     'Yearly_Pct_Gain': [symbol_performance_no_prop['Yearly_Pct_Gain'].sum()],  # Sum of Yearly_Pct_Gain
                     'Target_Pct': [symbol_performance_no_prop['Target_Pct'].sum()],  # Sum of Target_Pct
-                    'Remain_$': [symbol_performance_no_prop['Target_$'].sum() - symbol_performance_no_prop['Total_PnL'].sum()],
+                    'Remain_$': [
+                        symbol_performance_no_prop['Target_$'].sum() - symbol_performance_no_prop['Total_PnL'].sum()],
                     'Target_$': [symbol_performance_no_prop['Target_$'].sum()],
                     # SUM of Target_$ (changed from mean to sum)
-                    'Target': ["Completed" if symbol_performance_no_prop['Yearly_Pct_Gain'].sum() >= symbol_performance_no_prop['Target_Pct'].sum() else
-                    "Failed" if symbol_performance_no_prop['Yearly_Pct_Gain'].sum() < -symbol_performance_no_prop['Target_Pct'].sum() else
-                    "In Progress"]  # Apply same three-state logic as other rows
+                    'Target': ["Completed" if symbol_performance_no_prop['Yearly_Pct_Gain'].sum() >=
+                                              symbol_performance_no_prop['Target_Pct'].sum() else
+                               "Failed" if symbol_performance_no_prop['Yearly_Pct_Gain'].sum() < -
+                               symbol_performance_no_prop['Target_Pct'].sum() else
+                               "In Progress"]  # Apply same three-state logic as other rows
                 }, index=['SUMMARY'])
 
                 # Add summary row to the performance dataframe
@@ -1550,15 +1554,15 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Remain_$': '${:,.2f}',
                         'Target_$': '${:,.2f}'  # Add formatting for the new Target $ column
                     }).apply(lambda x: ['background-color: lightblue' if x['Symbol'] == 'PROP' else
-                            'background-color: lightcoral' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
-                            'background-color: lightpink' if x['Total_PnL'] < 0 else
-                            'background-color: lightblue' if x['Total_PnL'] > 0 else
-                            'background-color: lightgreen' if x['Target'] == 'Completed' else
-                            'background-color: ' if x['Target'] == 'In Progress' else
-                            'background-color: lightgray' if x['Symbol'] == 'SUMMARY' else
-                            '' for _ in x], axis=1),
-                            use_container_width=True,
-                            height=400
+                                        'background-color: lightcoral' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
+                                        'background-color: lightpink' if x['Total_PnL'] < 0 else
+                                        'background-color: lightblue' if x['Total_PnL'] > 0 else
+                                        'background-color: lightgreen' if x['Target'] == 'Completed' else
+                                        'background-color: ' if x['Target'] == 'In Progress' else
+                                        'background-color: lightgray' if x['Symbol'] == 'SUMMARY' else
+                                        '' for _ in x], axis=1),
+                    use_container_width=True,
+                    height=400
                 )
 
                 # Download button for the performance data
@@ -1591,7 +1595,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                 # Reorder columns by month number
                 month_order = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December']
+                               'July', 'August', 'September', 'October', 'November', 'December']
                 available_months = [m for m in month_order if m in monthly_pivot.columns]
                 monthly_pivot = monthly_pivot.reindex(columns=available_months)
 
@@ -1681,7 +1685,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                 best_direction_by_symbol = []
                 for symbol in year_data['Symbol'].unique():
-                    if(symbol!="PROP"):
+                    if (symbol != "PROP"):
                         symbol_data = year_data[year_data['Symbol'] == symbol]
                         direction_stats = symbol_data.groupby('Direction').agg({
                             'PnL': 'sum',
@@ -1705,7 +1709,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Direction_PnL': '${:,.2f}',
                         'Direction_Win_Rate': '{:.1f}%'
                     }).apply(lambda x: ['background-color: lightgreen' if x['Direction_PnL'] > 0 else
-                                       'background-color: lightcoral' for _ in x], axis=1),
+                                        'background-color: lightcoral' for _ in x], axis=1),
                     use_container_width=True
                 )
 
@@ -1764,10 +1768,9 @@ elif st.session_state.current_page == "Symbol Stats":
                             'Avg_RR': '{:.2f}',
                             'Win_Rate': '{:.1f}%'
                         }).apply(lambda x: ['background-color: lightgreen' if x['Total_PnL'] > 0 else
-                                           'background-color: lightcoral' for _ in x], axis=1),
+                                            'background-color: lightcoral' for _ in x], axis=1),
                         use_container_width=True
                     )
-
 
                 # Summary of Best Strategies Across All Symbols
                 st.header("Best Strategies Summary")
@@ -1775,7 +1778,7 @@ elif st.session_state.current_page == "Symbol Stats":
                 # Get top strategy for each symbol
                 best_strategies = []
                 for symbol in year_data['Symbol'].unique():
-                    if(symbol!="PROP"):
+                    if (symbol != "PROP"):
                         symbol_data = year_data[year_data['Symbol'] == symbol]
                         strategy_stats = symbol_data.groupby('Strategy').agg({
                             'PnL': 'sum',
@@ -1798,7 +1801,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Strategy_PnL': '${:,.2f}',
                         'Strategy_Win_Rate': '{:.1f}%'
                     }).apply(lambda x: ['background-color: lightgreen' if x['Strategy_PnL'] > 0 else
-                                       'background-color: lightcoral' for _ in x], axis=1),
+                                        'background-color: lightcoral' for _ in x], axis=1),
                     use_container_width=True
                 )
 
@@ -1901,7 +1904,7 @@ elif st.session_state.current_page == "Risk Calculation":
     if 'saved_records' not in st.session_state:
         st.session_state.saved_records = []
 
-    #st.title("Risk Calculation")
+    # st.title("Risk Calculation")
     next_risk = 0
     if st.session_state.uploaded_data is not None:
         # Access the precomputed performance gap data directly
@@ -1919,6 +1922,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 except:
                     return {}
 
+
         # Usage - this will now use precomputed data
         performance_gaps = get_performance_gap_data()
 
@@ -1929,7 +1933,7 @@ elif st.session_state.current_page == "Risk Calculation":
             GBPUSD_EURUSD_gap = performance_gaps.get('GBPUSD_EURUSD', 0)
             JPY_Pairs_gap = performance_gaps.get('JPY_Pairs', 0)
             GBPAUD_EURAUD_gap = performance_gaps.get('GBPAUD_EURAUD', 0)
-            sum_gap = XAUUSD_gap+USDCAD_AUDUSD_gap+GBPAUD_EURAUD_gap+GBPUSD_EURUSD_gap+JPY_Pairs_gap
+            sum_gap = XAUUSD_gap + USDCAD_AUDUSD_gap + GBPAUD_EURAUD_gap + GBPUSD_EURUSD_gap + JPY_Pairs_gap
         else:
             # Fallback values if computation failed
             XAUUSD_gap = 0
@@ -1939,8 +1943,7 @@ elif st.session_state.current_page == "Risk Calculation":
             GBPAUD_EURAUD_gap = 0
             sum_gap = 0
 
-
-        a_momemtum_text= ''
+        a_momemtum_text = ''
         df = st.session_state.uploaded_data
         current_month_name = datetime.now().strftime("%B")
 
@@ -1953,7 +1956,6 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def calculate_monthly_stats_2(year_data):
-
 
             monthly_actual_loss = 0
             current_month_stats = []
@@ -1972,7 +1974,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 month_be_pnl = be_trades['PnL'].sum()
 
                 month_loss_pnl = lossers['PnL'].sum()
-                month_win_pnl = winners['PnL'].sum()+month_be_pnl
+                month_win_pnl = winners['PnL'].sum() + month_be_pnl
 
                 withdraw_deposit = month_data[month_data['Withdrawal_Deposit'].notna()]
                 cash_flow = withdraw_deposit['Withdrawal_Deposit'].sum()
@@ -1996,7 +1998,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 if (month_name == current_month_name):
 
-                    ten_percent_goal = starting_balance + round(starting_balance*0.10,2)
+                    ten_percent_goal = starting_balance + round(starting_balance * 0.10, 2)
 
                     month_data["Running_Equity"] = starting_balance + month_data["PnL"].cumsum()
                     month_data["Peak_Equity"] = month_data["Running_Equity"].cummax()
@@ -2004,35 +2006,34 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (month_data["Peak_Equity"].iloc[-1] >= ten_percent_goal):
                         month_data["Drawdown_Limit"] = round(month_data["Peak_Equity"] * 0.12, 2)
                         monthly_loss_limit = starting_balance * 0.12
-                        #monthly_loss_limit = month_data["Drawdown_Limit"].iloc[-1]
+                        # monthly_loss_limit = month_data["Drawdown_Limit"].iloc[-1]
                     else:
                         monthly_loss_limit = starting_balance * 0.12
 
-                        #month_data["Drawdown_Limit"] = round(month_data["Peak_Equity"] * 0.12, 2)
-                        #monthly_loss_limit = month_data["Drawdown_Limit"].iloc[-1]
-                        #monthly_loss_limit = round(starting_balance * 0.08, 2)
+                        # month_data["Drawdown_Limit"] = round(month_data["Peak_Equity"] * 0.12, 2)
+                        # monthly_loss_limit = month_data["Drawdown_Limit"].iloc[-1]
+                        # monthly_loss_limit = round(starting_balance * 0.08, 2)
 
-                    #monthly_loss_limit = round(starting_balance * 0.08, 2)
+                    # monthly_loss_limit = round(starting_balance * 0.08, 2)
                     monthly_loss_limit = starting_balance * 0.12
                     monthly_actual_loss = month_loss_pnl
                     current_month_stats = month_data
 
                 else:
-                    #monthly_loss_limit = round(ending_balance * 0.08, 2)
+                    # monthly_loss_limit = round(ending_balance * 0.08, 2)
                     monthly_actual_loss = 0
                     monthly_actual_gain = 0
                     monthly_loss_limit = starting_balance * 0.12
                 prev_month_balance = ending_balance + cash_flow
                 starting_balance = ending_balance + cash_flow
 
-
-
             return current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance
 
 
-        current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance = calculate_monthly_stats_2(year_data)
+        current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance = calculate_monthly_stats_2(
+            year_data)
 
-        if(df['Withdrawal_Deposit'].sum()!=0):
+        if (df['Withdrawal_Deposit'].sum() != 0):
             cash_flow = df['Withdrawal_Deposit'].cumsum()
         else:
             cash_flow = 0
@@ -2041,19 +2042,19 @@ elif st.session_state.current_page == "Risk Calculation":
         filled_equity = df['equity'].ffill()
         equity = filled_equity.iloc[-1]
 
-        #TRADING_GRADE_SCALE = {
-            #"A+": {"min_winrate": 71, "multiplier": 1.3, "min_trades": 20},
-            #"A": {"min_winrate": 61, "multiplier": 1.2, "min_trades": 20},
-            #"B": {"min_winrate": 51, "multiplier": 1.1, "min_trades": 20},
-            #"C": {"min_winrate": 41, "multiplier": 1.0, "min_trades": 20},
-        #}
+        # TRADING_GRADE_SCALE = {
+        # "A+": {"min_winrate": 71, "multiplier": 1.3, "min_trades": 20},
+        # "A": {"min_winrate": 61, "multiplier": 1.2, "min_trades": 20},
+        # "B": {"min_winrate": 51, "multiplier": 1.1, "min_trades": 20},
+        # "C": {"min_winrate": 41, "multiplier": 1.0, "min_trades": 20},
+        # }
 
         col1, col2 = st.columns(2)
 
         with col1:
             st.subheader("Grading Based Risk Multiplier")
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
-            strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)','Total Return'], ascending=False)
+            strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 
             # Format display
             display_df = strategy_stats.copy()
@@ -2067,7 +2068,7 @@ elif st.session_state.current_page == "Risk Calculation":
             st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
             st.session_state.current_risk = 1.0  # Base risk
 
-            #st.subheader("Adaptive Risk Calculation")
+            # st.subheader("Adaptive Risk Calculation")
             # trades = df['Result'].tolist()
             if (len(current_month_stats) > 0):
                 trades = current_month_stats
@@ -2082,13 +2083,14 @@ elif st.session_state.current_page == "Risk Calculation":
                            "Monthly Drawdown Limit From Peak"],
                 "Value": [f"{base_risk:.2%}" + " /$" + str(dollar_risk), str(word), "Balance $" + str(
                     round(round(monthly_loss_limit, 2) + round(monthly_actual_loss, 2), 2)) + " @" + str(
-                    round((round(monthly_loss_limit, 2)+ round(monthly_actual_loss, 2)) / starting_capital * 100,
+                    round((round(monthly_loss_limit, 2) + round(monthly_actual_loss, 2)) / starting_capital * 100,
                           2)) + "%"]
             }).set_index("Metric")
 
             st.table(result_df)
             st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
             next_risk = base_risk
+
 
         # Google Sheets integration functions
         def save_workflow_to_sheets(data):
@@ -2112,6 +2114,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 st.error(f"Error saving workflow data: {e}")
                 return False
 
+
         def load_workflow_from_sheets():
             """Load workflow data from Google Sheets"""
             try:
@@ -2130,15 +2133,17 @@ elif st.session_state.current_page == "Risk Calculation":
                 st.error(f"Error loading workflow data: {e}")
                 return pd.DataFrame()
 
+
         # Load existing records from Google Sheets on page load
         if not st.session_state.saved_records:
             with st.spinner("Loading existing records from cloud..."):
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
                     st.session_state.saved_records = workflow_data.to_dict('records')
-                    #st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
+                    # st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
 
-        #st.subheader("Risk Calculation")
+
+        # st.subheader("Risk Calculation")
 
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")
@@ -2176,6 +2181,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 st.warning("Failed to fetch AUD/USD. Using fallback: 0.7000")
                 return 0
 
+
         def calculate_position_size(risk_amount, stop_pips, pair):
             lot_size = 100000  # Standard lot size (100,000 units)
 
@@ -2186,19 +2192,20 @@ elif st.session_state.current_page == "Risk Calculation":
                 # For XAU/USD, 1 pip = $0.01 per ounce for a standard lot
 
                 pip_value = lot_size * 0.001
-            elif"CAD" in pair:
-                pip_value = 10/get_usd_cad()  # USD/CAD pip value (USD account)
-            elif pair=="EURAUD" or pair=="GBPAUD":
-                pip_value = 10/get_aud_usd()
+            elif "CAD" in pair:
+                pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
+            elif pair == "EURAUD" or pair == "GBPAUD":
+                pip_value = 10 / get_aud_usd()
 
-            elif"CHF" in pair:
-                pip_value = 10/get_usd_chf()
+            elif "CHF" in pair:
+                pip_value = 10 / get_usd_chf()
             else:
                 # For other pairs, 1 pip = 0.0001
                 pip_value = lot_size * 0.0001
 
             position_size = risk_amount / (stop_pips * pip_value)
             return round(position_size, 2)
+
 
         def calculate_position_size_propfirm(risk_amount, stop_pips, pair):
             lot_size = 100000  # Standard lot size (100,000 units)
@@ -2210,19 +2217,20 @@ elif st.session_state.current_page == "Risk Calculation":
                 # For XAU/USD, 1 pip = $0.01 per ounce for a standard lot
 
                 pip_value = lot_size * 0.001
-            elif"CAD" in pair:
-                pip_value = 10/get_usd_cad()  # USD/CAD pip value (USD account)
-            elif pair=="EURAUD" or pair=="GBPAUD":
-                pip_value = 10/get_aud_usd()
+            elif "CAD" in pair:
+                pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
+            elif pair == "EURAUD" or pair == "GBPAUD":
+                pip_value = 10 / get_aud_usd()
 
-            elif"CHF" in pair:
-                pip_value = 10/get_usd_chf()
+            elif "CHF" in pair:
+                pip_value = 10 / get_usd_chf()
             else:
                 # For other pairs, 1 pip = 0.0001
                 pip_value = lot_size * 0.0001
 
             position_size_propfirm = risk_amount / (stop_pips * pip_value)
             return round(position_size_propfirm, 2)
+
 
         currency_pairs = [
             "AUDUSD", "EURUSD", "GBPUSD", "GBPAUD", "EURAUD",
@@ -2242,13 +2250,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
         ]
         trade_curr = [
-            "AUDUSD","USDCAD"
+            "AUDUSD", "USDCAD"
         ]
         cad_sec = [
             "USDCAD"
         ]
-        aud_family1 =[
-            "AUDUSD","AUDJPY","GBPAUD", "EURAUD"
+        aud_family1 = [
+            "AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"
         ]
 
         europe_major = [
@@ -2259,49 +2267,49 @@ elif st.session_state.current_page == "Risk Calculation":
         ]
 
         xxxusd = [
-            "AUDUSD", "USDCAD","EURUSD", "GBPUSD"
+            "AUDUSD", "USDCAD", "EURUSD", "GBPUSD"
         ]
         majors_nocad = ["AUDUSD", "EURUSD", "GBPUSD", "USDJPY", "XAUUSD"]
-        majors = ["AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDJPY","XAUUSD"]
+        majors = ["AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDJPY", "XAUUSD"]
         majors_dollar = ["AUDUSD", "EURUSD", "GBPUSD", "XAUUSD"]
-        minors = ["GBPAUD", "EURAUD","GBPJPY", "EURJPY", "AUDJPY"]
+        minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
-        strategies = ['1_BNR','1_BNR_TPF', '2_BNR','2_BNR_TPF']
-        time_frame = ['Weekly Structure','Two_Daily Structure']
+        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
+        time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
             "GBPAUD": ["1_BNR"],
             "AUDUSD": [""],
             "EURAUD": ["1_BNR"],
-            "GBPJPY": ["1_BNR",  "1_BNR_TPF",'EM_2b', 'EM_3b'],
-            "EURJPY": ["1_BNR",  "1_BNR_TPF",'EM_2b', 'EM_3b'],
-            "AUDJPY": ["1_BNR",  "1_BNR_TPF", 'EM_2b', 'EM_3b'],
+            "GBPJPY": ["1_BNR", "1_BNR_TPF", 'EM_2b', 'EM_3b'],
+            "EURJPY": ["1_BNR", "1_BNR_TPF", 'EM_2b', 'EM_3b'],
+            "AUDJPY": ["1_BNR", "1_BNR_TPF", 'EM_2b', 'EM_3b'],
             # Add more restrictions as needed
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
-        within_61 = ["No","Yes"]
+        within_61 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": ["No"],
             "2_BNR_TPF": ["No"],
-            "3_BNR_TPF":[]
+            "3_BNR_TPF": []
         }
         incompatible_map_2 = {
-                        "EM_1c": ["8.41-10.41", ">=11.41"],
-                        "EM_2c": ["8.41-10.41", ">=11.41"],
-                        "EM_3c": ["8.41-10.41", ">=11.41"],
-                        "EM_1b": [">=11.41"],
-                        "EM_2b": [">=11.41"],
-                        "EM_3b": [">=11.41"],}
-        Variance = ["50", "559 - 66", "66 - 805","> 805"]
-        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%","9%-10.99%","11%-12.99%",">=13%"]
+            "EM_1c": ["8.41-10.41", ">=11.41"],
+            "EM_2c": ["8.41-10.41", ">=11.41"],
+            "EM_3c": ["8.41-10.41", ">=11.41"],
+            "EM_1b": [">=11.41"],
+            "EM_2b": [">=11.41"],
+            "EM_3b": [">=11.41"], }
+        Variance = ["50", "559 - 66", "66 - 805", "> 805"]
+        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
         incompatible_map_3 = {
             "1_TPF": ["50", "> 805"],
-            "1_BNR": ["50","559 - 66", "> 805"],
+            "1_BNR": ["50", "559 - 66", "> 805"],
             "1_BNR_TPF": ["50"],
             "2_BNR": [""],
             "2_BNR_TPF": [""],
-            "3_BNR_TPF": ["50","> 805","66 - 805"],}
+            "3_BNR_TPF": ["50", "> 805", "66 - 805"], }
         incompatible_map_5 = {
             "GBPAUD": ["No"],
             "EURAUD": ["No"],
@@ -2332,9 +2340,9 @@ elif st.session_state.current_page == "Risk Calculation":
             "XAUUSD": ["3%-4.99%"]}
 
         incompatible_map_9 = {
-            "Cross Wave": ['2_BNR','1_BNR','1_BNR_TPF'],
+            "Cross Wave": ['2_BNR', '1_BNR', '1_BNR_TPF'],
             "9%-10.99%Wave 1": ['1_BNR'],
-            "11%-12.99%Wave 1": ['1_BNR','1_BNR_TPF'],
+            "11%-12.99%Wave 1": ['1_BNR', '1_BNR_TPF'],
             # Add more restrictions as needed
         }
 
@@ -2350,24 +2358,23 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_11 = {
             "AUDJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
-            "GBPJPY":['Two_Daily Structure','Daily BOS', '8H/4H BOS'],
+            "GBPJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
             "EURJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
-            "EURAUD":['8H/4H BOS'],
+            "EURAUD": ['8H/4H BOS'],
             "GBPAUD": ['8H/4H BOS'],
         }
 
         incompatible_map_12 = {
             "3%-4.99%": ['1_BNR'],
             "XAUUSD5%-6.99%": ['1_BNR'],
-            "XAUUSD>=13%": ['1_BNR',"1_BNR_TPF"],
-            ">=13%": ['1_BNR',"1_BNR_TPF"],
-
+            "XAUUSD>=13%": ['1_BNR', "1_BNR_TPF"],
+            ">=13%": ['1_BNR', "1_BNR_TPF"],
 
         }
 
         incompatible_map_13 = {
             "Yes": [],
-            "No": ['1_BNR','1_BNR_TPF']
+            "No": ['1_BNR', '1_BNR_TPF']
 
         }
 
@@ -2383,86 +2390,106 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_15 = {
             "Two_Daily Structure": [],
 
-
         }
+
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
             return [s for s in time_frame if s not in disabled_timeframe]
 
-        def get_available_timeframe_2(listone,trend):
+
+        def get_available_timeframe_2(listone, trend):
             disabled_timeframe_2 = incompatible_map_14.get(trend, [])
             return [s for s in listone if s not in disabled_timeframe_2]
+
 
         def get_available_position(pairlist):
             disabled_position = incompatible_map_7.get(pairlist, [])
             return [s for s in pairlist if s not in disabled_position]
 
+
         def get_available_trend_position(pair):
             disabled_trend_position = incompatible_map_8.get(pair, [])
             return [s for s in Trend_Positions if s not in disabled_trend_position]
 
+
         def get_available_rr(strategy):
-                        disabled_rr = incompatible_map_2.get(strategy, [])
-                        return [s for s in potential_rr if s not in disabled_rr]
+            disabled_rr = incompatible_map_2.get(strategy, [])
+            return [s for s in potential_rr if s not in disabled_rr]
+
 
         def get_available_61(strategy):
-                        disabled_61 = incompatible_map_4.get(strategy, [])
-                        return [s for s in within_61 if s not in disabled_61]
+            disabled_61 = incompatible_map_4.get(strategy, [])
+            return [s for s in within_61 if s not in disabled_61]
+
+
         def get_available_61_2(pair, list_available):
-                        diabled_61 = incompatible_map_5.get(pair,[])
-                        return [s for s in list_available if s not in diabled_61]
+            diabled_61 = incompatible_map_5.get(pair, [])
+            return [s for s in list_available if s not in diabled_61]
+
+
         def get_available_61_3(position, list_available):
-                        diabled_61 = incompatible_map_6.get(position,[])
-                        return [s for s in list_available if s not in diabled_61]
+            diabled_61 = incompatible_map_6.get(position, [])
+            return [s for s in list_available if s not in diabled_61]
+
+
         def get_available_strategies(pair):
             disabled_strategies = incompatible_map.get(pair, [])
             return [s for s in strategies if s not in disabled_strategies]
 
-        def get_available_strategies2(cross_fib,strats):
+
+        def get_available_strategies2(cross_fib, strats):
             disabled_strategies_2 = incompatible_map_9.get(cross_fib, [])
             return [s for s in strats if s not in disabled_strategies_2]
 
-        def get_available_strategies3(trend_positions,pair,strats_2):
 
-            if(pair=="XAUUSD"):
-                var = pair+trend_positions
+        def get_available_strategies3(trend_positions, pair, strats_2):
+
+            if (pair == "XAUUSD"):
+                var = pair + trend_positions
             else:
                 var = trend_positions
             disabled_strategies_3 = incompatible_map_12.get(var, [])
             return [s for s in strats_2 if s not in disabled_strategies_3]
 
-        def get_available_strategies4(hh_ll,stratslist):
+
+        def get_available_strategies4(hh_ll, stratslist):
             disabled_strategies_4 = incompatible_map_13.get(hh_ll, [])
             return [s for s in stratslist if s not in disabled_strategies_4]
 
-        def get_available_strategies5(timeframe,stratslist):
+
+        def get_available_strategies5(timeframe, stratslist):
             disabled_strategies_5 = incompatible_map_15.get(timeframe, [])
             return [s for s in stratslist if s not in disabled_strategies_5]
+
+
         def get_available_variance(entry_model):
             available_variance = incompatible_map_3.get(entry_model, [])
             return [s for s in Variance if s not in available_variance]
-        def get_available_variance_2(trend,variancelist):
+
+
+        def get_available_variance_2(trend, variancelist):
             available_variances = incompatible_map_10.get(trend, [])
             return [s for s in variancelist if s not in available_variances]
 
-        def get_pair_prior_result(current_month_stats,selected_pair):
-            if(len(current_month_stats)>0):
+
+        def get_pair_prior_result(current_month_stats, selected_pair):
+            if (len(current_month_stats) > 0):
                 pair_trades = current_month_stats[current_month_stats['Symbol'] == selected_pair]
-                if(len(pair_trades)<1):
+                if (len(pair_trades) < 1):
                     return 'N'
                 else:
-                    loss_pair_trades = pair_trades[pair_trades["Result"]=="Loss"]
-                    be_pair_trades = pair_trades[pair_trades["Result"]=="BE"]
-                    if(len(loss_pair_trades)>=2):
+                    loss_pair_trades = pair_trades[pair_trades["Result"] == "Loss"]
+                    be_pair_trades = pair_trades[pair_trades["Result"] == "BE"]
+                    if (len(loss_pair_trades) >= 2):
                         return "X"
-                    elif(len(be_pair_trades)>2):
+                    elif (len(be_pair_trades) > 2):
                         return "X"
                     else:
-                        non_be_pair_trades = pair_trades[pair_trades["Result"]!="BE"]
-                        if(len(non_be_pair_trades)>0):
+                        non_be_pair_trades = pair_trades[pair_trades["Result"] != "BE"]
+                        if (len(non_be_pair_trades) > 0):
                             last_result = str(non_be_pair_trades["Result"].iloc[-1])
-                            if(last_result=="Win"):
+                            if (last_result == "Win"):
                                 return 'W'
                             else:
                                 return "L"
@@ -2471,7 +2498,9 @@ elif st.session_state.current_page == "Risk Calculation":
                             return "N"
             else:
                 return "N"
-        def get_pair_sect_count(current_month_stats,pair):
+
+
+        def get_pair_sect_count(current_month_stats, pair):
             if (len(current_month_stats) > 0):
                 current_month_stats = current_month_stats[current_month_stats['Result'] == "Loss"]
                 current_month_stats_linked = current_month_stats[current_month_stats['Symbol'].isin(xxxusd)]
@@ -2487,15 +2516,15 @@ elif st.session_state.current_page == "Risk Calculation":
             gold_count = 2
             pair_trades = 0
             if (len(current_month_stats) > 0):
-                if(pair in xxxaud):
+                if (pair in xxxaud):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(xxxaud)])
 
                     xxxaud_count = xxxaud_count - pair_trades
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud = len(current_month_stats_linked2)
-                        if(pair_trades_aud>=2):
+                        if (pair_trades_aud >= 2):
                             xxxaud_count = xxxaud_count - pair_trades_aud
-                    return  xxxaud_count
+                    return xxxaud_count
                 elif (pair == "AUDJPY"):
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud2 = len(current_month_stats_linked2)
@@ -2504,14 +2533,14 @@ elif st.session_state.current_page == "Risk Calculation":
                     YEN_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
                     audjpy_count = audjpy_count - YEN_trades
                     return audjpy_count
-                elif(pair in yens):
+                elif (pair in yens):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
                     yen_count = yen_count - pair_trades
 
                     return yen_count
-                elif(pair == "USDCAD"):
+                elif (pair == "USDCAD"):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'] == "USDCAD"])
-                    if(pair_trades>0):
+                    if (pair_trades > 0):
                         cad_count = 0
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
@@ -2535,7 +2564,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             audusd_count = 0
                     return audusd_count
 
-                elif(pair in europe_major):
+                elif (pair in europe_major):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
                     europe_count = europe_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
@@ -2553,92 +2582,84 @@ elif st.session_state.current_page == "Risk Calculation":
                 return 2
 
 
-
-        col1, col2 = st.columns(2, gap = "small")
+        col1, col2 = st.columns(2, gap="small")
         with col1:
             account_balance = equity
-            #account_balance = st.number_input("Account balance", equity)
-            #account_balance = st.number_input(
-                #"Account balance",
-                #value=equity,
-                #disabled=True  # Disables editing
-            #)
+            # account_balance = st.number_input("Account balance", equity)
+            # account_balance = st.number_input(
+            # "Account balance",
+            # value=equity,
+            # disabled=True  # Disables editing
+            # )
             st.markdown("<div style='height:50px;'></div>", unsafe_allow_html=True)
             selected_pair = st.selectbox("Trading Pair", currency_pairs)
             available_trend_position = get_available_trend_position(selected_pair)
             trend_position = st.selectbox("Trend Position", available_trend_position)
 
             available_time_frame = get_available_timeframe(selected_pair)
-            available_time_frame_2 = get_available_timeframe_2(available_time_frame,trend_position)
-            POI = st.selectbox("POI Type (2_Daily is 2nd to Last on Weekly -- Note that the wick on first weekly Candle need to be >=0.50%)", available_time_frame_2)
+            available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
+            POI = st.selectbox(
+                "POI Type (2_Daily is 2nd to Last on Weekly -- Note that the wick on first weekly Candle need to be >=0.50%)",
+                available_time_frame_2)
             cross_fib = st.selectbox("Wave Status", ['Wave 2+', 'Wave 1', 'Cross Wave'])
-            HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)",['Yes','No'])
-
-
-
+            HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
 
             available_strategies = get_available_strategies(selected_pair)
-            available_strats = get_available_strategies2(cross_fib,available_strategies)
-            varcross = trend_position+cross_fib
-            available_strats_crossfib = get_available_strategies2(varcross,available_strats)
+            available_strats = get_available_strategies2(cross_fib, available_strategies)
+            varcross = trend_position + cross_fib
+            available_strats_crossfib = get_available_strategies2(varcross, available_strats)
 
-            available_strats_2 = get_available_strategies3(trend_position,selected_pair,available_strats_crossfib)
-            available_strats_3 = get_available_strategies4(HH_LL,available_strats_2)
-            available_strats_4 = get_available_strategies5(POI,available_strats_3)
+            available_strats_2 = get_available_strategies3(trend_position, selected_pair, available_strats_crossfib)
+            available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
+            available_strats_4 = get_available_strategies5(POI, available_strats_3)
 
             risk_multiplier = st.selectbox("Entry Model",
                                            available_strats_4,
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
-            #Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
-            #Adaptive_value = st.number_input(
+            # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
+            # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",
             #	value=next_risk,
             #	disabled=True,
             #	format = "%.3f"
-            #)
+            # )
             available_vairances = get_available_variance(risk_multiplier)
-            if(selected_pair not in majors_dollar):
-                if('50' in available_vairances):
+            if (selected_pair not in majors_dollar):
+                if ('50' in available_vairances):
                     available_vairances.remove("50")
-            concat_trend = trend_position+risk_multiplier
-            final_variance1 = get_available_variance_2(concat_trend,available_vairances)
+            concat_trend = trend_position + risk_multiplier
+            final_variance1 = get_available_variance_2(concat_trend, available_vairances)
 
-            concat_trend2 = selected_pair+risk_multiplier
-            final_variance2 = get_available_variance_2(concat_trend2,final_variance1)
+            concat_trend2 = selected_pair + risk_multiplier
+            final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
             Variances = st.selectbox("Position Variance", final_variance2)
 
-
-
-
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk
-            #available_rr = get_available_rr(risk_multiplier)
+            # available_rr = get_available_rr(risk_multiplier)
             available_61 = get_available_61(risk_multiplier)
-            #Potential = st.selectbox("Potential RR", available_rr)
+            # Potential = st.selectbox("Potential RR", available_rr)
 
             available_61 = get_available_61(risk_multiplier)
-            available_61_2 = get_available_61_2(selected_pair,available_61)
-            available_61_3 = get_available_61_3(Variances,available_61_2)
+            available_61_2 = get_available_61_2(selected_pair, available_61)
+            available_61_3 = get_available_61_3(Variances, available_61_2)
 
             within_61 = st.selectbox("Price Within 64", available_61_3)
             st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
 
-
-            pair_result = get_pair_prior_result(current_month_stats,selected_pair)
-            #Pair_prior_result = st.selectbox("Pair Prior Result in Month", pair_result, disabled=True)
+            pair_result = get_pair_prior_result(current_month_stats, selected_pair)
+            # Pair_prior_result = st.selectbox("Pair Prior Result in Month", pair_result, disabled=True)
 
             sect_count = get_pair_sect_count(current_month_stats, selected_pair)
 
-
         with col2:
 
-
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
-            #st.write(strategy_stats.items())
-            #strategy_stats_df = pd.DataFrame(strategy_stats.tolist(), index=strategy_stats.index)
+            # st.write(strategy_stats.items())
+            # strategy_stats_df = pd.DataFrame(strategy_stats.tolist(), index=strategy_stats.index)
             multiplier = 1.0
             POI_multiplier = 1.0
             rr_multiplier = 1.0
@@ -2650,60 +2671,59 @@ elif st.session_state.current_page == "Risk Calculation":
 
             big_risk_multiplier = 1.0
             for strategy, metrics in strategy_stats.items():
-                #st.write(strategy)
-                #st.write(metrics)
+                # st.write(strategy)
+                # st.write(metrics)
 
                 if strategy == "Multiplier":
-                    #multiplier = metrics["Multiplier"]
+                    # multiplier = metrics["Multiplier"]
                     for Strategy_, Multiplier_ in metrics.items():
                         if Strategy_ == risk_multiplier:
                             multiplier = Multiplier_
-                            #st.write(Strategy_,Multiplier_)
+                            # st.write(Strategy_,Multiplier_)
 
                     break
 
-            #multiplier = calculate_strategy_grade_temp(risk_multiplier)
-            if(POI == 'Weekly Structure'):
+            # multiplier = calculate_strategy_grade_temp(risk_multiplier)
+            if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
-            elif(POI == 'Two_Daily Structure'):
+            elif (POI == 'Two_Daily Structure'):
                 POI_multiplier = 0.91
-
 
             if (within_61 == 'Yes'):
                 sixone_multiplier = 1.1
             else:
                 sixone_multiplier = 1.0
-            #if(Potential == '3.41-4.41'):
-                #rr_multiplier = 1.0
-            #elif(Potential == '5.41-7.41'):
-                #rr_multiplier = 1.1
-            #elif(Potential == '8.41-10.41'):
-                #rr_multiplier = 1.2
-            #elif (Potential == '>=11.41'):
-                #rr_multiplier = 1.3
+            # if(Potential == '3.41-4.41'):
+            # rr_multiplier = 1.0
+            # elif(Potential == '5.41-7.41'):
+            # rr_multiplier = 1.1
+            # elif(Potential == '8.41-10.41'):
+            # rr_multiplier = 1.2
+            # elif (Potential == '>=11.41'):
+            # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
                 trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
                 if (risk_multiplier == "1_BNR_TPF"):
-                    if(Variances =="559 - 66"):
+                    if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
                 else:
                     trend_position_multiplier = 1.05
             elif (trend_position == "7%-8.99%"):
                 if (risk_multiplier == "1_BNR_TPF"):
-                    if(Variances =="559 - 66"):
+                    if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
                 else:
                     trend_position_multiplier = 1.1
-            elif(trend_position == "9%-10.99%"):
+            elif (trend_position == "9%-10.99%"):
                 if (risk_multiplier == "1_BNR_TPF"):
-                    if(Variances =="559 - 66"):
+                    if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
                 else:
                     trend_position_multiplier = 1.0
             elif (trend_position == "11%-12.99%"):
-                if(risk_multiplier=="1_BNR" or risk_multiplier=="1_BNR_TPF"):
+                if (risk_multiplier == "1_BNR" or risk_multiplier == "1_BNR_TPF"):
                     if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.81
                     else:
@@ -2725,53 +2745,56 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 variance_multiplier = 1.0
 
-            if(pair_result == "N"):
+            if (pair_result == "N"):
                 prior_result_multiplier = 1.0
-            elif(pair_result == "W"):
+            elif (pair_result == "W"):
                 prior_result_multiplier = 1.15
-            elif(pair_result == "L"):
+            elif (pair_result == "L"):
                 prior_result_multiplier = 0.91
-            elif(pair_result=="X"):
+            elif (pair_result == "X"):
                 prior_result_multiplier = 0
 
-
-            if(sect_count>0):
+            if (sect_count > 0):
                 sect_count_multiplier = 1.0
             else:
                 sect_count_multiplier = 0.0
 
-            if(cross_fib == "Cross Wave"):
+            if (cross_fib == "Cross Wave"):
                 cross_fib_multiplier = 0.91
             else:
                 cross_fib_multiplier = 1.0
 
-            if(selected_pair in europe_major or selected_pair == "XAUUSD"):
-                if(pair_result == "W"):
-                    if(risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
-                        if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%" or trend_position == "7%-8.99%"):
+            if (selected_pair in europe_major or selected_pair == "XAUUSD"):
+                if (pair_result == "W"):
+                    if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+                        if (
+                                trend_position == "3%-4.99%" or trend_position == "5%-6.99%" or trend_position == "7%-8.99%"):
                             big_risk_multiplier = 1.5
             else:
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
-            final_risk_1 = (yearly_factor*Adaptive_value)*multiplier*POI_multiplier*trend_position_multiplier*sixone_multiplier*prior_result_multiplier*sect_count_multiplier*big_risk_multiplier*cross_fib_multiplier*variance_multiplier
+            final_risk_1 = (
+                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier
             final_risk = math.floor(final_risk_1)
-            if(final_risk>(yearly_factor*0.05)):
-                final_risk = yearly_factor*0.05
+            if (final_risk > (yearly_factor * 0.05)):
+                final_risk = yearly_factor * 0.05
 
-            if(stop_pips != None):
+            if (stop_pips != None):
                 position_size = calculate_position_size(final_risk, stop_pips, selected_pair)
                 position_size_propfirm = calculate_position_size_propfirm(2000, stop_pips, selected_pair)
-                set_global("position_size",position_size)
-                set_global("position_size_propfirm",position_size_propfirm)
+                set_global("position_size", position_size)
+                set_global("position_size_propfirm", position_size_propfirm)
             else:
                 position_size = 0
                 position_size_propfirm = 0
+
+
             def getPairEntrySL(pair):
-                if(pair == "GBPUSD"):
+                if (pair == "GBPUSD"):
                     return "223 ", "243"
                 elif (pair == "EURUSD"):
                     return "203 ", "223"
-                elif(pair == "AUDUSD"):
+                elif (pair == "AUDUSD"):
                     return "153 ", "193"
                 elif (pair == "XAUUSD"):
                     return "5 ", "9.3"
@@ -2781,10 +2804,12 @@ elif st.session_state.current_page == "Risk Calculation":
                     return "203 ", "233"
                 else:
                     return "253 ", "283"
+
+
             entry_title = ""
             entry_text = ""
-            SL_title=""
-            SL_text=""
+            SL_title = ""
+            SL_text = ""
             exit_title = ""
             exit_text = ""
             entry_pip, sl_pip = getPairEntrySL(selected_pair)
@@ -2804,34 +2829,36 @@ elif st.session_state.current_page == "Risk Calculation":
                     open_target = round(USDCAD_AUDUSD_gap / final_risk, 2)
                 return open_target
 
-            def compare_target(open_target,desire_target):
-                if(open_target<desire_target):
-                    if(open_target>3):
+
+            def compare_target(open_target, desire_target):
+                if (open_target < desire_target):
+                    if (open_target > 3):
                         return str(open_target)
                     else:
                         return "3"
-                elif(open_target>desire_target):
+                elif (open_target > desire_target):
                     return str(desire_target)
 
-            if(len(a_momemtum_text)<1):
-                                a_momemtum_text="To be Filled"
-            if(risk_multiplier == "1_BNR"):
-                if(within_61=="Yes"):
-                    if(selected_pair == "XAUUSD"):
+
+            if (len(a_momemtum_text) < 1):
+                a_momemtum_text = "To be Filled"
+            if (risk_multiplier == "1_BNR"):
+                if (within_61 == "Yes"):
+                    if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "$ Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "$"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),7.41)
-                    elif(selected_pair == "AUDUSD"):
+                        exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                    elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
-                    elif(selected_pair == "USDJPY"):
+                    elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
@@ -2844,7 +2871,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                 else:
                     if (selected_pair == "XAUUSD"):
@@ -2853,7 +2880,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "$"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
@@ -2874,8 +2901,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),5.41)
-            elif(risk_multiplier == "1_BNR_TPF"):
+                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+            elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
@@ -2883,7 +2910,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "$"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),7.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -2891,14 +2918,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + "$"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair),8.41)
-                    elif (selected_pair in minors or selected_pair=="AUDUSD"):
+                            exit_text = compare_target(get_one_target(selected_pair), 8.41)
+                    elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -2906,14 +2933,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " Pips"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair),6.41)
-                    elif (selected_pair =="USDJPY"):
+                            exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                    elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),20)
+                        exit_text = compare_target(get_one_target(selected_pair), 20)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -2921,14 +2948,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " Pips"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair),20)
+                            exit_text = compare_target(get_one_target(selected_pair), 20)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -2936,7 +2963,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " Pips"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair),7.41)
+                            exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
 
                 else:
@@ -2946,28 +2973,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "$"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),6.41)
-                    elif (selected_pair in minors or selected_pair=="AUDUSD"):
+                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                    elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),4.41)
-                    elif (selected_pair =="USDJPY"):
+                        exit_text = compare_target(get_one_target(selected_pair), 4.41)
+                    elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " Pips"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair),5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
 
 
@@ -2975,29 +3002,34 @@ elif st.session_state.current_page == "Risk Calculation":
                 length_title = "Leg One Length Requirement:"
                 length_text = ""
 
+
                 def get_sum_target():
-                    sum_target = round(sum_gap/final_risk,2)
+                    sum_target = round(sum_gap / final_risk, 2)
                     if (sum_target > 3):
                         return sum_target
                     else:
                         return 3
+
+
                 def get_open_target(selected_pair):
                     open_target = 0
-                    if(selected_pair in yens):
-                        open_target = round(JPY_Pairs_gap/final_risk,2)
-                    elif(selected_pair in gold_comm):
-                        open_target = round(XAUUSD_gap / final_risk,2)
+                    if (selected_pair in yens):
+                        open_target = round(JPY_Pairs_gap / final_risk, 2)
+                    elif (selected_pair in gold_comm):
+                        open_target = round(XAUUSD_gap / final_risk, 2)
                     elif (selected_pair in xxxaud):
-                        open_target = round(GBPAUD_EURAUD_gap / final_risk,2)
-                    elif(selected_pair in europe_major):
-                        open_target = round(GBPUSD_EURUSD_gap / final_risk,2)
-                    elif(selected_pair in trade_curr):
-                        open_target = round(USDCAD_AUDUSD_gap / final_risk,2)
-                    if(open_target>3):
+                        open_target = round(GBPAUD_EURAUD_gap / final_risk, 2)
+                    elif (selected_pair in europe_major):
+                        open_target = round(GBPUSD_EURUSD_gap / final_risk, 2)
+                    elif (selected_pair in trade_curr):
+                        open_target = round(USDCAD_AUDUSD_gap / final_risk, 2)
+                    if (open_target > 3):
                         return open_target
                     else:
                         return 3
-                if(selected_pair in minor_yens):
+
+
+                if (selected_pair in minor_yens):
                     if (Variances == "> 805"):
                         entry_title = "Entry Guide (SL__Entry Length):"
                         entry_text = "33% from 91 Fib"
@@ -3024,13 +3056,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    if(selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
-                        if(trend_position=="3%-4.99%" or trend_position=="5%-6.99%"):
-                            if(big_risk_multiplier>1):
+                    if (selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                        if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
+                            if (big_risk_multiplier > 1):
                                 total_target = get_sum_target()
                                 compare_target = get_open_target(selected_pair) * 1.725
-                                if(compare_target<total_target):
-                                    targeting = round(compare_target,2)
+                                if (compare_target < total_target):
+                                    targeting = round(compare_target, 2)
                                 else:
                                     targeting = total_target
                             else:
@@ -3048,7 +3080,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = targeting
 
                     elif (Variances == "559 - 66"):
-                        if(risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
+                        if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length):"
                             entry_text = "5 Pips before 559 or 618, 33% Max"
                             SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
@@ -3079,7 +3111,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_text = "Middle of FL and NF (62% Max)"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
-                    elif(Variances == "50"):
+                    elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
@@ -3096,7 +3128,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
 
                     if (selected_pair == "XAUUSD"):
-                        if(trend_position=="7%-8.99%" or trend_position=="5%-6.99%"):
+                        if (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
                             if (big_risk_multiplier > 1):
                                 total_target = get_sum_target()
                                 compare_target = get_open_target(selected_pair) * 1.725
@@ -3154,41 +3186,42 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
-
-
             col1, col2, col3 = st.columns([0.03, 1, 0.5], gap="small")
 
             with col2:
-                Risk_percentage = round(final_risk/account_balance*100,2)
+                Risk_percentage = round(final_risk / account_balance * 100, 2)
                 container = st.container()
-                container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>", unsafe_allow_html=True)
-                if(get_global('entry_model')!=None):
-                    container.metric("--Note that all SL must not exceed 33%","Entry: " + get_global('entry_model')+" ")
-                elif(get_global('entry_model')==None):
+                container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
+                                   unsafe_allow_html=True)
+                if (get_global('entry_model') != None):
+                    container.metric("--Note that all SL must not exceed 33%",
+                                     "Entry: " + get_global('entry_model') + " ")
+                elif (get_global('entry_model') == None):
                     container.metric("--Note that all SL must not exceed 33%", "Entry Criteria Pending")
 
-                if(monthly_loss_limit+monthly_actual_loss-final_risk<0):
-                    #container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))
+                if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
+                    # container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))
                     container.metric("Risk amount exceeded your monthly limit", "$0 (0.0% of Account)")
                 else:
                     container.metric("Your Next risk risk should be:", f"${final_risk} ({Risk_percentage}% of Account)")
                     set_global("final_risk", Risk_percentage)
-                    if(position_size>0):
-                                            if(position_size_propfirm>0):
-                                                if(risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
-                                                    if(pair_result == "W" or pair_result == "N"):
-                                                        if(selected_pair in europe_major or selected_pair in gold_comm):
-                                                            container.metric("Your Calculated lot size should be:",f"Personal {position_size} lots /" f"Propfirm {position_size_propfirm} lots")
-                                                        else:
-                                                            container.metric("Your Calculated lot size should be:",f"{position_size} lots")
-                                                    else:
-                                                        container.metric("Your Calculated lot size should be:", f"{position_size} lots")
-                                                else:
-                                                    container.metric("Your Calculated lot size should be:",f"{position_size} lots")
-                                            else:
-                                                container.metric("Your Calculated lot size should be:",f"{position_size} lots")
+                    if (position_size > 0):
+                        if (position_size_propfirm > 0):
+                            if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+                                if (pair_result == "W" or pair_result == "N"):
+                                    if (selected_pair in europe_major or selected_pair in gold_comm):
+                                        container.metric("Your Calculated lot size should be:",
+                                                         f"Personal {position_size} lots /" f"Propfirm {position_size_propfirm} lots")
+                                    else:
+                                        container.metric("Your Calculated lot size should be:", f"{position_size} lots")
+                                else:
+                                    container.metric("Your Calculated lot size should be:", f"{position_size} lots")
+                            else:
+                                container.metric("Your Calculated lot size should be:", f"{position_size} lots")
+                        else:
+                            container.metric("Your Calculated lot size should be:", f"{position_size} lots")
                     else:
-                                            container.metric("Your Calculated lot size should be:", "Please Enter stop pips")
+                        container.metric("Your Calculated lot size should be:", "Please Enter stop pips")
 
                     if (risk_multiplier == "1_BNR_TPF" or risk_multiplier == "1_BNR" or risk_multiplier == "3_BNR_TPF"):
                         container.metric(entry_title, entry_text)
@@ -3411,6 +3444,7 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
 
+
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""
@@ -3429,6 +3463,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error loading workflow data: {e}")
             return pd.DataFrame()
+
 
     def save_workflow_to_sheets(data):
         """Save workflow data to Google Sheets using existing functions"""
@@ -3450,6 +3485,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error saving workflow data: {e}")
             return False
+
 
     def sync_with_trade_signals():
         """Two-way sync between Active Opps and Trade Signals - FIXED VERSION"""
@@ -3520,6 +3556,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             return False, f"Sync error: {str(e)}"
 
+
     # SIMPLE ACTION FUNCTIONS
     def handle_update_record(record_index, entry_price, exit_price, target_price):
         """Handle record update"""
@@ -3537,6 +3574,7 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Update error: {e}")
             return False
 
+
     def handle_move_record(record_index, new_status):
         """Handle moving record to new status"""
         try:
@@ -3550,6 +3588,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Move error: {e}")
             return False
+
 
     def handle_delete_record(record_index):
         """Handle record deletion"""
@@ -3565,6 +3604,7 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Delete error: {e}")
             return False
 
+
     # Helper function
     def safe_float(value, default=0.0):
         if value is None or value == 'None' or value == '':
@@ -3574,12 +3614,14 @@ elif st.session_state.current_page == "Active Opps":
         except (ValueError, TypeError):
             return default
 
+
     # Generate unique key for each record
     def generate_unique_key(record_index, record, field_name):
         """Generate truly unique key using index, pair, and timestamp"""
         pair = record['selected_pair'].replace('/', '_').replace(' ', '_')
         timestamp = record['timestamp'].replace(':', '_').replace(' ', '_').replace('-', '_').replace('.', '_')
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
+
 
     # AUTO-RELOAD FUNCTION - CRITICAL FOR TWO-WAY SYNC
     def check_and_reload_from_sheets():
@@ -3611,6 +3653,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             print(f"Check reload error: {e}")
             return False
+
 
     # AUTO-RELOAD ON EVERY PAGE LOAD
     should_reload = check_and_reload_from_sheets()
@@ -4017,7 +4060,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER PLACED STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Placed':
-                        col_update, col_back , col_move, col_delete = st.columns(4)
+                        col_update, col_back, col_move, col_delete = st.columns(4)
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):
@@ -4110,7 +4153,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.write(f"**Variance:** {existing_variance}")
 
                         # Action buttons for Order Filled stage
-                        col_update_only, col_back, col_close  = st.columns([1, 1, 1])
+                        col_update_only, col_back, col_close = st.columns([1, 1, 1])
 
                         with col_update_only:
                             if st.button("Update Record", key=f"filled_update_{unique_key_base}"):
@@ -4283,15 +4326,16 @@ elif st.session_state.current_page == "Trade Signal":
         keys_to_remove = []
         for key in st.session_state.keys():
             if (key.startswith('confirm_execute_') or
-                key.startswith('confirm_back_ready_') or
-                key.startswith('confirm_update_sl_') or
-                key.startswith('confirm_be_')):
+                    key.startswith('confirm_back_ready_') or
+                    key.startswith('confirm_update_sl_') or
+                    key.startswith('confirm_be_')):
                 keys_to_remove.append(key)
 
         for key in keys_to_remove:
             del st.session_state[key]
 
         st.session_state.confirmation_states_reset = True
+
 
     # Add helper function first
     def safe_float(value, default=0.0):
@@ -4612,9 +4656,29 @@ elif st.session_state.current_page == "Trade Signal":
 
                     # ONLY CHECK THESE TWO FIELDS - IGNORE DIRECTION AND PRICE
                     if symbol_match and volume_match:
-                        # Create trade record - UPDATE ALL VALUES FROM POSITION (using correct camelCase)
+                        # FIX: ALWAYS use the actual position type from MetaApi, NEVER use calculated direction
+                        position_type = position.get('type', '')
+                        if position_type == 'POSITION_TYPE_SELL':
+                            actual_direction = "sell"  # lowercase to match your display
+                        elif position_type == 'POSITION_TYPE_BUY':
+                            actual_direction = "buy"  # lowercase to match your display
+                        else:
+                            actual_direction = "Unknown"  # fallback
+
+                        print(
+                            f"DEBUG: Position {position_symbol} has type: {position_type}, setting direction to: {actual_direction}")
+
+                        # Create trade record - USE ACTUAL POSITION DATA, NOT ORDER DATA
                         trade_record = {
-                            **order,  # Keep original order data
+                            'timestamp': order['timestamp'],
+                            'selected_pair': order['selected_pair'],
+                            'risk_multiplier': order['risk_multiplier'],
+                            'position_size': order['position_size'],
+                            'stop_pips': order['stop_pips'],
+                            # USE ACTUAL POSITION PRICES, NOT ORDER PRICES
+                            'entry_price': position.get('openPrice'),  # Actual filled price
+                            'exit_price': position.get('stopLoss'),  # Actual stop loss
+                            'target_price': position.get('takeProfit'),  # Actual take profit
                             'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'order_status': 'FILLED',
                             'position_id': position['id'],
@@ -4622,12 +4686,8 @@ elif st.session_state.current_page == "Trade Signal":
                             'current_sl': position.get('stopLoss'),
                             'current_tp': position.get('takeProfit'),
                             'profit': position.get('profit', 0),
-                            # UPDATE ALL VALUES FROM ACTUAL POSITION (using correct camelCase)
-                            'entry_price': position.get('openPrice'),  # Use actual filled price
-                            'exit_price': position.get('stopLoss'),  # Use actual stop loss from position
-                            'target_price': position.get('takeProfit'),  # Use actual take profit from position
-                            'direction': 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
-                            # Use actual direction
+                            'direction': actual_direction,  # USE ACTUAL DIRECTION FROM POSITION TYPE
+                            'status': 'Order Filled'
                         }
 
                         # Move from Order Placed to In Trade
@@ -4647,6 +4707,48 @@ elif st.session_state.current_page == "Trade Signal":
             return 0
 
 
+    def update_existing_in_trade_directions(positions):
+        """Update direction for existing In Trade records based on actual position types"""
+        try:
+            updated_count = 0
+            for trade in st.session_state.in_trade:
+                trade_symbol = trade['selected_pair']
+                formatted_trade_symbol = format_symbol_for_pepperstone(trade_symbol)
+
+                # Find matching position
+                for position in positions:
+                    position_symbol = position['symbol']
+
+                    # Check symbol match (same logic as auto-move)
+                    symbol_match = (
+                            position_symbol == formatted_trade_symbol or
+                            position_symbol.endswith('.a') and position_symbol.replace('.a', '') == trade_symbol or
+                            trade_symbol.endswith('.a') and trade_symbol.replace('.a', '') == position_symbol or
+                            position_symbol == trade_symbol
+                    )
+
+                    if symbol_match:
+                        # UPDATE: Always use actual position type, never keep old direction
+                        position_type = position.get('type', '')
+                        if position_type == 'POSITION_TYPE_SELL':
+                            new_direction = "sell"
+                        elif position_type == 'POSITION_TYPE_BUY':
+                            new_direction = "buy"
+                        else:
+                            new_direction = "Unknown"
+
+                        # Always update to match the actual position
+                        if trade.get('direction') != new_direction:
+                            trade['direction'] = new_direction
+                            updated_count += 1
+                            print(
+                                f"DEBUG: Updated {trade_symbol} direction from '{trade.get('direction')}' to '{new_direction}' (position type: {position_type})")
+                        break
+
+            return updated_count
+        except Exception as e:
+            print(f"Update existing in-trade directions error: {e}")
+            return 0
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
         """Fast order check with minimal overhead"""
         try:
@@ -5449,8 +5551,6 @@ elif st.session_state.current_page == "Trade Signal":
                         if formatted_symbol != signal['selected_pair']:
                             st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
 
-
-
         with tab2:
             st.subheader(" Order Placed")
             st.info("Orders that have been placed but not yet filled.")
@@ -5576,8 +5676,6 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Fill Time:** {trade.get('fill_time', 'N/A')}")
 
                         st.success(" This trade is now in Active Opps as 'Order Filled'")
-
-                        
 
         with tab4:
             st.subheader(" Open Positions")
@@ -5779,13 +5877,12 @@ elif st.session_state.current_page == "Stats":
         def highlight_summary(row):
             return ['background-color: ; font-weight: bold' if row['Month'] == 'Total' else '' for _ in row]
 
+
         df = st.session_state.uploaded_data
         df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
         df['Year'] = df['Date'].dt.year
         df['Month'] = df['Date'].dt.month_name()
         df['MonthNum'] = df['Date'].dt.month
-
-
 
         st.sidebar.header("Filters")
         selected_year = st.sidebar.selectbox(
@@ -5798,7 +5895,6 @@ elif st.session_state.current_page == "Stats":
         year_data = df[df['Year'] == selected_year]
 
 
-
         # Calculate monthly stats with chained balances
         def calculate_monthly_stats(year_data):
             monthly_stats = []
@@ -5806,7 +5902,6 @@ elif st.session_state.current_page == "Stats":
             prev_month_balance = starting_balance
             # Get all months in order
             months = year_data.groupby(['MonthNum', 'Month']).size().reset_index().sort_values('MonthNum')
-
 
             for _, (month_num, month_name, _) in months.iterrows():
                 month_data = year_data[year_data['MonthNum'] == month_num]
@@ -5821,22 +5916,21 @@ elif st.session_state.current_page == "Stats":
                 month_pnl = month_data['PnL'].sum()
                 ending_balance = starting_balance + month_pnl
 
-
-                #cash_flow = withdraw_deposit.sum()
+                # cash_flow = withdraw_deposit.sum()
 
                 # Calculate monthly percentage gain compared to previous month
                 if prev_month_balance != 0:
                     monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
-                    set_global("monthly_limit_left", starting_balance*0.08)
+                    set_global("monthly_limit_left", starting_balance * 0.08)
                 else:
                     monthly_pct_gain = 0
 
-                if(len(month_data[month_data['Result'] != 'BE'])>0):
+                if (len(month_data[month_data['Result'] != 'BE']) > 0):
                     winrate_month = round(len(winners) / len(month_data[month_data['Result'] != 'BE']) * 100, 1)
                     total_nobe = len(month_data[month_data['Result'] != 'BE'])
                 else:
                     winrate_month = 0
-                set_global("current_month",month_name)
+                set_global("current_month", month_name)
                 monthly_stats.append({
                     'MonthNum': month_num,
                     'Month': month_name,
@@ -5849,7 +5943,7 @@ elif st.session_state.current_page == "Stats":
                     'Starting_Balance': starting_balance,
                     'Ending_Trade_Balance': ending_balance,
                     'Total_PnL': month_pnl,
-                    #'Percentage_Gain': (month_pnl / starting_balance) * 100,
+                    # 'Percentage_Gain': (month_pnl / starting_balance) * 100,
                     'Monthly_Pct_Gain': monthly_pct_gain,
                     "Cash_Flow": cash_flow
 
@@ -5866,31 +5960,27 @@ elif st.session_state.current_page == "Stats":
                         'Total_Trades': df['Total_Trades'].sum(),
                         'BE_Trades': df['BE_Trades'].sum(),
                         'Wins': df['Wins'].sum(),
-                        'Win_Rate': round((df['Wins'].sum() / (df['Total_Trades'].sum()-df['BE_Trades'].sum())) * 100, 1) if df['Total_Trades'].sum() > 0 else 0,
+                        'Win_Rate': round((df['Wins'].sum() / (df['Total_Trades'].sum() - df['BE_Trades'].sum())) * 100,
+                                          1) if df['Total_Trades'].sum() > 0 else 0,
                         'Total_RR': df['Total_RR'].sum(),
                         'Avg_Winner_RR': df['Avg_Winner_RR'].mean(),  # Could also use weighted avg
                         'Starting_Balance': df.iloc[0]['Starting_Balance'],
                         'Ending_Trade_Balance': df.iloc[-1]['Ending_Trade_Balance'],
                         'Total_PnL': df['Total_PnL'].sum(),
-                        #'Monthly_Pct_Gain': round(abs((df.iloc[0]['Starting_Balance']-df.iloc[-1]['Ending_Trade_Balance'])/df.iloc[0]['Starting_Balance'])*100,1),  # Not meaningful as a total
-                        'Monthly_Pct_Gain': (df['Total_PnL'].sum())/(df.iloc[0]['Starting_Balance'])*100,
+                        # 'Monthly_Pct_Gain': round(abs((df.iloc[0]['Starting_Balance']-df.iloc[-1]['Ending_Trade_Balance'])/df.iloc[0]['Starting_Balance'])*100,1),  # Not meaningful as a total
+                        'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (df.iloc[0]['Starting_Balance']) * 100,
                         'Cash_Flow': df['Cash_Flow'].sum()
                     }
 
                 df = pd.concat([df, pd.DataFrame([summary_row])], ignore_index=True)
 
-
             return df
-            #return df
-            #return pd.DataFrame(monthly_stats)
-            #return pd.concat([df, pd.DataFrame([monthly_stats])], ignore_index=True)
-
-
-
+            # return df
+            # return pd.DataFrame(monthly_stats)
+            # return pd.concat([df, pd.DataFrame([monthly_stats])], ignore_index=True)
 
 
         monthly_stats = calculate_monthly_stats(year_data)
-
 
         # Format the table
         formatted_stats = monthly_stats[[
@@ -5928,8 +6018,6 @@ elif st.session_state.current_page == "Stats":
             .apply(highlight_summary, axis=1),
             use_container_width=True
         )
-
-
 
         # Breakeven trades info
         breakeven_count = len(year_data[year_data['Result'] == 'BE'])
@@ -5988,7 +6076,6 @@ elif st.session_state.current_page == "Guidelines":
     st.write("1_BNR_TPF -> 2_BNR || 1_BNR_TPF -> 2_BNR_TPF")
     st.write("2_BNR -> NO RETAKE || 2_BNR_TPF -> NO RETAKE")
 
-
 if st.session_state.current_page == "Entry Criteria Check":
     st.title("Entry Model Identification")
     # Define the question flow and animal database
@@ -6022,7 +6109,7 @@ if st.session_state.current_page == "Entry Criteria Check":
         "3_BNR_TPF": {
             "attempt": 2,
             "impulse_leg_length_3": True,
-            "impulse_leg_BOS_3":True,
+            "impulse_leg_BOS_3": True,
             "mid_attempt_leg_length": True,
             "left_leg_length": True,
             "TPF_Pattern_3": True
@@ -6072,7 +6159,7 @@ if st.session_state.current_page == "Entry Criteria Check":
                                     "text": "Whats the price position of the first attempt leg?",
                                     "options": ["<66", "\\>66"],
                                     "follow_up": {
-                                        "<66":{
+                                        "<66": {
                                             "id": "first_attempt_leg_length",
                                             "text": "Is the first attempt leg >= 0.99% for other pairs and >=1.49% for major pairs (EURUSD, GBPUSD, USDJPY) and >= 1.79% for Gold?",
                                             "options": ["Yes", "No"],
@@ -6099,7 +6186,7 @@ if st.session_state.current_page == "Entry Criteria Check":
                                             }  # Will complete survey after this
                                         },
                                     }
-                                     # Will complete survey after this
+                                    # Will complete survey after this
                                 },
 
                             }
@@ -6132,10 +6219,9 @@ if st.session_state.current_page == "Entry Criteria Check":
                                                     "text": "Is there a TPF pattern being formed, obvious TPF on the left or a trigger?",
                                                     "options": ["Yes", "No"],
                                                     "follow_up": None
-                                                    },
-                                                }
-                                            },
-
+                                                },
+                                            }
+                                        },
 
                                         "\\>66": {
                                             "id": "mid_attempt_leg_length_2",
@@ -6146,22 +6232,22 @@ if st.session_state.current_page == "Entry Criteria Check":
                                                     "id": "TPF_Pattern_3",
                                                     "text": "Is there a TPF pattern being formed, obvious TPF on the left or a trigger?",
                                                     "options": ["Yes", "No"],
-                                                        "follow_up": None
-                                                    },
-                                                      # Will complete survey after this
+                                                    "follow_up": None
+                                                },
+                                                # Will complete survey after this
 
-                                                                                                }
                                             }
-                                    # Will complete survey after this
-                                        },
+                                        }
+                                        # Will complete survey after this
+                                    },
 
-                                    }
-                                },
-                        "No": None  # Will complete survey after this
-                            }
+                                }
+                            },
+                            "No": None  # Will complete survey after this
+                        }
                     }
-                        },
-                }
+                },
+            }
         }
     ]
 

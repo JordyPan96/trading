@@ -5133,7 +5133,7 @@ elif st.session_state.current_page == "Trade Signal":
                         for order in st.session_state.in_trade[-moved_count:]:
                             update_workflow_status_in_sheets(order['timestamp'], 'Order Filled', order['selected_pair'])
                     else:
-                        st.warning(f"⚠️ Found {len(positions)} positions but no orders matched.")
+                        st.warning(f" Found {len(positions)} positions but no orders matched.")
 
 
             # Run the async function
@@ -5146,11 +5146,11 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Show connection status
     if st.session_state.metaapi_connected:
-        st.success(" Connected to trading account - Ready for trading")
+        st.success(" Connected to Trading Account - Ready for trading")
     else:
-        st.warning("⚠️ Not connected to trading account - Trades will not execute")
+        st.warning("⚠ Not Connected to Trading Account - Trades will not execute")
 
-    st.info("💡 Status changes are automatically saved to Active Opps workflow")
+    st.info(" Status changes are automatically saved to Active Opps workflow")
 
     st.markdown("---")
 

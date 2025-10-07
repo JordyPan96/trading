@@ -3689,7 +3689,7 @@ elif st.session_state.current_page == "Active Opps":
                                 st.info("No new records to add (all timestamps already exist)")
 
                     # Show preview of CSV data
-                    with st.expander("📋 Preview CSV Data (first 5 rows)"):
+                    with st.expander(" Preview CSV Data (first 5 rows)"):
                         st.dataframe(workflow_csv_data.head())
 
                     # Show data quality info
@@ -5169,14 +5169,14 @@ elif st.session_state.current_page == "Trade Signal":
         """)
     else:
         tab1, tab2, tab3, tab4 = st.tabs([
-            f"📋 Ready to Order ({len(st.session_state.ready_to_order)})",
-            f"⏳ Order Placed ({len(st.session_state.order_placed)})",
+            f" Ready to Order ({len(st.session_state.ready_to_order)})",
+            f" Order Placed ({len(st.session_state.order_placed)})",
             f" In Trade ({len(st.session_state.in_trade)})",
-            f"📈 Open Positions ({len(st.session_state.open_positions)})"
+            f" Open Positions ({len(st.session_state.open_positions)})"
         ])
 
         with tab1:
-            st.subheader("📋 Ready to Order")
+            st.subheader(" Ready to Order")
             st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
 
             if not st.session_state.ready_to_order:
@@ -5185,7 +5185,7 @@ elif st.session_state.current_page == "Trade Signal":
                 for i, signal in enumerate(st.session_state.ready_to_order):
                     unique_key = generate_unique_key(i, signal, "ready")
 
-                    with st.expander(f"🎯 {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}", expanded=True):
+                    with st.expander(f" {signal['selected_pair']} | {signal.get('timestamp', 'N/A')}", expanded=True):
                         col_instrument, col_execute = st.columns([2, 1])
 
                         with col_instrument:
@@ -5203,7 +5203,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                                 if validation_ok:
                                     direction = calculate_direction(signal.get('entry_price'), signal.get('exit_price'))
-                                    button_text = f"🎯 Execute {direction} Order"
+                                    button_text = f" Execute {direction} Order"
 
                                     if st.button(
                                             button_text,
@@ -5494,7 +5494,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.info(be_label)
 
                         with col_be_action:
-                            if st.button("🎯 Set to BE", key=f"be_{unique_key}", use_container_width=True,
+                            if st.button(" Set to BE", key=f"be_{unique_key}", use_container_width=True,
                                          help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
                                 import asyncio
 

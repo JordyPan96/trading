@@ -4127,12 +4127,27 @@ elif st.session_state.current_page == "Active Opps":
                         col9, col10 = st.columns(2)
                         with col9:
                             poi_options = ["Weekly", "2_Daily"]
-                            new_poi = st.selectbox(
+
+                            # Get existing POI value from record and map to dropdown options
+                            existing_poi = record.get('poi', '')
+                            poi_display = "Weekly"  # Default
+
+                            if existing_poi == "Weekly Structure" or existing_poi == "Weekly":
+                                poi_display = "Weekly"
+                            elif existing_poi == "Two_Daily Structure" or existing_poi == "2_Daily":
+                                poi_display = "2_Daily"
+                            elif existing_poi in poi_options:
+                                poi_display = existing_poi
+
+                            st.text_input(
                                 "POI",
-                                options=poi_options,
-                                index=0,
-                                key=f"poi_{unique_key_base}"
+                                value=poi_display,
+                                key=f"poi_{unique_key_base}",
+                                disabled=True,
+                                help="POI is set from the original record"
                             )
+                            # Store the value for the record
+                            new_poi = poi_display
 
                         with col10:
                             st.text_input(

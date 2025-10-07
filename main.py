@@ -2085,7 +2085,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     round((round(monthly_loss_limit, 2)+ round(monthly_actual_loss, 2)) / starting_capital * 100,
                           2)) + "%"]
             }).set_index("Metric")
-
+            st.markdown("<div style='margin-right: 100px;'></div>", unsafe_allow_html=True)
             st.table(result_df)
             next_risk = base_risk
 

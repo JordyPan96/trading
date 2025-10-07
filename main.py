@@ -5406,7 +5406,7 @@ elif st.session_state.current_page == "Trade Signal":
             success, message = sync_from_active_opps()
             if not success:
                 st.error(f"{message}")
-           
+
 
 
     # Auto-connect to MetaApi account
@@ -5514,12 +5514,12 @@ elif st.session_state.current_page == "Trade Signal":
             st.rerun()
 
     # Show connection status
-    if st.session_state.metaapi_connected:
-        st.success(" Connected to Trading Account - Ready for trading")
-    else:
+    if not st.session_state.metaapi_connected:
         st.warning("Not Connected to Trading Account - Trades will not execute")
 
-    st.info(" Status changes are automatically saved to Active Opps workflow")
+
+
+    #st.info(" Status changes are automatically saved to Active Opps workflow")
 
     st.markdown("---")
 

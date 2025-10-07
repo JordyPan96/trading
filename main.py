@@ -5358,18 +5358,7 @@ elif st.session_state.current_page == "Trade Signal":
                         if formatted_symbol != signal['selected_pair']:
                             st.info(f"**Trading Symbol:** {formatted_symbol} (Pepperstone format)")
 
-                        # Manual control buttons
-                        col_move, col_delete = st.columns(2)
-                        with col_move:
-                            if st.button("Move to Order Placed", key=f"manual_place_{unique_key}",
-                                         use_container_width=True):
-                                if handle_move_to_order_placed(i):
-                                    st.rerun()
-
-                        with col_delete:
-                            if st.button("Delete", key=f"delete_{unique_key}", use_container_width=True):
-                                if handle_delete_signal(i, 'ready_to_order'):
-                                    st.rerun()
+                        
 
         with tab2:
             st.subheader(" Order Placed")
@@ -5555,7 +5544,7 @@ elif st.session_state.current_page == "Trade Signal":
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")
-                        st.subheader("🛠 Modify Stop Loss Only")
+                        st.subheader("Modify Stop Loss Only")
 
                         col_sl, col_action = st.columns([1, 1])
 

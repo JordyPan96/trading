@@ -5658,19 +5658,20 @@ elif st.session_state.current_page == "Trade Signal":
                             st.info(be_label)
 
                         with col_be_action:
-                            # Generate unique confirmation key for BE
-                            be_confirm_key = f"confirm_be_{unique_key}"
+                            # Generate a simpler unique key for BE confirmation
+                            be_confirm_key = f"be_confirm_{i}"  # Use index instead of complex key
 
                             if st.session_state.get(be_confirm_key, False):
                                 # Show confirmation buttons
                                 col_confirm_be1, col_confirm_be2 = st.columns(2)
                                 with col_confirm_be1:
-                                    if st.button(
-                                            "CONFIRM Set to BE",
-                                            key=f"confirm_be_{unique_key}",
-                                            type="primary",
-                                            use_container_width=True,
-                                    ):
+                                    confirm_clicked = st.button(
+                                        "⚠️ CONFIRM Set to BE",
+                                        key=f"confirm_be_btn_{i}",
+                                        type="primary",
+                                        use_container_width=True,
+                                    )
+                                    if confirm_clicked:
                                         import asyncio
 
                                         with st.spinner("Setting to break-even..."):
@@ -5684,22 +5685,29 @@ elif st.session_state.current_page == "Trade Signal":
                                                 positions, error = asyncio.run(quick_get_positions())
                                                 if positions is not None:
                                                     st.session_state.open_positions = positions
-                                                st.session_state[be_confirm_key] = False
+                                                # Remove the confirmation state
+                                                if be_confirm_key in st.session_state:
+                                                    del st.session_state[be_confirm_key]
                                                 st.rerun()
                                             else:
                                                 st.error(message)
                                 with col_confirm_be2:
-                                    if st.button(
-                                            "✕ Cancel",
-                                            key=f"cancel_be_{unique_key}",
-                                            type="secondary",
-                                            use_container_width=True,
-                                    ):
-                                        st.session_state[be_confirm_key] = False
+                                    cancel_clicked = st.button(
+                                        "✕ Cancel",
+                                        key=f"cancel_be_btn_{i}",
+                                        type="secondary",
+                                        use_container_width=True,
+                                    )
+                                    if cancel_clicked:
+                                        # Remove the confirmation state
+                                        if be_confirm_key in st.session_state:
+                                            del st.session_state[be_confirm_key]
                                         st.rerun()
                             else:
-                                if st.button(" Set to BE", key=f"be_{unique_key}", use_container_width=True,
-                                             help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
+                                be_clicked = st.button(" Set to BE", key=f"be_btn_{i}", use_container_width=True,
+                                                       help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)")
+                                if be_clicked:
+                                    # Set confirmation state
                                     st.session_state[be_confirm_key] = True
                                     st.rerun()
 

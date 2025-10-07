@@ -4659,11 +4659,11 @@ elif st.session_state.current_page == "Trade Signal":
                         # FIX: ALWAYS use the actual position type from MetaApi, NEVER use calculated direction
                         position_type = position.get('type', '')
                         if position_type == 'POSITION_TYPE_SELL':
-                            actual_direction = "sell"  # lowercase to match your display
+                            actual_direction = "sell"
                         elif position_type == 'POSITION_TYPE_BUY':
-                            actual_direction = "buy"  # lowercase to match your display
+                            actual_direction = "buy"
                         else:
-                            actual_direction = "Unknown"  # fallback
+                            actual_direction = "Unknown"
 
                         print(
                             f"DEBUG: Position {position_symbol} has type: {position_type}, setting direction to: {actual_direction}")
@@ -4676,16 +4676,16 @@ elif st.session_state.current_page == "Trade Signal":
                             'position_size': order['position_size'],
                             'stop_pips': order['stop_pips'],
                             # USE ACTUAL POSITION PRICES, NOT ORDER PRICES
-                            'entry_price': position.get('openPrice'),  # Actual filled price
-                            'exit_price': position.get('stopLoss'),  # Actual stop loss
-                            'target_price': position.get('takeProfit'),  # Actual take profit
+                            'entry_price': safe_float(position.get('openPrice'), 0.0),  # Actual filled price
+                            'exit_price': safe_float(position.get('stopLoss'), 0.0),  # Actual stop loss
+                            'target_price': safe_float(position.get('takeProfit'), 0.0),  # Actual take profit
                             'fill_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                             'order_status': 'FILLED',
                             'position_id': position['id'],
-                            'current_price': position.get('currentPrice'),
-                            'current_sl': position.get('stopLoss'),
-                            'current_tp': position.get('takeProfit'),
-                            'profit': position.get('profit', 0),
+                            'current_price': safe_float(position.get('currentPrice'), 0.0),
+                            'current_sl': safe_float(position.get('stopLoss'), 0.0),
+                            'current_tp': safe_float(position.get('takeProfit'), 0.0),
+                            'profit': safe_float(position.get('profit', 0), 0.0),
                             'direction': actual_direction,  # USE ACTUAL DIRECTION FROM POSITION TYPE
                             'status': 'Order Filled'
                         }
@@ -4696,6 +4696,8 @@ elif st.session_state.current_page == "Trade Signal":
                         st.session_state.in_trade.append(trade_record)
                         moved_count += 1
                         moved_details.append(f"{order_symbol} ({order_volume} lots)")
+                        print(
+                            f"DEBUG: Updated prices for {order_symbol}: Entry={trade_record['entry_price']}, SL={trade_record['exit_price']}, TP={trade_record['target_price']}")
                         break
 
             return moved_count
@@ -4708,28 +4710,50 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def update_existing_in_trade_directions(positions):
-        """Update direction for existing In Trade records based on actual position types"""
+        """Update direction AND PRICES for existing In Trade records based on actual position types"""
         try:
             updated_count = 0
+            print(
+                f"DEBUG: Checking {len(positions)} positions against {len(st.session_state.in_trade)} in-trade records")
+
             for trade in st.session_state.in_trade:
                 trade_symbol = trade['selected_pair']
                 formatted_trade_symbol = format_symbol_for_pepperstone(trade_symbol)
 
+                print(f"DEBUG: Looking for match for trade: {trade_symbol} (formatted: {formatted_trade_symbol})")
+
                 # Find matching position
+                match_found = False
                 for position in positions:
                     position_symbol = position['symbol']
+                    position_type = position.get('type', 'UNKNOWN_TYPE')
 
-                    # Check symbol match (same logic as auto-move)
-                    symbol_match = (
-                            position_symbol == formatted_trade_symbol or
-                            position_symbol.endswith('.a') and position_symbol.replace('.a', '') == trade_symbol or
-                            trade_symbol.endswith('.a') and trade_symbol.replace('.a', '') == position_symbol or
-                            position_symbol == trade_symbol
-                    )
+                    # Check symbol match with multiple strategies
+                    symbol_match = False
+
+                    # Strategy 1: Direct match
+                    if position_symbol == formatted_trade_symbol:
+                        symbol_match = True
+                    # Strategy 2: Position has .a but trade doesn't
+                    elif position_symbol.endswith('.a') and position_symbol.replace('.a', '') == trade_symbol:
+                        symbol_match = True
+                    # Strategy 3: Trade has .a but position doesn't
+                    elif trade_symbol.endswith('.a') and trade_symbol.replace('.a', '') == position_symbol:
+                        symbol_match = True
+                    # Strategy 4: Both without .a but match
+                    elif position_symbol == trade_symbol:
+                        symbol_match = True
+                    # Strategy 5: Case-insensitive match
+                    elif position_symbol.upper() == trade_symbol.upper():
+                        symbol_match = True
+                    elif position_symbol.upper() == formatted_trade_symbol.upper():
+                        symbol_match = True
 
                     if symbol_match:
-                        # UPDATE: Always use actual position type, never keep old direction
-                        position_type = position.get('type', '')
+                        match_found = True
+                        print(f"DEBUG: MATCH FOUND! {trade_symbol} <-> {position_symbol}")
+
+                        # Determine direction from position type
                         if position_type == 'POSITION_TYPE_SELL':
                             new_direction = "sell"
                         elif position_type == 'POSITION_TYPE_BUY':
@@ -4737,17 +4761,63 @@ elif st.session_state.current_page == "Trade Signal":
                         else:
                             new_direction = "Unknown"
 
-                        # Always update to match the actual position
-                        if trade.get('direction') != new_direction:
+                        # Get actual prices from position
+                        actual_entry_price = safe_float(position.get('openPrice'), 0.0)
+                        actual_sl_price = safe_float(position.get('stopLoss'), 0.0)
+                        actual_tp_price = safe_float(position.get('takeProfit'), 0.0)
+
+                        # Check if any updates are needed
+                        needs_update = False
+
+                        # Check direction
+                        old_direction = trade.get('direction', 'None')
+                        if old_direction != new_direction:
                             trade['direction'] = new_direction
-                            updated_count += 1
+                            needs_update = True
                             print(
-                                f"DEBUG: Updated {trade_symbol} direction from '{trade.get('direction')}' to '{new_direction}' (position type: {position_type})")
+                                f"DEBUG: Updated {trade_symbol} direction from '{old_direction}' to '{new_direction}'")
+
+                        # Check entry price
+                        old_entry = safe_float(trade.get('entry_price'), 0.0)
+                        if abs(old_entry - actual_entry_price) > 0.00001:  # Small tolerance for float comparison
+                            trade['entry_price'] = actual_entry_price
+                            needs_update = True
+                            print(f"DEBUG: Updated {trade_symbol} entry price from {old_entry} to {actual_entry_price}")
+
+                        # Check stop loss (exit_price)
+                        old_sl = safe_float(trade.get('exit_price'), 0.0)
+                        if abs(old_sl - actual_sl_price) > 0.00001:
+                            trade['exit_price'] = actual_sl_price
+                            needs_update = True
+                            print(f"DEBUG: Updated {trade_symbol} stop loss from {old_sl} to {actual_sl_price}")
+
+                        # Check take profit (target_price)
+                        old_tp = safe_float(trade.get('target_price'), 0.0)
+                        if abs(old_tp - actual_tp_price) > 0.00001:
+                            trade['target_price'] = actual_tp_price
+                            needs_update = True
+                            print(f"DEBUG: Updated {trade_symbol} take profit from {old_tp} to {actual_tp_price}")
+
+                        # Also update current prices
+                        trade['current_price'] = safe_float(position.get('currentPrice'), 0.0)
+                        trade['current_sl'] = actual_sl_price
+                        trade['current_tp'] = actual_tp_price
+                        trade['profit'] = safe_float(position.get('profit', 0), 0.0)
+
+                        if needs_update:
+                            updated_count += 1
                         break
 
+                if not match_found:
+                    print(f"DEBUG: NO MATCH found for trade: {trade_symbol}")
+
+            print(f"DEBUG: Updated {updated_count} trade records (direction and prices)")
             return updated_count
+
         except Exception as e:
             print(f"Update existing in-trade directions error: {e}")
+            import traceback
+            traceback.print_exc()
             return 0
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
         """Fast order check with minimal overhead"""

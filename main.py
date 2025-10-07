@@ -5285,7 +5285,7 @@ elif st.session_state.current_page == "Trade Signal":
                 st.rerun()
 
     with col_conn2:
-        if st.button(" View Active Opps", key="view_opps", use_container_width=True):
+        if st.button(" View Active Opportunities", key="view_opps", use_container_width=True):
             st.session_state.current_page = "Active Opps"
             st.rerun()
 

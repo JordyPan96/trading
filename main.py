@@ -4039,7 +4039,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.write(f"**Variance:** {existing_variance}")
 
                         # Action buttons for Order Filled stage
-                        col_update_only, col_close, col_back = st.columns([1, 1, 1])
+                        col_update_only, col_back, col_close  = st.columns([1, 1, 1])
 
                         with col_update_only:
                             if st.button("Update Record", key=f"filled_update_{unique_key_base}"):

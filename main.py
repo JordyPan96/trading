@@ -3198,8 +3198,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         # Determine if button should be disabled
                         add_order_disabled = False
 
-                        if st.button(" Add Order", type="secondary", use_container_width=True,
-                                     disabled=add_order_disabled):
+                        if st.button(" Add Order", type="secondary", disabled=add_order_disabled):
                             # Check if Stop Loss is 0 or missing
                             if stop_pips is None or stop_pips == 0:
                                 st.error("Cannot add order: Stop Loss is required and cannot be 0!")
@@ -3257,11 +3256,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                         else:
                                             st.error("Order added locally but failed to save to cloud!")
 
-                        if st.button("View Active Opps"):
+                        # Add View Active Opps button below the Add Order button (same size)
+                        if st.button("📋 View Active Opps"):
                             st.session_state.current_page = "Active Opps"
                             st.rerun()
-
-
 
 
                     elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
@@ -3270,15 +3268,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         container.metric(entry_title, entry_text)
 
-                        container.metric(exit_title, exit_title)
+                        container.metric(exit_title, exit_text)
 
                         # Determine if button should be disabled
 
                         add_order_disabled = False
 
-                        if st.button(" Add Order", type="secondary", use_container_width=True,
-
-                                     disabled=add_order_disabled):
+                        if st.button(" Add Order", type="secondary", disabled=add_order_disabled):
 
                             # Check if Stop Loss is 0 or missing
 
@@ -3382,10 +3378,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                             st.error("Order added locally but failed to save to cloud!")
 
-                        # Add View Active Opps button below the Add Order button
+                        # Add View Active Opps button below the Add Order button (same size)
 
-                        if st.button("View Active Opps"):
+                        if st.button("📋 View Active Opps"):
                             st.session_state.current_page = "Active Opps"
+
                             st.rerun()
 
                         st.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)

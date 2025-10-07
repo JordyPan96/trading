@@ -4133,12 +4133,9 @@ elif st.session_state.current_page == "Active Opps":
 
                         # Use the actual values (either from matching trade or existing record)
                         final_direction = st.session_state.saved_records[record_index].get('direction', 'Unknown')
-                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'),
-                                                       0.0)
-                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'),
-                                                      0.0)
-                        final_target_price = safe_float(
-                            st.session_state.saved_records[record_index].get('target_price'), 0.0)
+                        final_entry_price = safe_float(st.session_state.saved_records[record_index].get('entry_price'), 0.0)
+                        final_exit_price = safe_float(st.session_state.saved_records[record_index].get('exit_price'), 0.0)
+                        final_target_price = safe_float(st.session_state.saved_records[record_index].get('target_price'), 0.0)
 
                         # KEEP ORIGINAL DESIGN - JUST REPLACE FIELDS WITH SYNCED VALUES
                         col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
@@ -4154,9 +4151,8 @@ elif st.session_state.current_page == "Active Opps":
                             entry_display = final_entry_price if final_entry_price > 0 else "Waiting for fill..."
                             st.text_input(
                                 "Entry Price",
-                                value=f"{entry_display:.5f}" if isinstance(entry_display,
-                                                                           (int, float)) else entry_display,
-                                key=f"entry_{unique_key_base}",
+                                value=f"{entry_display:.5f}" if isinstance(entry_display, (int, float)) else entry_display,
+                                key=f"entry_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Actual filled price from trade execution"
                             )
@@ -4167,7 +4163,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.text_input(
                                 "Exit Price",
                                 value=f"{exit_display:.5f}" if isinstance(exit_display, (int, float)) else exit_display,
-                                key=f"exit_{unique_key_base}",
+                                key=f"exit_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Actual stop loss from trade execution"
                             )
@@ -4177,9 +4173,8 @@ elif st.session_state.current_page == "Active Opps":
                             target_display = final_target_price if final_target_price > 0 else "Waiting for fill..."
                             st.text_input(
                                 "Target Price",
-                                value=f"{target_display:.5f}" if isinstance(target_display,
-                                                                            (int, float)) else target_display,
-                                key=f"target_{unique_key_base}",
+                                value=f"{target_display:.5f}" if isinstance(target_display, (int, float)) else target_display,
+                                key=f"target_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Actual take profit from trade execution"
                             )
@@ -4202,7 +4197,7 @@ elif st.session_state.current_page == "Active Opps":
                             st.text_input(
                                 "Direction",
                                 value=direction_display,
-                                key=f"direction_{unique_key_base}",
+                                key=f"direction_filled_{unique_key_base}",  # CHANGED: Added "_filled" to make unique
                                 disabled=True,
                                 help="Direction is automatically updated from actual trade data"
                             )
@@ -4319,8 +4314,7 @@ elif st.session_state.current_page == "Active Opps":
                                             if current_trade_data is not None and not current_trade_data.empty:
                                                 # Ensure only the specified columns exist in current data
                                                 required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
-                                                                    'POI', 'Strategy', 'Variance', 'Result', 'RR',
-                                                                    'PnL',
+                                                                    'POI', 'Strategy', 'Variance', 'Result', 'RR', 'PnL',
                                                                     'Withdrawal_Deposit', 'PROP_Pct']
 
                                                 # Add missing columns if they don't exist

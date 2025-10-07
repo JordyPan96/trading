@@ -3607,7 +3607,7 @@ elif st.session_state.current_page == "Active Opps":
                     st.info("Data is already up to date")
 
     with col_sync2:
-        if st.button("📤 View Trade Signals", key="view_signals", use_container_width=True):
+        if st.button(" View Trade Signals", key="view_signals", use_container_width=True):
             st.session_state.current_page = "Trade Signal"
             st.rerun()
 
@@ -3753,14 +3753,14 @@ elif st.session_state.current_page == "Active Opps":
             csv_data = csv_data[column_order]
             csv = csv_data.to_csv(index=False)
             st.download_button(
-                "📤 Export CSV",
+                " Export CSV",
                 csv,
                 f"workflow_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 "text/csv",
                 key="export_csv"
             )
         else:
-            st.button("📤 Export CSV", disabled=True, key="export_disabled")
+            st.button(" Export CSV", disabled=True, key="export_disabled")
 
     if not st.session_state.saved_records:
         st.info(

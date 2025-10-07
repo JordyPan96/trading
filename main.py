@@ -4084,6 +4084,31 @@ elif st.session_state.current_page == "Active Opps":
 
                     # ORDER FILLED STAGE ACTIONS
                     else:
+                        # AUTO-UPDATE DIRECTION FROM IN TRADE DATA
+                        # First, try to find matching In Trade record from Trade Signals page
+                        current_direction = record.get('direction', 'Unknown')
+
+                        # Look for matching record in in_trade session state
+                        matching_trade = None
+                        for trade in st.session_state.get('in_trade', []):
+                            if (trade.get('selected_pair') == record['selected_pair'] and
+                                    trade.get('timestamp') == record['timestamp']):
+                                matching_trade = trade
+                                break
+
+                        # If found matching trade, update direction
+                        if matching_trade:
+                            actual_direction = matching_trade.get('direction', 'Unknown')
+                            if actual_direction != current_direction:
+                                # Update the direction in the saved record
+                                st.session_state.saved_records[record_index]['direction'] = actual_direction
+                                # Save to Google Sheets
+                                save_workflow_to_sheets(st.session_state.saved_records)
+                                st.rerun()
+
+                        # Use the actual direction (either from matching trade or existing record)
+                        final_direction = st.session_state.saved_records[record_index].get('direction', 'Unknown')
+
                         # Additional fields for Order Filled stage
                         col5, col6, col7, col8 = st.columns(4)
 
@@ -4097,13 +4122,17 @@ elif st.session_state.current_page == "Active Opps":
                             )
 
                         with col6:
-                            direction_options = ["buy", "sell"]
-                            new_direction = st.selectbox(
+                            # DISABLED DIRECTION FIELD - Auto-updated from In Trade data
+                            direction_display = final_direction if final_direction != "Unknown" else "Waiting for trade data..."
+                            st.text_input(
                                 "Direction",
-                                options=direction_options,
-                                index=0,
-                                key=f"direction_{unique_key_base}"
+                                value=direction_display,
+                                key=f"direction_{unique_key_base}",
+                                disabled=True,  # Disable user editing
+                                help="Direction is automatically updated from actual trade data"
                             )
+                            # Hidden field to store the actual direction value
+                            st.session_state.saved_records[record_index]['direction'] = final_direction
 
                         with col7:
                             new_rr = st.number_input(
@@ -4152,17 +4181,27 @@ elif st.session_state.current_page == "Active Opps":
                             existing_variance = record.get('Variances', 'Not set')
                             st.write(f"**Variance:** {existing_variance}")
 
+                        # Show auto-update status
+                        if matching_trade:
+                            if final_direction != "Unknown":
+                                st.success(
+                                    f"✓ Direction automatically set to: {final_direction.upper()} (from trade data)")
+                            else:
+                                st.warning("⚠ Waiting for direction data from trade...")
+                        else:
+                            st.info("ℹ No matching trade found. Direction will update when trade is detected.")
+
                         # Action buttons for Order Filled stage
                         col_update_only, col_back, col_close = st.columns([1, 1, 1])
 
                         with col_update_only:
                             if st.button("Update Record", key=f"filled_update_{unique_key_base}"):
-                                # Update all fields including the new ones
+                                # Update all fields including the new ones (except direction - it's auto-updated)
                                 st.session_state.saved_records[record_index]['entry_price'] = entry_price
                                 st.session_state.saved_records[record_index]['exit_price'] = exit_price
                                 st.session_state.saved_records[record_index]['target_price'] = target_price
                                 st.session_state.saved_records[record_index]['result'] = new_result
-                                st.session_state.saved_records[record_index]['direction'] = new_direction
+                                # Direction is NOT updated here - it's auto-updated from trade data
                                 st.session_state.saved_records[record_index]['rr'] = new_rr
                                 st.session_state.saved_records[record_index]['pnl'] = new_pnl
                                 st.session_state.saved_records[record_index]['poi'] = new_poi
@@ -4176,7 +4215,7 @@ elif st.session_state.current_page == "Active Opps":
                             if st.button("Finalize & Close Trade", key=f"filled_close_{unique_key_base}",
                                          type="primary"):
                                 # Validate required fields
-                                if (new_result and new_direction and new_poi and
+                                if (new_result and final_direction and new_poi and
                                         new_rr is not None and new_pnl is not None):
 
                                     # Get existing Trend Position and Variance from the record
@@ -4192,7 +4231,7 @@ elif st.session_state.current_page == "Active Opps":
                                         completed_trade = {
                                             'Date': datetime.now().strftime("%Y-%m-%d"),
                                             'Symbol': record['selected_pair'],
-                                            'Direction': new_direction,
+                                            'Direction': final_direction,  # Use the auto-updated direction
                                             'Trend Position': existing_trend_position,
                                             'POI': new_poi,
                                             'Strategy': record['risk_multiplier'],

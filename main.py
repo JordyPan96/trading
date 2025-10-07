@@ -5405,7 +5405,7 @@ elif st.session_state.current_page == "Trade Signal":
         with st.spinner(" Quick syncing from Active Opps..."):
             success, message = sync_from_active_opps()
             if success:
-                st.success(f"Sync Complete")
+                st.success(f"")
             else:
                 st.error(f"{message}")
 

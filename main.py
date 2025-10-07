@@ -3929,14 +3929,14 @@ elif st.session_state.current_page == "Active Opps":
                                 if handle_update_record(record_index, entry_price, exit_price, target_price):
                                     st.rerun()
 
-                        with col_move:
-                            if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
-                                if handle_move_record(record_index, 'Order Placed'):
-                                    st.rerun()
-
                         with col_spec:  # NEW: Move to Speculation button
                             if st.button("Move to Speculation", key=f"move_spec_{unique_key_base}"):
                                 if handle_move_record(record_index, 'Speculation'):
+                                    st.rerun()
+
+                        with col_move:
+                            if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
+                                if handle_move_record(record_index, 'Order Placed'):
                                     st.rerun()
 
                         with col_delete:

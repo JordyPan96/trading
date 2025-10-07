@@ -701,11 +701,11 @@ with st.sidebar.expander("⚙Session Management"):
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("💾 Save Session"):
+        if st.button(" Save Session"):
             save_persistent_session()
             st.success("Saved!")
     with col2:
-        if st.button("🔄 Clear Session"):
+        if st.button(" Clear Session"):
             clear_persistent_session()
             st.session_state.clear()
             st.rerun()
@@ -716,7 +716,7 @@ starting_capital = 50000
 if st.session_state.current_page == "Home":
     # AUTOMATIC CLOUD SYNC ON APP LOAD
     if 'auto_sync_done' not in st.session_state:
-        with st.spinner("🔄 Syncing with cloud..."):
+        with st.spinner(" Syncing with cloud..."):
             df = load_data_from_sheets()
             if df is not None and not df.empty:
                 st.session_state.uploaded_data = df
@@ -868,7 +868,7 @@ if st.session_state.current_page == "Home":
                     st.info("No data found in cloud storage")
 
         with col2:
-            if st.button("💾 Save to Cloud"):
+            if st.button(" Save to Cloud"):
                 if st.session_state.uploaded_data is not None:
                     # Clean data before saving to fix JSON serialization issues
                     data_to_save = clean_data_for_google_sheets(st.session_state.uploaded_data)
@@ -1140,10 +1140,10 @@ if st.session_state.current_page == "Home":
         # Row Actions
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Refresh Grid"):
+            if st.button(" Refresh Grid"):
                 st.rerun()
         with col2:
-            if st.button("💾 Save All Changes"):
+            if st.button(" Save All Changes"):
                 if st.session_state.uploaded_data is not None:
                     try:
                         # Clean data before saving to fix JSON serialization issues
@@ -1185,7 +1185,7 @@ if st.session_state.current_page == "Home":
             if len(grid_response['data']) < len(current_data):
                 st.success(f"🔍 Filter active: Showing {len(grid_response['data'])} of {len(current_data)} rows")
             else:
-                st.info("📊 Showing complete dataset")
+                st.info(" Showing complete dataset")
 
         except Exception as e:
             st.error(f"Error processing grid response: {str(e)}")
@@ -3197,7 +3197,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         # Determine if button should be disabled
                         add_order_disabled = False
 
-                        if st.button("💾 Add Order", type="secondary", use_container_width=False,
+                        if st.button(" Add Order", type="secondary", use_container_width=False,
                                      disabled=add_order_disabled):
                             # Check if Stop Loss is 0 or missing
                             if stop_pips is None or stop_pips == 0:
@@ -3263,7 +3263,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         # Determine if button should be disabled
                         add_order_disabled = False
 
-                        if st.button("💾 Add Order", type="secondary", use_container_width=False,
+                        if st.button(" Add Order", type="secondary", use_container_width=False,
                                      disabled=add_order_disabled):
                             # Check if Stop Loss is 0 or missing
                             if stop_pips is None or stop_pips == 0:
@@ -3548,7 +3548,7 @@ elif st.session_state.current_page == "Active Opps":
     # AUTO-RELOAD ON EVERY PAGE LOAD
     should_reload = check_and_reload_from_sheets()
     if should_reload:
-        with st.spinner("🔄 Reloading updated data from cloud..."):
+        with st.spinner(" Reloading updated data from cloud..."):
             workflow_data = load_workflow_from_sheets()
             if not workflow_data.empty:
                 st.session_state.saved_records = workflow_data.to_dict('records')
@@ -3558,7 +3558,7 @@ elif st.session_state.current_page == "Active Opps":
 
     # INITIAL LOAD
     if not st.session_state.saved_records:
-        with st.spinner("🔄 Loading data from cloud..."):
+        with st.spinner(" Loading data from cloud..."):
             workflow_data = load_workflow_from_sheets()
             if not workflow_data.empty:
                 st.session_state.saved_records = workflow_data.to_dict('records')
@@ -3590,7 +3590,7 @@ elif st.session_state.current_page == "Active Opps":
     col_sync1, col_sync2, col_sync3 = st.columns(3)
 
     with col_sync1:
-        if st.button("🔄 Check for Updates", key="check_updates", use_container_width=True):
+        if st.button(" Check for Updates", key="check_updates", use_container_width=True):
             with st.spinner("Checking for updates..."):
                 should_reload = check_and_reload_from_sheets()
                 if should_reload:
@@ -3734,7 +3734,7 @@ elif st.session_state.current_page == "Active Opps":
                     st.error("No data found")
 
     with col2:
-        if st.button("🔄 Sync Trade Signals", key="sync_signals"):
+        if st.button(" Sync Trade Signals", key="sync_signals"):
             success, message = sync_with_trade_signals()
             if success:
                 st.session_state.last_action = "synced_signals"
@@ -4755,7 +4755,7 @@ elif st.session_state.current_page == "Trade Signal":
     def update_workflow_status_in_sheets(timestamp, new_status, instrument_name=None):
         """Update a specific record's status in Google Sheets workflow using instrument name + timestamp for precise matching"""
         try:
-            print(f"🔄 Updating status for {instrument_name} (timestamp: {timestamp}) to {new_status}")
+            print(f" Updating status for {instrument_name} (timestamp: {timestamp}) to {new_status}")
 
             # Load current workflow data
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
@@ -4796,7 +4796,7 @@ elif st.session_state.current_page == "Trade Signal":
                 return False, f"Record not found: {instrument_name} at {timestamp}"
 
             # Save updated data back to sheets
-            print("💾 Saving updated workflow to Google Sheets...")
+            print(" Saving updated workflow to Google Sheets...")
             success = save_data_to_sheets(workflow_df, sheet_name="Trade", worksheet_name="Workflow")
 
             if success:
@@ -4822,7 +4822,7 @@ elif st.session_state.current_page == "Trade Signal":
             timestamp = signal['timestamp']
             symbol = signal['selected_pair']
 
-            print(f"🔄 Moving {symbol} to Order Placed (timestamp: {timestamp})")
+            print(f" Moving {symbol} to Order Placed (timestamp: {timestamp})")
 
             # First update the status in Google Sheets WITH INSTRUMENT NAME
             success, message = update_workflow_status_in_sheets(timestamp, 'Order Placed', symbol)
@@ -4872,7 +4872,7 @@ elif st.session_state.current_page == "Trade Signal":
             timestamp = order['timestamp']
             symbol = order['selected_pair']
 
-            print(f"🔄 Moving {symbol} to In Trade (timestamp: {timestamp})")
+            print(f" Moving {symbol} to In Trade (timestamp: {timestamp})")
 
             # First update the status in Google Sheets WITH INSTRUMENT NAME
             success, message = update_workflow_status_in_sheets(timestamp, 'Order Filled', symbol)
@@ -4920,7 +4920,7 @@ elif st.session_state.current_page == "Trade Signal":
             timestamp = order['timestamp']
             symbol = order['selected_pair']
 
-            print(f"🔄 Moving {symbol} back to Ready (timestamp: {timestamp})")
+            print(f" Moving {symbol} back to Ready (timestamp: {timestamp})")
 
             # First update the status in Google Sheets WITH INSTRUMENT NAME
             success, message = update_workflow_status_in_sheets(timestamp, 'Order Ready', symbol)
@@ -5040,7 +5040,7 @@ elif st.session_state.current_page == "Trade Signal":
 
     # Quick sync on page load
     if not st.session_state.ready_to_order and not st.session_state.order_placed and not st.session_state.in_trade:
-        with st.spinner("🔄 Quick syncing from Active Opps..."):
+        with st.spinner(" Quick syncing from Active Opps..."):
             success, message = sync_from_active_opps()
             if success:
                 st.success(f"Sync Complete")
@@ -5100,7 +5100,7 @@ elif st.session_state.current_page == "Trade Signal":
     col_conn1, col_conn2, col_conn3, col_conn4 = st.columns(4)
 
     with col_conn1:
-        if st.button("🔄 Sync from Opps", key="sync_from_opps", use_container_width=True):
+        if st.button(" Sync from Opps", key="sync_from_opps", use_container_width=True):
             with st.spinner("Syncing from Active Opps..."):
                 success, message = sync_from_active_opps()
                 if success:
@@ -5110,12 +5110,12 @@ elif st.session_state.current_page == "Trade Signal":
                 st.rerun()
 
     with col_conn2:
-        if st.button("📊 View Active Opps", key="view_opps", use_container_width=True):
+        if st.button(" View Active Opps", key="view_opps", use_container_width=True):
             st.session_state.current_page = "Active Opps"
             st.rerun()
 
     with col_conn3:
-        if st.button("🔄 Refresh Positions", key="refresh_positions", use_container_width=True):
+        if st.button(" Refresh Positions", key="refresh_positions", use_container_width=True):
             import asyncio
 
 
@@ -5141,7 +5141,7 @@ elif st.session_state.current_page == "Trade Signal":
             st.rerun()
 
     with col_conn4:
-        if st.button("🔄 Refresh Data", key="refresh_data", use_container_width=True):
+        if st.button(" Refresh Data", key="refresh_data", use_container_width=True):
             st.rerun()
 
     # Show connection status
@@ -5292,7 +5292,7 @@ elif st.session_state.current_page == "Trade Signal":
                         col_check, col_move, col_back = st.columns(3)
 
                         with col_check:
-                            if st.button("🔄 Quick Check", key=f"check_{unique_key}", use_container_width=True):
+                            if st.button(" Quick Check", key=f"check_{unique_key}", use_container_width=True):
                                 import asyncio
 
                                 with st.spinner("Quick checking..."):
@@ -5364,23 +5364,23 @@ elif st.session_state.current_page == "Trade Signal":
 
                         col_close, col_back, col_delete = st.columns(3)
                         with col_close:
-                            if st.button("📊 Close Trade", key=f"close_{unique_key}", type="primary",
+                            if st.button(" Close Trade", key=f"close_{unique_key}", type="primary",
                                          use_container_width=True):
                                 if handle_delete_signal(i, 'in_trade'):
                                     st.rerun()
 
                         with col_back:
-                            if st.button("↩️ Back to Placed", key=f"back_{unique_key}", use_container_width=True):
+                            if st.button(" Back to Placed", key=f"back_{unique_key}", use_container_width=True):
                                 if handle_move_back_to_ready(i):
                                     st.rerun()
 
                         with col_delete:
-                            if st.button("🗑️ Delete", key=f"delete_trade_{unique_key}", use_container_width=True):
+                            if st.button(" Delete", key=f"delete_trade_{unique_key}", use_container_width=True):
                                 if handle_delete_signal(i, 'in_trade'):
                                     st.rerun()
 
         with tab4:
-            st.subheader("📈 Open Positions")
+            st.subheader(" Open Positions")
             st.info("Live positions from MT5 account.")
 
             if not st.session_state.open_positions:
@@ -5391,7 +5391,7 @@ elif st.session_state.current_page == "Trade Signal":
                                                      {'selected_pair': position['symbol'], 'timestamp': position['id']},
                                                      "position")
 
-                    with st.expander(f"📈 {position['symbol']} | {position['type']} | {position['volume']} lots",
+                    with st.expander(f" {position['symbol']} | {position['type']} | {position['volume']} lots",
                                      expanded=True):
                         col1, col2, col3 = st.columns([2, 1, 1])
 
@@ -5443,7 +5443,7 @@ elif st.session_state.current_page == "Trade Signal":
                             # Align the Update Stop Loss button with the input field
                             st.write("")  # Add some vertical spacing for alignment
                             st.write("")  # Add some vertical spacing for alignment
-                            if st.button("💾 Update Stop Loss", key=f"update_{unique_key}", type="primary",
+                            if st.button(" Update Stop Loss", key=f"update_{unique_key}", type="primary",
                                          use_container_width=True):
                                 import asyncio
 
@@ -5954,7 +5954,7 @@ if st.session_state.current_page == "Entry Criteria Check":
         st.write("### Your Answers:")
         st.json(st.session_state.answers)
 
-        if st.button("🔄 Start New Analysis"):
+        if st.button(" Start New Analysis"):
             reset_survey()
             st.rerun()
 

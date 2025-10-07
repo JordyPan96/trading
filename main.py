@@ -3257,10 +3257,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                         else:
                                             st.error("Order added locally but failed to save to cloud!")
 
-                        # Add View Active Opps button below the Add Order button
-                        if st.button("View Active Opps", use_container_width=True):
+                        if st.button("View Active Opps"):
                             st.session_state.current_page = "Active Opps"
                             st.rerun()
+
 
 
 
@@ -3270,7 +3270,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         container.metric(entry_title, entry_text)
 
-                        container.metric(exit_title, exit_text)
+                        container.metric(exit_title, exit_title)
 
                         # Determine if button should be disabled
 
@@ -3384,9 +3384,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         # Add View Active Opps button below the Add Order button
 
-                        if st.button("View Active Opps", use_container_width=True):
+                        if st.button("View Active Opps"):
                             st.session_state.current_page = "Active Opps"
-
                             st.rerun()
 
                         st.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)

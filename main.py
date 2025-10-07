@@ -4201,7 +4201,10 @@ elif st.session_state.current_page == "Trade Signal":
         # Clear any existing confirmation states
         keys_to_remove = []
         for key in st.session_state.keys():
-            if key.startswith('confirm_execute_') or key.startswith('confirm_back_ready_'):
+            if (key.startswith('confirm_execute_') or
+                key.startswith('confirm_back_ready_') or
+                key.startswith('confirm_update_sl_') or
+                key.startswith('confirm_be_')):
                 keys_to_remove.append(key)
 
         for key in keys_to_remove:
@@ -5575,27 +5578,53 @@ elif st.session_state.current_page == "Trade Signal":
                             )
 
                         with col_action:
-                            # Align the Update Stop Loss button with the input field
-                            st.write("")  # Add some vertical spacing for alignment
-                            st.write("")  # Add some vertical spacing for alignment
-                            if st.button(" Update Stop Loss", key=f"update_{unique_key}", type="primary",
-                                         use_container_width=True):
-                                import asyncio
+                            # Generate unique confirmation key for update SL
+                            update_sl_key = f"confirm_update_sl_{unique_key}"
 
-                                with st.spinner("Updating stop loss..."):
-                                    success, message = asyncio.run(modify_position_sl(
-                                        position['id'],
-                                        new_sl
-                                    ))
-                                    if success:
-                                        st.success(message)
-                                        # Refresh positions
-                                        positions, error = asyncio.run(quick_get_positions())
-                                        if positions is not None:
-                                            st.session_state.open_positions = positions
+                            if st.session_state.get(update_sl_key, False):
+                                # Show confirmation buttons
+                                col_confirm_sl1, col_confirm_sl2 = st.columns(2)
+                                with col_confirm_sl1:
+                                    if st.button(
+                                            "CONFIRM Update SL",
+                                            key=f"confirm_update_{unique_key}",
+                                            type="primary",
+                                            use_container_width=True,
+                                    ):
+                                        import asyncio
+
+                                        with st.spinner("Updating stop loss..."):
+                                            success, message = asyncio.run(modify_position_sl(
+                                                position['id'],
+                                                new_sl
+                                            ))
+                                            if success:
+                                                st.success(message)
+                                                # Refresh positions
+                                                positions, error = asyncio.run(quick_get_positions())
+                                                if positions is not None:
+                                                    st.session_state.open_positions = positions
+                                                st.session_state[update_sl_key] = False
+                                                st.rerun()
+                                            else:
+                                                st.error(message)
+                                with col_confirm_sl2:
+                                    if st.button(
+                                            "✕ Cancel",
+                                            key=f"cancel_update_{unique_key}",
+                                            type="secondary",
+                                            use_container_width=True,
+                                    ):
+                                        st.session_state[update_sl_key] = False
                                         st.rerun()
-                                    else:
-                                        st.error(message)
+                            else:
+                                # Align the Update Stop Loss button with the input field
+                                st.write("")  # Add some vertical spacing for alignment
+                                st.write("")  # Add some vertical spacing for alignment
+                                if st.button(" Update Stop Loss", key=f"update_{unique_key}", type="primary",
+                                             use_container_width=True):
+                                    st.session_state[update_sl_key] = True
+                                    st.rerun()
 
                         # SET TO BREAK-EVEN BUTTON
                         col_be, col_be_action = st.columns([1, 1])
@@ -5629,24 +5658,50 @@ elif st.session_state.current_page == "Trade Signal":
                             st.info(be_label)
 
                         with col_be_action:
-                            if st.button(" Set to BE", key=f"be_{unique_key}", use_container_width=True,
-                                         help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
-                                import asyncio
+                            # Generate unique confirmation key for BE
+                            be_confirm_key = f"confirm_be_{unique_key}"
 
-                                with st.spinner("Setting to break-even..."):
-                                    success, message = asyncio.run(modify_position_sl(
-                                        position['id'],
-                                        be_price
-                                    ))
-                                    if success:
-                                        st.success(message)
-                                        # Refresh positions
-                                        positions, error = asyncio.run(quick_get_positions())
-                                        if positions is not None:
-                                            st.session_state.open_positions = positions
+                            if st.session_state.get(be_confirm_key, False):
+                                # Show confirmation buttons
+                                col_confirm_be1, col_confirm_be2 = st.columns(2)
+                                with col_confirm_be1:
+                                    if st.button(
+                                            "CONFIRM Set to BE",
+                                            key=f"confirm_be_{unique_key}",
+                                            type="primary",
+                                            use_container_width=True,
+                                    ):
+                                        import asyncio
+
+                                        with st.spinner("Setting to break-even..."):
+                                            success, message = asyncio.run(modify_position_sl(
+                                                position['id'],
+                                                be_price
+                                            ))
+                                            if success:
+                                                st.success(message)
+                                                # Refresh positions
+                                                positions, error = asyncio.run(quick_get_positions())
+                                                if positions is not None:
+                                                    st.session_state.open_positions = positions
+                                                st.session_state[be_confirm_key] = False
+                                                st.rerun()
+                                            else:
+                                                st.error(message)
+                                with col_confirm_be2:
+                                    if st.button(
+                                            "✕ Cancel",
+                                            key=f"cancel_be_{unique_key}",
+                                            type="secondary",
+                                            use_container_width=True,
+                                    ):
+                                        st.session_state[be_confirm_key] = False
                                         st.rerun()
-                                    else:
-                                        st.error(message)
+                            else:
+                                if st.button(" Set to BE", key=f"be_{unique_key}", use_container_width=True,
+                                             help="Set stop loss to break-even price (entry ± 5 pips for forex, entry ± $2 for gold)"):
+                                    st.session_state[be_confirm_key] = True
+                                    st.rerun()
 
 elif st.session_state.current_page == "Stats":
 

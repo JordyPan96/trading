@@ -855,7 +855,7 @@ if st.session_state.current_page == "Home":
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("📥 Load from Cloud"):
+            if st.button(" Load from Cloud"):
                 df = load_data_from_sheets()
                 if df is not None and not df.empty:
                     st.session_state.uploaded_data = df
@@ -3722,7 +3722,7 @@ elif st.session_state.current_page == "Active Opps":
     # Control buttons
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📥 Load from Cloud", key="load_cloud"):
+        if st.button(" Load from Cloud", key="load_cloud"):
             with st.spinner("Loading..."):
                 workflow_data = load_workflow_from_sheets()
                 if not workflow_data.empty:
@@ -4684,7 +4684,7 @@ elif st.session_state.current_page == "Trade Signal":
             workflow_df = load_data_from_sheets(sheet_name="Trade", worksheet_name="Workflow")
 
             if workflow_df is not None and not workflow_df.empty:
-                print(f"📥 Loaded {len(workflow_df)} records from Workflow sheet")
+                print(f" Loaded {len(workflow_df)} records from Workflow sheet")
 
                 # Convert timestamp to string for consistent comparison
                 if 'timestamp' in workflow_df.columns:

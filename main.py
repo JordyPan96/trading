@@ -5832,29 +5832,53 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Current Price:** {current_price:.5f}")
 
                         with col3:
-                            sl_price = safe_float(position.get('stopLoss'), 0.0)
+                            current_sl_price = safe_float(position.get('stopLoss'), 0.0)  # Current SL (may change)
                             tp_price = safe_float(position.get('takeProfit'), 0.0)
 
-                            # Calculate BE Price
+                            # Try to find the ORIGINAL values from in_trade records
                             symbol = position['symbol']
                             direction = 'BUY' if position.get('type') == 'POSITION_TYPE_BUY' else 'SELL'
+
+                            # Initialize storage if not exists
                             if 'be_prices' not in st.session_state:
                                 st.session_state.be_prices = {}
-                            if symbol not in st.session_state.be_prices:
-                                st.session_state.be_prices[symbol] = calculate_be_price(open_price, sl_price, direction)
-                            be_price = st.session_state.be_prices[symbol]
+                            if 'first_trail_prices' not in st.session_state:
+                                st.session_state.first_trail_prices = {}
+                            if 'original_sl_prices' not in st.session_state:
+                                st.session_state.original_sl_prices = {}
 
-                            # NEW: Calculate First Trail Price
-                            # Try to find the strategy from in_trade records
+                            # Find original values from when trade was filled
+                            original_open_price = open_price  # Fallback to current
+                            original_sl_price = current_sl_price  # Fallback to current
                             strategy = "Unknown"
+
                             for trade in st.session_state.in_trade:
                                 if trade['selected_pair'] == symbol.replace('.a', ''):
                                     strategy = trade.get('risk_multiplier', 'Unknown')
+                                    # Use ORIGINAL values from when trade was filled
+                                    original_open_price = safe_float(trade.get('entry_price'), open_price)
+                                    original_sl_price = safe_float(trade.get('exit_price'), current_sl_price)
                                     break
 
-                            first_trail_price = calculate_first_trail_price(open_price, sl_price, strategy)
+                            # Store original SL for reference
+                            if symbol not in st.session_state.original_sl_prices:
+                                st.session_state.original_sl_prices[symbol] = original_sl_price
 
-                            st.write(f"**Stop Loss:** {sl_price:.5f}")
+                            # Calculate BE Price once based on ORIGINAL values
+                            if symbol not in st.session_state.be_prices:
+                                st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
+                                                                                        original_sl_price, direction)
+                            be_price = st.session_state.be_prices[symbol]
+
+                            # Calculate First Trail Price once based on ORIGINAL values
+                            if symbol not in st.session_state.first_trail_prices:
+                                st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
+                                    original_open_price, original_sl_price, strategy
+                                )
+                            first_trail_price = st.session_state.first_trail_prices[symbol]
+
+                            # Display current SL (which may change) but fixed BE and First Trail prices
+                            st.write(f"**Stop Loss:** {current_sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**BE Price (2.5R):** {be_price:.5f}")
                             st.write(f"**First Trail Price:** {first_trail_price:.5f}")

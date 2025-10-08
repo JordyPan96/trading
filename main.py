@@ -4400,6 +4400,36 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             return 0.0
 
+    # Add this new function to calculate first trail price
+    def calculate_first_trail_price(entry_price, stop_loss, strategy):
+        """Calculate first trail price based on strategy and risk"""
+        try:
+            entry = safe_float(entry_price, 0.0)
+            stop = safe_float(stop_loss, 0.0)
+
+            if entry == 0 or stop == 0:
+                return 0.0
+
+            risk_distance = abs(entry - stop)
+
+            # Determine multiplier based on strategy
+            if strategy in ['1_BNR', '1_BNR_TPF']:
+                multiplier = 3.0
+            elif strategy in ['2_BNR', '2_BNR_TPF']:
+                multiplier = 5.0
+            else:
+                multiplier = 3.0  # Default fallback
+
+            # Calculate trail price based on direction
+            if entry > stop:  # BUY position
+                trail_price = entry + (risk_distance * multiplier)
+            else:  # SELL position
+                trail_price = entry - (risk_distance * multiplier)
+
+            return trail_price
+        except:
+            return 0.0
+
 
     def format_symbol_for_pepperstone(symbol):
         """Add .a suffix to symbols for Pepperstone broker"""
@@ -5813,9 +5843,21 @@ elif st.session_state.current_page == "Trade Signal":
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(open_price, sl_price, direction)
                             be_price = st.session_state.be_prices[symbol]
+
+                            # NEW: Calculate First Trail Price
+                            # Try to find the strategy from in_trade records
+                            strategy = "Unknown"
+                            for trade in st.session_state.in_trade:
+                                if trade['selected_pair'] == symbol.replace('.a', ''):
+                                    strategy = trade.get('risk_multiplier', 'Unknown')
+                                    break
+
+                            first_trail_price = calculate_first_trail_price(open_price, sl_price, strategy)
+
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**BE Price (2.5R):** {be_price:.5f}")
+                            st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")

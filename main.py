@@ -4317,7 +4317,7 @@ elif st.session_state.current_page == "Trade Signal":
     if 'metaapi_connected' not in st.session_state:
         st.session_state.metaapi_connected = False
     if 'metaapi_account_id' not in st.session_state:
-        st.session_state.metaapi_account_id = "da2226bc-34b9-4304-b294-7c542551e4d3"
+        st.session_state.metaapi_account_id = "a8776e6a-6bcd-46a5-9e57-9f1d50c6499b"
     if 'metaapi_connection' not in st.session_state:
         st.session_state.metaapi_connection = None
     if 'ready_to_order' not in st.session_state:

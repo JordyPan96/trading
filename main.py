@@ -3439,6 +3439,7 @@ elif st.session_state.current_page == "Active Opps":
         try:
             url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
             response = requests.get(url, timeout=10)
+            response.raise_for_status()  # Raise an error if request failed
             root = ET.fromstring(response.content)
 
             red_news = []
@@ -3459,7 +3460,8 @@ elif st.session_state.current_page == "Active Opps":
                         date_obj = datetime.strptime(f"{date_str} {time_str}", "%b %d %Y %H:%M")
                         date_iso = date_obj.strftime('%Y-%m-%d')
                         time_formatted = date_obj.strftime('%H:%M')
-                    except:
+                    except Exception as e:
+                        print(f"Date parsing error: {e} for date '{date_str}' and time '{time_str}'")
                         date_iso = date_str
                         time_formatted = time_str
 
@@ -3474,12 +3476,13 @@ elif st.session_state.current_page == "Active Opps":
                         'Impact': 'HIGH 🔴'
                     })
 
+            if not red_news:
+                print("No high-impact events found in the XML feed at this time.")
             return red_news
 
         except Exception as e:
             print(f"Error fetching red news from XML: {e}")
             return []
-
 
     st.title("Saved Records")
 

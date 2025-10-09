@@ -3479,7 +3479,7 @@ elif st.session_state.current_page == "Active Opps":
                         'Forecast': ev.get('forecast', 'N/A'),
                         'Previous': ev.get('previous', 'N/A'),
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                        'Impact': 'HIGH 🔴'
+                        'Impact': 'HIGH'
                     })
 
         return red_news
@@ -3545,11 +3545,11 @@ elif st.session_state.current_page == "Active Opps":
 
             for date in sorted_dates:
                 if date == today.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Today ({date})"
+                    date_display = f"Today ({date})"
                 elif date == tomorrow.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Tomorrow ({date})"
+                    date_display = f"Tomorrow ({date})"
                 else:
-                    date_display = f"📅 {date}"
+                    date_display = f"{date}"
 
                 evs = events_by_date[date]  # No sorting by time, since time is removed
                 with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):

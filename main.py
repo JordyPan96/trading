@@ -3431,205 +3431,86 @@ elif st.session_state.current_page == "Active Opps":
     import time
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_debug():
+    def get_red_news_simple():
         """
-        Updated function with proper debugging and flexible selectors
+        Simple approach - looks for any red/high-impact indicators in the Forex Factory calendar
         """
         try:
             url = "https://www.forexfactory.com/calendar"
             headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             }
 
-            print("🔄 Fetching Forex Factory calendar...")
-            response = requests.get(url, headers=headers, timeout=15)
-            response.raise_for_status()
+            response = requests.get(url, headers=headers, timeout=10)
+            content = response.text.lower()
 
-            # Save HTML for inspection (debugging)
-            with open("forex_factory_debug.html", "w", encoding="utf-8") as f:
-                f.write(response.text)
-            print("💾 Saved HTML to forex_factory_debug.html for inspection")
+            high_impact_indicators = [
+                'calendar__impact--high',
+                'impact-high',
+                'high impact',
+                'high-impact',
+                'ff-impact-high',
+                'style="color:red"',
+                'icon-news-high'
+            ]
 
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = BeautifulSoup(content, 'html.parser')
+            rows = soup.find_all('tr')
             red_news = []
 
-            # More flexible row selection
-            rows = soup.find_all('tr')
-            print(f"📊 Found {len(rows)} total table rows")
-
-            # Filter for calendar rows with various possible class patterns
-            calendar_rows = []
             for row in rows:
-                row_class = row.get('class', [])
-                row_class_str = ' '.join(row_class) if row_class else ''
+                row_html = str(row).lower()
+                if any(indicator in row_html for indicator in high_impact_indicators):
+                    try:
+                        cells = row.find_all('td')
+                        if len(cells) >= 7:
+                            time_text = cells[0].get_text(strip=True)
+                            currency = cells[1].get_text(strip=True)
+                            impact = cells[2].get_text(strip=True)
+                            event = cells[3].get_text(strip=True)
+                            actual = cells[4].get_text(strip=True)
+                            forecast = cells[5].get_text(strip=True)
+                            previous = cells[6].get_text(strip=True)
 
-                # Multiple patterns for calendar rows
-                if any(pattern in row_class_str for pattern in ['calendar__row', 'calendar-row', 'cal-row', 'row-calendar']):
-                    calendar_rows.append(row)
-                # Also include rows that have multiple td elements (likely data rows)
-                elif len(row.find_all('td')) >= 4:
-                    calendar_rows.append(row)
-
-            print(f"📅 Found {len(calendar_rows)} potential calendar rows")
-
-            for i, row in enumerate(calendar_rows):
-                try:
-                    # Skip header rows
-                    row_html = str(row).lower()
-                    if any(header in row_html for header in ['header', 'title', 'day']):
+                            if event and "header" not in row_html:
+                                red_news.append({
+                                    'Time': time_text or 'N/A',
+                                    'Currency': currency or 'N/A',
+                                    'Event': event or 'N/A',
+                                    'Forecast': forecast or 'N/A',
+                                    'Previous': previous or 'N/A',
+                                    'Actual': actual or 'N/A',
+                                    'Impact': 'HIGH 🔴'
+                                })
+                    except Exception as e:
+                        print(f"Error parsing row: {e}")
                         continue
 
-                    # Get all cells for this row
-                    cells = row.find_all('td')
-                    if len(cells) < 4:
-                        continue
-
-                    # More flexible impact cell detection
-                    impact_cell = None
-                    for cell in cells:
-                        cell_class = cell.get('class', [])
-                        cell_class_str = ' '.join(cell_class)
-                        if any(pattern in cell_class_str for pattern in ['impact', 'importance', 'priority', 'level']):
-                            impact_cell = cell
-                            break
-
-                    # If no specific impact cell found, try the 3rd or 4th cell
-                    if not impact_cell and len(cells) > 3:
-                        impact_cell = cells[3]  # Often impact is in 4th position
-
-                    if not impact_cell:
-                        continue
-
-                    # DEBUG: Print impact cell content for first few rows
-                    if i < 3:
-                        print(f"🔍 Row {i} impact cell: {str(impact_cell)[:200]}...")
-
-                    # Comprehensive high impact detection
-                    is_high_impact = False
-                    impact_html = str(impact_cell).lower()
-
-                    # Method 1: Check for high impact in HTML content
-                    high_indicators = [
-                        'high impact', 'high-impact', 'impact-high',
-                        'calendar__impact-high', 'ff-impact-high', 'high',
-                        'red', 'important', 'urgent'
-                    ]
-
-                    for indicator in high_indicators:
-                        if indicator in impact_html:
-                            is_high_impact = True
-                            print(f"🎯 Found high impact via indicator: {indicator}")
-                            break
-
-                    # Method 2: Check title attribute
-                    if not is_high_impact and impact_cell.has_attr('title'):
-                        title = impact_cell['title'].lower()
-                        if any(indicator in title for indicator in high_indicators):
-                            is_high_impact = True
-                            print(f"🎯 Found high impact via title: {title}")
-
-                    # Method 3: Check span elements within impact cell
-                    if not is_high_impact:
-                        spans = impact_cell.find_all('span')
-                        for span in spans:
-                            span_html = str(span).lower()
-                            if any(indicator in span_html for indicator in high_indicators):
-                                is_high_impact = True
-                                print(f"🎯 Found high impact via span: {span_html[:100]}")
-                                break
-                            # Check span title
-                            if span.has_attr('title') and any(indicator in span['title'].lower() for indicator in high_indicators):
-                                is_high_impact = True
-                                break
-
-                    # Method 4: Check for visual indicators (color, icons)
-                    if not is_high_impact:
-                        # Look for red colors in styles
-                        styles = impact_cell.find_all(style=True)
-                        for style_tag in styles:
-                            style = style_tag['style'].lower()
-                            if 'red' in style or '#f00' in style or 'color:red' in style:
-                                is_high_impact = True
-                                print("🎯 Found high impact via red color style")
-                                break
-
-                    if is_high_impact:
-                        print(f"✅ Row {i} identified as HIGH IMPACT")
-
-                        # Extract data with flexible cell positioning
-                        time_text = "N/A"
-                        currency = "N/A"
-                        event_text = "N/A"
-                        forecast = "N/A"
-                        previous = "N/A"
-                        actual = "N/A"
-
-                        # Time cell (often first cell)
-                        if len(cells) > 0:
-                            time_cell = cells[0]
-                            time_text = time_cell.get_text(strip=True) or "N/A"
-
-                        # Currency cell (often second cell)
-                        if len(cells) > 1:
-                            currency_cell = cells[1]
-                            currency = currency_cell.get_text(strip=True) or "N/A"
-
-                        # Event cell (often third cell)
-                        if len(cells) > 2:
-                            event_cell = cells[2]
-                            event_text = event_cell.get_text(strip=True) or "N/A"
-
-                        # Forecast/Previous/Actual cells (variable positions)
-                        for j, cell in enumerate(cells):
-                            cell_text = cell.get_text(strip=True)
-                            cell_class = ' '.join(cell.get('class', []))
-
-                            if 'forecast' in cell_class and forecast == "N/A":
-                                forecast = cell_text
-                            elif 'previous' in cell_class and previous == "N/A":
-                                previous = cell_text
-                            elif 'actual' in cell_class and actual == "N/A":
-                                actual = cell_text
-
-                        # If we found a valid event, add it
-                        if event_text and event_text != "N/A" and "day" not in event_text.lower():
-                            news_item = {
-                                'Time': time_text,
-                                'Currency': currency,
-                                'Event': event_text,
-                                'Forecast': forecast,
-                                'Previous': previous,
-                                'Actual': actual,
-                                'Impact': 'HIGH 🔴'
-                            }
-                            red_news.append(news_item)
-                            print(f"📰 Added: {currency} - {event_text}")
-
-                except Exception as e:
-                    print(f"❌ Error processing row {i}: {e}")
-                    continue
-
-            print(f"✅ Final result: Found {len(red_news)} high impact events")
+            # Fallback keyword match
+            if not red_news:
+                fallback_keywords = [
+                    'unemployment claims', 'non-farm payroll', 'cpi',
+                    'inflation', 'interest rate', 'fomc', 'gdp', 'retail sales'
+                ]
+                for keyword in fallback_keywords:
+                    if keyword in content:
+                        print(f"Possible red news found: {keyword}")
 
             # Organize by dates
             today = datetime.now().date()
             dates_to_show = [today + timedelta(days=i) for i in range(5)]
 
-            red_news_by_date = {}
-            for date in dates_to_show:
-                red_news_by_date[date.strftime('%Y-%m-%d')] = []
-
-            # Put all events under today for now
+            red_news_by_date = {date.strftime('%Y-%m-%d'): [] for date in dates_to_show}
             red_news_by_date[today.strftime('%Y-%m-%d')] = red_news
 
             return red_news_by_date
 
         except Exception as e:
-            print(f"💥 Major error: {e}")
-            st.error(f"Error fetching red news: {e}")
+            print(f"Error fetching red news: {e}")
             today = datetime.now().date()
             dates_to_show = [today + timedelta(days=i) for i in range(5)]
             return {date.strftime('%Y-%m-%d'): [] for date in dates_to_show}
+
 
     st.title("Saved Records")
 
@@ -3654,111 +3535,118 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     # ==================== RED NEWS SECTION ====================
-    st.markdown("---")
     st.subheader("🔴 High Impact Forex News - Next 5 Days")
 
-    # Enhanced controls with debugging
-    col_news1, col_news2, col_news3, col_news4 = st.columns([2, 1, 1, 1])
+    # Red news controls
+    col_news1, col_news2, col_news3 = st.columns([2, 1, 1])
 
     with col_news1:
-        if st.button("🔄 Refresh with Debug", key="refresh_debug", use_container_width=True):
-            with st.spinner("Fetching with detailed debugging..."):
-                st.session_state.red_news_data = get_red_news_debug()
+        if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
+            with st.spinner("Fetching high impact news..."):
+                st.session_state.red_news_data = get_red_news_simple()
                 st.session_state.last_news_fetch = datetime.now()
-                st.success("Check terminal for debug output!")
+                st.success("Red news updated!")
 
     with col_news2:
-        if st.button("📁 View Raw HTML", key="view_html", use_container_width=True):
-            try:
-                with open("forex_factory_debug.html", "r", encoding="utf-8") as f:
-                    html_content = f.read()
-                st.text_area("Raw HTML (first 2000 chars):", html_content[:2000], height=300)
-            except:
-                st.warning("No HTML file found. Click 'Refresh with Debug' first.")
-
-    with col_news3:
+        # Auto-refresh toggle
         auto_refresh_news = st.checkbox("Auto-refresh", value=False, key="auto_refresh_news")
 
-    with col_news4:
+    with col_news3:
         if st.session_state.last_news_fetch:
             st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
         else:
-            st.write("Click refresh")
+            st.write("Not loaded")
 
-    # Initial load
-    if not st.session_state.red_news_data:
+    # Fetch red news if not already loaded or auto-refresh is enabled
+    if not st.session_state.red_news_data or auto_refresh_news:
         with st.spinner("Loading high impact news..."):
-            st.session_state.red_news_data = get_red_news_debug()
+            st.session_state.red_news_data = get_red_news_simple()
             st.session_state.last_news_fetch = datetime.now()
 
-    # Display results
+    # Display red news
     if st.session_state.red_news_data:
         total_red_events = sum(len(events) for events in st.session_state.red_news_data.values())
 
         if total_red_events > 0:
             st.success(f"🎯 Found {total_red_events} high impact events!")
 
-            # Display all events in an organized way
-            for date, events in st.session_state.red_news_data.items():
-                if events:
-                    with st.expander(f"📅 {date} - {len(events)} events", expanded=True):
-                        for event in events:
-                            st.markdown(
-                                f"""
-                                    <div style="
-                                        background: linear-gradient(45deg, #ff4444, #cc0000);
-                                        color: white;
-                                        padding: 12px;
-                                        border-radius: 8px;
-                                        margin: 8px 0;
-                                        border-left: 5px solid #ff0000;
-                                    ">
-                                        <div style="display: flex; justify-content: between; align-items: start;">
-                                            <div style="flex: 1;">
-                                                <strong>⏰ {event['Time']}</strong> | 
-                                                <strong>💰 {event['Currency']}</strong>
+            # Create tabs for each day
+            dates = list(st.session_state.red_news_data.keys())
+            tabs = st.tabs([f"📅 {date} ({len(st.session_state.red_news_data[date])})" for date in dates])
+
+            for i, (date, tab) in enumerate(zip(dates, tabs)):
+                with tab:
+                    daily_events = st.session_state.red_news_data[date]
+
+                    if daily_events:
+                        for event in daily_events:
+                            with st.container():
+                                # Create a red alert box for each event
+                                st.markdown(
+                                    f"""
+                                        <div style="
+                                            background: linear-gradient(45deg, #ff4444, #cc0000);
+                                            color: white;
+                                            padding: 12px;
+                                            border-radius: 8px;
+                                            margin: 8px 0;
+                                            border-left: 5px solid #ff0000;
+                                        ">
+                                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                                <div>
+                                                    <strong>⏰ {event['Time']}</strong> | 
+                                                    <strong>💰 {event['Currency']}</strong>
+                                                </div>
+                                                <div style="background: white; color: #ff4444; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                                                    HIGH IMPACT
+                                                </div>
                                             </div>
-                                            <div style="background: white; color: #ff4444; padding: 2px 8px; border-radius: 12px; font-size: 12px; white-space: nowrap;">
-                                                HIGH IMPACT
+                                            <div style="margin-top: 8px; font-size: 14px;">
+                                                <strong>{event['Event']}</strong>
                                             </div>
                                         </div>
-                                        <div style="margin-top: 8px; font-size: 14px;">
-                                            <strong>{event['Event']}</strong>
-                                        </div>
-                                    </div>
-                                    """,
-                                unsafe_allow_html=True
-                            )
+                                        """,
+                                    unsafe_allow_html=True
+                                )
 
-                            # Show details
-                            details = []
-                            if event['Forecast'] != 'N/A':
-                                details.append(f"**Forecast:** {event['Forecast']}")
-                            if event['Previous'] != 'N/A':
-                                details.append(f"**Previous:** {event['Previous']}")
-                            if event['Actual'] != 'N/A':
-                                details.append(f"**Actual:** {event['Actual']}")
+                                # Show details if available
+                                details = []
+                                if event['Forecast'] != 'N/A' and event['Forecast']:
+                                    details.append(f"**Forecast:** {event['Forecast']}")
+                                if event['Previous'] != 'N/A' and event['Previous']:
+                                    details.append(f"**Previous:** {event['Previous']}")
+                                if event['Actual'] != 'N/A' and event['Actual']:
+                                    details.append(f"**Actual:** {event['Actual']}")
 
-                            if details:
-                                st.markdown(" | ".join(details))
+                                if details:
+                                    st.markdown(" | ".join(details))
+
+                                st.divider()
+                    else:
+                        st.info("✅ No high impact events for this date")
         else:
-            st.error("❌ No high impact events found despite debugging.")
-            st.markdown("""
-                **Next steps:**
-                1. Check the terminal for debug output
-                2. Click **'View Raw HTML'** to see the actual page content
-                3. Look for class names like `calendar__impact-high` or `high` in the HTML
-                4. The website structure may have changed significantly
+            st.info("ℹ️ No high impact red news found. Markets may be calm.")
 
-                **Quick fix:** Open `forex_factory_debug.html` in your browser and inspect the element structure.
-                """)
+            # Helpful troubleshooting
+            with st.expander("Troubleshooting Tips"):
+                st.markdown("""
+                    **If you see red news on Forex Factory but not here:**
+                    1. The website structure may have changed
+                    2. Try refreshing the page
+                    3. Check if there are actually high-impact (red) events today
+                    4. The events might be medium/low impact instead
 
-    # Auto-refresh
+                    **Direct link:** [Forex Factory Calendar](https://www.forexfactory.com/calendar)
+                    """)
+
+    # Auto-refresh logic
     if auto_refresh_news:
-        time.sleep(60)
-        st.session_state.red_news_data = get_red_news_debug()
+        time.sleep(60)  # Refresh every 60 seconds
+        st.session_state.red_news_data = get_red_news_simple()
         st.session_state.last_news_fetch = datetime.now()
         st.rerun()
+
+    st.markdown("---")
 
 
     # Use your existing Google Sheets functions

@@ -3432,57 +3432,72 @@ elif st.session_state.current_page == "Active Opps":
     import xml.etree.ElementTree as ET
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_from_xml():
+    def get_red_news_from_xml(retries=3, delay=3):
         """
         Fetch high-impact (red) forex news from Forex Factory's XML calendar feed.
+        Retries a few times if no data is found, with debug logging.
         """
-        try:
-            url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()  # Raise an error if request failed
-            root = ET.fromstring(response.content)
+        url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
 
-            red_news = []
+        for attempt in range(1, retries + 1):
+            try:
+                response = requests.get(url, timeout=10)
+                print(
+                    f"[Attempt {attempt}] Response status: {response.status_code}, Content length: {len(response.content)}")
+                response.raise_for_status()
 
-            for event in root.findall('event'):
-                impact = event.findtext('impact', default='').strip().lower()
-                if impact == 'high':
-                    date_str = event.findtext('date', default='')
-                    time_str = event.findtext('time', default='')
-                    currency = event.findtext('currency', default='N/A')
-                    title = event.findtext('title', default='N/A')
-                    actual = event.findtext('actual', default='N/A')
-                    forecast = event.findtext('forecast', default='N/A')
-                    previous = event.findtext('previous', default='N/A')
+                root = ET.fromstring(response.content)
+                red_news = []
 
-                    # Combine date and time for sorting or filtering if needed
-                    try:
-                        date_obj = datetime.strptime(f"{date_str} {time_str}", "%b %d %Y %H:%M")
-                        date_iso = date_obj.strftime('%Y-%m-%d')
-                        time_formatted = date_obj.strftime('%H:%M')
-                    except Exception as e:
-                        print(f"Date parsing error: {e} for date '{date_str}' and time '{time_str}'")
-                        date_iso = date_str
-                        time_formatted = time_str
+                for event in root.findall('event'):
+                    impact = event.findtext('impact', default='').strip().lower()
+                    print(f"Event impact: '{impact}'")
 
-                    red_news.append({
-                        'Date': date_iso,
-                        'Time': time_formatted,
-                        'Currency': currency,
-                        'Event': title,
-                        'Actual': actual,
-                        'Forecast': forecast,
-                        'Previous': previous,
-                        'Impact': 'HIGH 🔴'
-                    })
+                    if impact == 'high':
+                        date_str = event.findtext('date', default='').strip()
+                        time_str = event.findtext('time', default='').strip()
+                        currency = event.findtext('currency', default='N/A').strip()
+                        title = event.findtext('title', default='N/A').strip()
+                        actual = event.findtext('actual', default='N/A').strip()
+                        forecast = event.findtext('forecast', default='N/A').strip()
+                        previous = event.findtext('previous', default='N/A').strip()
 
-            if not red_news:
-                print("No high-impact events found in the XML feed at this time.")
-            return red_news
+                        # Combine date and time for sorting or filtering if possible
+                        try:
+                            date_obj = datetime.strptime(f"{date_str} {time_str}", "%b %d %Y %H:%M")
+                            date_iso = date_obj.strftime('%Y-%m-%d')
+                            time_formatted = date_obj.strftime('%H:%M')
+                        except Exception as e:
+                            print(f"Date parse error: {e} for '{date_str} {time_str}'")
+                            date_iso = date_str
+                            time_formatted = time_str
 
-        except Exception as e:
-            print(f"Error fetching red news from XML: {e}")
-            return []
+                        red_news.append({
+                            'Date': date_iso,
+                            'Time': time_formatted,
+                            'Currency': currency,
+                            'Event': title,
+                            'Actual': actual,
+                            'Forecast': forecast,
+                            'Previous': previous,
+                            'Impact': 'HIGH 🔴'
+                        })
+
+                if red_news:
+                    print(f"Found {len(red_news)} high impact events.")
+                    return red_news
+                else:
+                    print(f"No high impact events found on attempt {attempt}.")
+
+            except Exception as e:
+                print(f"Error on attempt {attempt}: {e}")
+
+            if attempt < retries:
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)
+
+        print("All attempts failed or no data found. Returning empty list.")
+        return []
 
     st.title("Saved Records")
 

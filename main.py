@@ -3474,7 +3474,6 @@ elif st.session_state.current_page == "Active Opps":
                 if event_date in (today, tomorrow):
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
-                        'Time': dt.strftime('%H:%M'),
                         'Currency': ev.get('country', 'N/A'),
                         'Event': ev.get('title', 'N/A'),
                         'Forecast': ev.get('forecast', 'N/A'),
@@ -3526,7 +3525,7 @@ elif st.session_state.current_page == "Active Opps":
     # Initial load
     if not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
-            st.session_state.red_events = get_red_news_from_json()
+            st.session_state.red_events = get_red_news_from_json_with_rate_limit()
             st.session_state.last_news_fetch = datetime.utcnow()
 
     red_events = st.session_state.red_events
@@ -3554,12 +3553,12 @@ elif st.session_state.current_page == "Active Opps":
                 else:
                     date_display = f"📅 {date}"
 
-                evs = sorted(events_by_date[date], key=lambda x: x['Time'])
+                evs = events_by_date[date]  # No sorting by time, since time is removed
                 with st.expander(f"{date_display} ({len(evs)} events)", expanded=True):
                     for e in evs:
                         col_a, col_b = st.columns([3, 1])
                         with col_a:
-                            st.write(f"**{e['Time']}** - **[{e['Currency']}] {e['Event']}**")
+                            st.write(f"**[{e['Currency']}] {e['Event']}**")
                             details = []
                             if e['Forecast'] and e['Forecast'] != 'N/A':
                                 details.append(f"Forecast: {e['Forecast']}")

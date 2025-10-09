@@ -3534,12 +3534,23 @@ elif st.session_state.current_page == "Active Opps":
 
     if red_events:
         now_utc = datetime.now(timezone.utc)
-        today = now_utc.date()
-        yesterday = today - timedelta(days=1)
-        tomorrow = today + timedelta(days=1)
+        # Calculate dates in Melbourne timezone for yesterday, today, tomorrow
+        now_melb = now_utc.astimezone(melbourne_tz).date()
+        yesterday = now_melb - timedelta(days=1)
+        today = now_melb
+        tomorrow = now_melb + timedelta(days=1)
 
-        valid_dates = {yesterday.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d')}
-        filtered = [e for e in red_events if e['Date'] in valid_dates]
+        valid_dates = {yesterday, today, tomorrow}
+
+        # Convert event Date strings to date objects for comparison
+        filtered = []
+        for e in red_events:
+            try:
+                event_date = datetime.strptime(e['Date'], '%Y-%m-%d').date()
+            except Exception:
+                continue
+            if event_date in valid_dates:
+                filtered.append(e)
 
         if filtered:
             # Group events by date
@@ -3551,40 +3562,37 @@ elif st.session_state.current_page == "Active Opps":
 
             st.success(f"🔴 Found {len(filtered)} High-Impact Events (Yesterday, Today & Tomorrow):")
 
-            # Melbourne timezone
-            melb_tz = pytz.timezone('Australia/Melbourne')
-
-            for date in sorted_dates:
+            for date_str in sorted_dates:
+                event_date = datetime.strptime(date_str, '%Y-%m-%d').date()
                 # Friendly date display
-                if date == today.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Today ({date})"
-                elif date == yesterday.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Yesterday ({date})"
-                elif date == tomorrow.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Tomorrow ({date})"
+                if event_date == today:
+                    date_display = f"📅 Today ({date_str})"
+                elif event_date == yesterday:
+                    date_display = f"📅 Yesterday ({date_str})"
+                elif event_date == tomorrow:
+                    date_display = f"📅 Tomorrow ({date_str})"
                 else:
-                    date_display = f"📅 {date}"
+                    date_display = f"📅 {date_str}"
 
-                evs = events_by_date[date]
-                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):  # default not expanded
+                evs = events_by_date[date_str]
+                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):
                     for e in evs:
                         col_a, col_b = st.columns([3, 1])
                         with col_a:
-                            # Convert UTC ISO time to Melbourne local time
                             try:
                                 dt_utc = datetime.fromisoformat(e['TimeUTC'])
-                                dt_local = dt_utc.astimezone(melb_tz)
+                                dt_local = dt_utc.astimezone(melbourne_tz)
                                 time_local_str = dt_local.strftime('%H:%M')
                             except Exception:
                                 time_local_str = "N/A"
 
                             st.write(f"**{time_local_str}** - **[{e['Currency']}] {e['Event']}**")
                             details = []
-                            if e['Forecast'] and e['Forecast'] != 'N/A':
+                            if e.get('Forecast') and e['Forecast'] != 'N/A':
                                 details.append(f"Forecast: {e['Forecast']}")
-                            if e['Previous'] and e['Previous'] != 'N/A':
+                            if e.get('Previous') and e['Previous'] != 'N/A':
                                 details.append(f"Previous: {e['Previous']}")
-                            if e['Actual'] and e['Actual'] != 'N/A':
+                            if e.get('Actual') and e['Actual'] != 'N/A':
                                 details.append(f"Actual: {e['Actual']}")
                             if details:
                                 st.caption(" | ".join(details))

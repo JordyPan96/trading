@@ -3498,14 +3498,13 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_action = None
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
-    if 'red_news_data' not in st.session_state:
-        st.session_state.red_news_data = {}
+    # Initialize session states for red news
+    if 'red_events' not in st.session_state:
+        st.session_state.red_events = []
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    # ==================== RED NEWS SECTION ====================
     # ==================== RED NEWS SECTION USING XML ====================
-    st.markdown("---")
     st.subheader("🔴 High Impact Forex News - This Week")
 
     # Red news controls

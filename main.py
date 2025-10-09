@@ -3534,29 +3534,39 @@ elif st.session_state.current_page == "Active Opps":
 
     if red_events:
         now_utc = datetime.now(timezone.utc)
-        now_melb = now_utc.astimezone(melbourne_tz).date()
-        yesterday = now_melb - timedelta(days=1)
-        today = now_melb
-        tomorrow = now_melb + timedelta(days=1)
+        now_melb = now_utc.astimezone(melbourne_tz)
+        today_melb = now_melb.date()
+        yesterday = today_melb - timedelta(days=1)
+        tomorrow = today_melb + timedelta(days=1)
+        valid_dates = {yesterday, today_melb, tomorrow}
 
-        valid_dates = {yesterday, today, tomorrow}
-
-        # Filter events based on Melbourne local date
+        # Filter events from yesterday/today/tomorrow AND only those still in the future
         filtered = []
         for e in red_events:
             try:
+                # Get the event date (from Date field)
                 event_date = datetime.strptime(e['Date'], '%Y-%m-%d').date()
+
+                # Check if it's in the valid date range
+                if event_date not in valid_dates:
+                    continue
+
+                # Get event datetime in Melbourne time
+                dt_utc = datetime.fromisoformat(e['TimeUTC'])
+                dt_local = dt_utc.astimezone(melbourne_tz)
+
+                # Only include if event time is still in the future
+                if dt_local > now_melb:
+                    filtered.append(e)
+
             except Exception:
                 continue
-            if event_date in valid_dates:
-                filtered.append(e)
 
         if filtered:
-
             with st.expander("Upcoming Red News", expanded=False):
                 highlight_keywords = [
                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                    "GDP", "Non-Farm", "CPI", "election","non farm","PMI"
+                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
                 ]
 
                 for e in filtered:
@@ -3618,9 +3628,9 @@ elif st.session_state.current_page == "Active Opps":
 
                     st.divider()
         else:
-            st.info("✅ No high-impact events found for yesterday, today or tomorrow.")
+            st.info("No high-impact future events found for yesterday, today or tomorrow.")
     else:
-        st.info("✅ No high-impact events found.")
+        st.info("No high-impact events found.")
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

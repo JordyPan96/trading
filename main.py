@@ -3432,72 +3432,65 @@ elif st.session_state.current_page == "Active Opps":
     import pytz
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_from_xml(retries=3, delay=3):
-        """
-        Fetch high-impact (red) forex news from Forex Factory's XML calendar feed.
-        Retries a few times if no data is found, with debug logging.
-        """
-        url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
+    def get_red_news_from_html():
+        url = "https://www.forexfactory.com/calendar?week=this"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-        for attempt in range(1, retries + 1):
+        melbourne_tz = pytz.timezone('Australia/Melbourne')
+        now_melbourne = datetime.now(melbourne_tz)
+        today = now_melbourne.date()
+        tomorrow = today + timedelta(days=1)
+
+        red_news = []
+
+        # Find all rows with high impact
+        rows = soup.select('tr.calendar__row.calendar__row--impact-high')  # CSS selector for high impact rows
+
+        for row in rows:
             try:
-                response = requests.get(url, timeout=10)
-                print(
-                    f"[Attempt {attempt}] Response status: {response.status_code}, Content length: {len(response.content)}")
-                response.raise_for_status()
+                # Extract date/time info (Forex Factory uses data-event-datetime attribute)
+                event_datetime = row.get('data-event-datetime')
+                if event_datetime:
+                    # Example format: '2025-10-09T00:00:00Z' (UTC)
+                    dt_utc = datetime.strptime(event_datetime, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc)
+                    dt_local = dt_utc.astimezone(melbourne_tz)
+                    event_date = dt_local.date()
 
-                root = ET.fromstring(response.content)
-                red_news = []
+                    if event_date != today and event_date != tomorrow:
+                        continue  # Skip if not today or tomorrow (Melbourne time)
 
-                for event in root.findall('event'):
-                    impact = event.findtext('impact', default='').strip().lower()
-                    print(f"Event impact: '{impact}'")
+                    # Extract other details
+                    time_str = dt_local.strftime('%H:%M')
+                    currency = row.select_one('td.calendar__currency').text.strip() if row.select_one(
+                        'td.calendar__currency') else "N/A"
+                    event = row.select_one('td.calendar__event').text.strip() if row.select_one(
+                        'td.calendar__event') else "N/A"
+                    forecast = row.select_one('td.calendar__forecast').text.strip() if row.select_one(
+                        'td.calendar__forecast') else "N/A"
+                    previous = row.select_one('td.calendar__previous').text.strip() if row.select_one(
+                        'td.calendar__previous') else "N/A"
+                    actual = row.select_one('td.calendar__actual').text.strip() if row.select_one(
+                        'td.calendar__actual') else "N/A"
 
-                    if impact == 'high':
-                        date_str = event.findtext('date', default='').strip()
-                        time_str = event.findtext('time', default='').strip()
-                        currency = event.findtext('currency', default='N/A').strip()
-                        title = event.findtext('title', default='N/A').strip()
-                        actual = event.findtext('actual', default='N/A').strip()
-                        forecast = event.findtext('forecast', default='N/A').strip()
-                        previous = event.findtext('previous', default='N/A').strip()
-
-                        # Combine date and time for sorting or filtering if possible
-                        try:
-                            date_obj = datetime.strptime(f"{date_str} {time_str}", "%b %d %Y %H:%M")
-                            date_iso = date_obj.strftime('%Y-%m-%d')
-                            time_formatted = date_obj.strftime('%H:%M')
-                        except Exception as e:
-                            print(f"Date parse error: {e} for '{date_str} {time_str}'")
-                            date_iso = date_str
-                            time_formatted = time_str
-
-                        red_news.append({
-                            'Date': date_iso,
-                            'Time': time_formatted,
-                            'Currency': currency,
-                            'Event': title,
-                            'Actual': actual,
-                            'Forecast': forecast,
-                            'Previous': previous,
-                            'Impact': 'HIGH 🔴'
-                        })
-
-                if red_news:
-                    print(f"Found {len(red_news)} high impact events.")
-                    return red_news
-                else:
-                    print(f"No high impact events found on attempt {attempt}.")
-
+                    red_news.append({
+                        'Date': event_date.strftime('%Y-%m-%d'),
+                        'Time': time_str,
+                        'Currency': currency,
+                        'Event': event,
+                        'Forecast': forecast,
+                        'Previous': previous,
+                        'Actual': actual,
+                        'Impact': 'HIGH 🔴'
+                    })
             except Exception as e:
-                print(f"Error on attempt {attempt}: {e}")
+                print(f"Error parsing row: {e}")
+                continue
 
-            if attempt < retries:
-                print(f"Retrying in {delay} seconds...")
-                time.sleep(delay)
-
-        print("All attempts failed or no data found. Returning empty list.")
-        return []
+        return red_news
 
     st.title("Saved Records")
 
@@ -3531,7 +3524,7 @@ elif st.session_state.current_page == "Active Opps":
     with col_news1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
-                st.session_state.red_events = get_red_news_from_xml()
+                st.session_state.red_events = get_red_news_from_html()
                 st.session_state.last_news_fetch = datetime.now()
 
     with col_news2:
@@ -3543,7 +3536,7 @@ elif st.session_state.current_page == "Active Opps":
     # Initial load if not already loaded
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
-            st.session_state.red_events = get_red_news_from_xml()
+            st.session_state.red_events = get_red_news_from_html()
             st.session_state.last_news_fetch = datetime.now()
 
     red_events = st.session_state.red_events

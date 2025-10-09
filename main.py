@@ -3433,39 +3433,34 @@ elif st.session_state.current_page == "Active Opps":
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json():
-        """
-        Fetch high-impact (red) forex news from the JSON feed.
-        Returns a list of dicts with those events for this week.
-        """
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
         try:
             resp = requests.get(url, timeout=10)
             resp.raise_for_status()
             data = resp.json()
         except Exception as e:
-            print(f"Error fetching JSON feed: {e}")
+            print("JSON fetch error:", e)
             return []
 
         red_news = []
-        now = datetime.utcnow()
+        today = datetime.utcnow().date()
+        tomorrow = today + timedelta(days=1)
 
         for ev in data:
-            # The JSON objects have fields like:
-            # { "title": ..., "country": ..., "date": "2025-10-09T14:30:00-04:00", "impact": "High", ... }
             impact = ev.get('impact', '').strip().lower()
             if impact == 'high':
-                # Parse the date field to a datetime
-                dt = None
+                date_str = ev.get('date')
+                if not date_str:
+                    continue
                 try:
-                    dt = dp.parse(ev.get('date'))
+                    dt = dp.parse(date_str)
                 except Exception as e:
-                    # fallback: skip if cannot parse
+                    print("Date parse error:", date_str, e)
                     continue
 
-                # We want today + tomorrow (UTC)
                 event_date = dt.date()
-                today = datetime.utcnow().date()
-                tomorrow = today + timedelta(days=1)
+                # Now event_date is based on dt’s timezone offset (parsed properly by dateutil)
+
                 if event_date in (today, tomorrow):
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
@@ -3477,7 +3472,6 @@ elif st.session_state.current_page == "Active Opps":
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
                         'Impact': 'HIGH 🔴'
                     })
-
         return red_news
 
     st.title("Saved Records")

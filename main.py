@@ -4006,10 +4006,10 @@ elif st.session_state.current_page == "Active Opps":
     total_active_count = order_placed_count + order_filled_count
 
     # Display counts
-    st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
-    st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
-    st.write(
-        f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
+    #st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
+    #st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
+    #st.write(
+        #f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
 
     # Control buttons
     col1, col2, col3 = st.columns(3)
@@ -6712,4 +6712,3 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-

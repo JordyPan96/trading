@@ -3431,6 +3431,7 @@ elif st.session_state.current_page == "Active Opps":
     import xml.etree.ElementTree as ET
     import pytz
     from dateutil import parser as dp
+    from zoneinfo import ZoneInfo  # Python 3.9+
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
@@ -3443,7 +3444,6 @@ elif st.session_state.current_page == "Active Opps":
             return []
 
         text = resp.text
-        # Detect if the response is HTML “Request Denied”
         if text.lower().startswith("<!doctype html") or "request denied" in text.lower():
             print("Received HTML or Denial page instead of JSON — likely rate limit triggered")
             return []
@@ -3474,12 +3474,13 @@ elif st.session_state.current_page == "Active Opps":
                 if event_date in (today, tomorrow):
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
+                        'TimeUTC': dt.strftime('%Y-%m-%dT%H:%M:%S%z'),  # add full datetime with tz info
                         'Currency': ev.get('country', 'N/A'),
                         'Event': ev.get('title', 'N/A'),
                         'Forecast': ev.get('forecast', 'N/A'),
                         'Previous': ev.get('previous', 'N/A'),
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                        'Impact': 'HIGH'
+                        'Impact': 'HIGH 🔴'
                     })
 
         return red_news
@@ -3508,6 +3509,8 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     #st.subheader("🔴 High Impact Forex News - Today & Tomorrow (via JSON)")
+    # Set your timezone here:
+    melbourne_tz = ZoneInfo('Australia/Melbourne')
 
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -3543,20 +3546,30 @@ elif st.session_state.current_page == "Active Opps":
 
             sorted_dates = sorted(events_by_date.keys())
 
+            st.success(f"🔴 Found {len(filtered)} High-Impact Events (Today & Tomorrow):")
+
             for date in sorted_dates:
                 if date == today.strftime('%Y-%m-%d'):
-                    date_display = f"Today ({date})"
+                    date_display = f"📅 Today ({date})"
                 elif date == tomorrow.strftime('%Y-%m-%d'):
-                    date_display = f"Tomorrow ({date})"
+                    date_display = f"📅 Tomorrow ({date})"
                 else:
-                    date_display = f"{date}"
+                    date_display = f"📅 {date}"
 
-                evs = events_by_date[date]  # No sorting by time, since time is removed
-                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):
+                evs = events_by_date[date]
+                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):  # collapsed by default
                     for e in evs:
+                        # Convert UTC time string to Melbourne local time
+                        try:
+                            dt_utc = datetime.strptime(e['TimeUTC'], '%Y-%m-%dT%H:%M:%S%z')
+                            dt_local = dt_utc.astimezone(melbourne_tz)
+                            time_str = dt_local.strftime('%Y-%m-%d %H:%M %Z')
+                        except Exception:
+                            time_str = 'N/A'
+
                         col_a, col_b = st.columns([3, 1])
                         with col_a:
-                            st.write(f"**[{e['Currency']}] {e['Event']}**")
+                            st.write(f"**{time_str}** - **[{e['Currency']}] {e['Event']}**")
                             details = []
                             if e['Forecast'] and e['Forecast'] != 'N/A':
                                 details.append(f"Forecast: {e['Forecast']}")

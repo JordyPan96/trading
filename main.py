@@ -3455,38 +3455,26 @@ elif st.session_state.current_page == "Active Opps":
             return []
 
         red_news = []
+
         now_utc = datetime.now(timezone.utc)
         today = now_utc.date()
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
 
         valid_dates = {yesterday, today, tomorrow}
+        valid_dates_str = {d.strftime('%Y-%m-%d') for d in valid_dates}
 
         for ev in data:
             date_str = ev.get('date')
-            print(f"Event date raw: {date_str}, impact: {ev.get('impact')}")
             impact = ev.get('impact', '').strip().lower()
-            if impact == 'high':
-                date_str = ev.get('date')
-                if not date_str:
-                    continue
-                try:
-                    dt = dp.parse(date_str)
-                    # Convert to UTC
-                    if dt.tzinfo is not None:
-                        dt_utc = dt.astimezone(timezone.utc)
-                    else:
-                        dt_utc = dt.replace(tzinfo=timezone.utc)
-                except Exception as e:
-                    print("Date parse failed:", date_str, e)
-                    continue
 
-                event_date = dt_utc.date()
+            if impact == 'high' and date_str:
+                event_date_str = date_str[:10]  # Extract 'YYYY-MM-DD' from JSON date string
 
-                if event_date in valid_dates:
+                if event_date_str in valid_dates_str:
                     red_news.append({
-                        'Date': event_date.strftime('%Y-%m-%d'),
-                        'TimeUTC': dt_utc.isoformat(),
+                        'Date': event_date_str,
+                        'TimeUTC': date_str,  # full original datetime string with timezone
                         'Currency': ev.get('country', 'N/A'),
                         'Event': ev.get('title', 'N/A'),
                         'Forecast': ev.get('forecast', 'N/A'),

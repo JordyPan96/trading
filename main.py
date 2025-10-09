@@ -3556,7 +3556,7 @@ elif st.session_state.current_page == "Active Opps":
             with st.expander("Upcoming Red News", expanded=False):
                 highlight_keywords = [
                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                    "GDP", "Non-Farm", "CPI", "election","non farm"
+                    "GDP", "Non-Farm", "CPI", "election","non farm","PMI"
                 ]
 
                 for e in filtered:
@@ -6712,3 +6712,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+

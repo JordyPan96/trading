@@ -3534,7 +3534,7 @@ elif st.session_state.current_page == "Active Opps":
 
     red_events = st.session_state.red_events
 
-    # Debug info to check how many events were fetched
+    # Debug info: show how many events fetched
     st.write(f"Fetched {len(red_events)} high-impact news events")
 
     if red_events:
@@ -3548,18 +3548,19 @@ elif st.session_state.current_page == "Active Opps":
         filtered = []
         for e in red_events:
             try:
-                # Parse event date
                 event_date = datetime.strptime(e['Date'], '%Y-%m-%d').date()
                 if event_date not in valid_dates:
                     continue
 
-                # Safer ISO datetime parsing
                 dt_utc = isoparse(e['TimeUTC'])
                 dt_local = dt_utc.astimezone(melbourne_tz)
 
-                # Commented out time filtering to avoid missing events
-                # if dt_local > now_melb:
-                filtered.append(e)
+                # Uncomment for debugging event vs now times
+                # st.write(f"Event time: {dt_local}, Now Melbourne: {now_melb}")
+
+                # Only future events relative to Melbourne time
+                if dt_local > now_melb:
+                    filtered.append(e)
 
             except Exception as ex:
                 st.write(f"Error parsing event: {ex}")
@@ -3577,7 +3578,7 @@ elif st.session_state.current_page == "Active Opps":
                         dt_utc = isoparse(e['TimeUTC'])
                         dt_local = dt_utc.astimezone(melbourne_tz)
                         date_str = dt_local.strftime('%Y-%m-%d')
-                        time_str = dt_local.strftime('%I:%M %p')  # 12-hour with AM/PM
+                        time_str = dt_local.strftime('%I:%M %p')
                         datetime_display = f"{date_str} {time_str}"
                     except Exception:
                         datetime_display = "N/A"
@@ -3628,7 +3629,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     st.divider()
         else:
-            st.info("No high-impact events found for yesterday, today or tomorrow.")
+            st.info("No high-impact future events found for yesterday, today or tomorrow.")
     else:
         st.info("No high-impact events found.")
 

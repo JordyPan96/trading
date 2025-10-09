@@ -3425,6 +3425,94 @@ elif st.session_state.current_page == "Active Opps":
     import streamlit as st
     import pandas as pd
     from datetime import datetime
+    import requests
+    from bs4 import BeautifulSoup
+    from datetime import datetime, timedelta
+
+
+    # ==================== RED NEWS FUNCTION ====================
+    def get_red_news_5_days():
+        """
+        Get high-impact (red) forex news for the next 5 days from Forex Factory
+        """
+        try:
+            # Get today and next 4 days
+            today = datetime.now().date()
+            dates_to_check = [today + timedelta(days=i) for i in range(5)]
+
+            red_news_by_date = {}
+
+            for target_date in dates_to_check:
+                # Format date for Forex Factory URL (month=12&year=2024&day=15)
+                url = f"https://www.forexfactory.com/calendar?month={target_date.month}&year={target_date.year}"
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+
+                response = requests.get(url, headers=headers)
+                soup = BeautifulSoup(response.content, 'html.parser')
+
+                daily_red_news = []
+
+                # Find the calendar table
+                calendar_table = soup.find('table', class_='calendar__table')
+
+                if calendar_table:
+                    rows = calendar_table.find_all('tr', class_='calendar__row')
+
+                    for row in rows:
+                        try:
+                            # Check if it's a high impact (red) event
+                            impact_cell = row.find('td', class_='calendar__impact')
+                            if impact_cell:
+                                impact_span = impact_cell.find('span')
+                                if impact_span and 'high' in impact_span.get('title', '').lower():
+
+                                    # Extract time
+                                    time_cell = row.find('td', class_='calendar__time')
+                                    time_text = time_cell.get_text(strip=True) if time_cell else "All Day"
+
+                                    # Extract currency
+                                    currency_cell = row.find('td', class_='calendar__currency')
+                                    currency = currency_cell.get_text(strip=True) if currency_cell else "N/A"
+
+                                    # Extract event
+                                    event_cell = row.find('td', class_='calendar__event')
+                                    event = event_cell.get_text(strip=True) if event_cell else "N/A"
+
+                                    # Extract actual and forecast values
+                                    actual_cell = row.find('td', class_='calendar__actual')
+                                    actual = actual_cell.get_text(strip=True) if actual_cell else "N/A"
+
+                                    forecast_cell = row.find('td', class_='calendar__forecast')
+                                    forecast = forecast_cell.get_text(strip=True) if forecast_cell else "N/A"
+
+                                    previous_cell = row.find('td', class_='calendar__previous')
+                                    previous = previous_cell.get_text(strip=True) if previous_cell else "N/A"
+
+                                    # Check if this event is on our target date by looking at the row's data-date attribute
+                                    row_date_attr = row.get('data-date', '')
+                                    if str(target_date) in row_date_attr or not row_date_attr:
+                                        daily_red_news.append({
+                                            'Time': time_text,
+                                            'Currency': currency,
+                                            'Event': event,
+                                            'Actual': actual,
+                                            'Forecast': forecast,
+                                            'Previous': previous,
+                                            'Impact': 'HIGH 🔴'
+                                        })
+
+                        except Exception as e:
+                            continue
+
+                red_news_by_date[target_date.strftime('%Y-%m-%d')] = daily_red_news
+
+            return red_news_by_date
+
+        except Exception as e:
+            st.error(f"Error fetching red news: {e}")
+            return {}
 
     st.title("Saved Records")
 
@@ -3443,8 +3531,83 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_action = None
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
+    if 'red_news_data' not in st.session_state:
+        st.session_state.red_news_data = {}
+    if 'last_news_fetch' not in st.session_state:
+        st.session_state.last_news_fetch = None
 
+    # ==================== RED NEWS SECTION ====================
+    st.markdown("---")
+    st.subheader("🔴 High Impact Forex News - Next 5 Days")
 
+    # Red news controls
+    col_news1, col_news2, col_news3 = st.columns([2, 1, 1])
+
+    with col_news1:
+        if st.button("🔄 Refresh Red News", key="refresh_red_news"):
+            with st.spinner("Fetching high impact news..."):
+                st.session_state.red_news_data = get_red_news_5_days()
+                st.session_state.last_news_fetch = datetime.now()
+                st.success("Red news updated!")
+
+    with col_news2:
+        # Auto-refresh toggle
+        auto_refresh_news = st.checkbox("Auto-refresh", value=False, key="auto_refresh_news")
+
+    with col_news3:
+        if st.session_state.last_news_fetch:
+            st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
+        else:
+            st.write("Not loaded")
+
+    # Fetch red news if not already loaded or auto-refresh is enabled
+    if not st.session_state.red_news_data or auto_refresh_news:
+        with st.spinner("Loading high impact news..."):
+            st.session_state.red_news_data = get_red_news_5_days()
+            st.session_state.last_news_fetch = datetime.now()
+
+    # Display red news in an organized way
+    if st.session_state.red_news_data:
+        total_red_events = sum(len(events) for events in st.session_state.red_news_data.values())
+
+        if total_red_events > 0:
+            st.success(f"🎯 Found {total_red_events} high impact events across {len(st.session_state.red_news_data)} days")
+
+            # Create tabs for each day
+            dates = list(st.session_state.red_news_data.keys())
+            tabs = st.tabs([f"📅 {date} ({len(st.session_state.red_news_data[date])})" for date in dates])
+
+            for i, (date, tab) in enumerate(zip(dates, tabs)):
+                with tab:
+                    daily_events = st.session_state.red_news_data[date]
+
+                    if daily_events:
+                        for event in daily_events:
+                            with st.container():
+                                col1, col2, col3 = st.columns([1, 3, 1])
+
+                                with col1:
+                                    st.markdown(f"**{event['Time']}**")
+                                    st.markdown(f"**{event['Currency']}**")
+
+                                with col2:
+                                    st.markdown(f"**{event['Event']}**")
+                                    if event['Forecast'] != 'N/A' and event['Previous'] != 'N/A':
+                                        st.markdown(f"Forecast: `{event['Forecast']}` | Previous: `{event['Previous']}`")
+
+                                with col3:
+                                    st.markdown("**HIGH 🔴**")
+
+                                st.divider()
+                    else:
+                        st.info("No high impact events for this date")
+        else:
+            st.info("✅ No high impact red news found in the next 5 days. Markets are calm.")
+
+    else:
+        st.error("Failed to load red news data")
+
+    st.markdown("---")
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""

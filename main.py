@@ -3456,7 +3456,10 @@ elif st.session_state.current_page == "Active Opps":
 
         red_news = []
         today = datetime.utcnow().date()
+        yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
+
+        valid_dates = {yesterday, today, tomorrow}
 
         for ev in data:
             impact = ev.get('impact', '').strip().lower()
@@ -3471,16 +3474,16 @@ elif st.session_state.current_page == "Active Opps":
                     continue
 
                 event_date = dt.date()
-                if event_date in (today, tomorrow):
+                if event_date in valid_dates:
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
-                        'TimeUTC': dt.isoformat(),  # add full datetime with tz info
+                        'TimeUTC': dt.isoformat(),  # ISO8601 with timezone colon, e.g. 2025-10-09T18:00:00-04:00
                         'Currency': ev.get('country', 'N/A'),
                         'Event': ev.get('title', 'N/A'),
                         'Forecast': ev.get('forecast', 'N/A'),
                         'Previous': ev.get('previous', 'N/A'),
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                        'Impact': 'HIGH 🔴'
+                        'Impact': 'HIGH'
                     })
 
         return red_news
@@ -3508,7 +3511,6 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    #st.subheader("🔴 High Impact Forex News - Today & Tomorrow (via JSON)")
     # Set your timezone here:
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
@@ -3535,70 +3537,82 @@ elif st.session_state.current_page == "Active Opps":
 
     if red_events:
         today = datetime.utcnow().date()
+        yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
 
-        filtered = [e for e in red_events if e['Date'] in (today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d'))]
+        relevant_dates = {yesterday.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d')}
+        filtered = [e for e in red_events if e['Date'] in relevant_dates]
 
         if filtered:
-            events_by_date = {}
-            for e in filtered:
-                events_by_date.setdefault(e['Date'], []).append(e)
+            # Sort events by date and time UTC for display order
+            def sort_key(e):
+                try:
+                    return datetime.strptime(e['TimeUTC'], '%Y-%m-%dT%H:%M:%S%z')
+                except Exception:
+                    return datetime.min
 
-            sorted_dates = sorted(events_by_date.keys())
 
-            st.success(f"🔴 Found {len(filtered)} High-Impact Events (Today & Tomorrow):")
+            filtered.sort(key=sort_key)
 
-            for date in sorted_dates:
-                if date == today.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Today ({date})"
-                elif date == tomorrow.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Tomorrow ({date})"
-                else:
-                    date_display = f"📅 {date}"
+            with st.expander(f"High-Impact Events for Yesterday, Today & Tomorrow ({len(filtered)} events)",
+                             expanded=False):
+                current_display_date = None
+                for e in filtered:
+                    # Convert UTC time string to Melbourne local time
+                    try:
+                        dt_utc = datetime.strptime(e['TimeUTC'], '%Y-%m-%dT%H:%M:%S%z')
+                        dt_local = dt_utc.astimezone(melbourne_tz)
+                        time_str = dt_local.strftime('%Y-%m-%d %H:%M %Z')
+                        local_date_str = dt_local.strftime('%Y-%m-%d')
+                    except Exception:
+                        time_str = 'N/A'
+                        local_date_str = None
 
-                evs = events_by_date[date]
-                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):  # collapsed by default
-                    for e in evs:
-                        # Convert UTC time string to Melbourne local time
-                        try:
-                            dt_utc = datetime.strptime(e['TimeUTC'], '%Y-%m-%dT%H:%M:%S%z')
-                            dt_local = dt_utc.astimezone(melbourne_tz)
-                            time_str = dt_local.strftime('%Y-%m-%d %H:%M %Z')
-                        except Exception:
-                            time_str = 'N/A'
+                    # Show a date header whenever the date changes
+                    if local_date_str != current_display_date:
+                        current_display_date = local_date_str
+                        # Make a friendly label
+                        if local_date_str == yesterday.strftime('%Y-%m-%d'):
+                            st.markdown(f"### 📅 Yesterday ({local_date_str})")
+                        elif local_date_str == today.strftime('%Y-%m-%d'):
+                            st.markdown(f"### 📅 Today ({local_date_str})")
+                        elif local_date_str == tomorrow.strftime('%Y-%m-%d'):
+                            st.markdown(f"### 📅 Tomorrow ({local_date_str})")
+                        else:
+                            st.markdown(f"### 📅 {local_date_str}")
 
-                        col_a, col_b = st.columns([3, 1])
-                        with col_a:
-                            st.write(f"**{time_str}** - **[{e['Currency']}] {e['Event']}**")
-                            details = []
-                            if e['Forecast'] and e['Forecast'] != 'N/A':
-                                details.append(f"Forecast: {e['Forecast']}")
-                            if e['Previous'] and e['Previous'] != 'N/A':
-                                details.append(f"Previous: {e['Previous']}")
-                            if e['Actual'] and e['Actual'] != 'N/A':
-                                details.append(f"Actual: {e['Actual']}")
-                            if details:
-                                st.caption(" | ".join(details))
-                        with col_b:
-                            st.markdown(
-                                """
-                                <div style="
-                                  background: #ff4444;
-                                  color: white;
-                                  padding: 4px 8px;
-                                  border-radius: 12px;
-                                  font-size: 12px;
-                                  text-align: center;
-                                  font-weight: bold;
-                                ">
-                                  HIGH
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
-                        st.divider()
+                    col_a, col_b = st.columns([3, 1])
+                    with col_a:
+                        st.write(f"**{time_str}** - **[{e['Currency']}] {e['Event']}**")
+                        details = []
+                        if e['Forecast'] and e['Forecast'] != 'N/A':
+                            details.append(f"Forecast: {e['Forecast']}")
+                        if e['Previous'] and e['Previous'] != 'N/A':
+                            details.append(f"Previous: {e['Previous']}")
+                        if e['Actual'] and e['Actual'] != 'N/A':
+                            details.append(f"Actual: {e['Actual']}")
+                        if details:
+                            st.caption(" | ".join(details))
+                    with col_b:
+                        st.markdown(
+                            """
+                            <div style="
+                              background: #ff4444;
+                              color: white;
+                              padding: 4px 8px;
+                              border-radius: 12px;
+                              font-size: 12px;
+                              text-align: center;
+                              font-weight: bold;
+                            ">
+                              HIGH
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                    st.divider()
         else:
-            st.info("✅ No high-impact events found for today or tomorrow.")
+            st.info("✅ No high-impact events found for yesterday, today, or tomorrow.")
     else:
         st.info("✅ No high-impact events found.")
 

@@ -3424,12 +3424,12 @@ elif st.session_state.current_page == "Risk Calculation":
 elif st.session_state.current_page == "Active Opps":
     import streamlit as st
     import pandas as pd
-    from datetime import datetime
     import requests
     from bs4 import BeautifulSoup
     from datetime import datetime, timedelta
     import time
     import xml.etree.ElementTree as ET
+    import pytz
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_xml(retries=3, delay=3):
@@ -3516,14 +3516,16 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_action = None
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
-    # Initialize session state variables
+    # Initialize session states for red news
     if 'red_events' not in st.session_state:
         st.session_state.red_events = []
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
+    # ==================== RED NEWS SECTION USING XML ====================
     st.subheader("🔴 High Impact Forex News - Today & Tomorrow")
 
+    # Red news controls
     col_news1, col_news2 = st.columns([2, 1])
 
     with col_news1:
@@ -3533,13 +3535,13 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.last_news_fetch = datetime.now()
 
     with col_news2:
-        if st.session_state.last_news_fetch:
+        if st.session_state.get('last_news_fetch'):
             st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
         else:
             st.write("Click refresh")
 
-    # Load news initially if empty
-    if not st.session_state.red_events:
+    # Initial load if not already loaded
+    if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_xml()
             st.session_state.last_news_fetch = datetime.now()
@@ -3547,62 +3549,92 @@ elif st.session_state.current_page == "Active Opps":
     red_events = st.session_state.red_events
 
     if red_events:
-        today = datetime.now().strftime('%Y-%m-%d')
-        tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        # Set timezone for Melbourne
+        melbourne_tz = pytz.timezone('Australia/Melbourne')
+        now_melbourne = datetime.now(melbourne_tz)
+        today_local = now_melbourne.date()
+        tomorrow_local = today_local + timedelta(days=1)
 
-        filtered_events = [e for e in red_events if e['Date'] in [today, tomorrow]]
+        filtered_events = []
+        for event in red_events:
+            try:
+                dt_utc = datetime.strptime(event['Date'] + ' ' + event['Time'], '%Y-%m-%d %H:%M')
+                dt_utc = dt_utc.replace(tzinfo=pytz.utc)
+                dt_local = dt_utc.astimezone(melbourne_tz)
+                event_local_date = dt_local.date()
+
+                if event_local_date == today_local or event_local_date == tomorrow_local:
+                    # Update event Date and Time to local for display
+                    event['Date'] = event_local_date.strftime('%Y-%m-%d')
+                    event['Time'] = dt_local.strftime('%H:%M')
+                    filtered_events.append(event)
+
+            except Exception as e:
+                print(f"Date parse error for event {event}: {e}")
+                continue
 
         if filtered_events:
+            # Group events by date
             events_by_date = {}
             for event in filtered_events:
-                events_by_date.setdefault(event['Date'], []).append(event)
+                date = event['Date']
+                if date not in events_by_date:
+                    events_by_date[date] = []
+                events_by_date[date].append(event)
 
             sorted_dates = sorted(events_by_date.keys())
 
             st.success(f"🔴 Found {len(filtered_events)} High-Impact Events (Today & Tomorrow):")
 
             for date in sorted_dates:
-                date_display = (
-                    f"📅 Today ({date})" if date == today else
-                    f"📅 Tomorrow ({date})" if date == tomorrow else
-                    f"📅 {date}"
-                )
+                if date == today_local.strftime('%Y-%m-%d'):
+                    date_display = f"📅 Today ({date})"
+                elif date == tomorrow_local.strftime('%Y-%m-%d'):
+                    date_display = f"📅 Tomorrow ({date})"
+                else:
+                    date_display = f"📅 {date}"
 
                 date_events = sorted(events_by_date[date], key=lambda x: x['Time'])
 
                 with st.expander(f"{date_display} ({len(date_events)} events)", expanded=True):
                     for event in date_events:
-                        col1, col2 = st.columns([3, 1])
-                        with col1:
-                            st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
+                        with st.container():
+                            col1, col2 = st.columns([3, 1])
+                            with col1:
+                                st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
 
-                            details = []
-                            if event['Forecast'] != 'N/A' and event['Forecast']:
-                                details.append(f"Forecast: {event['Forecast']}")
-                            if event['Previous'] != 'N/A' and event['Previous']:
-                                details.append(f"Previous: {event['Previous']}")
-                            if event['Actual'] != 'N/A' and event['Actual']:
-                                details.append(f"Actual: {event['Actual']}")
+                                details = []
+                                if event['Forecast'] != 'N/A' and event['Forecast']:
+                                    details.append(f"Forecast: {event['Forecast']}")
+                                if event['Previous'] != 'N/A' and event['Previous']:
+                                    details.append(f"Previous: {event['Previous']}")
+                                if event['Actual'] != 'N/A' and event['Actual']:
+                                    details.append(f"Actual: {event['Actual']}")
 
-                            if details:
-                                st.caption(" | ".join(details))
+                                if details:
+                                    st.caption(" | ".join(details))
 
-                        with col2:
-                            st.markdown("""
-                                <div style="
-                                    background: #ff4444;
-                                    color: white;
-                                    padding: 4px 8px;
-                                    border-radius: 12px;
-                                    font-size: 12px;
-                                    text-align: center;
-                                    font-weight: bold;
-                                ">HIGH</div>
-                            """, unsafe_allow_html=True)
+                            with col2:
+                                st.markdown(
+                                    """
+                                    <div style="
+                                        background: #ff4444; 
+                                        color: white; 
+                                        padding: 4px 8px; 
+                                        border-radius: 12px; 
+                                        font-size: 12px; 
+                                        text-align: center;
+                                        font-weight: bold;
+                                    ">
+                                        HIGH
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
 
-                        st.divider()
+                            st.divider()
         else:
-            st.info("✅ No high-impact events found for today or tomorrow.")
+            st.info("✅ No high-impact events found for today or tomorrow (Melbourne time).")
     else:
         st.info("✅ No high-impact events found.")
 

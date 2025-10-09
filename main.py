@@ -3426,7 +3426,7 @@ elif st.session_state.current_page == "Active Opps":
     import pandas as pd
     import requests
     from bs4 import BeautifulSoup
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     import time
     import xml.etree.ElementTree as ET
     import pytz

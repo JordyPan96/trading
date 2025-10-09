@@ -3552,8 +3552,7 @@ elif st.session_state.current_page == "Active Opps":
                 filtered.append(e)
 
         if filtered:
-            st.success(f"🔴 Found {len(filtered)} High-Impact Events (Yesterday, Today & Tomorrow):")
-
+            
             with st.expander("Show All Events", expanded=True):
                 for e in filtered:
                     try:

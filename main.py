@@ -3555,8 +3555,7 @@ elif st.session_state.current_page == "Active Opps":
         st.write("All event dates in session_state:")
         st.write(sorted(set(e['Date'] for e in red_events)))
 
-        st.write("Filtered events dates:")
-        st.write(sorted(set(e['Date'] for e in filtered)))
+        
 
         valid_dates = {yesterday.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d')}
         filtered = [e for e in red_events if e['Date'] in valid_dates]

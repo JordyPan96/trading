@@ -3552,8 +3552,8 @@ elif st.session_state.current_page == "Active Opps":
                 filtered.append(e)
 
         if filtered:
-            
-            with st.expander("Show All Events", expanded=True):
+
+            with st.expander("Upcoming Red News", expanded=False):
                 for e in filtered:
                     try:
                         dt_utc = datetime.fromisoformat(e['TimeUTC'])

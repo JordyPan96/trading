@@ -3507,7 +3507,7 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    st.subheader("🔴 High Impact Forex News - Today & Tomorrow (via JSON)")
+    #st.subheader("🔴 High Impact Forex News - Today & Tomorrow (via JSON)")
 
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -3543,7 +3543,7 @@ elif st.session_state.current_page == "Active Opps":
 
             sorted_dates = sorted(events_by_date.keys())
 
-            st.success(f"🔴 Found {len(filtered)} High-Impact Events (Today & Tomorrow):")
+            
 
             for date in sorted_dates:
                 if date == today.strftime('%Y-%m-%d'):

@@ -3430,16 +3430,28 @@ elif st.session_state.current_page == "Active Opps":
     import time
     import xml.etree.ElementTree as ET
     import pytz
+    from dateutil import parser as dp
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_from_json():
+    def get_red_news_from_json_with_rate_limit():
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
         try:
             resp = requests.get(url, timeout=10)
             resp.raise_for_status()
-            data = resp.json()
         except Exception as e:
-            print("JSON fetch error:", e)
+            print("Request error:", e)
+            return []
+
+        text = resp.text
+        # Detect if the response is HTML “Request Denied”
+        if text.lower().startswith("<!doctype html") or "request denied" in text.lower():
+            print("Received HTML or Denial page instead of JSON — likely rate limit triggered")
+            return []
+
+        try:
+            data = resp.json()
+        except ValueError as e:
+            print("JSON parse error:", e)
             return []
 
         red_news = []
@@ -3455,12 +3467,10 @@ elif st.session_state.current_page == "Active Opps":
                 try:
                     dt = dp.parse(date_str)
                 except Exception as e:
-                    print("Date parse error:", date_str, e)
+                    print("Date parse failed:", date_str, e)
                     continue
 
                 event_date = dt.date()
-                # Now event_date is based on dt’s timezone offset (parsed properly by dateutil)
-
                 if event_date in (today, tomorrow):
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
@@ -3472,6 +3482,7 @@ elif st.session_state.current_page == "Active Opps":
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
                         'Impact': 'HIGH 🔴'
                     })
+
         return red_news
 
     st.title("Saved Records")
@@ -3503,7 +3514,7 @@ elif st.session_state.current_page == "Active Opps":
     with col1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news_json", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
-                st.session_state.red_events = get_red_news_from_json()
+                st.session_state.red_events = get_red_news_from_json_with_rate_limit()
                 st.session_state.last_news_fetch = datetime.utcnow()
 
     with col2:

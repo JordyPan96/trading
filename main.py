@@ -3438,6 +3438,8 @@ elif st.session_state.current_page == "Active Opps":
         root = ET.fromstring(response.content)
 
         melbourne_tz = pytz.timezone('Australia/Melbourne')
+        utc_tz = pytz.UTC
+
         today = datetime.now(melbourne_tz).date()
         tomorrow = today + timedelta(days=1)
 
@@ -3449,14 +3451,15 @@ elif st.session_state.current_page == "Active Opps":
                 date_str = event.findtext('date', '').strip()  # e.g. "10-06-2025"
                 time_str = event.findtext('time', '').strip()  # e.g. "7:00am"
 
-                # Parse date/time from Forex Factory format to datetime with Melbourne timezone
+                # Forex Factory date format: DD-MM-YYYY and time like 7:00am
                 try:
                     dt_naive = datetime.strptime(f"{date_str} {time_str}", "%d-%m-%Y %I:%M%p")
-                    dt_localized = melbourne_tz.localize(dt_naive)
+                    dt_utc = utc_tz.localize(dt_naive)  # Assign UTC timezone
+                    dt_localized = dt_utc.astimezone(melbourne_tz)  # Convert to Melbourne time
                     event_date = dt_localized.date()
                     event_time = dt_localized.strftime('%H:%M')
                 except Exception as e:
-                    # fallback: skip if parsing fails
+                    # skip if parsing fails
                     continue
 
                 if event_date not in [today, tomorrow]:
@@ -3516,8 +3519,8 @@ elif st.session_state.current_page == "Active Opps":
         else:
             st.write("Click refresh")
 
-    # Initial load if not already loaded
-    if 'red_events' not in st.session_state or not st.session_state.red_events:
+    # Initial load if not already loaded or empty
+    if not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_xml_ff()
             st.session_state.last_news_fetch = datetime.now()
@@ -3525,7 +3528,6 @@ elif st.session_state.current_page == "Active Opps":
     red_events = st.session_state.red_events
 
     if red_events:
-        # Set timezone for Melbourne
         melbourne_tz = pytz.timezone('Australia/Melbourne')
         now_melbourne = datetime.now(melbourne_tz)
         today_local = now_melbourne.date()
@@ -3534,13 +3536,14 @@ elif st.session_state.current_page == "Active Opps":
         filtered_events = []
         for event in red_events:
             try:
-                dt_utc = datetime.strptime(event['Date'] + ' ' + event['Time'], '%Y-%m-%d %H:%M')
-                dt_utc = dt_utc.replace(tzinfo=pytz.utc)
-                dt_local = dt_utc.astimezone(melbourne_tz)
+                # event['Date'] and ['Time'] are already localized in get_red_news_from_xml_ff,
+                # but let's ensure correct parsing just in case
+                dt_local = datetime.strptime(f"{event['Date']} {event['Time']}", '%Y-%m-%d %H:%M')
+                dt_local = melbourne_tz.localize(dt_local)
                 event_local_date = dt_local.date()
 
                 if event_local_date == today_local or event_local_date == tomorrow_local:
-                    # Update event Date and Time to local for display
+                    # Update event date/time for display (redundant if already localized, but safe)
                     event['Date'] = event_local_date.strftime('%Y-%m-%d')
                     event['Time'] = dt_local.strftime('%H:%M')
                     filtered_events.append(event)

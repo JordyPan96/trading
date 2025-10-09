@@ -3516,16 +3516,14 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_action = None
     if 'last_sync_time' not in st.session_state:
         st.session_state.last_sync_time = datetime.now()
-    # Initialize session states for red news
+    # Initialize session state variables
     if 'red_events' not in st.session_state:
         st.session_state.red_events = []
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    # ==================== RED NEWS SECTION USING XML ====================
     st.subheader("🔴 High Impact Forex News - Today & Tomorrow")
 
-    # Red news controls
     col_news1, col_news2 = st.columns([2, 1])
 
     with col_news1:
@@ -3535,95 +3533,74 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.last_news_fetch = datetime.now()
 
     with col_news2:
-        if st.session_state.get('last_news_fetch'):
+        if st.session_state.last_news_fetch:
             st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
         else:
             st.write("Click refresh")
 
-    # Initial load if not already loaded
-    if 'red_events' not in st.session_state:
+    # Load news initially if empty
+    if not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_xml()
             st.session_state.last_news_fetch = datetime.now()
 
-    # Display red news - only today and tomorrow
     red_events = st.session_state.red_events
 
     if red_events:
-        # Get today's and tomorrow's dates
         today = datetime.now().strftime('%Y-%m-%d')
         tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
 
-        # Filter events for only today and tomorrow
-        filtered_events = [
-            event for event in red_events
-            if event['Date'] in [today, tomorrow]
-        ]
+        filtered_events = [e for e in red_events if e['Date'] in [today, tomorrow]]
 
         if filtered_events:
-            # Group events by date
             events_by_date = {}
             for event in filtered_events:
-                date = event['Date']
-                if date not in events_by_date:
-                    events_by_date[date] = []
-                events_by_date[date].append(event)
+                events_by_date.setdefault(event['Date'], []).append(event)
 
-            # Sort dates chronologically
             sorted_dates = sorted(events_by_date.keys())
 
             st.success(f"🔴 Found {len(filtered_events)} High-Impact Events (Today & Tomorrow):")
 
-            # Display events grouped by date
             for date in sorted_dates:
-                # Format date display
-                if date == today:
-                    date_display = f"📅 Today ({date})"
-                elif date == tomorrow:
-                    date_display = f"📅 Tomorrow ({date})"
-                else:
-                    date_display = f"📅 {date}"
+                date_display = (
+                    f"📅 Today ({date})" if date == today else
+                    f"📅 Tomorrow ({date})" if date == tomorrow else
+                    f"📅 {date}"
+                )
 
                 date_events = sorted(events_by_date[date], key=lambda x: x['Time'])
 
                 with st.expander(f"{date_display} ({len(date_events)} events)", expanded=True):
                     for event in date_events:
-                        with st.container():
-                            col1, col2 = st.columns([3, 1])
-                            with col1:
-                                st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
 
-                                # Show details in a compact way
-                                details = []
-                                if event['Forecast'] != 'N/A' and event['Forecast']:
-                                    details.append(f"Forecast: {event['Forecast']}")
-                                if event['Previous'] != 'N/A' and event['Previous']:
-                                    details.append(f"Previous: {event['Previous']}")
-                                if event['Actual'] != 'N/A' and event['Actual']:
-                                    details.append(f"Actual: {event['Actual']}")
+                            details = []
+                            if event['Forecast'] != 'N/A' and event['Forecast']:
+                                details.append(f"Forecast: {event['Forecast']}")
+                            if event['Previous'] != 'N/A' and event['Previous']:
+                                details.append(f"Previous: {event['Previous']}")
+                            if event['Actual'] != 'N/A' and event['Actual']:
+                                details.append(f"Actual: {event['Actual']}")
 
-                                if details:
-                                    st.caption(" | ".join(details))
+                            if details:
+                                st.caption(" | ".join(details))
 
-                            with col2:
-                                st.markdown(
-                                    f"""
-                                    <div style="
-                                        background: #ff4444; 
-                                        color: white; 
-                                        padding: 4px 8px; 
-                                        border-radius: 12px; 
-                                        font-size: 12px; 
-                                        text-align: center;
-                                        font-weight: bold;
-                                    ">
-                                        HIGH
-                                    </div>
-                                    """,
-                                    unsafe_allow_html=True
-                                )
+                        with col2:
+                            st.markdown("""
+                                <div style="
+                                    background: #ff4444;
+                                    color: white;
+                                    padding: 4px 8px;
+                                    border-radius: 12px;
+                                    font-size: 12px;
+                                    text-align: center;
+                                    font-weight: bold;
+                                ">HIGH</div>
+                            """, unsafe_allow_html=True)
 
-                            st.divider()
+                        st.divider()
         else:
             st.info("✅ No high-impact events found for today or tomorrow.")
     else:

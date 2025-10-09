@@ -3437,10 +3437,7 @@ elif st.session_state.current_page == "Active Opps":
         response = requests.get(url, timeout=10)
         root = ET.fromstring(response.content)
 
-        melbourne_tz = pytz.timezone('Australia/Melbourne')
-        utc_tz = pytz.UTC
-
-        today = datetime.now(melbourne_tz).date()
+        today = datetime.utcnow().date()  # Use UTC date for filtering
         tomorrow = today + timedelta(days=1)
 
         red_news = []
@@ -3448,19 +3445,16 @@ elif st.session_state.current_page == "Active Opps":
         for event in root.findall('event'):
             impact = event.findtext('impact', '').strip()
             if impact.lower() == 'high':
-                date_str = event.findtext('date', '').strip()  # e.g. "10-06-2025"
-                time_str = event.findtext('time', '').strip()  # e.g. "7:00am"
+                date_str = event.findtext('date', '').strip()  # format: "10-06-2025"
+                time_str = event.findtext('time', '').strip()  # format: "7:00am"
 
-                # Forex Factory date format: DD-MM-YYYY and time like 7:00am
+                # Parse Forex Factory date/time assuming UTC (no timezone conversion)
                 try:
                     dt_naive = datetime.strptime(f"{date_str} {time_str}", "%d-%m-%Y %I:%M%p")
-                    dt_utc = utc_tz.localize(dt_naive)  # Assign UTC timezone
-                    dt_localized = dt_utc.astimezone(melbourne_tz)  # Convert to Melbourne time
-                    event_date = dt_localized.date()
-                    event_time = dt_localized.strftime('%H:%M')
-                except Exception as e:
-                    # skip if parsing fails
-                    continue
+                    event_date = dt_naive.date()
+                    event_time = dt_naive.strftime('%H:%M')
+                except Exception:
+                    continue  # skip events that don't parse correctly
 
                 if event_date not in [today, tomorrow]:
                     continue
@@ -3502,7 +3496,7 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     # ==================== RED NEWS SECTION USING XML ====================
-    st.subheader("🔴 High Impact Forex News - Today & Tomorrow")
+    st.subheader("🔴 High Impact Forex News - Today & Tomorrow (UTC)")
 
     # Red news controls
     col_news1, col_news2 = st.columns([2, 1])
@@ -3511,11 +3505,11 @@ elif st.session_state.current_page == "Active Opps":
         if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
                 st.session_state.red_events = get_red_news_from_xml_ff()
-                st.session_state.last_news_fetch = datetime.now()
+                st.session_state.last_news_fetch = datetime.utcnow()
 
     with col_news2:
         if st.session_state.get('last_news_fetch'):
-            st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
+            st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M UTC')}")
         else:
             st.write("Click refresh")
 
@@ -3523,34 +3517,18 @@ elif st.session_state.current_page == "Active Opps":
     if not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_xml_ff()
-            st.session_state.last_news_fetch = datetime.now()
+            st.session_state.last_news_fetch = datetime.utcnow()
 
     red_events = st.session_state.red_events
 
     if red_events:
-        melbourne_tz = pytz.timezone('Australia/Melbourne')
-        now_melbourne = datetime.now(melbourne_tz)
-        today_local = now_melbourne.date()
-        tomorrow_local = today_local + timedelta(days=1)
+        today_utc = datetime.utcnow().date()
+        tomorrow_utc = today_utc + timedelta(days=1)
 
-        filtered_events = []
-        for event in red_events:
-            try:
-                # event['Date'] and ['Time'] are already localized in get_red_news_from_xml_ff,
-                # but let's ensure correct parsing just in case
-                dt_local = datetime.strptime(f"{event['Date']} {event['Time']}", '%Y-%m-%d %H:%M')
-                dt_local = melbourne_tz.localize(dt_local)
-                event_local_date = dt_local.date()
-
-                if event_local_date == today_local or event_local_date == tomorrow_local:
-                    # Update event date/time for display (redundant if already localized, but safe)
-                    event['Date'] = event_local_date.strftime('%Y-%m-%d')
-                    event['Time'] = dt_local.strftime('%H:%M')
-                    filtered_events.append(event)
-
-            except Exception as e:
-                print(f"Date parse error for event {event}: {e}")
-                continue
+        filtered_events = [
+            event for event in red_events if
+            event['Date'] in [today_utc.strftime('%Y-%m-%d'), tomorrow_utc.strftime('%Y-%m-%d')]
+        ]
 
         if filtered_events:
             # Group events by date
@@ -3563,13 +3541,13 @@ elif st.session_state.current_page == "Active Opps":
 
             sorted_dates = sorted(events_by_date.keys())
 
-            st.success(f"🔴 Found {len(filtered_events)} High-Impact Events (Today & Tomorrow):")
+            st.success(f"🔴 Found {len(filtered_events)} High-Impact Events (Today & Tomorrow UTC):")
 
             for date in sorted_dates:
-                if date == today_local.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Today ({date})"
-                elif date == tomorrow_local.strftime('%Y-%m-%d'):
-                    date_display = f"📅 Tomorrow ({date})"
+                if date == today_utc.strftime('%Y-%m-%d'):
+                    date_display = f"📅 Today (UTC) ({date})"
+                elif date == tomorrow_utc.strftime('%Y-%m-%d'):
+                    date_display = f"📅 Tomorrow (UTC) ({date})"
                 else:
                     date_display = f"📅 {date}"
 
@@ -3613,7 +3591,7 @@ elif st.session_state.current_page == "Active Opps":
 
                             st.divider()
         else:
-            st.info("✅ No high-impact events found for today or tomorrow (Melbourne time).")
+            st.info("✅ No high-impact events found for today or tomorrow (UTC).")
     else:
         st.info("✅ No high-impact events found.")
 

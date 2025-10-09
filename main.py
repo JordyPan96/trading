@@ -3554,45 +3554,46 @@ elif st.session_state.current_page == "Active Opps":
         if filtered:
             st.success(f"🔴 Found {len(filtered)} High-Impact Events (Yesterday, Today & Tomorrow):")
 
-            for e in filtered:
-                try:
-                    dt_utc = datetime.fromisoformat(e['TimeUTC'])
-                    dt_local = dt_utc.astimezone(melbourne_tz)
-                    date_str = dt_local.strftime('%Y-%m-%d')
-                    time_str = dt_local.strftime('%H:%M')
-                    datetime_display = f"{date_str} {time_str}"
-                except Exception:
-                    datetime_display = "N/A"
+            with st.expander("Show All Events", expanded=True):
+                for e in filtered:
+                    try:
+                        dt_utc = datetime.fromisoformat(e['TimeUTC'])
+                        dt_local = dt_utc.astimezone(melbourne_tz)
+                        date_str = dt_local.strftime('%Y-%m-%d')
+                        time_str = dt_local.strftime('%I:%M %p')  # 12-hour format with AM/PM
+                        datetime_display = f"{date_str} {time_str}"
+                    except Exception:
+                        datetime_display = "N/A"
 
-                st.write(f"**{datetime_display}** - **[{e['Currency']}] {e['Event']}**")
-                details = []
-                if e.get('Forecast') and e['Forecast'] != 'N/A':
-                    details.append(f"Forecast: {e['Forecast']}")
-                if e.get('Previous') and e['Previous'] != 'N/A':
-                    details.append(f"Previous: {e['Previous']}")
-                if e.get('Actual') and e['Actual'] != 'N/A':
-                    details.append(f"Actual: {e['Actual']}")
-                if details:
-                    st.caption(" | ".join(details))
+                    st.write(f"**{datetime_display}** - **[{e['Currency']}] {e['Event']}**")
+                    details = []
+                    if e.get('Forecast') and e['Forecast'] != 'N/A':
+                        details.append(f"Forecast: {e['Forecast']}")
+                    if e.get('Previous') and e['Previous'] != 'N/A':
+                        details.append(f"Previous: {e['Previous']}")
+                    if e.get('Actual') and e['Actual'] != 'N/A':
+                        details.append(f"Actual: {e['Actual']}")
+                    if details:
+                        st.caption(" | ".join(details))
 
-                st.markdown(
-                    """
-                    <div style="
-                      background: #ff4444;
-                      color: white;
-                      padding: 4px 8px;
-                      border-radius: 12px;
-                      font-size: 12px;
-                      text-align: center;
-                      font-weight: bold;
-                      width: 50px;
-                    ">
-                      HIGH
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-                st.divider()
+                    st.markdown(
+                        """
+                        <div style="
+                          background: #ff4444;
+                          color: white;
+                          padding: 4px 8px;
+                          border-radius: 12px;
+                          font-size: 12px;
+                          text-align: center;
+                          font-weight: bold;
+                          width: 50px;
+                        ">
+                          HIGH
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    st.divider()
         else:
             st.info("✅ No high-impact events found for yesterday, today or tomorrow.")
     else:

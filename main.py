@@ -3523,6 +3523,7 @@ elif st.session_state.current_page == "Active Opps":
 
     if red_events:
         today_utc = datetime.utcnow().date()
+        st.write(today_utc)
         tomorrow_utc = today_utc + timedelta(days=1)
 
         filtered_events = [

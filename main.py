@@ -3521,22 +3521,6 @@ elif st.session_state.current_page == "Active Opps":
     # Set your timezone here:
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
-    st.write("### Debug Info:")
-    now_utc = datetime.now(timezone.utc)
-    today = now_utc.date()
-    yesterday = today - timedelta(days=1)
-    tomorrow = today + timedelta(days=1)
-
-    st.write("Yesterday:", yesterday.strftime('%Y-%m-%d'))
-    st.write("Today:", today.strftime('%Y-%m-%d'))
-    st.write("Tomorrow:", tomorrow.strftime('%Y-%m-%d'))
-
-    if red_events:
-        st.write("All event dates in red_events:")
-        st.write(sorted(set(e['Date'] for e in red_events)))
-    else:
-        st.write("No red events loaded yet.")
-
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news_json", use_container_width=True):
@@ -3563,6 +3547,16 @@ elif st.session_state.current_page == "Active Opps":
         today = now_utc.date()
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
+
+        st.write("Yesterday:", yesterday.strftime('%Y-%m-%d'))
+        st.write("Today:", today.strftime('%Y-%m-%d'))
+        st.write("Tomorrow:", tomorrow.strftime('%Y-%m-%d'))
+
+        st.write("All event dates in session_state:")
+        st.write(sorted(set(e['Date'] for e in red_events)))
+
+        st.write("Filtered events dates:")
+        st.write(sorted(set(e['Date'] for e in filtered)))
 
         valid_dates = {yesterday.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d')}
         filtered = [e for e in red_events if e['Date'] in valid_dates]

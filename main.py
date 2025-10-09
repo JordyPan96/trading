@@ -3505,10 +3505,10 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     # ==================== RED NEWS SECTION USING XML ====================
-    st.subheader("🔴 High Impact Forex News - This Week")
+    st.subheader("🔴 High Impact Forex News - Today & Tomorrow")
 
     # Red news controls
-    col_news1, col_news2, col_news3 = st.columns([2, 1, 1])
+    col_news1, col_news2 = st.columns([2, 1])
 
     with col_news1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
@@ -3517,11 +3517,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.last_news_fetch = datetime.now()
 
     with col_news2:
-        # Auto-refresh toggle
-        auto_refresh_news = st.checkbox("Auto-refresh", value=False, key="auto_refresh_news")
-
-    with col_news3:
-        if st.session_state.last_news_fetch:
+        if st.session_state.get('last_news_fetch'):
             st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
         else:
             st.write("Click refresh")
@@ -3532,74 +3528,88 @@ elif st.session_state.current_page == "Active Opps":
             st.session_state.red_events = get_red_news_from_xml()
             st.session_state.last_news_fetch = datetime.now()
 
-    # Display red news in your preferred format
+    # Display red news - only today and tomorrow
     red_events = st.session_state.red_events
 
     if red_events:
-        # Group events by date
-        events_by_date = {}
-        for event in red_events:
-            date = event['Date']
-            if date not in events_by_date:
-                events_by_date[date] = []
-            events_by_date[date].append(event)
+        # Get today's and tomorrow's dates
+        today = datetime.now().strftime('%Y-%m-%d')
+        tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
 
-        # Sort dates chronologically
-        sorted_dates = sorted(events_by_date.keys())
+        # Filter events for only today and tomorrow
+        filtered_events = [
+            event for event in red_events
+            if event['Date'] in [today, tomorrow]
+        ]
 
-        st.success(f"🔴 Found {len(red_events)} High-Impact Events:")
+        if filtered_events:
+            # Group events by date
+            events_by_date = {}
+            for event in filtered_events:
+                date = event['Date']
+                if date not in events_by_date:
+                    events_by_date[date] = []
+                events_by_date[date].append(event)
 
-        # Display events grouped by date
-        for date in sorted_dates:
-            date_events = sorted(events_by_date[date], key=lambda x: x['Time'])
+            # Sort dates chronologically
+            sorted_dates = sorted(events_by_date.keys())
 
-            with st.expander(f"📅 {date} ({len(date_events)} events)", expanded=True):
-                for event in date_events:
-                    with st.container():
-                        col1, col2 = st.columns([3, 1])
-                        with col1:
-                            st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
+            st.success(f"🔴 Found {len(filtered_events)} High-Impact Events (Today & Tomorrow):")
 
-                            # Show details in a compact way
-                            details = []
-                            if event['Forecast'] != 'N/A' and event['Forecast']:
-                                details.append(f"Forecast: {event['Forecast']}")
-                            if event['Previous'] != 'N/A' and event['Previous']:
-                                details.append(f"Previous: {event['Previous']}")
-                            if event['Actual'] != 'N/A' and event['Actual']:
-                                details.append(f"Actual: {event['Actual']}")
+            # Display events grouped by date
+            for date in sorted_dates:
+                # Format date display
+                if date == today:
+                    date_display = f"📅 Today ({date})"
+                elif date == tomorrow:
+                    date_display = f"📅 Tomorrow ({date})"
+                else:
+                    date_display = f"📅 {date}"
 
-                            if details:
-                                st.caption(" | ".join(details))
+                date_events = sorted(events_by_date[date], key=lambda x: x['Time'])
 
-                        with col2:
-                            st.markdown(
-                                f"""
-                                <div style="
-                                    background: #ff4444; 
-                                    color: white; 
-                                    padding: 4px 8px; 
-                                    border-radius: 12px; 
-                                    font-size: 12px; 
-                                    text-align: center;
-                                    font-weight: bold;
-                                ">
-                                    HIGH
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
+                with st.expander(f"{date_display} ({len(date_events)} events)", expanded=True):
+                    for event in date_events:
+                        with st.container():
+                            col1, col2 = st.columns([3, 1])
+                            with col1:
+                                st.write(f"**{event['Time']}** - **[{event['Currency']}] {event['Event']}**")
 
-                        st.divider()
+                                # Show details in a compact way
+                                details = []
+                                if event['Forecast'] != 'N/A' and event['Forecast']:
+                                    details.append(f"Forecast: {event['Forecast']}")
+                                if event['Previous'] != 'N/A' and event['Previous']:
+                                    details.append(f"Previous: {event['Previous']}")
+                                if event['Actual'] != 'N/A' and event['Actual']:
+                                    details.append(f"Actual: {event['Actual']}")
+
+                                if details:
+                                    st.caption(" | ".join(details))
+
+                            with col2:
+                                st.markdown(
+                                    f"""
+                                    <div style="
+                                        background: #ff4444; 
+                                        color: white; 
+                                        padding: 4px 8px; 
+                                        border-radius: 12px; 
+                                        font-size: 12px; 
+                                        text-align: center;
+                                        font-weight: bold;
+                                    ">
+                                        HIGH
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+
+                            st.divider()
+        else:
+            st.info("✅ No high-impact events found for today or tomorrow.")
     else:
-        st.info("✅ No high-impact events found this week (markets may be calm).")
-
-    # Auto-refresh logic
-    if auto_refresh_news:
-        time.sleep(60)  # Refresh every 60 seconds
-        st.session_state.red_events = get_red_news_from_xml()
-        st.session_state.last_news_fetch = datetime.now()
-        st.rerun()
+        st.info("✅ No high-impact events found.")
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

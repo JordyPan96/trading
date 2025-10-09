@@ -3543,8 +3543,6 @@ elif st.session_state.current_page == "Active Opps":
 
             sorted_dates = sorted(events_by_date.keys())
 
-            
-
             for date in sorted_dates:
                 if date == today.strftime('%Y-%m-%d'):
                     date_display = f"📅 Today ({date})"
@@ -3554,7 +3552,7 @@ elif st.session_state.current_page == "Active Opps":
                     date_display = f"📅 {date}"
 
                 evs = events_by_date[date]  # No sorting by time, since time is removed
-                with st.expander(f"{date_display} ({len(evs)} events)", expanded=True):
+                with st.expander(f"{date_display} ({len(evs)} events)", expanded=False):
                     for e in evs:
                         col_a, col_b = st.columns([3, 1])
                         with col_a:

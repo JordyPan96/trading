@@ -3556,7 +3556,7 @@ elif st.session_state.current_page == "Active Opps":
             with st.expander("Upcoming Red News", expanded=False):
                 highlight_keywords = [
                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                    "GDP", "Non-Farm", "CPI", "election"
+                    "GDP", "Non-Farm", "CPI", "election","non farm"
                 ]
 
                 for e in filtered:

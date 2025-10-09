@@ -3432,63 +3432,46 @@ elif st.session_state.current_page == "Active Opps":
     import pytz
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_from_html():
-        url = "https://www.forexfactory.com/calendar?week=this"
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.text, 'html.parser')
+    def get_red_news_from_xml_ff():
+        url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
+        response = requests.get(url, timeout=10)
+        root = ET.fromstring(response.content)
 
         melbourne_tz = pytz.timezone('Australia/Melbourne')
-        now_melbourne = datetime.now(melbourne_tz)
-        today = now_melbourne.date()
+        today = datetime.now(melbourne_tz).date()
         tomorrow = today + timedelta(days=1)
 
         red_news = []
 
-        # Find all rows with high impact
-        rows = soup.select('tr.calendar__row.calendar__row--impact-high')  # CSS selector for high impact rows
+        for event in root.findall('event'):
+            impact = event.findtext('impact', '').strip()
+            if impact.lower() == 'high':
+                date_str = event.findtext('date', '').strip()  # e.g. "10-06-2025"
+                time_str = event.findtext('time', '').strip()  # e.g. "7:00am"
 
-        for row in rows:
-            try:
-                # Extract date/time info (Forex Factory uses data-event-datetime attribute)
-                event_datetime = row.get('data-event-datetime')
-                if event_datetime:
-                    # Example format: '2025-10-09T00:00:00Z' (UTC)
-                    dt_utc = datetime.strptime(event_datetime, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc)
-                    dt_local = dt_utc.astimezone(melbourne_tz)
-                    event_date = dt_local.date()
+                # Parse date/time from Forex Factory format to datetime with Melbourne timezone
+                try:
+                    dt_naive = datetime.strptime(f"{date_str} {time_str}", "%d-%m-%Y %I:%M%p")
+                    dt_localized = melbourne_tz.localize(dt_naive)
+                    event_date = dt_localized.date()
+                    event_time = dt_localized.strftime('%H:%M')
+                except Exception as e:
+                    # fallback: skip if parsing fails
+                    continue
 
-                    if event_date != today and event_date != tomorrow:
-                        continue  # Skip if not today or tomorrow (Melbourne time)
+                if event_date not in [today, tomorrow]:
+                    continue
 
-                    # Extract other details
-                    time_str = dt_local.strftime('%H:%M')
-                    currency = row.select_one('td.calendar__currency').text.strip() if row.select_one(
-                        'td.calendar__currency') else "N/A"
-                    event = row.select_one('td.calendar__event').text.strip() if row.select_one(
-                        'td.calendar__event') else "N/A"
-                    forecast = row.select_one('td.calendar__forecast').text.strip() if row.select_one(
-                        'td.calendar__forecast') else "N/A"
-                    previous = row.select_one('td.calendar__previous').text.strip() if row.select_one(
-                        'td.calendar__previous') else "N/A"
-                    actual = row.select_one('td.calendar__actual').text.strip() if row.select_one(
-                        'td.calendar__actual') else "N/A"
-
-                    red_news.append({
-                        'Date': event_date.strftime('%Y-%m-%d'),
-                        'Time': time_str,
-                        'Currency': currency,
-                        'Event': event,
-                        'Forecast': forecast,
-                        'Previous': previous,
-                        'Actual': actual,
-                        'Impact': 'HIGH 🔴'
-                    })
-            except Exception as e:
-                print(f"Error parsing row: {e}")
-                continue
+                red_news.append({
+                    'Date': event_date.strftime('%Y-%m-%d'),
+                    'Time': event_time,
+                    'Currency': event.findtext('country', 'N/A').strip(),
+                    'Event': event.findtext('title', 'N/A').strip(),
+                    'Forecast': event.findtext('forecast', 'N/A').strip(),
+                    'Previous': event.findtext('previous', 'N/A').strip(),
+                    'Actual': 'N/A',
+                    'Impact': 'HIGH 🔴'
+                })
 
         return red_news
 
@@ -3524,7 +3507,7 @@ elif st.session_state.current_page == "Active Opps":
     with col_news1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
-                st.session_state.red_events = get_red_news_from_html()
+                st.session_state.red_events = get_red_news_from_xml_ff()
                 st.session_state.last_news_fetch = datetime.now()
 
     with col_news2:
@@ -3536,7 +3519,7 @@ elif st.session_state.current_page == "Active Opps":
     # Initial load if not already loaded
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
-            st.session_state.red_events = get_red_news_from_html()
+            st.session_state.red_events = get_red_news_from_xml_ff()
             st.session_state.last_news_fetch = datetime.now()
 
     red_events = st.session_state.red_events

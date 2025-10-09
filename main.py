@@ -3509,29 +3509,16 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     # ==================== RED NEWS SECTION ====================
-    # ==================== RED NEWS SECTION USING XML ====================
-    st.markdown("---")
-    st.subheader("🔴 High Impact Forex News - This Week")
+    st.subheader("🔴 High Impact Forex News")
 
     # Red news controls
     col_news1, col_news2, col_news3 = st.columns([2, 1, 1])
 
     with col_news1:
         if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
-            with st.spinner("Fetching high impact news from XML..."):
-                red_news_list = get_red_news_from_xml()
-
-                # Convert to the date-organized format
-                red_news_by_date = {}
-                for news in red_news_list:
-                    date = news['Date']
-                    if date not in red_news_by_date:
-                        red_news_by_date[date] = []
-                    red_news_by_date[date].append(news)
-
-                st.session_state.red_news_data = red_news_by_date
+            with st.spinner("Checking for high impact news..."):
+                st.session_state.red_events = get_red_news_from_xml()
                 st.session_state.last_news_fetch = datetime.now()
-                st.success(f"Found {len(red_news_list)} high impact events!")
 
     with col_news2:
         # Auto-refresh toggle
@@ -3544,105 +3531,64 @@ elif st.session_state.current_page == "Active Opps":
             st.write("Click refresh")
 
     # Initial load if not already loaded
-    if not st.session_state.red_news_data:
-        with st.spinner("Loading high impact news from XML..."):
-            red_news_list = get_red_news_from_xml()
-
-            # Convert to the date-organized format
-            red_news_by_date = {}
-            for news in red_news_list:
-                date = news['Date']
-                if date not in red_news_by_date:
-                    red_news_by_date[date] = []
-                red_news_by_date[date].append(news)
-
-            st.session_state.red_news_data = red_news_by_date
+    if 'red_events' not in st.session_state:
+        with st.spinner("Loading high impact news..."):
+            st.session_state.red_events = get_red_news_from_xml()
             st.session_state.last_news_fetch = datetime.now()
 
-    # Display red news
-    if st.session_state.red_news_data:
-        total_red_events = sum(len(events) for events in st.session_state.red_news_data.values())
+    # Display red news in your preferred format
+    red_events = st.session_state.red_events
 
-        if total_red_events > 0:
-            st.success(f"🎯 Found {total_red_events} high impact events this week!")
+    if red_events:
+        st.success(f"🔴 Found {len(red_events)} High-Impact Events:")
 
-            # Sort dates chronologically
-            sorted_dates = sorted(st.session_state.red_news_data.keys())
+        # Display in a clean, compact format
+        for event in red_events:
+            with st.container():
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"**{event['Date']} {event['Time']}** - **[{event['Currency']}] {event['Event']}**")
 
-            # Create tabs for each day
-            tabs = st.tabs([f"📅 {date} ({len(st.session_state.red_news_data[date])})" for date in sorted_dates])
+                    # Show details in a compact way
+                    details = []
+                    if event['Forecast'] != 'N/A' and event['Forecast']:
+                        details.append(f"Forecast: {event['Forecast']}")
+                    if event['Previous'] != 'N/A' and event['Previous']:
+                        details.append(f"Previous: {event['Previous']}")
+                    if event['Actual'] != 'N/A' and event['Actual']:
+                        details.append(f"Actual: {event['Actual']}")
 
-            for date, tab in zip(sorted_dates, tabs):
-                with tab:
-                    daily_events = st.session_state.red_news_data[date]
+                    if details:
+                        st.caption(" | ".join(details))
 
-                    # Sort events by time
-                    daily_events_sorted = sorted(daily_events, key=lambda x: x['Time'])
+                with col2:
+                    st.markdown(
+                        f"""
+                            <div style="
+                                background: #ff4444; 
+                                color: white; 
+                                padding: 4px 8px; 
+                                border-radius: 12px; 
+                                font-size: 12px; 
+                                text-align: center;
+                                font-weight: bold;
+                            ">
+                                HIGH
+                            </div>
+                            """,
+                        unsafe_allow_html=True
+                    )
 
-                    for event in daily_events_sorted:
-                        with st.container():
-                            # Create a red alert box for each event
-                            st.markdown(
-                                f"""
-                                <div style="
-                                    background: linear-gradient(45deg, #ff4444, #cc0000);
-                                    color: white;
-                                    padding: 12px;
-                                    border-radius: 8px;
-                                    margin: 8px 0;
-                                    border-left: 5px solid #ff0000;
-                                ">
-                                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                                        <div>
-                                            <strong>⏰ {event['Time']}</strong> | 
-                                            <strong>💰 {event['Currency']}</strong>
-                                        </div>
-                                        <div style="background: white; color: #ff4444; padding: 2px 8px; border-radius: 12px; font-size: 12px; white-space: nowrap;">
-                                            HIGH IMPACT
-                                        </div>
-                                    </div>
-                                    <div style="margin-top: 8px; font-size: 14px;">
-                                        <strong>{event['Event']}</strong>
-                                    </div>
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
-
-                            # Show details if available
-                            details = []
-                            if event['Forecast'] != 'N/A' and event['Forecast']:
-                                details.append(f"**Forecast:** {event['Forecast']}")
-                            if event['Previous'] != 'N/A' and event['Previous']:
-                                details.append(f"**Previous:** {event['Previous']}")
-                            if event['Actual'] != 'N/A' and event['Actual']:
-                                details.append(f"**Actual:** {event['Actual']}")
-
-                            if details:
-                                st.markdown(" | ".join(details))
-
-                            st.divider()
-        else:
-            st.info("✅ No high impact red news found for this week. Markets are calm.")
+                st.divider()
+    else:
+        st.info("✅ No high-impact events found (markets may be calm).")
 
     # Auto-refresh logic
     if auto_refresh_news:
         time.sleep(60)  # Refresh every 60 seconds
-        red_news_list = get_red_news_from_xml()
-
-        # Convert to the date-organized format
-        red_news_by_date = {}
-        for news in red_news_list:
-            date = news['Date']
-            if date not in red_news_by_date:
-                red_news_by_date[date] = []
-            red_news_by_date[date].append(news)
-
-        st.session_state.red_news_data = red_news_by_date
+        st.session_state.red_events = get_red_news_from_xml()
         st.session_state.last_news_fetch = datetime.now()
         st.rerun()
-
-
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

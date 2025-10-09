@@ -3760,8 +3760,6 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = datetime.now()
         st.rerun()
 
-st.markdown("---")
-
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

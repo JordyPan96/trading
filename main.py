@@ -3432,153 +3432,58 @@ elif st.session_state.current_page == "Active Opps":
     import xml.etree.ElementTree as ET
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
-    def get_red_news_rss():
+    import requests
+    import xml.etree.ElementTree as ET
+    from datetime import datetime
+
+
+    def get_red_news_from_xml():
         """
-        Get high impact forex news using Forex Factory RSS feed (more reliable)
+        Fetch high-impact (red) forex news from Forex Factory's XML calendar feed.
         """
         try:
-            # Forex Factory RSS feed
-            url = "https://www.forexfactory.com/feed.php"
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-
-            print("🔄 Fetching Forex Factory RSS feed...")
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-
-            # Parse XML
-            soup = BeautifulSoup(response.content, 'xml')
-            items = soup.find_all('item')
+            url = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
+            response = requests.get(url, timeout=10)
+            root = ET.fromstring(response.content)
 
             red_news = []
 
-            for item in items:
-                try:
-                    title = item.find('title')
-                    description = item.find('description')
-                    pub_date = item.find('pubDate')
+            for event in root.findall('event'):
+                impact = event.findtext('impact', default='').strip().lower()
+                if impact == 'high':
+                    date_str = event.findtext('date', default='')
+                    time_str = event.findtext('time', default='')
+                    currency = event.findtext('currency', default='N/A')
+                    title = event.findtext('title', default='N/A')
+                    actual = event.findtext('actual', default='N/A')
+                    forecast = event.findtext('forecast', default='N/A')
+                    previous = event.findtext('previous', default='N/A')
 
-                    if title and description:
-                        title_text = title.get_text()
-                        desc_text = description.get_text()
-                        pub_date_text = pub_date.get_text() if pub_date else ""
+                    # Combine date and time for sorting or filtering if needed
+                    try:
+                        date_obj = datetime.strptime(f"{date_str} {time_str}", "%b %d %Y %H:%M")
+                        date_iso = date_obj.strftime('%Y-%m-%d')
+                        time_formatted = date_obj.strftime('%H:%M')
+                    except:
+                        date_iso = date_str
+                        time_formatted = time_str
 
-                        # Look for high impact indicators in title or description
-                        high_impact_keywords = [
-                            'high impact', 'high-impact', 'red news', 'major news',
-                            'unemployment claims', 'non-farm payroll', 'nfp', 'cpi',
-                            'inflation', 'interest rate', 'fomc', 'gdp', 'retail sales',
-                            'central bank', 'fed', 'ecb', 'boe', 'boj'
-                        ]
+                    red_news.append({
+                        'Date': date_iso,
+                        'Time': time_formatted,
+                        'Currency': currency,
+                        'Event': title,
+                        'Actual': actual,
+                        'Forecast': forecast,
+                        'Previous': previous,
+                        'Impact': 'HIGH 🔴'
+                    })
 
-                        # Check if it's high impact
-                        is_high_impact = any(keyword in title_text.lower() for keyword in high_impact_keywords)
-
-                        if is_high_impact:
-                            # Parse the description to extract details
-                            desc_soup = BeautifulSoup(desc_text, 'html.parser')
-
-                            # Extract time, currency, etc. from description
-                            time_match = re.search(r'(\d{1,2}:\d{2}[ap]m?)', title_text, re.IGNORECASE)
-                            time_text = time_match.group(1) if time_match else "All Day"
-
-                            # Extract currency (look for 3-letter codes)
-                            currency_match = re.search(r'\b([A-Z]{3})\b', title_text)
-                            currency = currency_match.group(1) if currency_match else "N/A"
-
-                            # Clean the event title
-                            event_text = title_text
-
-                            red_news.append({
-                                'Time': time_text,
-                                'Currency': currency,
-                                'Event': event_text,
-                                'Forecast': 'N/A',  # RSS doesn't provide these
-                                'Previous': 'N/A',
-                                'Actual': 'N/A',
-                                'Impact': 'HIGH 🔴',
-                                'PubDate': pub_date_text
-                            })
-
-                except Exception as e:
-                    print(f"Error parsing RSS item: {e}")
-                    continue
-
-            print(f"✅ Found {len(red_news)} high impact events via RSS")
-
-            # Organize by dates
-            today = datetime.now().date()
-            dates_to_show = [today + timedelta(days=i) for i in range(5)]
-
-            red_news_by_date = {}
-            for date in dates_to_show:
-                red_news_by_date[date.strftime('%Y-%m-%d')] = []
-
-            # Put all events under today for now
-            red_news_by_date[today.strftime('%Y-%m-%d')] = red_news
-
-            return red_news_by_date
+            return red_news
 
         except Exception as e:
-            print(f"Error fetching RSS: {e}")
-            st.error(f"Error fetching red news via RSS: {e}")
-            today = datetime.now().date()
-            dates_to_show = [today + timedelta(days=i) for i in range(5)]
-            return {date.strftime('%Y-%m-%d'): [] for date in dates_to_show}
-
-
-    # ==================== ALTERNATIVE: ECONOMIC CALENDAR API ====================
-    def get_red_news_api():
-        """
-        Alternative: Use free economic calendar API
-        """
-        try:
-            # Using Financial Modeling Prep free API (no key required for basic)
-            url = "https://financialmodelingprep.com/api/v3/economic_calendar?from=2024-01-01&to=2024-12-31"
-
-            print("🔄 Fetching from economic calendar API...")
-            response = requests.get(url, timeout=10)
-
-            if response.status_code == 200:
-                data = response.json()
-                red_news = []
-
-                for event in data:
-                    # Filter for high impact events
-                    if event.get('impact') == 'High':
-                        red_news.append({
-                            'Time': event.get('time', 'N/A'),
-                            'Currency': event.get('country', 'N/A'),
-                            'Event': event.get('event', 'N/A'),
-                            'Forecast': event.get('estimate', 'N/A'),
-                            'Previous': event.get('previous', 'N/A'),
-                            'Actual': event.get('actual', 'N/A'),
-                            'Impact': 'HIGH 🔴',
-                            'Date': event.get('date', 'N/A')
-                        })
-
-                print(f"✅ Found {len(red_news)} high impact events via API")
-
-                # Organize by dates
-                today = datetime.now().date()
-                dates_to_show = [today + timedelta(days=i) for i in range(5)]
-
-                red_news_by_date = {}
-                for date in dates_to_show:
-                    red_news_by_date[date.strftime('%Y-%m-%d')] = []
-
-                # Put all events under today for now
-                red_news_by_date[today.strftime('%Y-%m-%d')] = red_news
-
-                return red_news_by_date
-            else:
-                print(f"API returned status: {response.status_code}")
-                return {}
-
-        except Exception as e:
-            print(f"Error with API: {e}")
-            return {}
+            print(f"Error fetching red news from XML: {e}")
+            return []
 
 
     st.title("Saved Records")
@@ -3604,44 +3509,54 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.last_news_fetch = None
 
     # ==================== RED NEWS SECTION ====================
+    # ==================== RED NEWS SECTION USING XML ====================
     st.markdown("---")
-    st.subheader("🔴 High Impact Forex News - Next 5 Days")
+    st.subheader("🔴 High Impact Forex News - This Week")
 
-    # Red news controls with multiple methods
-    col_news1, col_news2, col_news3, col_news4 = st.columns([2, 1, 1, 1])
+    # Red news controls
+    col_news1, col_news2, col_news3 = st.columns([2, 1, 1])
 
     with col_news1:
-        method = st.selectbox(
-            "Data Source:",
-            ["RSS Feed", "Economic Calendar API", "Web Scraping"],
-            key="news_method"
-        )
+        if st.button("🔄 Refresh Red News", key="refresh_red_news", use_container_width=True):
+            with st.spinner("Fetching high impact news from XML..."):
+                red_news_list = get_red_news_from_xml()
+
+                # Convert to the date-organized format
+                red_news_by_date = {}
+                for news in red_news_list:
+                    date = news['Date']
+                    if date not in red_news_by_date:
+                        red_news_by_date[date] = []
+                    red_news_by_date[date].append(news)
+
+                st.session_state.red_news_data = red_news_by_date
+                st.session_state.last_news_fetch = datetime.now()
+                st.success(f"Found {len(red_news_list)} high impact events!")
 
     with col_news2:
-        if st.button("🔄 Refresh News", key="refresh_red_news", use_container_width=True):
-            with st.spinner(f"Fetching from {method}..."):
-                if method == "RSS Feed":
-                    st.session_state.red_news_data = get_red_news_rss()
-                elif method == "Economic Calendar API":
-                    st.session_state.red_news_data = get_red_news_api()
-                else:
-                    st.session_state.red_news_data = get_red_news_simple()
-                st.session_state.last_news_fetch = datetime.now()
-                st.success(f"News updated from {method}!")
-
-    with col_news3:
+        # Auto-refresh toggle
         auto_refresh_news = st.checkbox("Auto-refresh", value=False, key="auto_refresh_news")
 
-    with col_news4:
+    with col_news3:
         if st.session_state.last_news_fetch:
             st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M')}")
         else:
             st.write("Click refresh")
 
-    # Initial load
+    # Initial load if not already loaded
     if not st.session_state.red_news_data:
-        with st.spinner("Loading high impact news..."):
-            st.session_state.red_news_data = get_red_news_rss()  # Start with RSS
+        with st.spinner("Loading high impact news from XML..."):
+            red_news_list = get_red_news_from_xml()
+
+            # Convert to the date-organized format
+            red_news_by_date = {}
+            for news in red_news_list:
+                date = news['Date']
+                if date not in red_news_by_date:
+                    red_news_by_date[date] = []
+                red_news_by_date[date].append(news)
+
+            st.session_state.red_news_data = red_news_by_date
             st.session_state.last_news_fetch = datetime.now()
 
     # Display red news
@@ -3649,37 +3564,48 @@ elif st.session_state.current_page == "Active Opps":
         total_red_events = sum(len(events) for events in st.session_state.red_news_data.values())
 
         if total_red_events > 0:
-            st.success(f"🎯 Found {total_red_events} high impact events using {method}!")
+            st.success(f"🎯 Found {total_red_events} high impact events this week!")
 
-            # Display all events
-            for date, events in st.session_state.red_news_data.items():
-                if events:
-                    with st.expander(f"📅 {date} - {len(events)} events", expanded=True):
-                        for event in events:
+            # Sort dates chronologically
+            sorted_dates = sorted(st.session_state.red_news_data.keys())
+
+            # Create tabs for each day
+            tabs = st.tabs([f"📅 {date} ({len(st.session_state.red_news_data[date])})" for date in sorted_dates])
+
+            for date, tab in zip(sorted_dates, tabs):
+                with tab:
+                    daily_events = st.session_state.red_news_data[date]
+
+                    # Sort events by time
+                    daily_events_sorted = sorted(daily_events, key=lambda x: x['Time'])
+
+                    for event in daily_events_sorted:
+                        with st.container():
+                            # Create a red alert box for each event
                             st.markdown(
                                 f"""
-                                    <div style="
-                                        background: linear-gradient(45deg, #ff4444, #cc0000);
-                                        color: white;
-                                        padding: 12px;
-                                        border-radius: 8px;
-                                        margin: 8px 0;
-                                        border-left: 5px solid #ff0000;
-                                    ">
-                                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                                            <div style="flex: 1;">
-                                                <strong>⏰ {event['Time']}</strong> | 
-                                                <strong>💰 {event['Currency']}</strong>
-                                            </div>
-                                            <div style="background: white; color: #ff4444; padding: 2px 8px; border-radius: 12px; font-size: 12px; white-space: nowrap;">
-                                                HIGH IMPACT
-                                            </div>
+                                <div style="
+                                    background: linear-gradient(45deg, #ff4444, #cc0000);
+                                    color: white;
+                                    padding: 12px;
+                                    border-radius: 8px;
+                                    margin: 8px 0;
+                                    border-left: 5px solid #ff0000;
+                                ">
+                                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                                        <div>
+                                            <strong>⏰ {event['Time']}</strong> | 
+                                            <strong>💰 {event['Currency']}</strong>
                                         </div>
-                                        <div style="margin-top: 8px; font-size: 14px;">
-                                            <strong>{event['Event']}</strong>
+                                        <div style="background: white; color: #ff4444; padding: 2px 8px; border-radius: 12px; font-size: 12px; white-space: nowrap;">
+                                            HIGH IMPACT
                                         </div>
                                     </div>
-                                    """,
+                                    <div style="margin-top: 8px; font-size: 14px;">
+                                        <strong>{event['Event']}</strong>
+                                    </div>
+                                </div>
+                                """,
                                 unsafe_allow_html=True
                             )
 
@@ -3695,36 +3621,27 @@ elif st.session_state.current_page == "Active Opps":
                             if details:
                                 st.markdown(" | ".join(details))
 
-                            if event.get('PubDate'):
-                                st.caption(f"Published: {event['PubDate']}")
-
                             st.divider()
         else:
-            st.warning(f"No high impact events found using {method}.")
-            st.info("""
-                **Try these solutions:**
-                1. Switch to a different data source using the dropdown
-                2. Check if there are actually high-impact events today
-                3. The RSS feed might be temporarily unavailable
+            st.info("✅ No high impact red news found for this week. Markets are calm.")
 
-                **Direct links:**
-                - [Forex Factory Calendar](https://www.forexfactory.com/calendar)
-                - [Forex Factory RSS](https://www.forexfactory.com/feed.php)
-                """)
-
-    # Auto-refresh
+    # Auto-refresh logic
     if auto_refresh_news:
-        time.sleep(60)
-        if method == "RSS Feed":
-            st.session_state.red_news_data = get_red_news_rss()
-        elif method == "Economic Calendar API":
-            st.session_state.red_news_data = get_red_news_api()
-        else:
-            st.session_state.red_news_data = get_red_news_simple()
+        time.sleep(60)  # Refresh every 60 seconds
+        red_news_list = get_red_news_from_xml()
+
+        # Convert to the date-organized format
+        red_news_by_date = {}
+        for news in red_news_list:
+            date = news['Date']
+            if date not in red_news_by_date:
+                red_news_by_date[date] = []
+            red_news_by_date[date].append(news)
+
+        st.session_state.red_news_data = red_news_by_date
         st.session_state.last_news_fetch = datetime.now()
         st.rerun()
 
-    st.markdown("---")
 
 
     # Use your existing Google Sheets functions

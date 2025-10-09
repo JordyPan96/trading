@@ -3481,7 +3481,7 @@ elif st.session_state.current_page == "Active Opps":
                         'Forecast': ev.get('forecast', 'N/A'),
                         'Previous': ev.get('previous', 'N/A'),
                         'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                        'Impact': 'HIGH 🔴'
+                        'Impact': 'HIGH'
                     })
 
         print(f"Success: Retrieved and processed {len(red_news)} high-impact news events.")
@@ -3609,20 +3609,7 @@ elif st.session_state.current_page == "Active Opps":
                     if details:
                         st.caption(" | ".join(details))
 
-                    st.markdown("""
-                        <div style="
-                          background: #ff0000;
-                          color: white;
-                          padding: 4px 8px;
-                          border-radius: 12px;
-                          font-size: 12px;
-                          text-align: center;
-                          font-weight: bold;
-                          width: 50px;
-                        ">
-                          HIGH
-                        </div>
-                    """, unsafe_allow_html=True)
+                
 
                     if should_highlight:
                         st.markdown("</div>", unsafe_allow_html=True)

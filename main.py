@@ -3463,6 +3463,8 @@ elif st.session_state.current_page == "Active Opps":
         valid_dates = {yesterday, today, tomorrow}
 
         for ev in data:
+            date_str = ev.get('date')
+            print(f"Event date raw: {date_str}, impact: {ev.get('impact')}")
             impact = ev.get('impact', '').strip().lower()
             if impact == 'high':
                 date_str = ev.get('date')
@@ -3547,15 +3549,6 @@ elif st.session_state.current_page == "Active Opps":
         today = now_utc.date()
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
-
-        st.write("Yesterday:", yesterday.strftime('%Y-%m-%d'))
-        st.write("Today:", today.strftime('%Y-%m-%d'))
-        st.write("Tomorrow:", tomorrow.strftime('%Y-%m-%d'))
-
-        st.write("All event dates in session_state:")
-        st.write(sorted(set(e['Date'] for e in red_events)))
-
-        
 
         valid_dates = {yesterday.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), tomorrow.strftime('%Y-%m-%d')}
         filtered = [e for e in red_events if e['Date'] in valid_dates]

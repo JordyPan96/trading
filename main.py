@@ -3572,51 +3572,51 @@ elif st.session_state.current_page == "Active Opps":
                     event_name = e['Event']
                     should_highlight = any(keyword.lower() in event_name.lower() for keyword in highlight_keywords)
 
-                    container_style = """
-                        background-color: #ffdddd;
-                        padding: 10px;
-                        border-radius: 8px;
-                        margin-bottom: 10px;
-                    """ if should_highlight else ""
-
-                    with st.container():
-                        if should_highlight:
-                            st.markdown(f'<div style="{container_style}">', unsafe_allow_html=True)
-
-                        st.write(f"**{datetime_display}** - **[{e['Currency']}] {event_name}**")
-
-                        details = []
-                        if e.get('Forecast') and e['Forecast'] != 'N/A':
-                            details.append(f"Forecast: {e['Forecast']}")
-                        if e.get('Previous') and e['Previous'] != 'N/A':
-                            details.append(f"Previous: {e['Previous']}")
-                        if e.get('Actual') and e['Actual'] != 'N/A':
-                            details.append(f"Actual: {e['Actual']}")
-                        if details:
-                            st.caption(" | ".join(details))
-
-                        st.markdown(
-                            """
+                    if should_highlight:
+                        st.markdown("""
                             <div style="
-                              background: #ff4444;
-                              color: white;
-                              padding: 4px 8px;
-                              border-radius: 12px;
-                              font-size: 12px;
-                              text-align: center;
-                              font-weight: bold;
-                              width: 50px;
+                                background-color: #ff4444;
+                                color: white;
+                                padding: 12px;
+                                border-radius: 10px;
+                                margin-bottom: 10px;
                             ">
-                              HIGH
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        """, unsafe_allow_html=True)
 
-                        if should_highlight:
-                            st.markdown("</div>", unsafe_allow_html=True)
+                    st.write(f"**{datetime_display}** - **[{e['Currency']}] {event_name}**")
 
-                        st.divider()
+                    details = []
+                    if e.get('Forecast') and e['Forecast'] != 'N/A':
+                        details.append(f"Forecast: {e['Forecast']}")
+                    if e.get('Previous') and e['Previous'] != 'N/A':
+                        details.append(f"Previous: {e['Previous']}")
+                    if e.get('Actual') and e['Actual'] != 'N/A':
+                        details.append(f"Actual: {e['Actual']}")
+                    if details:
+                        st.caption(" | ".join(details))
+
+                    st.markdown(
+                        """
+                        <div style="
+                          background: #ff0000;
+                          color: white;
+                          padding: 4px 8px;
+                          border-radius: 12px;
+                          font-size: 12px;
+                          text-align: center;
+                          font-weight: bold;
+                          width: 50px;
+                        ">
+                          HIGH
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    if should_highlight:
+                        st.markdown("</div>", unsafe_allow_html=True)
+
+                    st.divider()
         else:
             st.info("✅ No high-impact events found for yesterday, today or tomorrow.")
     else:

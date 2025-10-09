@@ -3474,7 +3474,7 @@ elif st.session_state.current_page == "Active Opps":
                 if event_date in (today, tomorrow):
                     red_news.append({
                         'Date': event_date.strftime('%Y-%m-%d'),
-                        'TimeUTC': dt.strftime('%Y-%m-%dT%H:%M:%S%z'),  # add full datetime with tz info
+                        'TimeUTC': dt.isoformat(),  # add full datetime with tz info
                         'Currency': ev.get('country', 'N/A'),
                         'Event': ev.get('title', 'N/A'),
                         'Forecast': ev.get('forecast', 'N/A'),

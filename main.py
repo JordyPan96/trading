@@ -3432,6 +3432,7 @@ elif st.session_state.current_page == "Active Opps":
     import pytz
     from dateutil import parser as dp
     from zoneinfo import ZoneInfo  # Python 3.9+
+    from dateutil.parser import isoparse
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():

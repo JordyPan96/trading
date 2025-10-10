@@ -3376,7 +3376,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                         'target_price': 0.0,
 
-                                        'status': 'Speculation'  # Default status
+                                        'status': 'Speculation',  # Default status
+
+                                        'exit_rr': exit_text
 
                                     }
 
@@ -4125,6 +4127,7 @@ elif st.session_state.current_page == "Active Opps":
                         st.write(f"**Strategy:** {record['risk_multiplier']}")
                         st.write(f"**Position Size:** {record['position_size']}")
                         st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
+                        st.write(f"**Target RR:** {record.get('exit_rr', 'N/A')}")
 
                     with col2:
                         entry_price = st.number_input(

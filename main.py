@@ -3547,9 +3547,6 @@ elif st.session_state.current_page == "Active Opps":
 
     red_events = st.session_state.red_events
 
-    # Debug info: show how many events fetched
-    #st.write(f"Fetched {len(red_events)} high-impact news events")
-
     if red_events:
         now_melb = datetime.now(melbourne_tz)
 
@@ -3572,10 +3569,17 @@ elif st.session_state.current_page == "Active Opps":
                     "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
                 ]
 
+                current_day = None
+
                 for dt_local, e in filtered:
-                    date_str = dt_local.strftime('%Y-%m-%d')
+                    date_str = dt_local.strftime('%Y-%m-%d')  # Used to track day changes
+                    day_str = dt_local.strftime('%A')  # Just the weekday, e.g., "Friday"
                     time_str = dt_local.strftime('%I:%M %p')
-                    datetime_display = f"{date_str} {time_str}"
+
+                    # Add header when a new day starts
+                    if current_day != date_str:
+                        st.markdown(f"### {day_str}")
+                        current_day = date_str
 
                     event_name = e['Event']
                     should_highlight = any(keyword.lower() in event_name.lower() for keyword in highlight_keywords)
@@ -3591,7 +3595,7 @@ elif st.session_state.current_page == "Active Opps":
                             ">
                         """, unsafe_allow_html=True)
 
-                    st.write(f"**{datetime_display}** - **[{e['Currency']}] {event_name}**")
+                    st.write(f"**{time_str}** - **[{e['Currency']}] {event_name}**")
 
                     details = []
                     if e.get('Forecast') and e['Forecast'] != 'N/A':

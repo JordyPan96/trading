@@ -3457,34 +3457,47 @@ elif st.session_state.current_page == "Active Opps":
 
         red_news = []
 
-        now_utc = datetime.now(timezone.utc)
-        today = now_utc.date()
-        yesterday = today - timedelta(days=1)
-        tomorrow = today + timedelta(days=1)
+        # Timezones
+        melbourne_tz = pytz.timezone("Australia/Melbourne")
+        now_melb = datetime.now(melbourne_tz)
+        today_melb = now_melb.date()
 
-        valid_dates = {yesterday, today, tomorrow}
-        valid_dates_str = {d.strftime('%Y-%m-%d') for d in valid_dates}
+        # Get the end of the current week (Sunday)
+        days_until_sunday = 6 - today_melb.weekday()
+        end_of_week = today_melb + timedelta(days=days_until_sunday)
 
         for ev in data:
             date_str = ev.get('date')
             impact = ev.get('impact', '').strip().lower()
 
-            if impact == 'high' and date_str:
-                event_date_str = date_str[:10]  # Extract 'YYYY-MM-DD' from JSON date string
+            if impact != 'high' or not date_str:
+                continue
 
-                if event_date_str in valid_dates_str:
-                    red_news.append({
-                        'Date': event_date_str,
-                        'TimeUTC': date_str,  # full original datetime string with timezone
-                        'Currency': ev.get('country', 'N/A'),
-                        'Event': ev.get('title', 'N/A'),
-                        'Forecast': ev.get('forecast', 'N/A'),
-                        'Previous': ev.get('previous', 'N/A'),
-                        'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                        'Impact': 'HIGH'
-                    })
+            try:
+                # Parse the original UTC datetime
+                event_dt_utc = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                # Convert to Melbourne time
+                event_dt_melb = event_dt_utc.astimezone(melbourne_tz)
+                event_date_melb = event_dt_melb.date()
+            except Exception as e:
+                print(f"Error parsing date: {date_str} — {e}")
+                continue
 
-        print(f"Success: Retrieved and processed {len(red_news)} high-impact news events.")
+            # Include only events from now until end of the week (Melbourne time)
+            if today_melb <= event_date_melb <= end_of_week:
+                red_news.append({
+                    'Date': event_date_melb.strftime('%Y-%m-%d'),
+                    'TimeMelbourne': event_dt_melb.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                    'Currency': ev.get('country', 'N/A'),
+                    'Event': ev.get('title', 'N/A'),
+                    'Forecast': ev.get('forecast', 'N/A'),
+                    'Previous': ev.get('previous', 'N/A'),
+                    'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
+                    'Impact': 'HIGH'
+                })
+
+        print(
+            f"Success: Retrieved and processed {len(red_news)} high-impact news events (future this week, Melbourne time).")
         return red_news
 
     st.title("Saved Records")
@@ -3510,7 +3523,7 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    # Set your timezone here:
+    # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
     col1, col2 = st.columns([2, 1])
@@ -3518,11 +3531,11 @@ elif st.session_state.current_page == "Active Opps":
         if st.button("🔄 Refresh Red News", key="refresh_red_news_json", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
                 st.session_state.red_events = get_red_news_from_json_with_rate_limit()
-                st.session_state.last_news_fetch = datetime.now(timezone.utc)
+                st.session_state.last_news_fetch = datetime.now()
 
     with col2:
         if st.session_state.last_news_fetch:
-            st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M UTC')}")
+            st.write(f"Last: {st.session_state.last_news_fetch.strftime('%H:%M:%S')}")
         else:
             st.write("Click refresh")
 
@@ -3530,7 +3543,7 @@ elif st.session_state.current_page == "Active Opps":
     if not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_json_with_rate_limit()
-            st.session_state.last_news_fetch = datetime.now(timezone.utc)
+            st.session_state.last_news_fetch = datetime.now()
 
     red_events = st.session_state.red_events
 
@@ -3538,50 +3551,31 @@ elif st.session_state.current_page == "Active Opps":
     st.write(f"Fetched {len(red_events)} high-impact news events")
 
     if red_events:
-        now_utc = datetime.now(timezone.utc)
-        now_melb = now_utc.astimezone(melbourne_tz)
-        today_melb = now_melb.date()
-        yesterday = today_melb - timedelta(days=1)
-        tomorrow = today_melb + timedelta(days=1)
-        valid_dates = {yesterday, today_melb, tomorrow}
+        now_melb = datetime.now(melbourne_tz)
 
         filtered = []
         for e in red_events:
             try:
-                event_date = datetime.strptime(e['Date'], '%Y-%m-%d').date()
-                if event_date not in valid_dates:
-                    continue
-
-                dt_utc = isoparse(e['TimeUTC'])
-                dt_local = dt_utc.astimezone(melbourne_tz)
-
-                # Uncomment for debugging event vs now times
-                # st.write(f"Event time: {dt_local}, Now Melbourne: {now_melb}")
-
-                # Only future events relative to Melbourne time
+                dt_local = isoparse(e['TimeMelbourne'])
                 if dt_local > now_melb:
-                    filtered.append(e)
-
+                    filtered.append((dt_local, e))
             except Exception as ex:
-                st.write(f"Error parsing event: {ex}")
+                st.write(f"Error parsing event time: {ex}")
                 continue
 
+        filtered.sort(key=lambda x: x[0])  # Sort by time
+
         if filtered:
-            with st.expander("Upcoming Red News", expanded=False):
+            with st.expander("Upcoming Red News", expanded=True):
                 highlight_keywords = [
                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
                     "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
                 ]
 
-                for e in filtered:
-                    try:
-                        dt_utc = isoparse(e['TimeUTC'])
-                        dt_local = dt_utc.astimezone(melbourne_tz)
-                        date_str = dt_local.strftime('%Y-%m-%d')
-                        time_str = dt_local.strftime('%I:%M %p')
-                        datetime_display = f"{date_str} {time_str}"
-                    except Exception:
-                        datetime_display = "N/A"
+                for dt_local, e in filtered:
+                    date_str = dt_local.strftime('%Y-%m-%d')
+                    time_str = dt_local.strftime('%I:%M %p')
+                    datetime_display = f"{date_str} {time_str}"
 
                     event_name = e['Event']
                     should_highlight = any(keyword.lower() in event_name.lower() for keyword in highlight_keywords)
@@ -3609,14 +3603,12 @@ elif st.session_state.current_page == "Active Opps":
                     if details:
                         st.caption(" | ".join(details))
 
-                
-
                     if should_highlight:
                         st.markdown("</div>", unsafe_allow_html=True)
 
                     st.divider()
         else:
-            st.info("No high-impact future events found for yesterday, today or tomorrow.")
+            st.info("No high-impact events found for the rest of this week.")
     else:
         st.info("No high-impact events found.")
 

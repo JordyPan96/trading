@@ -3548,7 +3548,7 @@ elif st.session_state.current_page == "Active Opps":
     red_events = st.session_state.red_events
 
     # Debug info: show how many events fetched
-    st.write(f"Fetched {len(red_events)} high-impact news events")
+    #st.write(f"Fetched {len(red_events)} high-impact news events")
 
     if red_events:
         now_melb = datetime.now(melbourne_tz)

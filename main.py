@@ -6375,10 +6375,10 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data = {
         '': ['2_BNR', '2_BNR_TPF'],
-        'XAUUSD <66': ['1.79%', '1.79%'],
+        'XAUUSD <66': ['1.79%', '1.19%'],
         'XAUUSD >66': ['1.19%', '1.19%'],
-        'GBPUSD/EURUSD <66': ['1.49%', '1.49%'],
-        'GBPUSD/EURUSD >66': ['0.99%', '0.5%'],
+        'GBPUSD/EURUSD <66': ['1.49%', '0.99%'],
+        'GBPUSD/EURUSD >66': ['0.99%', '0.99%'],
         'OTHER <66': ['0.99%', '0.5%'],
         'OTHER >66': ['0.99%', '0.5%']
     }

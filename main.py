@@ -4552,7 +4552,7 @@ elif st.session_state.current_page == "Trade Signal":
             return "Unknown"
 
 
-    def calculate_be_price(entry_price, exit_price, direction):
+    def calculate_be_price(entry_price, exit_price, direction, strategy):
         """Calculate BE Price at 2.5R"""
         try:
             entry = safe_float(entry_price, 0.0)
@@ -4564,9 +4564,15 @@ elif st.session_state.current_page == "Trade Signal":
             distance = abs(entry - exit_val)
 
             if direction == "BUY":
-                return entry + (distance * 2.5)
+                if strategy in ['1_BNR', '1_BNR_TPF']:
+                    return entry + (distance * 1.5)
+                elif strategy in ['2_BNR', '2_BNR_TPF']:
+                    return entry + (distance * 2.5)
             elif direction == "SELL":
-                return entry - (distance * 2.5)
+                if strategy in ['1_BNR', '1_BNR_TPF']:
+                    return entry - (distance * 1.5)
+                elif strategy in ['2_BNR', '2_BNR_TPF']:
+                    return entry - (distance * 2.5)
             else:
                 return 0.0
         except:
@@ -6039,7 +6045,7 @@ elif st.session_state.current_page == "Trade Signal":
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        original_sl_price, direction)
+                                                                                        original_sl_price, direction,strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values

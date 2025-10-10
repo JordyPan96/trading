@@ -4568,11 +4568,15 @@ elif st.session_state.current_page == "Trade Signal":
                     return entry + (distance * 1.5)
                 elif strategy in ['2_BNR', '2_BNR_TPF']:
                     return entry + (distance * 2.5)
+                else:
+                    return entry + (distance * 1.5)
             elif direction == "SELL":
                 if strategy in ['1_BNR', '1_BNR_TPF']:
                     return entry - (distance * 1.5)
                 elif strategy in ['2_BNR', '2_BNR_TPF']:
                     return entry - (distance * 2.5)
+                else:
+                    return entry - (distance * 1.5)
             else:
                 return 0.0
         except:

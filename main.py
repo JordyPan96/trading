@@ -541,13 +541,13 @@ def get_google_sheets_client():
             st.sidebar.error(" Missing required credentials (private_key or client_email)")
             return None
 
-        st.sidebar.success(f" Service Account: {creds_dict.get('client_email', 'Unknown')}")
+        #st.sidebar.success(f" Service Account: {creds_dict.get('client_email', 'Unknown')}")
 
         # Create credentials
         creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         client = gspread.authorize(creds)
 
-        st.sidebar.success(" Google Sheets connected successfully!")
+        #st.sidebar.success(" Google Sheets connected successfully!")
         return client
 
     except Exception as e:
@@ -570,7 +570,7 @@ def load_data_from_sheets(sheet_name="Trade", worksheet_name="Trade.csv"):
 
             if records:
                 df = pd.DataFrame(records)
-                st.sidebar.success(f" Loaded {len(df)} rows from Google Sheets")
+                #st.sidebar.success(f" Loaded {len(df)} rows from Google Sheets")
 
                 # CLEAN THE DATA - This is the key fix!
                 df_clean = clean_data_for_calculations(df)

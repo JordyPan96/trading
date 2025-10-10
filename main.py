@@ -6371,16 +6371,16 @@ elif st.session_state.current_page == "Stats":
 elif st.session_state.current_page == "Guidelines":
     st.title("Guidelines to Follow")
 
-    st.subheader("Length Requirement for Two Entries (Price squeeze out of 559 zone)")
+    st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of 559 zone)")
 
     table_data = {
         '': ['2_BNR', '2_BNR_TPF'],
-        'XAUUSD <66': ['1.79%', '1.19%'],
-        'XAUUSD >66': ['1.19%', '1.19%'],
-        'GBPUSD/EURUSD <66': ['1.49%', '0.99%'],
-        'GBPUSD/EURUSD >66': ['0.99%', '0.99%'],
-        'OTHER <66': ['0.99%', '0.5%'],
-        'OTHER >66': ['0.99%', '0.5%']
+        'XAUUSD 50 - 66': ['1.79%', '1.19%'],
+        'XAUUSD 66 - 786': ['1.19%', '1.19%'],
+        'GBPUSD/EURUSD 50 - 66': ['1.49%', '0.99%'],
+        'GBPUSD/EURUSD 66 - 786': ['0.99%', '0.99%'],
+        'OTHER 50 - 66': ['0.99%', '0.5%'],
+        'OTHER 66 - 786': ['0.99%', '0.5%']
     }
 
     st.table(table_data)

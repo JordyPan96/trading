@@ -4553,7 +4553,7 @@ elif st.session_state.current_page == "Trade Signal":
 
 
     def calculate_be_price(entry_price, exit_price, direction, strategy):
-        """Calculate BE Price at 2.5R"""
+        """Calculate Break-Even Price based on strategy and direction."""
         try:
             entry = safe_float(entry_price, 0.0)
             exit_val = safe_float(exit_price, 0.0)
@@ -4561,30 +4561,30 @@ elif st.session_state.current_page == "Trade Signal":
             if entry == 0 or exit_val == 0:
                 return 0.0
 
-            distance = abs(entry - exit_val)
+            risk_distance = abs(entry - exit_val)
 
-            if direction == "BUY":
-                if strategy in ['1_BNR', '1_BNR_TPF']:
-                    return entry + (distance * 1.5)
-                elif strategy in ['2_BNR', '2_BNR_TPF']:
-                    return entry + (distance * 2.5)
-                else:
-                    return entry + (distance * 1.5)
-            elif direction == "SELL":
-                if strategy in ['1_BNR', '1_BNR_TPF']:
-                    return entry - (distance * 1.5)
-                elif strategy in ['2_BNR', '2_BNR_TPF']:
-                    return entry - (distance * 2.5)
-                else:
-                    return entry - (distance * 1.5)
+            # Strategy → Multiplier mapping
+            strategy_multipliers = {
+                '1_BNR': 1.5,
+                '1_BNR_TPF': 1.5,
+                '2_BNR': 2.5,
+                '2_BNR_TPF': 2.5
+            }
+            multiplier = strategy_multipliers.get(strategy, 1.5)
+
+            direction = direction.upper()
+            if direction == 'BUY':
+                return entry + (risk_distance * multiplier)
+            elif direction == 'SELL':
+                return entry - (risk_distance * multiplier)
             else:
-                return 0.0
+                return 0.0  # Invalid direction
         except:
             return 0.0
 
     # Add this new function to calculate first trail price
-    def calculate_first_trail_price(entry_price, stop_loss, strategy):
-        """Calculate first trail price based on strategy and risk"""
+    def calculate_first_trail_price(entry_price, stop_loss, direction, strategy):
+        """Calculate first trail price based on strategy and trade direction ('BUY' or 'SELL')"""
         try:
             entry = safe_float(entry_price, 0.0)
             stop = safe_float(stop_loss, 0.0)
@@ -4594,21 +4594,22 @@ elif st.session_state.current_page == "Trade Signal":
 
             risk_distance = abs(entry - stop)
 
-            # Determine multiplier based on strategy
-            if strategy in ['1_BNR', '1_BNR_TPF']:
-                multiplier = 3.0
-            elif strategy in ['2_BNR', '2_BNR_TPF']:
-                multiplier = 5.0
+            # Strategy → Multiplier mapping
+            strategy_multipliers = {
+                '1_BNR': 3.0,
+                '1_BNR_TPF': 3.0,
+                '2_BNR': 5.0,
+                '2_BNR_TPF': 5.0
+            }
+            multiplier = strategy_multipliers.get(strategy, 3.0)
+
+            direction = direction.upper()
+            if direction == 'BUY':
+                return entry + (risk_distance * multiplier)
+            elif direction == 'SELL':
+                return entry - (risk_distance * multiplier)
             else:
-                multiplier = 3.0  # Default fallback
-
-            # Calculate trail price based on direction
-            if entry > stop:  # BUY position
-                trail_price = entry + (risk_distance * multiplier)
-            else:  # SELL position
-                trail_price = entry - (risk_distance * multiplier)
-
-            return trail_price
+                return 0.0  # Invalid direction
         except:
             return 0.0
 
@@ -6049,13 +6050,13 @@ elif st.session_state.current_page == "Trade Signal":
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        original_sl_price, direction,strategy)
+                                                                                        original_sl_price, direction, strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values
                             if symbol not in st.session_state.first_trail_prices:
                                 st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
-                                    original_open_price, original_sl_price, strategy
+                                    original_open_price, original_sl_price, direction, strategy
                                 )
                             first_trail_price = st.session_state.first_trail_prices[symbol]
 

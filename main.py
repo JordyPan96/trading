@@ -3269,7 +3269,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                         'entry_price': 0.0,  # Default values
                                         'exit_price': 0.0,
                                         'target_price': 0.0,
-                                        'status': 'Speculation'  # Default status
+                                        'status': 'Speculation',  # Default status
+                                        'exit_rr': exit_text
                                     }
 
                                     if existing_index is not None:

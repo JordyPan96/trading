@@ -3496,8 +3496,8 @@ elif st.session_state.current_page == "Active Opps":
                     'Impact': 'HIGH'
                 })
 
-        print(
-            f"Success: Retrieved and processed {len(red_news)} high-impact news events (future this week, Melbourne time).")
+        #print(
+            #f"Success: Retrieved and processed {len(red_news)} high-impact news events (future this week, Melbourne time).")
         return red_news
 
     st.title("Saved Records")

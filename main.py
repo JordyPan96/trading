@@ -3575,7 +3575,7 @@ elif st.session_state.current_page == "Active Opps":
                     date_str = dt_local.strftime('%Y-%m-%d')  # Used to track day changes
                     day_str = dt_local.strftime('%A')  # Just the weekday, e.g., "Friday"
                     time_str = dt_local.strftime('%I:%M %p')
-                    date_display = dt_local.strftime('%B %d, %Y')  # Month day, year, e.g., October 10, 2025
+                    date_display = dt_local.strftime('%Y-%m-%d')  # Format: 2025-10-10
 
                     # Add header when a new day starts
                     if current_day != date_str:

@@ -3081,7 +3081,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length):"
+                            entry_title = "Entry Guide (SL__Entry Length): More than 5 Pips Count as Position 50"
                             entry_text = "5 Pips before 559 or 618, 33% Max"
                             SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                             SL_text = "Middle of FL and NF (62% Max)"
@@ -3098,14 +3098,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "66 - 805"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length):"
+                            entry_title = "Entry Guide (SL__Entry Length): More than 5 Pips Count as Position 559 - 66"
                             entry_text = "5 Pips before 702, 33% Max"
                             SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                             SL_text = "Middle of FL and NF (62% Max)"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length):"
+                            entry_title = "Entry Guide (SL__Entry Length): More than 5 Pips Count as Position 559 - 66"
                             entry_text = "5 Pips before 702, 33% Max"
                             SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                             SL_text = "Middle of FL and NF (62% Max)"
@@ -3149,7 +3149,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length):"
+                                entry_title = "Entry Guide (SL__Entry Length): More than 2 $ Count as Position 50"
                                 entry_text = "2 $ before 559 or 618, 33% Max"
                                 SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                                 SL_text = "Middle of FL and NF (62% Max)"
@@ -3165,14 +3165,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         elif (Variances == "66 - 805"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length):"
+                                entry_title = "Entry Guide (SL__Entry Length): More than 2 $ Count as Position 559 - 66"
                                 entry_text = "2 $ before 702, 33% Max"
                                 SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                                 SL_text = "Middle of FL and NF (62% Max)"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length):"
+                                entry_title = "Entry Guide (SL__Entry Length): More than 2 $ Count as Position 559 - 66"
                                 entry_text = "2 $ before 702, 33% Max"
                                 SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
                                 SL_text = "Middle of FL and NF (62% Max)"

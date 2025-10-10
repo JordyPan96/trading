@@ -3487,7 +3487,7 @@ elif st.session_state.current_page == "Active Opps":
             if today_melb <= event_date_melb <= end_of_week:
                 red_news.append({
                     'Date': event_date_melb.strftime('%Y-%m-%d'),
-                    'TimeMelbourne': event_dt_melb.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                    'TimeMelbourne': event_dt_melb.isoformat(),
                     'Currency': ev.get('country', 'N/A'),
                     'Event': ev.get('title', 'N/A'),
                     'Forecast': ev.get('forecast', 'N/A'),

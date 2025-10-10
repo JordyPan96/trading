@@ -3147,7 +3147,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_text = "2$ behind 91 Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
-                        elif (Variances == "559 -ON 559 66"):
+                        elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide (SL__Entry Length): More than 2 $ before 559 Count as Position 50"
                                 entry_text = "2 $ before 559 or 618, 33% Max"

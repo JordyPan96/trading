@@ -4569,12 +4569,12 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Strategy → Multiplier mapping
             strategy_multipliers = {
-                '1_BNR': 1.5,
-                '1_BNR_TPF': 1.5,
+                '1_BNR': 2.0,
+                '1_BNR_TPF': 2.0,
                 '2_BNR': 2.5,
                 '2_BNR_TPF': 2.5
             }
-            multiplier = strategy_multipliers.get(strategy, 1.5)
+            multiplier = strategy_multipliers.get(strategy, 2.0)
 
             direction = direction.upper()
             if direction == 'BUY':
@@ -4600,12 +4600,12 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Strategy → Multiplier mapping
             strategy_multipliers = {
-                '1_BNR': 3.0,
-                '1_BNR_TPF': 3.0,
+                '1_BNR': 4.0,
+                '1_BNR_TPF': 4.0,
                 '2_BNR': 5.0,
                 '2_BNR_TPF': 5.0
             }
-            multiplier = strategy_multipliers.get(strategy, 3.0)
+            multiplier = strategy_multipliers.get(strategy, 4.0)
 
             direction = direction.upper()
             if direction == 'BUY':
@@ -6392,8 +6392,8 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("BE Rules")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 1.5 R",
-                              'Trigger at 1.5 R',
+        'Trigger Condition': ["Trigger at 2 R",
+                              'Trigger at 2 R',
                               'Trigger at 2.5 R', 'Trigger at 2.5 R'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry"]
@@ -6403,7 +6403,7 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("First Trail Rules")
     table_data3 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 3R", 'Trigger at 3R', 'Trigger at 5R', 'Trigger at 5R'],
+        'Trigger Condition': ["Trigger at 4R", 'Trigger at 4R', 'Trigger at 5R', 'Trigger at 5R'],
         'Action': ["Behind first 8H Structure or huge candle, then no further trailing",
                    'Behind first 8H Structure or huge candle, then no further trailing',
                    "Behind first 8H Structure or huge candle", "Behind first 8H Structure or huge candle"]

@@ -3575,6 +3575,7 @@ elif st.session_state.current_page == "Active Opps":
                     date_str = dt_local.strftime('%Y-%m-%d')  # Used to track day changes
                     day_str = dt_local.strftime('%A')  # Just the weekday, e.g., "Friday"
                     time_str = dt_local.strftime('%I:%M %p')
+                    date_display = dt_local.strftime('%B %d, %Y')  # Month day, year, e.g., October 10, 2025
 
                     # Add header when a new day starts
                     if current_day != date_str:
@@ -3595,7 +3596,7 @@ elif st.session_state.current_page == "Active Opps":
                             ">
                         """, unsafe_allow_html=True)
 
-                    st.write(f"**{time_str}** - **[{e['Currency']}] {event_name}**")
+                    st.write(f"**{date_display} - {time_str}** - **[{e['Currency']}] {event_name}**")
 
                     details = []
                     if e.get('Forecast') and e['Forecast'] != 'N/A':

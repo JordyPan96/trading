@@ -6377,8 +6377,8 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("BE Rules")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["For Buys 2 8H Green stick from entry, For Sells 2 8H Red Stick from entry.",
-                              'For Buys 2 8H Green stick from entry, For Sells 2 8H Red Stick from entry.',
+        'Trigger Condition': ["Trigger at 1.5 R",
+                              'Trigger at 1.5 R',
                               'Trigger at 2.5 R', 'Trigger at 2.5 R'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry"]

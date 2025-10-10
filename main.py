@@ -3566,7 +3566,7 @@ elif st.session_state.current_page == "Active Opps":
         filtered.sort(key=lambda x: x[0])  # Sort by time
 
         if filtered:
-            with st.expander("Upcoming Red News", expanded=True):
+            with st.expander("Upcoming Red News", expanded=False):
                 highlight_keywords = [
                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
                     "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"

@@ -3602,7 +3602,7 @@ elif st.session_state.current_page == "Active Opps":
                                 keyword.lower() in event_name.lower()
                                 for keyword in [
                                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
+                                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI", "Unemployment claims"
                                 ]
                             )
                             )

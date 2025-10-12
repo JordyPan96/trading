@@ -2366,7 +2366,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_12 = {
             "3%-4.99%": ['1_BNR'],
-            "XAUUSD5%-6.99%": ['1_BNR'],
+            "XAUUSD5%-6.99%": [''],
             "XAUUSD>=13%": ['1_BNR', "1_BNR_TPF"],
             ">=13%": ['1_BNR', "1_BNR_TPF"],
 

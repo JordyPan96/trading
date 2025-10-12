@@ -6403,7 +6403,7 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("First Trail Rules")
     table_data3 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 4R", 'Trigger at 4R', 'Trigger at 5R', 'Trigger at 5R'],
+        'Trigger Condition': ["Trigger at 4R", 'Trigger at 4R', 'Trigger at 4R', 'Trigger at 4R'],
         'Action': ["Behind first 8H Structure or huge candle, then no further trailing",
                    'Behind first 8H Structure or huge candle, then no further trailing',
                    "Behind first 8H Structure or huge candle", "Behind first 8H Structure or huge candle"]

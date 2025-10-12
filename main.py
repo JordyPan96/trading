@@ -3577,45 +3577,44 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        st.markdown("## 🗓️ Upcoming Red News - Weekly View")
+        with st.expander("Upcoming Red News - Weekly View", expanded=False):
+            cols = st.columns(7)
+            for i, day in enumerate(week_dates):
+                with cols[i]:
+                    day_events = events_by_day.get(day, [])
+                    day_str = day.strftime('%a\n%d %b')
+                    st.markdown(f"### {day_str}")
 
-        cols = st.columns(7)
-        for i, day in enumerate(week_dates):
-            with cols[i]:
-                day_events = events_by_day.get(day, [])
-                day_str = day.strftime('%a\n%d %b')
-                st.markdown(f"### {day_str}")
+                    if not day_events:
+                        st.caption("No events")
+                    else:
+                        for dt_local, e in sorted(day_events, key=lambda x: x[0]):
+                            time_str = dt_local.strftime('%I:%M %p')
+                            event_name = e['Event']
+                            currency = e['Currency']
 
-                if not day_events:
-                    st.caption("No events")
-                else:
-                    for dt_local, e in sorted(day_events, key=lambda x: x[0]):
-                        time_str = dt_local.strftime('%I:%M %p')
-                        event_name = e['Event']
-                        currency = e['Currency']
+                            should_highlight = any(
+                                keyword.lower() in event_name.lower()
+                                for keyword in [
+                                    "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
+                                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
+                                ]
+                            )
 
-                        should_highlight = any(
-                            keyword.lower() in event_name.lower()
-                            for keyword in [
-                                "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                                "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
-                            ]
-                        )
-
-                        if should_highlight:
-                            st.markdown(f"""
-                                <div style="
-                                    background-color: #ff4444;
-                                    color: white;
-                                    padding: 8px;
-                                    border-radius: 6px;
-                                    margin-bottom: 6px;
-                                ">
-                                <b>{time_str}</b> [{currency}] {event_name}
-                                </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            st.write(f"**{time_str}** [{currency}] {event_name}")
+                            if should_highlight:
+                                st.markdown(f"""
+                                    <div style="
+                                        background-color: #ff4444;
+                                        color: white;
+                                        padding: 8px;
+                                        border-radius: 6px;
+                                        margin-bottom: 6px;
+                                    ">
+                                    <b>{time_str}</b> [{currency}] {event_name}
+                                    </div>
+                                """, unsafe_allow_html=True)
+                            else:
+                                st.write(f"**{time_str}** [{currency}] {event_name}")
     else:
         st.info("No high-impact events found.")
 

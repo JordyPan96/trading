@@ -3551,10 +3551,15 @@ elif st.session_state.current_page == "Active Opps":
         now_melb = datetime.now(melbourne_tz)
 
         filtered = []
+        start_of_week = now_melb.date() - timedelta(days=now_melb.weekday())  # Monday
+        end_of_week = start_of_week + timedelta(days=6)  # Sunday
+
         for e in red_events:
             try:
                 dt_local = isoparse(e['TimeMelbourne'])
-                if dt_local > now_melb:
+                event_date = dt_local.date()
+
+                if start_of_week <= event_date <= end_of_week:
                     filtered.append((dt_local, e))
             except Exception as ex:
                 st.write(f"Error parsing event time: {ex}")

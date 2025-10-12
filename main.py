@@ -3474,20 +3474,18 @@ elif st.session_state.current_page == "Active Opps":
             date_str = ev.get('date')
             impact = ev.get('impact', '').strip().lower()
 
-            if impact != 'high' or not date_str:
+            # Include both high impact and holiday events
+            if impact not in ['high', 'holiday'] or not date_str:
                 continue
 
             try:
-                # Parse the original UTC datetime
                 event_dt_utc = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-                # Convert to Melbourne time
                 event_dt_melb = event_dt_utc.astimezone(melbourne_tz)
                 event_date_melb = event_dt_melb.date()
             except Exception as e:
                 print(f"Error parsing date: {date_str} — {e}")
                 continue
 
-            # Include only events from now until end of the week (Melbourne time)
             if today_melb <= event_date_melb <= end_of_week:
                 red_news.append({
                     'Date': event_date_melb.strftime('%Y-%m-%d'),
@@ -3497,7 +3495,7 @@ elif st.session_state.current_page == "Active Opps":
                     'Forecast': ev.get('forecast', 'N/A'),
                     'Previous': ev.get('previous', 'N/A'),
                     'Actual': ev.get('actual', 'N/A') if 'actual' in ev else 'N/A',
-                    'Impact': 'HIGH'
+                    'Impact': impact.upper()  # Use actual impact (e.g., HIGH or HOLIDAY)
                 })
 
         #print(
@@ -3593,15 +3591,37 @@ elif st.session_state.current_page == "Active Opps":
                             event_name = e['Event']
                             currency = e['Currency']
 
-                            should_highlight = any(
+                            impact = e.get('Impact', '').upper()
+
+                            # Detect holidays
+                            is_holiday = (impact == 'HOLIDAY')
+
+                            # Detect high-impact keywords
+                            should_highlight = (
+                                    impact == 'HIGH' and any(
                                 keyword.lower() in event_name.lower()
                                 for keyword in [
                                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
                                     "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
                                 ]
                             )
+                            )
 
-                            if should_highlight:
+                            if is_holiday:
+                                # Grey background for holiday
+                                st.markdown(f"""
+                                    <div style="
+                                        background-color: #d3d3d3;
+                                        color: black;
+                                        padding: 8px;
+                                        border-radius: 6px;
+                                        margin-bottom: 6px;
+                                    ">
+                                    <b>{time_str}</b> [{currency}] {event_name}
+                                    </div>
+                                """, unsafe_allow_html=True)
+                            elif should_highlight:
+                                # Red background for high-impact keywords
                                 st.markdown(f"""
                                     <div style="
                                         background-color: #ff4444;

@@ -3598,7 +3598,7 @@ elif st.session_state.current_page == "Active Opps":
                                 border-radius: 8px;
                                 text-align: center;
                                 font-weight: bold;
-                                margin-bottom: 10px;
+                                margin-bottom: 20px;
                             ">
                                 {day_name}<br>{day_num}
                             </div>
@@ -3613,7 +3613,7 @@ elif st.session_state.current_page == "Active Opps":
                                 border-radius: 8px;
                                 text-align: center;
                                 font-weight: bold;
-                                margin-bottom: 10px;
+                                margin-bottom: 20px;
                             ">
                                 {day_name}<br>{day_num}
                             </div>

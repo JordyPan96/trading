@@ -3467,9 +3467,9 @@ elif st.session_state.current_page == "Active Opps":
         now_melb = datetime.now(melbourne_tz)
         today_melb = now_melb.date()
 
-        # Get the end of the current week (Sunday)
-        days_until_sunday = 6 - today_melb.weekday()
-        end_of_week = today_melb + timedelta(days=days_until_sunday)
+        # ✅ Define start and end of the current week (Monday to Sunday)
+        start_of_week = today_melb - timedelta(days=today_melb.weekday())  # Monday
+        end_of_week = start_of_week + timedelta(days=6)  # Sunday
 
         for ev in data:
             date_str = ev.get('date')
@@ -3487,7 +3487,8 @@ elif st.session_state.current_page == "Active Opps":
                 print(f"Error parsing date: {date_str} — {e}")
                 continue
 
-            if today_melb <= event_date_melb <= end_of_week:
+            # ✅ Include all events within current week (not just future ones)
+            if start_of_week <= event_date_melb <= end_of_week:
                 red_news.append({
                     'Date': event_date_melb.strftime('%Y-%m-%d'),
                     'TimeMelbourne': event_dt_melb.isoformat(),
@@ -3499,11 +3500,7 @@ elif st.session_state.current_page == "Active Opps":
                     'Impact': impact.upper()  # Use actual impact (e.g., HIGH or HOLIDAY)
                 })
 
-        #print(
-            #f"Success: Retrieved and processed {len(red_news)} high-impact news events (future this week, Melbourne time).")
         return red_news
-
-    st.title("Saved Records")
 
     # Initialize session states
     if 'saved_records' not in st.session_state:

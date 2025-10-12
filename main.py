@@ -1,5 +1,6 @@
 # main.py (your entry point)
 import os
+from collections import defaultdict
 
 import streamlit as st
 import pandas as pd
@@ -3565,58 +3566,56 @@ elif st.session_state.current_page == "Active Opps":
 
         filtered.sort(key=lambda x: x[0])  # Sort by time
 
-        if filtered:
-            with st.expander("Upcoming Red News", expanded=False):
-                highlight_keywords = [
-                    "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
-                ]
+        # Group events by date
+        events_by_day = defaultdict(list)
 
-                current_day = None
+        for dt_local, e in filtered:
+            date_key = dt_local.date()
+            events_by_day[date_key].append((dt_local, e))
 
-                for dt_local, e in filtered:
-                    date_str = dt_local.strftime('%Y-%m-%d')  # Used to track day changes
-                    day_str = dt_local.strftime('%A')  # Just the weekday, e.g., "Friday"
-                    time_str = dt_local.strftime('%I:%M %p')
-                    date_display = dt_local.strftime('%Y-%m-%d')  # Format: 2025-10-10
+        # Create a 7-day calendar starting today
+        today = now_melb.date()
+        week_dates = [today + timedelta(days=i) for i in range(7)]
 
-                    # Add header when a new day starts
-                    if current_day != date_str:
-                        st.markdown(f"### {day_str}")
-                        current_day = date_str
+        st.markdown("## 🗓️ Upcoming Red News - Weekly View")
 
-                    event_name = e['Event']
-                    should_highlight = any(keyword.lower() in event_name.lower() for keyword in highlight_keywords)
+        cols = st.columns(7)
+        for i, day in enumerate(week_dates):
+            with cols[i]:
+                day_events = events_by_day.get(day, [])
+                day_str = day.strftime('%a\n%d %b')
+                st.markdown(f"### {day_str}")
 
-                    if should_highlight:
-                        st.markdown("""
-                            <div style="
-                                background-color: #ff4444;
-                                color: white;
-                                padding: 12px;
-                                border-radius: 10px;
-                                margin-bottom: 10px;
-                            ">
-                        """, unsafe_allow_html=True)
+                if not day_events:
+                    st.caption("No events")
+                else:
+                    for dt_local, e in sorted(day_events, key=lambda x: x[0]):
+                        time_str = dt_local.strftime('%I:%M %p')
+                        event_name = e['Event']
+                        currency = e['Currency']
 
-                    st.write(f"**{date_display} - {time_str}** - **[{e['Currency']}] {event_name}**")
+                        should_highlight = any(
+                            keyword.lower() in event_name.lower()
+                            for keyword in [
+                                "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
+                                "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI"
+                            ]
+                        )
 
-                    details = []
-                    if e.get('Forecast') and e['Forecast'] != 'N/A':
-                        details.append(f"Forecast: {e['Forecast']}")
-                    if e.get('Previous') and e['Previous'] != 'N/A':
-                        details.append(f"Previous: {e['Previous']}")
-                    if e.get('Actual') and e['Actual'] != 'N/A':
-                        details.append(f"Actual: {e['Actual']}")
-                    if details:
-                        st.caption(" | ".join(details))
-
-                    if should_highlight:
-                        st.markdown("</div>", unsafe_allow_html=True)
-
-                    st.divider()
-        else:
-            st.info("No high-impact events found for the rest of this week.")
+                        if should_highlight:
+                            st.markdown(f"""
+                                <div style="
+                                    background-color: #ff4444;
+                                    color: white;
+                                    padding: 8px;
+                                    border-radius: 6px;
+                                    margin-bottom: 6px;
+                                ">
+                                <b>{time_str}</b> [{currency}] {event_name}
+                                </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.write(f"**{time_str}** [{currency}] {event_name}")
     else:
         st.info("No high-impact events found.")
 

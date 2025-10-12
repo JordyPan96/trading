@@ -3195,7 +3195,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
                                    unsafe_allow_html=True)
                 if (get_global('entry_model') != None):
-                    container.metric("--Note that all SL must not exceed 33%",
+                    container.metric("--Note that all Entry must not exceed 33%",
                                      "Entry: " + get_global('entry_model') + " ")
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)

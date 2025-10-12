@@ -3199,7 +3199,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                      "Entry: " + get_global('entry_model') + " ")
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
-                    container.metric("--Note that all SL must not exceed 33%", "Minimum Length for "+selected_pair+" is "+entry_percent)
+                    container.metric("--Note that all SL must not exceed 33%", "Minimum Length for "+selected_pair+" is "+base_percent+"%")
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
                     # container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))

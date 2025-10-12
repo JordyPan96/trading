@@ -3035,7 +3035,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide (SL__Entry Length):"
                         entry_text = "33% from 91 Fib"
                         SL_title = "SL Guide: Head Fib must be within 31% of wick"
-                        SL_text = "2 Pips behind 91 Fib"
+                        SL_text = "ON 91 Fib"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "6.41"
 
@@ -3076,7 +3076,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide (SL__Entry Length):"
                         entry_text = "33% from 91 Fib"
                         SL_title = "SL Guide:"
-                        SL_text = "2 Pips behind 91 Fib"
+                        SL_text = "ON 91 Fib"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
@@ -3145,7 +3145,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length):"
                             entry_text = "33% from 91 Fib"
                             SL_title = "SL Guide:"
-                            SL_text = "2$ behind 91 Fib"
+                            SL_text = "ON 91 Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):

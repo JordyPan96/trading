@@ -3583,8 +3583,39 @@ elif st.session_state.current_page == "Active Opps":
             for i, day in enumerate(week_dates):
                 with cols[i]:
                     day_events = events_by_day.get(day, [])
-                    day_str = day.strftime('%a\n%d %b')
-                    st.markdown(f"### {day_str}")
+                    # Format the day label
+                    day_name = day.strftime('%a')  # e.g. "Mon"
+                    day_num = day.strftime('%d %b')  # e.g. "14 Oct"
+
+                    # Highlight today with a styled blue box
+                    if day == today:
+                        st.markdown(f"""
+                            <div style="
+                                background-color: #007bff;
+                                color: white;
+                                padding: 10px;
+                                border-radius: 8px;
+                                text-align: center;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            ">
+                                {day_name}<br>{day_num}<br><span style='font-size: 0.8em;'>(Today)</span>
+                            </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                            <div style="
+                                background-color: #f0f2f6;
+                                color: black;
+                                padding: 10px;
+                                border-radius: 8px;
+                                text-align: center;
+                                font-weight: bold;
+                                margin-bottom: 10px;
+                            ">
+                                {day_name}<br>{day_num}
+                            </div>
+                        """, unsafe_allow_html=True)
 
                     if not day_events:
                         st.caption("No events")

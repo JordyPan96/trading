@@ -3530,7 +3530,7 @@ elif st.session_state.current_page == "Active Opps":
 
     col1, col2 = st.columns([2, 1])
     with col1:
-        if st.button("🔄 Refresh Red News", key="refresh_red_news_json", use_container_width=True):
+        if st.button("Refresh News", key="refresh_red_news_json", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
                 st.session_state.red_events = get_red_news_from_json_with_rate_limit()
                 st.session_state.last_news_fetch = datetime.now()
@@ -3575,7 +3575,7 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        with st.expander("Upcoming Red News - Weekly View", expanded=False):
+        with st.expander("Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:

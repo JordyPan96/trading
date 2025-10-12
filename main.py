@@ -3583,25 +3583,8 @@ elif st.session_state.current_page == "Active Opps":
             for i, day in enumerate(week_dates):
                 with cols[i]:
                     day_events = events_by_day.get(day, [])
-                    # Get today's date in Melbourne
-                    today_melb = now_melb.date()
-
-                    # Format day string
                     day_str = day.strftime('%a\n%d %b')
-
-                    # Highlight the current day in blue
-                    if day == today_melb:
-                        st.markdown(f"""
-                            <div style="text-align:center; font-weight:bold; color:#007bff;">
-                                {day.strftime('%a')}<br>{day.strftime('%d %b')}
-                            </div>
-                        """, unsafe_allow_html=True)
-                    else:
-                        st.markdown(f"""
-                            <div style="text-align:center; font-weight:bold;">
-                                {day.strftime('%a')}<br>{day.strftime('%d %b')}
-                            </div>
-                        """, unsafe_allow_html=True)
+                    st.markdown(f"### {day_str}")
 
                     if not day_events:
                         st.caption("No events")

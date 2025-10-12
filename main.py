@@ -2791,19 +2791,19 @@ elif st.session_state.current_page == "Risk Calculation":
 
             def getPairEntrySL(pair):
                 if (pair == "GBPUSD"):
-                    return "223 ", "243"
+                    return "12", "18"
                 elif (pair == "EURUSD"):
-                    return "203 ", "223"
+                    return "12 ", "18"
                 elif (pair == "AUDUSD"):
-                    return "153 ", "193"
+                    return "12 ", "22"
                 elif (pair == "XAUUSD"):
-                    return "5 ", "9.3"
+                    return "12", "30"
                 elif (pair == "USDJPY"):
-                    return "223 ", "253"
+                    return "12", "18"
                 elif (pair == "USDCAD"):
-                    return "203 ", "233"
+                    return "12", "18"
                 else:
-                    return "253 ", "283"
+                    return "12", "30"
 
 
             entry_title = ""
@@ -2846,122 +2846,122 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "$ Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "$"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "$ Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "$"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "Pips Distance"
+                        entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " Pips"
+                        SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
             elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "$ Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + "$"
+                        SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
-                            entry_text = "From ON TPF fib to max " + entry_pip + "$ Distance"
+                            entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                             SL_title = "SL Guide:"
-                            SL_text = "Entry set to " + sl_pip + "$"
+                            SL_text = "Entry set to " + sl_pip + "%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
-                            entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                            entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                             SL_title = "SL Guide:"
-                            SL_text = "Entry set to " + sl_pip + " Pips"
+                            SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
-                            entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                            entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                             SL_title = "SL Guide:"
-                            SL_text = "Entry set to " + sl_pip + " Pips"
+                            SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 20)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
-                            entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                            entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                             SL_title = "SL Guide:"
-                            SL_text = "Entry set to " + sl_pip + " Pips"
+                            SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
@@ -2969,30 +2969,30 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "$ Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + "$"
+                        SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
-                        entry_text = "From ON TPF fib to max " + entry_pip + "Pips Distance"
+                        entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
-                        SL_text = "Entry set to " + sl_pip + " Pips"
+                        SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 

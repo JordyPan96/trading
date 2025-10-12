@@ -4569,10 +4569,10 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Strategy → Multiplier mapping
             strategy_multipliers = {
-                '1_BNR': 2.0,
-                '1_BNR_TPF': 2.0,
-                '2_BNR': 2.5,
-                '2_BNR_TPF': 2.5
+                '1_BNR': 2.5,
+                '1_BNR_TPF': 2.5,
+                '2_BNR': 2.0,
+                '2_BNR_TPF': 2.0
             }
             multiplier = strategy_multipliers.get(strategy, 2.0)
 
@@ -4602,8 +4602,8 @@ elif st.session_state.current_page == "Trade Signal":
             strategy_multipliers = {
                 '1_BNR': 4.0,
                 '1_BNR_TPF': 4.0,
-                '2_BNR': 5.0,
-                '2_BNR_TPF': 5.0
+                '2_BNR': 4.0,
+                '2_BNR_TPF': 4.0
             }
             multiplier = strategy_multipliers.get(strategy, 4.0)
 
@@ -6392,9 +6392,9 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("BE Rules")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 2 R",
-                              'Trigger at 2 R',
-                              'Trigger at 2.5 R', 'Trigger at 2.5 R'],
+        'Trigger Condition': ["Trigger at 2.5 R",
+                              'Trigger at 2.5 R',
+                              'Trigger at 2.0 R', 'Trigger at 2.0 R'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry"]
     }

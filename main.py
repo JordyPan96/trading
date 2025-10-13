@@ -4156,8 +4156,8 @@ elif st.session_state.current_page == "Active Opps":
             if new_status == 'Order Ready':
                 current_order_ready_count = sum(
                     1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
-                if current_order_ready_count >= 3:
-                    st.error("❌ Maximum limit of 3 Order Ready orders reached! Cannot move this record to Order Ready.")
+                if current_order_ready_count >= 2:
+                    st.error("Maximum limit of 2 Order Ready orders reached! Cannot move this record to Order Ready.")
                     return False
 
             st.session_state.saved_records[record_index]['status'] = new_status

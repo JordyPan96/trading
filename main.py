@@ -648,7 +648,7 @@ def save_data_to_sheets(df, sheet_name="Trade", worksheet_name="Trade.csv"):
 
 
 def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
-    """Replace data in Google Sheets after filtering by Date >= today"""
+    """Replace data in Google Sheets after filtering by Date >= today in Melbourne time"""
     try:
         # Step 1: Convert input to DataFrame if needed
         if isinstance(data, list):
@@ -661,9 +661,12 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
             # Convert to datetime and normalize to date only (remove time component)
             df["Date"] = pd.to_datetime(df["Date"], errors='coerce').dt.normalize()
 
-            # Get today's date (normalized, no time component)
-            today = pd.to_datetime(datetime.today().date()).normalize()
+            # ✅ Get today's date in Australia/Melbourne timezone
+            melbourne_tz = pytz.timezone("Australia/Melbourne")
+            today_melbourne = datetime.now(melbourne_tz).date()
 
+            # Convert to datetime64[ns] for comparison with normalized df["Date"]
+            today = pd.to_datetime(today_melbourne)
 
             # Show which dates are considered past vs future
             past_dates = df[df["Date"] < today]["Date"].unique()
@@ -700,7 +703,6 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
 
         # Step 4: Write filtered data to the worksheet
         set_with_dataframe(worksheet, df)
-        #st.success(f"✅ Successfully replaced {worksheet_name} with {len(df)} rows (filtered to today and future)")
         return True
 
     except Exception as e:
@@ -4017,7 +4019,7 @@ elif st.session_state.current_page == "Active Opps":
                         #st.success("News data REPLACED and updated successfully!")
                     else:
                         st.error("Failed to REPLACE news in Google Sheets")
-                
+
 
     with col2:
         if st.session_state.last_news_fetch:

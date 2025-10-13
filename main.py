@@ -3688,6 +3688,20 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
+    # Inject custom CSS to style *only* the specific expander
+    st.markdown("""
+        <style>
+        /* Style only the expander with this specific label */
+        [data-testid="stExpander"] > summary:has(span:contains("Upcoming News - Weekly View")) {
+            background-color: #ff4b4b !important;
+            color: white !important;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
@@ -3734,7 +3748,6 @@ elif st.session_state.current_page == "Active Opps":
 
         # Group events by date
         events_by_day = defaultdict(list)
-
         for dt_local, e in filtered:
             date_key = dt_local.date()
             events_by_day[date_key].append((dt_local, e))
@@ -3748,11 +3761,11 @@ elif st.session_state.current_page == "Active Opps":
             for i, day in enumerate(week_dates):
                 with cols[i]:
                     day_events = events_by_day.get(day, [])
-                    # Format the day label
-                    day_name = day.strftime('%a')  # "Mon"
-                    day_num = day.strftime('%d %b')  # "14 Oct"
 
-                    # Header styling
+                    # Format day headers
+                    day_name = day.strftime('%a')  # Mon
+                    day_num = day.strftime('%d %b')  # 14 Oct
+
                     if day == today:
                         # Today: Blue background
                         st.markdown(f"""
@@ -3791,13 +3804,10 @@ elif st.session_state.current_page == "Active Opps":
                             time_str = dt_local.strftime('%I:%M %p')
                             event_name = e['Event']
                             currency = e['Currency']
-
                             impact = e.get('Impact', '').upper()
 
-                            # Detect holidays
                             is_holiday = (impact == 'HOLIDAY')
 
-                            # Detect high-impact keywords
                             should_highlight = (
                                     impact == 'HIGH' and any(
                                 keyword.lower() in event_name.lower()
@@ -3809,7 +3819,6 @@ elif st.session_state.current_page == "Active Opps":
                             )
 
                             if is_holiday:
-                                # Grey background for holiday
                                 st.markdown(f"""
                                     <div style="
                                         background-color: #d3d3d3;
@@ -3822,7 +3831,6 @@ elif st.session_state.current_page == "Active Opps":
                                     </div>
                                 """, unsafe_allow_html=True)
                             elif should_highlight:
-                                # Red background for high-impact keywords
                                 st.markdown(f"""
                                     <div style="
                                         background-color: #ff4444;

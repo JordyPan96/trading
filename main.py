@@ -502,7 +502,7 @@ if 'session_initialized' not in st.session_state:
 
 if not st.session_state.current_page:
     st.session_state.current_page = "Home"
-    
+
 @st.cache_resource
 def get_google_sheets_client():
     """Initialize Google Sheets connection - supports both Streamlit secrets and GitHub secrets"""
@@ -3444,7 +3444,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                         # If it's a new record (not updating existing) and we're at max capacity
                                         if existing_index is None and len(st.session_state.saved_records) >= 3:
                                             st.error(
-                                                "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                                "Maximum of 3 records reached! Please delete a record from the Records page before adding a new one.")
                                         else:
                                             # Create a record with timestamp and all selections
                                             record = {
@@ -3577,7 +3577,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                             st.error(
 
-                                                "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                                "Maximum of 3 records reached! Please delete a record from the Records page before adding a new one.")
 
                                         else:
 

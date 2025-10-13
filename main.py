@@ -3743,34 +3743,38 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        # Add CSS to style the expander header
+        # Add CSS to style the expander header - more specific targeting
         st.markdown("""
             <style>
-            /* Target the expander header and make it red */
-            .stExpander > div:first-child {
+            /* Target expander header using data-testid */
+            [data-testid="stExpander"] div[role="button"] {
                 background-color: #ff4444 !important;
                 border-radius: 8px !important;
-            }
-
-            /* Make the header text white */
-            .stExpander > div:first-child .st-emotion-cache-1j9eomj {
                 color: white !important;
                 font-weight: bold !important;
+                padding: 10px !important;
+            }
+
+            /* Make sure the text is white */
+            [data-testid="stExpander"] div[role="button"] p {
+                color: white !important;
+                font-weight: bold !important;
+                margin: 0 !important;
             }
 
             /* Style the expander icon */
-            .stExpander > div:first-child svg {
+            [data-testid="stExpander"] div[role="button"] svg {
                 fill: white !important;
             }
 
-            /* Optional: Change hover color */
-            .stExpander > div:first-child:hover {
+            /* Hover effect */
+            [data-testid="stExpander"] div[role="button"]:hover {
                 background-color: #cc0000 !important;
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Use the actual expander but now it will have a red header
+        # Use the actual expander
         with st.expander("▼ Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):

@@ -2306,7 +2306,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     error_msg = (
                         f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
                         f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
-                        f"Can trade again after: {cooldown_end_date.strftime('%Y-%m-%d')} "
+                        f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
                         f"({days_remaining} days, {hours_remaining} hours remaining)"
                     )
                     return False, error_msg

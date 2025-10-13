@@ -2316,7 +2316,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     total_hours = max(0, int(time_remaining.total_seconds() // 3600))
 
                     error_msg = (
-                        f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
+                        f"Group {selected_group} Cooldown period active! "
                         #f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
                         #f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
                         f"({total_hours} hours remaining)"

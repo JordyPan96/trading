@@ -4622,7 +4622,7 @@ elif st.session_state.current_page == "Active Opps":
                             if total_active_count >= 2:
                                 st.error("Max 2 active records reached (Order Placed + Order Filled)")
                             elif current_order_ready_count >= 3:
-                                st.error("❌ Maximum limit of 3 Order Ready orders reached!")
+                                st.error("Maximum limit of 3 'Order Ready' orders reached!")
 
                         with col_delete:
                             if st.button("Delete", key=f"delete_{unique_key_base}"):

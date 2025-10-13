@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 import pytz
 import gspread
 from google.oauth2.service_account import Credentials
+from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
 # Configure page
 st.set_page_config(layout="wide")
@@ -646,27 +647,42 @@ def save_data_to_sheets(df, sheet_name="Trade", worksheet_name="Trade.csv"):
         return False
 
 
-def replace_data_on_sheet(data, sheet_name, worksheet_name):
-    """Completely replace data in a Google Sheet worksheet"""
+def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
+    """Completely replace data in the 'News' worksheet of a Google Sheet"""
     try:
-        # Convert data to DataFrame if it's not already
+        # Convert list to DataFrame if needed
         if isinstance(data, list):
             df = pd.DataFrame(data)
         else:
             df = data.copy()
 
-        # Use your existing save function but with a clear-and-replace strategy
-        # First, clear the worksheet by saving an empty DataFrame with the same columns
-        empty_df = pd.DataFrame(columns=df.columns)
-        save_data_to_sheets(empty_df, sheet_name=sheet_name, worksheet_name=worksheet_name)
+        client = get_google_sheets_client()
+        if client is None:
+            return False
 
-        # Now save the actual data
-        success = save_data_to_sheets(df, sheet_name=sheet_name, worksheet_name=worksheet_name)
+        try:
+            sheet = client.open(sheet_name)
+        except gspread.SpreadsheetNotFound:
+            st.sidebar.error(f"Sheet '{sheet_name}' not found")
+            return False
 
-        return success
+        try:
+            worksheet = sheet.worksheet(worksheet_name)
+            worksheet.clear()
+        except gspread.WorksheetNotFound:
+            # Create worksheet if it doesn't exist
+            row_count, col_count = df.shape
+            worksheet = sheet.add_worksheet(
+                title=worksheet_name,
+                rows=str(max(row_count, 100)),
+                cols=str(max(col_count, 20))
+            )
+
+        set_with_dataframe(worksheet, df)
+        return True
 
     except Exception as e:
-        st.error(f"Error in replace_data_on_sheet: {e}")
+        st.sidebar.error(f"Error in replace_data_on_sheet: {e}")
         return False
 
 

@@ -3743,11 +3743,11 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        # Add CSS with very specific targeting
+        # Add CSS that targets ALL expander headers (nuclear option)
         st.markdown("""
             <style>
-            /* Nuclear option - target any element that contains our expander text */
-            div[class*="stExpander"] > details > summary {
+            /* Target ALL expander headers and make them red */
+            .stExpander > label {
                 background-color: #ff4444 !important;
                 color: white !important;
                 border-radius: 8px !important;
@@ -3755,63 +3755,23 @@ elif st.session_state.current_page == "Active Opps":
                 font-weight: bold !important;
             }
 
-            div[class*="stExpander"] > details > summary:hover {
+            .stExpander > label:hover {
                 background-color: #cc0000 !important;
             }
 
-            div[class*="stExpander"] > details > summary::-webkit-details-marker {
+            .stExpander > label p {
                 color: white !important;
+                font-weight: bold !important;
             }
 
-            /* Alternative selectors */
-            section[data-testid="stExpander"] > div:first-child,
-            div[data-testid="stExpander"] > div:first-child,
-            .st-emotion-cache-1j9eomj,
-            .st-emotion-cache-1lcbm6i {
-                background-color: #ff4444 !important;
-                color: white !important;
-                border-radius: 8px !important;
-                padding: 10px !important;
-                font-weight: bold !important;
+            .stExpander > label svg {
+                fill: white !important;
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Use a custom key to help target this specific expander
-        with st.expander("▼ Upcoming News - Weekly View", expanded=False, key="red_news_expander"):
-            # Add JavaScript to force the style
-            st.components.v1.html("""
-                <script>
-                // Wait for page to load
-                setTimeout(function() {
-                    // Find our expander by the text content
-                    const elements = document.querySelectorAll('*');
-                    for (let el of elements) {
-                        if (el.textContent && el.textContent.includes('Upcoming News - Weekly View')) {
-                            // Go up to find the expander header
-                            let header = el.closest('[data-testid="stExpander"]');
-                            if (header) {
-                                let headerButton = header.querySelector('div:first-child');
-                                if (headerButton) {
-                                    headerButton.style.backgroundColor = '#ff4444';
-                                    headerButton.style.color = 'white';
-                                    headerButton.style.borderRadius = '8px';
-                                    headerButton.style.padding = '10px';
-                                    headerButton.style.fontWeight = 'bold';
-
-                                    // Also style any text inside
-                                    let textElements = headerButton.querySelectorAll('*');
-                                    textElements.forEach(textEl => {
-                                        textEl.style.color = 'white';
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }, 100);
-                </script>
-            """, height=0)
-
+        # Use the expander without key parameter
+        with st.expander("▼ Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:

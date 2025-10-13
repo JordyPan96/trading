@@ -1879,7 +1879,7 @@ elif st.session_state.current_page == "Symbol Stats":
         st.warning("Please upload data first to analyze symbol statistics")
 
 elif st.session_state.current_page == "Risk Calculation":
-    st.write("Effective theme primaryColor:", st.get_option("theme.primaryColor"))
+
     # Remove all top padding
     st.markdown(
         """
@@ -2055,6 +2055,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         with col1:
             st.subheader("Grading Based Risk Multiplier")
+            st.write("Effective theme primaryColor:", st.get_option("theme.primaryColor"))
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
             strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 

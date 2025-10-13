@@ -4091,7 +4091,7 @@ elif st.session_state.current_page == "Active Opps":
         st.rerun()
 
     # SYNC STATUS SECTION - ENHANCED FOR TWO-WAY SYNC
-    #st.write("---")
+    st.write("---")
     col_sync1, col_sync2, col_sync3, col_sync4 = st.columns(4)  # Changed to 4 columns
 
     with col_sync1:

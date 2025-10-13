@@ -700,7 +700,7 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
 
         # Step 4: Write filtered data to the worksheet
         set_with_dataframe(worksheet, df)
-        st.success(f"✅ Successfully replaced {worksheet_name} with {len(df)} rows (filtered to today and future)")
+        #st.success(f"✅ Successfully replaced {worksheet_name} with {len(df)} rows (filtered to today and future)")
         return True
 
     except Exception as e:
@@ -4014,7 +4014,7 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
                         st.session_state.data_source = 'forex_factory'
-                        st.success("News data REPLACED and updated successfully!")
+                        #st.success("News data REPLACED and updated successfully!")
                     else:
                         st.error("Failed to REPLACE news in Google Sheets")
                 else:
@@ -4030,7 +4030,7 @@ elif st.session_state.current_page == "Active Opps":
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             # First try to load from Google Sheets
-     
+
             sheet_events = load_events_from_sheets()
 
             if sheet_events:

@@ -3743,18 +3743,23 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        st.markdown("""
-            <style>
-            div[data-testid="stExpander"] div[role="button"] p {
-                background-color: #ff4444 !important;
-                color: white !important;
-                border-radius: 8px !important;
-                padding: 10px !important;
-            }
-            </style>
-        """, unsafe_allow_html=True)
+        # Create custom expander with red background
+        with st.container():
+            # Red header
+            st.markdown("""
+                <div style="background-color: #ff4444; color: white; padding: 12px; 
+                            border-radius: 8px 8px 0 0; font-weight: bold; font-size: 16px;
+                            border: 2px solid #ff4444; border-bottom: none;">
+                    ▼ Upcoming News - Weekly View
+                </div>
+            """, unsafe_allow_html=True)
 
-        with st.expander("Upcoming News - Weekly View", expanded=False):
+            # Content area
+            st.markdown("""
+                <div style="border: 2px solid #ff4444; border-top: none; 
+                            border-radius: 0 0 8px 8px; padding: 20px; margin-bottom: 20px;">
+            """, unsafe_allow_html=True)
+
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:
@@ -3848,6 +3853,8 @@ elif st.session_state.current_page == "Active Opps":
                             else:
                                 st.write(f"**{time_str}** [{currency}] {event_name}")
                     st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
+
+            st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info("No high-impact events found.")
 

@@ -9,4 +9,5 @@ matplotlib
 gspread
 metaapi-cloud-sdk>=7.0.0
 python-dateutil
+gspread_dataframe
 

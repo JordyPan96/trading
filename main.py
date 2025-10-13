@@ -3700,7 +3700,8 @@ elif st.session_state.current_page == "Active Opps":
     from dateutil.parser import isoparse
     from collections import defaultdict
 
-        # ==================== ROBUST RED NEWS FUNCTION ====================
+
+    # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
         try:
@@ -3762,6 +3763,7 @@ elif st.session_state.current_page == "Active Opps":
                 })
 
         return red_news
+
 
     # Initialize session states
     if 'saved_records' not in st.session_state:
@@ -3854,7 +3856,6 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
                     else:
                         st.error("Failed to save news to Google Sheets")
-
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -4017,6 +4018,7 @@ elif st.session_state.current_page == "Active Opps":
     else:
         st.write("No high-impact events found.")
 
+
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""
@@ -4150,6 +4152,14 @@ elif st.session_state.current_page == "Active Opps":
     def handle_move_record(record_index, new_status):
         """Handle moving record to new status"""
         try:
+            # Check if moving to Order Ready and limit is reached
+            if new_status == 'Order Ready':
+                current_order_ready_count = sum(
+                    1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
+                if current_order_ready_count >= 3:
+                    st.error("❌ Maximum limit of 3 Order Ready orders reached! Cannot move this record to Order Ready.")
+                    return False
+
             st.session_state.saved_records[record_index]['status'] = new_status
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
@@ -4236,7 +4246,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.saved_records = workflow_data.to_dict('records')
                 sync_with_trade_signals()
                 st.session_state.last_sync_time = datetime.now()
-                #st.success(" Data updated from cloud!")
+                # st.success(" Data updated from cloud!")
 
     # INITIAL LOAD
     if not st.session_state.saved_records:
@@ -4281,11 +4291,10 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.saved_records = workflow_data.to_dict('records')
                         sync_with_trade_signals()
                         st.session_state.last_sync_time = datetime.now()
-                        #st.success(" Data updated from cloud!")
+                        # st.success(" Data updated from cloud!")
                         st.rerun()
                     else:
                         st.info("No data found in cloud")
-
 
     with col_sync2:
         if st.button(" Add New Speculation", key="add_new_spec", use_container_width=True):
@@ -4399,11 +4408,14 @@ elif st.session_state.current_page == "Active Opps":
     # Only count Order Placed and Order Filled as active records (exclude Order Ready)
     total_active_count = order_placed_count + order_filled_count
 
-    # Display counts
-    #st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
-    #st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
-    #st.write(
-        #f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
+    # Display counts with Order Ready limit warning
+    st.write(f"**Order Ready Records:** {order_ready_count}/3")
+    if order_ready_count >= 3:
+        st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
+    # st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
+    # st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
+    # st.write(
+    # f"Speculation: {speculation_count}, Order Ready: {order_ready_count}, Order Placed: {order_placed_count}, Order Filled: {order_filled_count}")
 
     # Control buttons
     col1, col2, col3 = st.columns(3)
@@ -4595,14 +4607,22 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                         with col_move:
-                            can_move = all_required_fields_valid and total_active_count < 2
+                            # Check Order Ready limit
+                            current_order_ready_count = sum(
+                                1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
+                            can_move = all_required_fields_valid and total_active_count < 2 and current_order_ready_count < 3
+
                             if st.button("Move to Order Ready",
                                          key=f"move_{unique_key_base}",
                                          disabled=not can_move):
                                 if handle_move_record(record_index, 'Order Ready'):
                                     st.rerun()
+
+                            # Show appropriate error messages
                             if total_active_count >= 2:
                                 st.error("Max 2 active records reached (Order Placed + Order Filled)")
+                            elif current_order_ready_count >= 3:
+                                st.error("❌ Maximum limit of 3 Order Ready orders reached!")
 
                         with col_delete:
                             if st.button("Delete", key=f"delete_{unique_key_base}"):

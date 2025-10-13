@@ -3743,6 +3743,20 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
+        # Add custom CSS for red expander background
+        st.markdown("""
+            <style>
+            .streamlit-expanderHeader {
+                background-color: #ff4444 !important;
+                color: white !important;
+                border-radius: 8px !important;
+            }
+            .streamlit-expanderHeader:hover {
+                background-color: #cc0000 !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
         with st.expander("Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):

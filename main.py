@@ -2247,6 +2247,74 @@ elif st.session_state.current_page == "Risk Calculation":
                     return False, f"Same group pair(s) ({', '.join(group_pairs)}) already exist in {', '.join(stages)} stage(s). Please delete them first."
 
             return True, "No conflicts found"
+
+
+        def check_cooldown_period(selected_pair, uploaded_data, cooldown_days=1):
+            """Check if there's a cooldown period for the selected pair's group"""
+            if uploaded_data is None or uploaded_data.empty:
+                return True, "No data available"
+
+            # Define symbol groups
+            symbol_groups = {
+                'XAUUSD': {'symbols': ['XAUUSD'], 'target': 0},
+                'USDCAD_AUDUSD': {'symbols': ['USDCAD', 'AUDUSD'], 'target': 0},
+                'GBPUSD_EURUSD': {'symbols': ['GBPUSD', 'EURUSD'], 'target': 0},
+                'JPY_Pairs': {'symbols': ['GBPJPY', 'EURJPY', 'AUDJPY', 'USDJPY'], 'target': 0},
+                'GBPAUD_EURAUD': {'symbols': ['GBPAUD', 'EURAUD'], 'target': 0}
+            }
+
+            # Find which group the selected pair belongs to
+            selected_group = None
+            for group_name, group_info in symbol_groups.items():
+                if selected_pair in group_info['symbols']:
+                    selected_group = group_name
+                    break
+
+            if selected_group is None:
+                return True, "Pair not in any group"
+
+            # Get all symbols in the same group
+            group_symbols = symbol_groups[selected_group]['symbols']
+
+            try:
+                # Ensure Date column is datetime
+                df = uploaded_data.copy()
+                df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+                df = df.dropna(subset=['Date'])
+
+                # Filter for relevant records: same group symbols with BE or Loss results
+                recent_trades = df[
+                    (df['Symbol'].isin(group_symbols)) &
+                    (df['Result'].isin(['BE', 'Loss']))
+                    ]
+
+                if recent_trades.empty:
+                    return True, "No recent BE/Loss trades in group"
+
+                # Get the most recent trade date in the group
+                most_recent_date = recent_trades['Date'].max()
+                current_date = pd.Timestamp.now().normalize()  # Current date without time
+
+                # Calculate cooldown end date (most recent date + cooldown_days)
+                cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days)
+
+                # Check if we're still in cooldown period
+                if current_date < cooldown_end_date:
+                    days_remaining = (cooldown_end_date - current_date).days
+                    hours_remaining = (cooldown_end_date - pd.Timestamp.now()).seconds // 3600
+
+                    error_msg = (
+                        f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
+                        f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
+                        f"Can trade again after: {cooldown_end_date.strftime('%Y-%m-%d')} "
+                        f"({days_remaining} days, {hours_remaining} hours remaining)"
+                    )
+                    return False, error_msg
+                else:
+                    return True, "Cooldown period has passed"
+
+            except Exception as e:
+                return True, f"Error checking cooldown: {str(e)}"
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")
             response = requests.get(url).json()
@@ -3336,90 +3404,99 @@ elif st.session_state.current_page == "Risk Calculation":
                         add_order_disabled = False
 
                         if st.button(" Add Order", type="secondary", disabled=add_order_disabled):
-                            # NEW: Check for existing active records first
-                            can_proceed, error_message = check_existing_active_records(selected_pair,
-                                                                                       st.session_state.saved_records)
+                            # NEW: Check cooldown period first
+                            cooldown_ok, cooldown_message = check_cooldown_period(
+                                selected_pair,
+                                st.session_state.uploaded_data,
+                                cooldown_days=1  # 1 day cooldown as requested
+                            )
 
-                            if not can_proceed:
-                                st.error(error_message)
+                            if not cooldown_ok:
+                                st.error(cooldown_message)
                             else:
-                                # Check if Stop Loss is 0 or missing
-                                if stop_pips is None or stop_pips == 0:
-                                    st.error("Cannot add order: Stop Loss is required and cannot be 0!")
-                                elif (position_size <= 0):
-                                    st.error("Position size is required to be greater than 0")
+                                # Check for existing active records first
+                                can_proceed, error_message = check_existing_active_records(selected_pair,
+                                                                                           st.session_state.saved_records)
+
+                                if not can_proceed:
+                                    st.error(error_message)
                                 else:
-                                    # Check if maximum records reached (only for new records, not updates)
-                                    existing_index = None
-                                    for i, existing_record in enumerate(st.session_state.saved_records):
-                                        if existing_record['selected_pair'] == selected_pair:
-                                            existing_index = i
-                                            break
-
-                                    # If it's a new record (not updating existing) and we're at max capacity
-                                    if existing_index is None and len(st.session_state.saved_records) >= 5:
-                                        st.error(
-                                            "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                    # Check if Stop Loss is 0 or missing
+                                    if stop_pips is None or stop_pips == 0:
+                                        st.error("Cannot add order: Stop Loss is required and cannot be 0!")
+                                    elif (position_size <= 0):
+                                        st.error("Position size is required to be greater than 0")
                                     else:
-                                        # Create a record with timestamp and all selections
-                                        record = {
-                                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                            # More detailed timestamp
-                                            'selected_pair': selected_pair,
-                                            'trend_position': trend_position,
-                                            'POI': POI,
-                                            'cross_fib': cross_fib,
-                                            'HH_LL': HH_LL,
-                                            'risk_multiplier': risk_multiplier,
-                                            'Variances': Variances,
-                                            'stop_pips': stop_pips,
-                                            'within_61': within_61,
-                                            'final_risk': final_risk,  # This is important for comparison
-                                            'position_size': position_size,
-                                            'position_size_propfirm': position_size_propfirm,
-                                            'entry_price': 0.0,  # Default values
-                                            'exit_price': 0.0,
-                                            'target_price': 0.0,
-                                            'status': 'Speculation',  # Default status
-                                            'exit_rr': exit_text
-                                        }
+                                        # Check if maximum records reached (only for new records, not updates)
+                                        existing_index = None
+                                        for i, existing_record in enumerate(st.session_state.saved_records):
+                                            if existing_record['selected_pair'] == selected_pair:
+                                                existing_index = i
+                                                break
 
-                                        # Handle group conflicts for new records
-                                        if existing_index is None:
-                                            updated_records, conflict_message = check_and_handle_group_conflict(
-                                                selected_pair, final_risk, st.session_state.saved_records
-                                            )
+                                        # If it's a new record (not updating existing) and we're at max capacity
+                                        if existing_index is None and len(st.session_state.saved_records) >= 5:
+                                            st.error(
+                                                "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                        else:
+                                            # Create a record with timestamp and all selections
+                                            record = {
+                                                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                                # More detailed timestamp
+                                                'selected_pair': selected_pair,
+                                                'trend_position': trend_position,
+                                                'POI': POI,
+                                                'cross_fib': cross_fib,
+                                                'HH_LL': HH_LL,
+                                                'risk_multiplier': risk_multiplier,
+                                                'Variances': Variances,
+                                                'stop_pips': stop_pips,
+                                                'within_61': within_61,
+                                                'final_risk': final_risk,  # This is important for comparison
+                                                'position_size': position_size,
+                                                'position_size_propfirm': position_size_propfirm,
+                                                'entry_price': 0.0,  # Default values
+                                                'exit_price': 0.0,
+                                                'target_price': 0.0,
+                                                'status': 'Speculation',  # Default status
+                                                'exit_rr': exit_text
+                                            }
 
-                                            if conflict_message and "Higher risk pair" in conflict_message:
-                                                st.warning(conflict_message)
-                                                # Don't add the new record - use a flag to skip the rest
-                                                should_add_record = False
+                                            # Handle group conflicts for new records
+                                            if existing_index is None:
+                                                updated_records, conflict_message = check_and_handle_group_conflict(
+                                                    selected_pair, final_risk, st.session_state.saved_records
+                                                )
+
+                                                if conflict_message and "Higher risk pair" in conflict_message:
+                                                    st.warning(conflict_message)
+                                                    # Don't add the new record - use a flag to skip the rest
+                                                    should_add_record = False
+                                                else:
+                                                    st.session_state.saved_records = updated_records
+                                                    if conflict_message and "Replaced" in conflict_message:
+                                                        st.info(conflict_message)
+                                                    # Add new record
+                                                    st.session_state.saved_records.append(record)
+                                                    should_add_record = True
+
                                             else:
-                                                st.session_state.saved_records = updated_records
-                                                if conflict_message and "Replaced" in conflict_message:
-                                                    st.info(conflict_message)
-                                                # Add new record
-                                                st.session_state.saved_records.append(record)
+                                                # Update existing record (no group conflict check for updates)
+                                                st.session_state.saved_records[existing_index] = record
                                                 should_add_record = True
 
-                                        else:
-                                            # Update existing record (no group conflict check for updates)
-                                            st.session_state.saved_records[existing_index] = record
-                                            should_add_record = True
-
-                                        # Only save to Google Sheets if we should add/update the record
-                                        if should_add_record:
-                                            # SAVE TO GOOGLE SHEETS
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
-                                                st.success("Successfully Processed Order and Saved to Cloud!")
-                                            else:
-                                                st.error("Order processed locally but failed to save to cloud!")
+                                            # Only save to Google Sheets if we should add/update the record
+                                            if should_add_record:
+                                                # SAVE TO GOOGLE SHEETS
+                                                if save_workflow_to_sheets(st.session_state.saved_records):
+                                                    st.success("Successfully Processed Order and Saved to Cloud!")
+                                                else:
+                                                    st.error("Order processed locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button (same size)
                         if st.button("View Active Opportunities"):
                             st.session_state.current_page = "Active Opps"
                             st.rerun()
-
 
 
                     elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
@@ -3436,143 +3513,159 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if st.button(" Add Order", type="secondary", disabled=add_order_disabled):
 
-                            # NEW: Check for existing active records first
+                            # NEW: Check cooldown period first
 
-                            can_proceed, error_message = check_existing_active_records(selected_pair,
-                                                                                       st.session_state.saved_records)
+                            cooldown_ok, cooldown_message = check_cooldown_period(
 
-                            if not can_proceed:
+                                selected_pair,
 
-                                st.error(error_message)
+                                st.session_state.uploaded_data,
+
+                                cooldown_days=1  # 1 day cooldown as requested
+
+                            )
+
+                            if not cooldown_ok:
+
+                                st.error(cooldown_message)
 
                             else:
 
-                                # Check if Stop Loss is 0 or missing
+                                # Check for existing active records first
 
-                                if stop_pips is None or stop_pips == 0:
+                                can_proceed, error_message = check_existing_active_records(selected_pair,
 
-                                    st.error("Cannot add order: Stop Loss is required and cannot be 0!")
+                                                                                           st.session_state.saved_records)
+
+                                if not can_proceed:
+
+                                    st.error(error_message)
 
                                 else:
 
-                                    # Check if maximum records reached (only for new records, not updates)
+                                    # Check if Stop Loss is 0 or missing
 
-                                    existing_index = None
+                                    if stop_pips is None or stop_pips == 0:
 
-                                    for i, existing_record in enumerate(st.session_state.saved_records):
-
-                                        if existing_record['selected_pair'] == selected_pair:
-                                            existing_index = i
-
-                                            break
-
-                                    # If it's a new record (not updating existing) and we're at max capacity
-
-                                    if existing_index is None and len(st.session_state.saved_records) >= 5:
-
-                                        st.error(
-
-                                            "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
+                                        st.error("Cannot add order: Stop Loss is required and cannot be 0!")
 
                                     else:
 
-                                        # Create a record with timestamp and all selections
+                                        # Check if maximum records reached (only for new records, not updates)
 
-                                        record = {
+                                        existing_index = None
 
-                                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        for i, existing_record in enumerate(st.session_state.saved_records):
 
-                                            # More detailed timestamp
+                                            if existing_record['selected_pair'] == selected_pair:
+                                                existing_index = i
 
-                                            'selected_pair': selected_pair,
+                                                break
 
-                                            'trend_position': trend_position,
+                                        # If it's a new record (not updating existing) and we're at max capacity
 
-                                            'POI': POI,
+                                        if existing_index is None and len(st.session_state.saved_records) >= 5:
 
-                                            'cross_fib': cross_fib,
+                                            st.error(
 
-                                            'HH_LL': HH_LL,
-
-                                            'risk_multiplier': risk_multiplier,
-
-                                            'Variances': Variances,
-
-                                            'stop_pips': stop_pips,
-
-                                            'within_61': within_61,
-
-                                            'final_risk': final_risk,  # This is important for comparison
-
-                                            'position_size': position_size,
-
-                                            'position_size_propfirm': position_size_propfirm,
-
-                                            'entry_price': 0.0,  # Default values
-
-                                            'exit_price': 0.0,
-
-                                            'target_price': 0.0,
-
-                                            'status': 'Speculation',  # Default status
-
-                                            'exit_rr': exit_text
-
-                                        }
-
-                                        # Handle group conflicts for new records
-
-                                        if existing_index is None:
-
-                                            updated_records, conflict_message = check_and_handle_group_conflict(
-
-                                                selected_pair, final_risk, st.session_state.saved_records
-
-                                            )
-
-                                            if conflict_message and "Higher risk pair" in conflict_message:
-
-                                                st.warning(conflict_message)
-
-                                                # Don't add the new record - use a flag to skip the rest
-
-                                                should_add_record = False
-
-                                            else:
-
-                                                st.session_state.saved_records = updated_records
-
-                                                if conflict_message and "Replaced" in conflict_message:
-                                                    st.info(conflict_message)
-
-                                                # Add new record
-
-                                                st.session_state.saved_records.append(record)
-
-                                                should_add_record = True
-
+                                                "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
 
                                         else:
 
-                                            # Update existing record (no group conflict check for updates)
+                                            # Create a record with timestamp and all selections
 
-                                            st.session_state.saved_records[existing_index] = record
+                                            record = {
 
-                                            should_add_record = True
+                                                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
-                                        # Only save to Google Sheets if we should add/update the record
+                                                'selected_pair': selected_pair,
 
-                                        if should_add_record:
+                                                'trend_position': trend_position,
 
-                                            # SAVE TO GOOGLE SHEETS
+                                                'POI': POI,
 
-                                            if save_workflow_to_sheets(st.session_state.saved_records):
+                                                'cross_fib': cross_fib,
 
-                                                st.success("Successfully Processed Order and Saved to Cloud!")
+                                                'HH_LL': HH_LL,
+
+                                                'risk_multiplier': risk_multiplier,
+
+                                                'Variances': Variances,
+
+                                                'stop_pips': stop_pips,
+
+                                                'within_61': within_61,
+
+                                                'final_risk': final_risk,  # This is important for comparison
+
+                                                'position_size': position_size,
+
+                                                'position_size_propfirm': position_size_propfirm,
+
+                                                'entry_price': 0.0,  # Default values
+
+                                                'exit_price': 0.0,
+
+                                                'target_price': 0.0,
+
+                                                'status': 'Speculation',  # Default status
+
+                                                'exit_rr': exit_text
+
+                                            }
+
+                                            # Handle group conflicts for new records
+
+                                            if existing_index is None:
+
+                                                updated_records, conflict_message = check_and_handle_group_conflict(
+
+                                                    selected_pair, final_risk, st.session_state.saved_records
+
+                                                )
+
+                                                if conflict_message and "Higher risk pair" in conflict_message:
+
+                                                    st.warning(conflict_message)
+
+                                                    # Don't add the new record - use a flag to skip the rest
+
+                                                    should_add_record = False
+
+                                                else:
+
+                                                    st.session_state.saved_records = updated_records
+
+                                                    if conflict_message and "Replaced" in conflict_message:
+                                                        st.info(conflict_message)
+
+                                                    # Add new record
+
+                                                    st.session_state.saved_records.append(record)
+
+                                                    should_add_record = True
 
                                             else:
 
-                                                st.error("Order processed locally but failed to save to cloud!")
+                                                # Update existing record (no group conflict check for updates)
+
+                                                st.session_state.saved_records[existing_index] = record
+
+                                                should_add_record = True
+
+                                            # Only save to Google Sheets if we should add/update the record
+
+                                            if should_add_record:
+
+                                                # SAVE TO GOOGLE SHEETS
+
+                                                if save_workflow_to_sheets(st.session_state.saved_records):
+
+                                                    st.success("Successfully Processed Order and Saved to Cloud!")
+
+                                                else:
+
+                                                    st.error("Order processed locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button (same size)
 

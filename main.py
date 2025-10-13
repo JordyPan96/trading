@@ -4134,7 +4134,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.saved_records = workflow_data.to_dict('records')
                 sync_with_trade_signals()
                 st.session_state.last_sync_time = datetime.now()
-                st.success(" Data updated from cloud!")
+                #st.success(" Data updated from cloud!")
 
     # INITIAL LOAD
     if not st.session_state.saved_records:
@@ -4179,12 +4179,11 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.saved_records = workflow_data.to_dict('records')
                         sync_with_trade_signals()
                         st.session_state.last_sync_time = datetime.now()
-                        st.success(" Data updated from cloud!")
+                        #st.success(" Data updated from cloud!")
                         st.rerun()
                     else:
                         st.info("No data found in cloud")
-                else:
-                    st.info("Data is already up to date")
+
 
     with col_sync2:
         if st.button(" Add New Speculation", key="add_new_spec", use_container_width=True):

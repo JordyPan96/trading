@@ -3750,25 +3750,33 @@ elif st.session_state.current_page == "Active Opps":
             ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
         ]
 
-        # Find which group the filled pair belongs to
-        target_group = None
+        # Find ALL groups the filled pair belongs to
+        target_groups = []
         for group in cross_groups:
             if filled_pair in group:
-                target_group = group
-                break
+                target_groups.append(group)
 
-        if not target_group:
+        if not target_groups:
             return saved_records, []  # No cross group restriction for this pair
 
-        # Find speculation records in the same group
+        # Find speculation records in ANY of the target groups
         records_to_delete = []
         updated_records = []
 
         for record in saved_records:
-            if (record.get('status') == 'Speculation' and
-                    record['selected_pair'] in target_group):
-                records_to_delete.append(record['selected_pair'])
+            if record.get('status') == 'Speculation':
+                # Check if this speculation record belongs to ANY of the target groups
+                should_delete = False
+                for target_group in target_groups:
+                    if record['selected_pair'] in target_group:
+                        should_delete = True
+                        records_to_delete.append(record['selected_pair'])
+                        break  # No need to check other groups
+
+                if not should_delete:
+                    updated_records.append(record)
             else:
+                # Keep all non-speculation records
                 updated_records.append(record)
 
         return updated_records, records_to_delete
@@ -4728,9 +4736,9 @@ elif st.session_state.current_page == "Active Opps":
                         )
 
                         # DEBUG: Show what's happening
-                        st.write(f"Checking {record['selected_pair']} - Belongs to groups: {conflict_groups}")
-                        st.write(f"Active records: {[r['selected_pair'] for r in active_stage_records]}")
-                        st.write(f"Has conflict: {has_cross_group_conflict}, Conflicting pairs: {conflicting_pairs}")
+                        #st.write(f"Checking {record['selected_pair']} - Belongs to groups: {conflict_groups}")
+                        #st.write(f"Active records: {[r['selected_pair'] for r in active_stage_records]}")
+                        #st.write(f"Has conflict: {has_cross_group_conflict}, Conflicting pairs: {conflicting_pairs}")
 
                         col_update, col_move, col_delete = st.columns(3)
 

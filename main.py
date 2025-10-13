@@ -3440,7 +3440,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 break
 
                                         # If it's a new record (not updating existing) and we're at max capacity
-                                        if existing_index is None and len(st.session_state.saved_records) >= 5:
+                                        if existing_index is None and len(st.session_state.saved_records) >= 3:
                                             st.error(
                                                 "Maximum of 5 records reached! Please delete a record from the Records page before adding a new one.")
                                         else:
@@ -3571,7 +3571,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                         # If it's a new record (not updating existing) and we're at max capacity
 
-                                        if existing_index is None and len(st.session_state.saved_records) >= 5:
+                                        if existing_index is None and len(st.session_state.saved_records) >= 3:
 
                                             st.error(
 

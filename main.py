@@ -3700,7 +3700,6 @@ elif st.session_state.current_page == "Active Opps":
     from dateutil.parser import isoparse
     from collections import defaultdict
 
-
     # ==================== CROSS GROUP VALIDATION FUNCTION ====================
     def check_cross_group_conflict(selected_pair, current_stage_records):
         """Check if there's already a record from the same cross group in active stages"""
@@ -3719,7 +3718,7 @@ elif st.session_state.current_page == "Active Opps":
                 break
 
         if not target_group:
-            return False, None  # No cross group restriction for this pair
+            return False, None, []  # No cross group restriction for this pair
 
         # Check if any record in active stages belongs to the same group
         conflicting_pairs = []
@@ -3731,7 +3730,6 @@ elif st.session_state.current_page == "Active Opps":
             return True, target_group, conflicting_pairs
 
         return False, target_group, []
-
 
     # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
@@ -3796,7 +3794,6 @@ elif st.session_state.current_page == "Active Opps":
 
         return red_news
 
-
     # Initialize session states
     if 'saved_records' not in st.session_state:
         st.session_state.saved_records = []
@@ -3833,7 +3830,6 @@ elif st.session_state.current_page == "Active Opps":
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
-
     def save_events_to_sheets(events):
         """Save events to Google Sheets"""
         if not events:
@@ -3851,7 +3847,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Failed to save to Google Sheets: {e}")
             return False
 
-
     def load_events_from_sheets():
         """Load events from Google Sheets using your existing function"""
         try:
@@ -3867,7 +3862,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Failed to load from Google Sheets: {e}")
             return None
-
 
     # Initialize session state for tracking data source
     if 'data_source' not in st.session_state:
@@ -4050,7 +4044,6 @@ elif st.session_state.current_page == "Active Opps":
     else:
         st.write("No high-impact events found.")
 
-
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():
         """Load workflow data from Google Sheets using existing functions"""
@@ -4069,7 +4062,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error loading workflow data: {e}")
             return pd.DataFrame()
-
 
     def save_workflow_to_sheets(data):
         """Save workflow data to Google Sheets using existing functions"""
@@ -4091,7 +4083,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Error saving workflow data: {e}")
             return False
-
 
     def sync_with_trade_signals():
         """Two-way sync between Active Opps and Trade Signals - FIXED VERSION"""
@@ -4162,7 +4153,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             return False, f"Sync error: {str(e)}"
 
-
     # SIMPLE ACTION FUNCTIONS
     def handle_update_record(record_index, entry_price, exit_price, target_price):
         """Handle record update"""
@@ -4179,7 +4169,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Update error: {e}")
             return False
-
 
     def handle_move_record(record_index, new_status):
         """Handle moving record to new status"""
@@ -4203,7 +4192,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Move error: {e}")
             return False
 
-
     def handle_delete_record(record_index):
         """Handle record deletion"""
         try:
@@ -4218,7 +4206,6 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Delete error: {e}")
             return False
 
-
     # Helper function
     def safe_float(value, default=0.0):
         if value is None or value == 'None' or value == '':
@@ -4228,14 +4215,12 @@ elif st.session_state.current_page == "Active Opps":
         except (ValueError, TypeError):
             return default
 
-
     # Generate unique key for each record
     def generate_unique_key(record_index, record, field_name):
         """Generate truly unique key using index, pair, and timestamp"""
         pair = record['selected_pair'].replace('/', '_').replace(' ', '_')
         timestamp = record['timestamp'].replace(':', '_').replace(' ', '_').replace('-', '_').replace('.', '_')
         return f"{field_name}_{record_index}_{pair}_{timestamp}"
-
 
     # AUTO-RELOAD FUNCTION - CRITICAL FOR TWO-WAY SYNC
     def check_and_reload_from_sheets():
@@ -4267,7 +4252,6 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             print(f"Check reload error: {e}")
             return False
-
 
     # AUTO-RELOAD ON EVERY PAGE LOAD
     should_reload = check_and_reload_from_sheets()
@@ -4441,9 +4425,9 @@ elif st.session_state.current_page == "Active Opps":
     total_active_count = order_placed_count + order_filled_count
 
     # Display counts with Order Ready limit warning
-    # st.write(f"**Order Ready Records:** {order_ready_count}/3")
-    # if order_ready_count >= 3:
-    # st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
+    #st.write(f"**Order Ready Records:** {order_ready_count}/3")
+    #if order_ready_count >= 3:
+    #st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
     # st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
     # st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
     # st.write(

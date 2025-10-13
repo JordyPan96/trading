@@ -4610,7 +4610,7 @@ elif st.session_state.current_page == "Active Opps":
                             # Check Order Ready limit
                             current_order_ready_count = sum(
                                 1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
-                            can_move = all_required_fields_valid and total_active_count < 2 and current_order_ready_count < 3
+                            can_move = all_required_fields_valid and total_active_count < 2 and current_order_ready_count < 2
 
                             if st.button("Move to Order Ready",
                                          key=f"move_{unique_key_base}",

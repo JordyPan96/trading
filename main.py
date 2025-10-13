@@ -3743,35 +3743,7 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        # Add CSS that targets ALL expander headers (nuclear option)
-        st.markdown("""
-            <style>
-            /* Target ALL expander headers and make them red */
-            .stExpander > label {
-                background-color: #ff4444 !important;
-                color: white !important;
-                border-radius: 8px !important;
-                padding: 10px !important;
-                font-weight: bold !important;
-            }
-
-            .stExpander > label:hover {
-                background-color: #cc0000 !important;
-            }
-
-            .stExpander > label p {
-                color: white !important;
-                font-weight: bold !important;
-            }
-
-            .stExpander > label svg {
-                fill: white !important;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
-        # Use the expander without key parameter
-        with st.expander("▼ Upcoming News - Weekly View", expanded=False):
+        with st.expander("Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:

@@ -2044,18 +2044,10 @@ elif st.session_state.current_page == "Risk Calculation":
         filled_equity = df['equity'].ffill()
         equity = filled_equity.iloc[-1]
 
-        # TRADING_GRADE_SCALE = {
-        # "A+": {"min_winrate": 71, "multiplier": 1.3, "min_trades": 20},
-        # "A": {"min_winrate": 61, "multiplier": 1.2, "min_trades": 20},
-        # "B": {"min_winrate": 51, "multiplier": 1.1, "min_trades": 20},
-        # "C": {"min_winrate": 41, "multiplier": 1.0, "min_trades": 20},
-        # }
-
         col1, col2 = st.columns(2)
 
         with col1:
             st.subheader("Grading Based Risk Multiplier")
-            st.write("Effective theme primaryColor:", st.get_option("theme.primaryColor"))
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
             strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 

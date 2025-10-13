@@ -3711,26 +3711,33 @@ elif st.session_state.current_page == "Active Opps":
             ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
         ]
 
-        # Find which group the selected pair belongs to
-        target_group = None
+        # Find ALL groups the selected pair belongs to
+        target_groups = []
         for group in cross_groups:
             if selected_pair in group:
-                target_group = group
-                break
+                target_groups.append(group)
 
-        if not target_group:
+        if not target_groups:
             return False, None, []  # No cross group restriction for this pair
 
-        # Check if any record in active stages belongs to the same group
+        # Check if any record in active stages belongs to ANY of the target groups
         conflicting_pairs = []
+        conflicting_groups = []
+
         for record in current_stage_records:
-            if record['selected_pair'] in target_group:
-                conflicting_pairs.append(record['selected_pair'])
+            for target_group in target_groups:
+                if record['selected_pair'] in target_group and record['selected_pair'] != selected_pair:
+                    conflicting_pairs.append(record['selected_pair'])
+                    conflicting_groups.append(target_group)
+                    break  # No need to check other groups for this record
 
         if conflicting_pairs:
-            return True, target_group, conflicting_pairs
+            # Remove duplicates but preserve order
+            conflicting_pairs = list(dict.fromkeys(conflicting_pairs))
+            conflicting_groups = list(dict.fromkeys(str(g) for g in conflicting_groups))
+            return True, target_groups, conflicting_pairs
 
-        return False, target_group, []
+        return False, target_groups, []
 
 
     # ==================== AUTO-DELETE CROSS GROUP SPECULATION FUNCTION ====================
@@ -4710,23 +4717,20 @@ elif st.session_state.current_page == "Active Opps":
                         if not target_price_valid:
                             st.error("Target price must be > 0 to move to Order Ready")
 
-                        # RELOAD FRESH DATA FROM GOOGLE SHEETS BEFORE CHECKING CONFLICTS
-                        with st.spinner("Checking real-time status..."):
-                            fresh_workflow_data = load_workflow_from_sheets()
-                            if not fresh_workflow_data.empty:
-                                fresh_records = fresh_workflow_data.to_dict('records')
-                            else:
-                                fresh_records = st.session_state.saved_records
-
-                        # NEW: Check cross group conflicts with FRESH data
+                        # NEW: Check cross group conflicts
                         active_stage_records = [
-                            r for r in fresh_records
+                            r for r in st.session_state.saved_records
                             if r.get('status') in ['Order Ready', 'Order Placed', 'Order Filled']
                         ]
 
-                        has_cross_group_conflict, conflict_group, conflicting_pairs = check_cross_group_conflict(
+                        has_cross_group_conflict, conflict_groups, conflicting_pairs = check_cross_group_conflict(
                             record['selected_pair'], active_stage_records
                         )
+
+                        # DEBUG: Show what's happening
+                        st.write(f"Checking {record['selected_pair']} - Belongs to groups: {conflict_groups}")
+                        st.write(f"Active records: {[r['selected_pair'] for r in active_stage_records]}")
+                        st.write(f"Has conflict: {has_cross_group_conflict}, Conflicting pairs: {conflicting_pairs}")
 
                         col_update, col_move, col_delete = st.columns(3)
 
@@ -4736,19 +4740,14 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                         with col_move:
-                            # Check Order Ready limit with FRESH data
+                            # Check Order Ready limit
                             current_order_ready_count = sum(
-                                1 for r in fresh_records if r.get('status') == 'Order Ready')
+                                1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
 
-                            # Calculate total active count with FRESH data
-                            total_active_count_fresh = sum(
-                                1 for r in fresh_records if
-                                r.get('status') in ['Order Ready', 'Order Placed', 'Order Filled'])
-
-                            # Check all conditions for moving to Order Ready with FRESH data
+                            # Check all conditions for moving to Order Ready
                             can_move = (
                                     all_required_fields_valid and
-                                    total_active_count_fresh < 2 and
+                                    total_active_count < 2 and
                                     current_order_ready_count < 2 and
                                     not has_cross_group_conflict
                             )
@@ -4761,35 +4760,12 @@ elif st.session_state.current_page == "Active Opps":
 
                             # Show appropriate error messages
                             if has_cross_group_conflict:
-                                st.error(f"Cross-group conflict! Same group as: {', '.join(conflicting_pairs)}")
-                            if total_active_count_fresh >= 2:
+                                st.error(
+                                    f"Cross-group conflict! {record['selected_pair']} shares groups with: {', '.join(conflicting_pairs)}")
+                            if total_active_count >= 2:
                                 st.error("Max 2 active records reached (Order Ready + Order Placed + Order Filled)")
                             elif current_order_ready_count >= 2:
                                 st.error("Maximum limit of 2 'Order Ready' orders reached!")
-
-                        with col_delete:
-                            if st.button("Delete", key=f"delete_{unique_key_base}"):
-                                if handle_delete_record(record_index):
-                                    st.rerun()
-
-                    # ORDER READY STAGE ACTIONS
-                    elif st.session_state.current_stage == 'Order Ready':
-                        col_update, col_spec, col_move, col_delete = st.columns(4)  # Changed to 4 columns
-
-                        with col_update:
-                            if st.button("Update Record", key=f"update_{unique_key_base}"):
-                                if handle_update_record(record_index, entry_price, exit_price, target_price):
-                                    st.rerun()
-
-                        with col_spec:  # NEW: Move to Speculation button
-                            if st.button("Move to Speculation", key=f"move_spec_{unique_key_base}"):
-                                if handle_move_record(record_index, 'Speculation'):
-                                    st.rerun()
-
-                        with col_move:
-                            if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
-                                if handle_move_record(record_index, 'Order Placed'):
-                                    st.rerun()
 
                         with col_delete:
                             if st.button("Delete", key=f"delete_{unique_key_base}"):

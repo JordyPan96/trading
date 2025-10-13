@@ -664,22 +664,14 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
             # Get today's date (normalized, no time component)
             today = pd.to_datetime(datetime.today().date()).normalize()
 
-            # Debug: Show what's being filtered
-            st.write(f"DEBUG: Today's date: {today}")
-            st.write(f"DEBUG: Date range in data: {df['Date'].min()} to {df['Date'].max()}")
-            st.write(f"DEBUG: Rows before filtering: {len(df)}")
 
             # Show which dates are considered past vs future
             past_dates = df[df["Date"] < today]["Date"].unique()
             future_dates = df[df["Date"] >= today]["Date"].unique()
-            st.write(f"DEBUG: Past dates being removed: {sorted(past_dates)}")
-            st.write(f"DEBUG: Future dates being kept: {sorted(future_dates)}")
 
             # Keep only rows on or after today
             df = df[df["Date"] >= today]
             df = df.reset_index(drop=True)
-
-            st.write(f"DEBUG: Rows after filtering: {len(df)}")
 
         else:
             st.sidebar.warning("No 'Date' column found — skipping filtering")
@@ -3973,8 +3965,6 @@ elif st.session_state.current_page == "Active Opps":
 
             df = df[required_columns]
 
-            st.write(f"DEBUG: Replacing Google Sheets with {len(events)} new events")
-
             # Use the new replace function instead of save
             success = replace_data_on_sheet(df, sheet_name="Trade", worksheet_name="News")
 
@@ -4015,11 +4005,11 @@ elif st.session_state.current_page == "Active Opps":
             with st.spinner("Checking for high impact news..."):
                 # Fetch new data
                 new_events = get_red_news_from_json_with_rate_limit()
-                st.write(f"DEBUG: Fetched {len(new_events) if new_events else 0} events from Forex Factory")
+
 
                 if new_events:
                     # Save to Google Sheets USING REPLACEMENT
-                    st.write("DEBUG: Attempting to REPLACE events in Google Sheets...")
+
                     if save_events_to_sheets(new_events):  # This now uses replace_data_on_sheet internally
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
@@ -4040,7 +4030,7 @@ elif st.session_state.current_page == "Active Opps":
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             # First try to load from Google Sheets
-            st.write("DEBUG: Attempting to load from Google Sheets...")
+     
             sheet_events = load_events_from_sheets()
 
             if sheet_events:
@@ -4050,14 +4040,14 @@ elif st.session_state.current_page == "Active Opps":
                 st.success("Loaded news data from Google Sheets")
             else:
                 # If no data in sheets, fetch new data
-                st.write("DEBUG: No data in sheets, fetching from Forex Factory...")
+
                 new_events = get_red_news_from_json_with_rate_limit()
                 if new_events:
                     st.session_state.red_events = new_events
                     st.session_state.last_news_fetch = datetime.now()
                     st.session_state.data_source = 'forex_factory'
                     # Save to Google Sheets for next time USING REPLACEMENT
-                    st.write("DEBUG: Saving fetched data to Google Sheets (REPLACEMENT)...")
+
                     if save_events_to_sheets(new_events):  # This now uses replace
                         st.success("Fetched new data and REPLACED Google Sheets")
                     else:
@@ -4833,10 +4823,6 @@ elif st.session_state.current_page == "Active Opps":
                             record['selected_pair'], active_stage_records
                         )
 
-                        # DEBUG: Show what's happening
-                        #st.write(f"Checking {record['selected_pair']} - Belongs to groups: {conflict_groups}")
-                        #st.write(f"Active records: {[r['selected_pair'] for r in active_stage_records]}")
-                        #st.write(f"Has conflict: {has_cross_group_conflict}, Conflicting pairs: {conflicting_pairs}")
 
                         col_update, col_move, col_delete = st.columns(3)
 

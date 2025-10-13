@@ -1879,6 +1879,7 @@ elif st.session_state.current_page == "Symbol Stats":
         st.warning("Please upload data first to analyze symbol statistics")
 
 elif st.session_state.current_page == "Risk Calculation":
+    st.write("Effective theme primaryColor:", st.get_option("theme.primaryColor"))
     # Remove all top padding
     st.markdown(
         """

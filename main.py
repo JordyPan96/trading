@@ -648,14 +648,25 @@ def save_data_to_sheets(df, sheet_name="Trade", worksheet_name="Trade.csv"):
 
 
 def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
-    """Completely replace data in the 'News' worksheet of a Google Sheet"""
+    """Replace data in Google Sheets after filtering by Date >= today"""
     try:
-        # Convert list to DataFrame if needed
+        # Step 1: Convert input to DataFrame if needed
         if isinstance(data, list):
             df = pd.DataFrame(data)
         else:
             df = data.copy()
 
+        # Step 2: Parse 'Date' column and filter rows
+        if "Date" in df.columns:
+            df["Date"] = pd.to_datetime(df["Date"], errors='coerce')  # Convert to datetime
+            today = pd.to_datetime(datetime.today().date())  # Use fixed date for reproducibility
+            df = df[df["Date"] >= today]  # Keep only rows on or after today
+            df = df.reset_index(drop=True)
+
+        else:
+            st.sidebar.warning("No 'Date' column found — skipping filtering")
+
+        # Step 3: Connect to Google Sheets
         client = get_google_sheets_client()
         if client is None:
             return False
@@ -670,7 +681,6 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
             worksheet = sheet.worksheet(worksheet_name)
             worksheet.clear()
         except gspread.WorksheetNotFound:
-            # Create worksheet if it doesn't exist
             row_count, col_count = df.shape
             worksheet = sheet.add_worksheet(
                 title=worksheet_name,
@@ -678,6 +688,7 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
                 cols=str(max(col_count, 20))
             )
 
+        # Step 4: Write filtered data to the worksheet
         set_with_dataframe(worksheet, df)
         return True
 

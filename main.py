@@ -4038,7 +4038,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.red_events = sheet_events
                 st.session_state.last_news_fetch = datetime.now()
                 st.session_state.data_source = 'cloud'
-                st.success("Loaded news data from Google Sheets")
+                #st.success("Loaded news data from Google Sheets")
             else:
                 # If no data in sheets, fetch new data
 
@@ -4049,9 +4049,7 @@ elif st.session_state.current_page == "Active Opps":
                     st.session_state.data_source = 'forex_factory'
                     # Save to Google Sheets for next time USING REPLACEMENT
 
-                    if save_events_to_sheets(new_events):  # This now uses replace
-                        st.success("Fetched new data and REPLACED Google Sheets")
-                    else:
+                    if not save_events_to_sheets(new_events):  # This now uses replace
                         st.error("Fetched new data but failed to REPLACE Google Sheets")
                 else:
                     st.session_state.red_events = []

@@ -3751,7 +3751,7 @@ elif st.session_state.current_page == "Active Opps":
                     if save_events_to_sheets(new_events):
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
-                        st.success("News updated and saved to Google Sheets!")
+                        #st.success("News updated and saved to Google Sheets!")
                     else:
                         st.error("Failed to save news to Google Sheets")
                 else:

@@ -3743,39 +3743,75 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        # Add CSS to style the expander header - more specific targeting
+        # Add CSS with very specific targeting
         st.markdown("""
             <style>
-            /* Target expander header using data-testid */
-            [data-testid="stExpander"] div[role="button"] {
+            /* Nuclear option - target any element that contains our expander text */
+            div[class*="stExpander"] > details > summary {
                 background-color: #ff4444 !important;
+                color: white !important;
                 border-radius: 8px !important;
-                color: white !important;
-                font-weight: bold !important;
                 padding: 10px !important;
-            }
-
-            /* Make sure the text is white */
-            [data-testid="stExpander"] div[role="button"] p {
-                color: white !important;
                 font-weight: bold !important;
-                margin: 0 !important;
             }
 
-            /* Style the expander icon */
-            [data-testid="stExpander"] div[role="button"] svg {
-                fill: white !important;
-            }
-
-            /* Hover effect */
-            [data-testid="stExpander"] div[role="button"]:hover {
+            div[class*="stExpander"] > details > summary:hover {
                 background-color: #cc0000 !important;
+            }
+
+            div[class*="stExpander"] > details > summary::-webkit-details-marker {
+                color: white !important;
+            }
+
+            /* Alternative selectors */
+            section[data-testid="stExpander"] > div:first-child,
+            div[data-testid="stExpander"] > div:first-child,
+            .st-emotion-cache-1j9eomj,
+            .st-emotion-cache-1lcbm6i {
+                background-color: #ff4444 !important;
+                color: white !important;
+                border-radius: 8px !important;
+                padding: 10px !important;
+                font-weight: bold !important;
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Use the actual expander
-        with st.expander("▼ Upcoming News - Weekly View", expanded=False):
+        # Use a custom key to help target this specific expander
+        with st.expander("▼ Upcoming News - Weekly View", expanded=False, key="red_news_expander"):
+            # Add JavaScript to force the style
+            st.components.v1.html("""
+                <script>
+                // Wait for page to load
+                setTimeout(function() {
+                    // Find our expander by the text content
+                    const elements = document.querySelectorAll('*');
+                    for (let el of elements) {
+                        if (el.textContent && el.textContent.includes('Upcoming News - Weekly View')) {
+                            // Go up to find the expander header
+                            let header = el.closest('[data-testid="stExpander"]');
+                            if (header) {
+                                let headerButton = header.querySelector('div:first-child');
+                                if (headerButton) {
+                                    headerButton.style.backgroundColor = '#ff4444';
+                                    headerButton.style.color = 'white';
+                                    headerButton.style.borderRadius = '8px';
+                                    headerButton.style.padding = '10px';
+                                    headerButton.style.fontWeight = 'bold';
+
+                                    // Also style any text inside
+                                    let textElements = headerButton.querySelectorAll('*');
+                                    textElements.forEach(textEl => {
+                                        textEl.style.color = 'white';
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }, 100);
+                </script>
+            """, height=0)
+
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:

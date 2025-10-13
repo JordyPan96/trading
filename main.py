@@ -4710,9 +4710,17 @@ elif st.session_state.current_page == "Active Opps":
                         if not target_price_valid:
                             st.error("Target price must be > 0 to move to Order Ready")
 
-                        # NEW: Check cross group conflicts
+                        # RELOAD FRESH DATA FROM GOOGLE SHEETS BEFORE CHECKING CONFLICTS
+                        with st.spinner("Checking real-time status..."):
+                            fresh_workflow_data = load_workflow_from_sheets()
+                            if not fresh_workflow_data.empty:
+                                fresh_records = fresh_workflow_data.to_dict('records')
+                            else:
+                                fresh_records = st.session_state.saved_records
+
+                        # NEW: Check cross group conflicts with FRESH data
                         active_stage_records = [
-                            r for r in st.session_state.saved_records
+                            r for r in fresh_records
                             if r.get('status') in ['Order Ready', 'Order Placed', 'Order Filled']
                         ]
 
@@ -4728,14 +4736,19 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                         with col_move:
-                            # Check Order Ready limit
+                            # Check Order Ready limit with FRESH data
                             current_order_ready_count = sum(
-                                1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
+                                1 for r in fresh_records if r.get('status') == 'Order Ready')
 
-                            # Check all conditions for moving to Order Ready
+                            # Calculate total active count with FRESH data
+                            total_active_count_fresh = sum(
+                                1 for r in fresh_records if
+                                r.get('status') in ['Order Ready', 'Order Placed', 'Order Filled'])
+
+                            # Check all conditions for moving to Order Ready with FRESH data
                             can_move = (
                                     all_required_fields_valid and
-                                    total_active_count < 2 and
+                                    total_active_count_fresh < 2 and
                                     current_order_ready_count < 2 and
                                     not has_cross_group_conflict
                             )
@@ -4749,7 +4762,7 @@ elif st.session_state.current_page == "Active Opps":
                             # Show appropriate error messages
                             if has_cross_group_conflict:
                                 st.error(f"Cross-group conflict! Same group as: {', '.join(conflicting_pairs)}")
-                            if total_active_count >= 2:
+                            if total_active_count_fresh >= 2:
                                 st.error("Max 2 active records reached (Order Ready + Order Placed + Order Filled)")
                             elif current_order_ready_count >= 2:
                                 st.error("Maximum limit of 2 'Order Ready' orders reached!")

@@ -2293,22 +2293,27 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 # Get the most recent trade date in the group
                 most_recent_date = recent_trades['Date'].max()
-                current_date = pd.Timestamp.now().normalize()  # Current date without time
 
-                # Calculate cooldown end date (most recent date + cooldown_days + 1)
-                # If trade was on 10-13, cooldown ends on 10-15 (2 days later)
+                # Set timezone to Melbourne
+                melbourne_tz = pytz.timezone('Australia/Melbourne')
+                current_melbourne_time = datetime.now(melbourne_tz)
+
+                # Calculate cooldown end date (most recent date + cooldown_days + 1) at Melbourne midnight
                 cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days + 1)
+                cooldown_end_melbourne = melbourne_tz.localize(
+                    datetime(cooldown_end_date.year, cooldown_end_date.month, cooldown_end_date.day, 0, 0, 0)
+                )
 
                 # Check if we're still in cooldown period
-                if current_date < cooldown_end_date:
-                    days_remaining = (cooldown_end_date - current_date).days
-                    hours_remaining = (cooldown_end_date - pd.Timestamp.now()).seconds // 3600
+                if current_melbourne_time < cooldown_end_melbourne:
+                    time_remaining = cooldown_end_melbourne - current_melbourne_time
+                    total_hours_remaining = int(time_remaining.total_seconds() // 3600)
 
                     error_msg = (
                         f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
                         f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
                         f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
-                        f"({days_remaining} days, {hours_remaining} hours remaining)"
+                        f"({total_hours_remaining} hours remaining)"
                     )
                     return False, error_msg
                 else:

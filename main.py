@@ -3703,6 +3703,7 @@ elif st.session_state.current_page == "Active Opps":
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
+
     def save_events_to_sheets(events):
         """Save events to Google Sheets"""
         if not events:
@@ -3720,6 +3721,7 @@ elif st.session_state.current_page == "Active Opps":
             st.error(f"Failed to save to Google Sheets: {e}")
             return False
 
+
     def load_events_from_sheets():
         """Load events from Google Sheets using your existing function"""
         try:
@@ -3735,6 +3737,7 @@ elif st.session_state.current_page == "Active Opps":
         except Exception as e:
             st.error(f"Failed to load from Google Sheets: {e}")
             return None
+
 
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -3901,7 +3904,7 @@ elif st.session_state.current_page == "Active Opps":
                             else:
                                 st.write(f"**{time_str}** [{currency}] {event_name}")
 
-                    st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
     else:
         st.info("No high-impact events found.")
 

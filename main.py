@@ -3485,28 +3485,28 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                         if conflict_message and "Higher risk pair" in conflict_message:
                                             st.warning(conflict_message)
-                                            return  # Don't add the new record
-
-                                        st.session_state.saved_records = updated_records
-                                        if conflict_message and "Replaced" in conflict_message:
-                                            st.info(conflict_message)
-
-                                        # Add new record
-                                        st.session_state.saved_records.append(record)
+                                            # Don't add the new record - use a flag to skip the rest
+                                            should_add_record = False
+                                        else:
+                                            st.session_state.saved_records = updated_records
+                                            if conflict_message and "Replaced" in conflict_message:
+                                                st.info(conflict_message)
+                                            # Add new record
+                                            st.session_state.saved_records.append(record)
+                                            should_add_record = True
 
                                     else:
                                         # Update existing record (no group conflict check for updates)
                                         st.session_state.saved_records[existing_index] = record
+                                        should_add_record = True
 
-                                    # SAVE TO GOOGLE SHEETS
-
-                                    if save_workflow_to_sheets(st.session_state.saved_records):
-
-                                        st.success("Successfully Processed Order and Saved to Cloud!")
-
-                                    else:
-
-                                        st.error("Order processed locally but failed to save to cloud!")
+                                    # Only save to Google Sheets if we should add/update the record
+                                    if should_add_record:
+                                        # SAVE TO GOOGLE SHEETS
+                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                            st.success("Successfully Processed Order and Saved to Cloud!")
+                                        else:
+                                            st.error("Order processed locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button (same size)
 

@@ -4017,8 +4017,7 @@ elif st.session_state.current_page == "Active Opps":
                         #st.success("News data REPLACED and updated successfully!")
                     else:
                         st.error("Failed to REPLACE news in Google Sheets")
-                else:
-                    st.warning("No new events found from Forex Factory")
+                
 
     with col2:
         if st.session_state.last_news_fetch:

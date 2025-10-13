@@ -2301,12 +2301,6 @@ elif st.session_state.current_page == "Risk Calculation":
                 # If trade was on Oct 13, cooldown ends on Oct 15
                 cooldown_end_date = most_recent_date.date() + timedelta(days=cooldown_days + 1)
 
-                # DEBUG
-                st.write(f"DEBUG: Most recent BE/Loss: {most_recent_date.date()}")
-                st.write(f"DEBUG: Current date: {current_date}")
-                st.write(f"DEBUG: Cooldown ends: {cooldown_end_date}")
-                st.write(f"DEBUG: Should block: {current_date < cooldown_end_date}")
-
                 # Check if we're still in cooldown period
                 if current_date < cooldown_end_date:
                     # Calculate hours remaining until midnight of cooldown end date
@@ -2322,7 +2316,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     total_hours = max(0, int(time_remaining.total_seconds() // 3600))
 
                     error_msg = (
-                        f"🚫 Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
+                        f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
                         f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
                         f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
                         f"({total_hours} hours remaining)"
@@ -2332,7 +2326,6 @@ elif st.session_state.current_page == "Risk Calculation":
                     return True, "Cooldown period has passed"
 
             except Exception as e:
-                st.error(f"Error in cooldown check: {e}")
                 return True, f"Error checking cooldown: {str(e)}"
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")

@@ -2294,42 +2294,45 @@ elif st.session_state.current_page == "Risk Calculation":
                 # Get the most recent trade date in the group
                 most_recent_date = recent_trades['Date'].max()
 
-                # Get current time in Melbourne timezone
-                melbourne_tz = pytz.timezone('Australia/Melbourne')
-                current_melbourne_time = datetime.now(melbourne_tz)
+                # Get current date (no time component)
+                current_date = datetime.now().date()
 
-                # Calculate cooldown end date (most recent date + cooldown_days + 1)
-                # If trade was on Oct 13, cooldown ends on Oct 15 at midnight Melbourne time
-                cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days + 1)
+                # Calculate when cooldown ends (trade date + 2 days)
+                # If trade was on Oct 13, cooldown ends on Oct 15
+                cooldown_end_date = most_recent_date.date() + timedelta(days=cooldown_days + 1)
 
-                # Convert cooldown_end_date to Melbourne timezone at midnight
-                cooldown_end_melbourne = melbourne_tz.localize(
-                    datetime(cooldown_end_date.year, cooldown_end_date.month, cooldown_end_date.day, 0, 0, 0)
-                )
-
-                # DEBUG: Print values to see what's happening
-                print(f"DEBUG - Most recent trade: {most_recent_date}")
-                print(f"DEBUG - Current Melbourne time: {current_melbourne_time}")
-                print(f"DEBUG - Cooldown end: {cooldown_end_melbourne}")
-                print(f"DEBUG - Should block: {current_melbourne_time < cooldown_end_melbourne}")
+                # DEBUG
+                st.write(f"DEBUG: Most recent BE/Loss: {most_recent_date.date()}")
+                st.write(f"DEBUG: Current date: {current_date}")
+                st.write(f"DEBUG: Cooldown ends: {cooldown_end_date}")
+                st.write(f"DEBUG: Should block: {current_date < cooldown_end_date}")
 
                 # Check if we're still in cooldown period
-                if current_melbourne_time < cooldown_end_melbourne:
-                    time_remaining = cooldown_end_melbourne - current_melbourne_time
-                    total_hours_remaining = int(time_remaining.total_seconds() // 3600)
+                if current_date < cooldown_end_date:
+                    # Calculate hours remaining until midnight of cooldown end date
+                    melbourne_tz = pytz.timezone('Australia/Melbourne')
+                    current_melbourne = datetime.now(melbourne_tz)
+
+                    # Create datetime for midnight of cooldown end date in Melbourne
+                    cooldown_midnight = melbourne_tz.localize(
+                        datetime(cooldown_end_date.year, cooldown_end_date.month, cooldown_end_date.day, 0, 0, 0)
+                    )
+
+                    time_remaining = cooldown_midnight - current_melbourne
+                    total_hours = max(0, int(time_remaining.total_seconds() // 3600))
 
                     error_msg = (
-                        f"Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
+                        f"🚫 Cooldown period active! Group {selected_group} has recent BE/Loss trades. "
                         f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
                         f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
-                        f"({total_hours_remaining} hours remaining)"
+                        f"({total_hours} hours remaining)"
                     )
-                    return False, error_msg  # Return False to BLOCK the order
+                    return False, error_msg  # BLOCK the order
                 else:
                     return True, "Cooldown period has passed"
 
             except Exception as e:
-                print(f"DEBUG - Error in cooldown check: {e}")
+                st.error(f"Error in cooldown check: {e}")
                 return True, f"Error checking cooldown: {str(e)}"
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")

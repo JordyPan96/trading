@@ -3688,23 +3688,6 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    # Wrap your expander in a container with a specific key
-    container_key = "my_red_expander"
-
-    # Inject CSS that targets only the expander inside this container
-    st.markdown(f"""
-        <style>
-        /* Scope CSS to container with key `my_red_expander` */
-        div.stKey-{container_key} [data-testid="stExpander"] details > summary {{
-            background-color: #ff4b4b !important;
-            color: white !important;
-            font-weight: bold !important;
-            border-radius: 6px !important;
-            padding: 10px !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
@@ -3722,8 +3705,8 @@ elif st.session_state.current_page == "Active Opps":
             st.write("Click refresh")
 
     # Initial load
-    if 'red_events' not in st.session_state or not st.session_state.red_events:
-        with st.spinner("Loading news..."):
+    if not st.session_state.red_events:
+        with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_json_with_rate_limit()
             st.session_state.last_news_fetch = datetime.now()
 
@@ -3739,117 +3722,123 @@ elif st.session_state.current_page == "Active Opps":
         for e in red_events:
             try:
                 dt_local = isoparse(e['TimeMelbourne'])
-                ev_date = dt_local.date()
-                if start_of_week <= ev_date <= end_of_week:
+                event_date = dt_local.date()
+
+                if start_of_week <= event_date <= end_of_week:
                     filtered.append((dt_local, e))
             except Exception as ex:
                 st.write(f"Error parsing event time: {ex}")
                 continue
 
-        filtered.sort(key=lambda x: x[0])
+        filtered.sort(key=lambda x: x[0])  # Sort by time
 
+        # Group events by date
         events_by_day = defaultdict(list)
+
         for dt_local, e in filtered:
-            events_by_day[dt_local.date()].append((dt_local, e))
+            date_key = dt_local.date()
+            events_by_day[date_key].append((dt_local, e))
 
+        # Create a 7-day calendar starting today
         today = now_melb.date()
-        week_dates = [start_of_week + timedelta(days=i) for i in range(7)]
+        week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        # Use container to wrap the expander, so CSS can target inside it
-        with st.container(key=container_key):
-            with st.expander("Upcoming News - Weekly View", expanded=False):
-                cols = st.columns(7)
-                for i, day in enumerate(week_dates):
-                    with cols[i]:
-                        day_events = events_by_day.get(day, [])
+        with st.expander("Upcoming News - Weekly View", expanded=False):
+            cols = st.columns(7)
+            for i, day in enumerate(week_dates):
+                with cols[i]:
+                    day_events = events_by_day.get(day, [])
+                    # Format the day label
+                    day_name = day.strftime('%a')  # "Mon"
+                    day_num = day.strftime('%d %b')  # "14 Oct"
 
-                        day_name = day.strftime('%a')
-                        day_num = day.strftime('%d %b')
+                    # Header styling
+                    if day == today:
+                        # Today: Blue background
+                        st.markdown(f"""
+                            <div style="
+                                background-color: #007bff;
+                                color: white;
+                                padding: 10px;
+                                border-radius: 8px;
+                                text-align: center;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                            ">
+                                {day_name}<br>{day_num}
+                            </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        # Other days: Black background
+                        st.markdown(f"""
+                            <div style="
+                                background-color: black;
+                                color: white;
+                                padding: 10px;
+                                border-radius: 8px;
+                                text-align: center;
+                                font-weight: bold;
+                                margin-bottom: 15px;
+                            ">
+                                {day_name}<br>{day_num}
+                            </div>
+                        """, unsafe_allow_html=True)
 
-                        # Header styling: (Inside the expander, after the CSS override above)
-                        if day == today:
-                            # Blue background for today
-                            st.markdown(f"""
-                                <div style="
-                                    background-color: #007bff;
-                                    color: white;
-                                    padding: 10px;
-                                    border-radius: 8px;
-                                    text-align: center;
-                                    font-weight: bold;
-                                    margin-bottom: 15px;
-                                ">
-                                    {day_name}<br>{day_num}
-                                </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            # Black background for other days
-                            st.markdown(f"""
-                                <div style="
-                                    background-color: black;
-                                    color: white;
-                                    padding: 10px;
-                                    border-radius: 8px;
-                                    text-align: center;
-                                    font-weight: bold;
-                                    margin-bottom: 15px;
-                                ">
-                                    {day_name}<br>{day_num}
-                                </div>
-                            """, unsafe_allow_html=True)
+                    if not day_events:
+                        st.caption("No events")
+                    else:
+                        for dt_local, e in sorted(day_events, key=lambda x: x[0]):
+                            time_str = dt_local.strftime('%I:%M %p')
+                            event_name = e['Event']
+                            currency = e['Currency']
 
-                        if not day_events:
-                            st.caption("No events")
-                        else:
-                            for dt_local, e in sorted(day_events, key=lambda x: x[0]):
-                                time_str = dt_local.strftime('%I:%M %p')
-                                event_name = e['Event']
-                                currency = e['Currency']
-                                impact = e.get('Impact', '').upper()
+                            impact = e.get('Impact', '').upper()
 
-                                is_holiday = (impact == 'HOLIDAY')
-                                should_highlight = (
-                                        impact == 'HIGH' and any(
-                                    keyword.lower() in event_name.lower()
-                                    for keyword in [
-                                        "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                                        "GDP", "Non-Farm", "CPI", "election", "non farm",
-                                        "PMI", "Unemployment claims"
-                                    ]
-                                )
-                                )
+                            # Detect holidays
+                            is_holiday = (impact == 'HOLIDAY')
 
-                                if is_holiday:
-                                    st.markdown(f"""
-                                        <div style="
-                                            background-color: #d3d3d3;
-                                            color: black;
-                                            padding: 8px;
-                                            border-radius: 6px;
-                                            margin-bottom: 6px;
-                                        ">
-                                            <b>{time_str}</b> [{currency}] {event_name}
-                                        </div>
-                                    """, unsafe_allow_html=True)
-                                elif should_highlight:
-                                    st.markdown(f"""
-                                        <div style="
-                                            background-color: #ff4444;
-                                            color: white;
-                                            padding: 8px;
-                                            border-radius: 6px;
-                                            margin-bottom: 6px;
-                                        ">
-                                            <b>{time_str}</b> [{currency}] {event_name}
-                                        </div>
-                                    """, unsafe_allow_html=True)
-                                else:
-                                    st.write(f"**{time_str}** [{currency}] {event_name}")
+                            # Detect high-impact keywords
+                            should_highlight = (
+                                    impact == 'HIGH' and any(
+                                keyword.lower() in event_name.lower()
+                                for keyword in [
+                                    "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
+                                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI", "Unemployment claims"
+                                ]
+                            )
+                            )
 
-            # Optionally add spacing
-            st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
+                            if is_holiday:
+                                # Grey background for holiday
+                                st.markdown(f"""
+                                    <div style="
+                                        background-color: #d3d3d3;
+                                        color: black;
+                                        padding: 8px;
+                                        border-radius: 6px;
+                                        margin-bottom: 6px;
+                                    ">
+                                    <b>{time_str}</b> [{currency}] {event_name}
+                                    </div>
+                                """, unsafe_allow_html=True)
+                            elif should_highlight:
+                                # Red background for high-impact keywords
+                                st.markdown(f"""
+                                    <div style="
+                                        background-color: #ff4444;
+                                        color: white;
+                                        padding: 8px;
+                                        border-radius: 6px;
+                                        margin-bottom: 6px;
+                                    ">
+                                    <b>{time_str}</b> [{currency}] {event_name}
+                                    </div>
+                                """, unsafe_allow_html=True)
+                            else:
+                                st.write(f"**{time_str}** [{currency}] {event_name}")
+                    st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
     else:
-        st.info("No events found for this week.")
+        st.info("No high-impact events found.")
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

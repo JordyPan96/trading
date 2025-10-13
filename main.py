@@ -2144,6 +2144,84 @@ elif st.session_state.current_page == "Risk Calculation":
                     # st.success(f"Loaded {len(st.session_state.saved_records)} existing records from cloud")
 
 
+        # PAIR GROUPING FUNCTIONS
+        def get_pair_group(selected_pair):
+            """Determine which group a pair belongs to"""
+            group_one = ["EURAUD", "GBPAUD"]
+            group_two = ["GBPJPY", "EURJPY", "AUDJPY", "USDJPY"]
+            group_three = ["AUDUSD", "USDCAD"]
+            group_four = ["GBPUSD", "EURUSD"]
+            group_five = ["XAUUSD"]
+
+            if selected_pair in group_one:
+                return "group_one"
+            elif selected_pair in group_two:
+                return "group_two"
+            elif selected_pair in group_three:
+                return "group_three"
+            elif selected_pair in group_four:
+                return "group_four"
+            elif selected_pair in group_five:
+                return "group_five"
+            else:
+                return None
+
+
+        def get_group_pairs(group_name):
+            """Get all pairs in a specific group"""
+            groups = {
+                "group_one": ["EURAUD", "GBPAUD"],
+                "group_two": ["GBPJPY", "EURJPY", "AUDJPY", "USDJPY"],
+                "group_three": ["AUDUSD", "USDCAD"],
+                "group_four": ["GBPUSD", "EURUSD"],
+                "group_five": ["XAUUSD"]
+            }
+            return groups.get(group_name, [])
+
+
+        def check_and_handle_group_conflict(new_pair, new_final_risk, saved_records):
+            """Check if new pair conflicts with existing pairs in same group and handle accordingly"""
+            new_pair_group = get_pair_group(new_pair)
+
+            if not new_pair_group:
+                return saved_records, None  # No group, no conflict
+
+            # Find existing records in the same group that are in Speculation stage
+            conflicting_records = []
+            for i, record in enumerate(saved_records):
+                if (record.get('status') == 'Speculation' and
+                        get_pair_group(record['selected_pair']) == new_pair_group):
+                    conflicting_records.append((i, record, record.get('final_risk', 0)))
+
+            if not conflicting_records:
+                return saved_records, None  # No conflicts
+
+            # Find the highest risk among existing records
+            max_existing_risk = max(risk for _, _, risk in conflicting_records)
+            max_risk_records = [(i, record, risk) for i, record, risk in conflicting_records if
+                                risk == max_existing_risk]
+
+            # Compare with new record
+            if new_final_risk > max_existing_risk:
+                # New record has higher risk - remove all conflicting
+                records_to_keep = [record for i, record in enumerate(saved_records)
+                                   if not (i in [idx for idx, _, _ in conflicting_records])]
+                removed_pairs = [record['selected_pair'] for _, record, _ in conflicting_records]
+                return records_to_keep, f"Replaced {len(conflicting_records)} lower risk pair(s): {', '.join(removed_pairs)}"
+
+            elif new_final_risk == max_existing_risk:
+                # Same risk - remove all existing and keep new one (latest wins)
+                records_to_keep = [record for i, record in enumerate(saved_records)
+                                   if not (i in [idx for idx, _, _ in conflicting_records])]
+                removed_pairs = [record['selected_pair'] for _, record, _ in conflicting_records]
+                return records_to_keep, f"Replaced {len(conflicting_records)} same risk pair(s): {', '.join(removed_pairs)}"
+
+            else:
+                # Existing has higher risk - don't add new one
+                highest_pair = max_risk_records[0][1]['selected_pair']  # Get first highest risk pair
+                return saved_records, f"Higher risk pair ({highest_pair} - ${max_existing_risk}) already exists in same group"
+
+
         # st.subheader("Risk Calculation")
 
         def get_live_rate(pair):
@@ -2775,7 +2853,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier
+                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05
@@ -3199,7 +3277,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                      "Entry: " + get_global('entry_model') + " ")
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
-                    container.metric("--Note that all Entry must not exceed 33%", "Min Length for "+selected_pair+" is "+base_percent+"%")
+                    container.metric("--Note that all Entry must not exceed 33%",
+                                     "Min Length for " + selected_pair + " is " + base_percent + "%")
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
                     # container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))
@@ -3265,7 +3344,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                         'Variances': Variances,
                                         'stop_pips': stop_pips,
                                         'within_61': within_61,
-                                        'final_risk': final_risk,
+                                        'final_risk': final_risk,  # This is important for comparison
                                         'position_size': position_size,
                                         'position_size_propfirm': position_size_propfirm,
                                         'entry_price': 0.0,  # Default values
@@ -3275,22 +3354,32 @@ elif st.session_state.current_page == "Risk Calculation":
                                         'exit_rr': exit_text
                                     }
 
-                                    if existing_index is not None:
-                                        # Replace existing record (this doesn't count against the limit)
-                                        st.session_state.saved_records[existing_index] = record
-                                        # SAVE TO GOOGLE SHEETS
-                                        if save_workflow_to_sheets(st.session_state.saved_records):
-                                            st.success("Successfully Updated Order and Saved to Cloud!")
-                                        else:
-                                            st.error("Order updated locally but failed to save to cloud!")
-                                    else:
+                                    # Handle group conflicts for new records
+                                    if existing_index is None:
+                                        updated_records, conflict_message = check_and_handle_group_conflict(
+                                            selected_pair, final_risk, st.session_state.saved_records
+                                        )
+
+                                        if conflict_message and "Higher risk pair" in conflict_message:
+                                            st.warning(conflict_message)
+                                            return  # Don't add the new record
+
+                                        st.session_state.saved_records = updated_records
+                                        if conflict_message and "Replaced" in conflict_message:
+                                            st.info(conflict_message)
+
                                         # Add new record
                                         st.session_state.saved_records.append(record)
-                                        # SAVE TO GOOGLE SHEETS
-                                        if save_workflow_to_sheets(st.session_state.saved_records):
-                                            st.success("Successfully Added Order and Saved to Cloud!")
-                                        else:
-                                            st.error("Order added locally but failed to save to cloud!")
+
+                                    else:
+                                        # Update existing record (no group conflict check for updates)
+                                        st.session_state.saved_records[existing_index] = record
+
+                                    # SAVE TO GOOGLE SHEETS
+                                    if save_workflow_to_sheets(st.session_state.saved_records):
+                                        st.success("Successfully Processed Order and Saved to Cloud!")
+                                    else:
+                                        st.error("Order processed locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button (same size)
                         if st.button("View Active Opportunities"):
@@ -3366,7 +3455,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                         'within_61': within_61,
 
-                                        'final_risk': final_risk,
+                                        'final_risk': final_risk,  # This is important for comparison
 
                                         'position_size': position_size,
 
@@ -3384,37 +3473,36 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                     }
 
-                                    if existing_index is not None:
+                                    # Handle group conflicts for new records
+                                    if existing_index is None:
+                                        updated_records, conflict_message = check_and_handle_group_conflict(
+                                            selected_pair, final_risk, st.session_state.saved_records
+                                        )
 
-                                        # Replace existing record (this doesn't count against the limit)
+                                        if conflict_message and "Higher risk pair" in conflict_message:
+                                            st.warning(conflict_message)
+                                            return  # Don't add the new record
 
+                                        st.session_state.saved_records = updated_records
+                                        if conflict_message and "Replaced" in conflict_message:
+                                            st.info(conflict_message)
+
+                                        # Add new record
+                                        st.session_state.saved_records.append(record)
+
+                                    else:
+                                        # Update existing record (no group conflict check for updates)
                                         st.session_state.saved_records[existing_index] = record
 
-                                        # SAVE TO GOOGLE SHEETS
+                                    # SAVE TO GOOGLE SHEETS
 
-                                        if save_workflow_to_sheets(st.session_state.saved_records):
+                                    if save_workflow_to_sheets(st.session_state.saved_records):
 
-                                            st.success("Successfully Updated Order and Saved to Cloud!")
-
-                                        else:
-
-                                            st.error("Order updated locally but failed to save to cloud!")
+                                        st.success("Successfully Processed Order and Saved to Cloud!")
 
                                     else:
 
-                                        # Add new record
-
-                                        st.session_state.saved_records.append(record)
-
-                                        # SAVE TO GOOGLE SHEETS
-
-                                        if save_workflow_to_sheets(st.session_state.saved_records):
-
-                                            st.success("Successfully Added Order and Saved to Cloud!")
-
-                                        else:
-
-                                            st.error("Order added locally but failed to save to cloud!")
+                                        st.error("Order processed locally but failed to save to cloud!")
 
                         # Add View Active Opps button below the Add Order button (same size)
 
@@ -3438,6 +3526,7 @@ elif st.session_state.current_page == "Active Opps":
     from dateutil import parser as dp
     from zoneinfo import ZoneInfo  # Python 3.9+
     from dateutil.parser import isoparse
+    from collections import defaultdict
 
         # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
@@ -4183,6 +4272,9 @@ elif st.session_state.current_page == "Active Opps":
                         st.write(f"**Position Size:** {record['position_size']}")
                         st.write(f"**Stop Pips:** {record.get('stop_pips', 'N/A')}")
                         st.write(f"**Target RR:** {record.get('exit_rr', 'N/A')}")
+                        # Show final risk if available
+                        if 'final_risk' in record:
+                            st.write(f"**Final Risk:** ${record['final_risk']}")
 
                     with col2:
                         entry_price = st.number_input(

@@ -658,10 +658,22 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
 
         # Step 2: Parse 'Date' column and filter rows
         if "Date" in df.columns:
-            df["Date"] = pd.to_datetime(df["Date"], errors='coerce')  # Convert to datetime
-            today = pd.to_datetime(datetime.today().date())  # Use fixed date for reproducibility
-            df = df[df["Date"] >= today]  # Keep only rows on or after today
+            # Convert to datetime and normalize to date only (remove time component)
+            df["Date"] = pd.to_datetime(df["Date"], errors='coerce').dt.normalize()
+
+            # Get today's date (normalized, no time component)
+            today = pd.to_datetime(datetime.today().date()).normalize()
+
+            # Debug: Show what's being filtered
+            st.write(f"DEBUG: Today's date: {today}")
+            st.write(f"DEBUG: Date range in data: {df['Date'].min()} to {df['Date'].max()}")
+            st.write(f"DEBUG: Rows before filtering: {len(df)}")
+
+            # Keep only rows on or after today
+            df = df[df["Date"] >= today]
             df = df.reset_index(drop=True)
+
+            st.write(f"DEBUG: Rows after filtering: {len(df)}")
 
         else:
             st.sidebar.warning("No 'Date' column found — skipping filtering")
@@ -690,6 +702,7 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
 
         # Step 4: Write filtered data to the worksheet
         set_with_dataframe(worksheet, df)
+        st.success(f"✅ Successfully replaced {worksheet_name} with {len(df)} rows (filtered to today and future)")
         return True
 
     except Exception as e:

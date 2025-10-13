@@ -4780,6 +4780,31 @@ elif st.session_state.current_page == "Active Opps":
                                 if handle_delete_record(record_index):
                                     st.rerun()
 
+                                    
+                    # ORDER READY STAGE ACTIONS
+                    elif st.session_state.current_stage == 'Order Ready':
+                        col_update, col_spec, col_move, col_delete = st.columns(4)  # Changed to 4 columns
+
+                        with col_update:
+                            if st.button("Update Record", key=f"update_{unique_key_base}"):
+                                if handle_update_record(record_index, entry_price, exit_price, target_price):
+                                    st.rerun()
+
+                        with col_spec:  # NEW: Move to Speculation button
+                            if st.button("Move to Speculation", key=f"move_spec_{unique_key_base}"):
+                                if handle_move_record(record_index, 'Speculation'):
+                                    st.rerun()
+
+                        with col_move:
+                            if st.button("Move to Order Placed", key=f"move_{unique_key_base}"):
+                                if handle_move_record(record_index, 'Order Placed'):
+                                    st.rerun()
+
+                        with col_delete:
+                            if st.button("Delete", key=f"delete_{unique_key_base}"):
+                                if handle_delete_record(record_index):
+                                    st.rerun()
+
                     # ORDER PLACED STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Placed':
                         col_update, col_back, col_move, col_delete = st.columns(4)

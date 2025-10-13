@@ -2295,8 +2295,9 @@ elif st.session_state.current_page == "Risk Calculation":
                 most_recent_date = recent_trades['Date'].max()
                 current_date = pd.Timestamp.now().normalize()  # Current date without time
 
-                # Calculate cooldown end date (most recent date + cooldown_days)
-                cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days)
+                # Calculate cooldown end date (most recent date + cooldown_days + 1)
+                # If trade was on 10-13, cooldown ends on 10-15 (2 days later)
+                cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days + 1)
 
                 # Check if we're still in cooldown period
                 if current_date < cooldown_end_date:

@@ -646,6 +646,30 @@ def save_data_to_sheets(df, sheet_name="Trade", worksheet_name="Trade.csv"):
         return False
 
 
+def replace_data_on_sheet(data, sheet_name, worksheet_name):
+    """Completely replace data in a Google Sheet worksheet"""
+    try:
+        # Convert data to DataFrame if it's not already
+        if isinstance(data, list):
+            df = pd.DataFrame(data)
+        else:
+            df = data.copy()
+
+        # Use your existing save function but with a clear-and-replace strategy
+        # First, clear the worksheet by saving an empty DataFrame with the same columns
+        empty_df = pd.DataFrame(columns=df.columns)
+        save_data_to_sheets(empty_df, sheet_name=sheet_name, worksheet_name=worksheet_name)
+
+        # Now save the actual data
+        success = save_data_to_sheets(df, sheet_name=sheet_name, worksheet_name=worksheet_name)
+
+        return success
+
+    except Exception as e:
+        st.error(f"Error in replace_data_on_sheet: {e}")
+        return False
+
+
 def delete_data_from_sheets(sheet_name="Trade.csv"):
     """Delete data from Google Sheets"""
     try:
@@ -3906,19 +3930,8 @@ elif st.session_state.current_page == "Active Opps":
 
             st.write(f"DEBUG: Replacing Google Sheets with {len(events)} new events")
 
-            # STRATEGY 1: Try direct replacement first
-            success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
-
-            if not success:
-                # STRATEGY 2: If that fails, try clearing first by saving empty then new data
-                st.write("DEBUG: First attempt failed, trying clear-and-replace strategy...")
-
-                # Save empty DataFrame to clear the sheet
-                empty_df = pd.DataFrame(columns=required_columns)
-                save_data_to_sheets(empty_df, sheet_name="Trade", worksheet_name="News")
-
-                # Now save the new data
-                success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
+            # Use the new replace function instead of save
+            success = replace_data_on_sheets(df, sheet_name="Trade", worksheet_name="News")
 
             if not success:
                 st.error("Failed to replace news data in Google Sheets")
@@ -3957,15 +3970,20 @@ elif st.session_state.current_page == "Active Opps":
             with st.spinner("Checking for high impact news..."):
                 # Fetch new data
                 new_events = get_red_news_from_json_with_rate_limit()
+                st.write(f"DEBUG: Fetched {len(new_events) if new_events else 0} events from Forex Factory")
 
                 if new_events:
-                    # Save to Google Sheets
-                    if save_events_to_sheets(new_events):
+                    # Save to Google Sheets USING REPLACEMENT
+                    st.write("DEBUG: Attempting to REPLACE events in Google Sheets...")
+                    if save_events_to_sheets(new_events):  # This now uses replace_data_on_sheet internally
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
-                        st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
+                        st.session_state.data_source = 'forex_factory'
+                        st.success("News data REPLACED and updated successfully!")
                     else:
-                        st.error("Failed to save news to Google Sheets")
+                        st.error("Failed to REPLACE news in Google Sheets")
+                else:
+                    st.warning("No new events found from Forex Factory")
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -3977,25 +3995,33 @@ elif st.session_state.current_page == "Active Opps":
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             # First try to load from Google Sheets
+            st.write("DEBUG: Attempting to load from Google Sheets...")
             sheet_events = load_events_from_sheets()
 
             if sheet_events:
                 st.session_state.red_events = sheet_events
                 st.session_state.last_news_fetch = datetime.now()
-                st.session_state.data_source = 'cloud'  # Set source to Cloud
+                st.session_state.data_source = 'cloud'
+                st.success("Loaded news data from Google Sheets")
             else:
                 # If no data in sheets, fetch new data
+                st.write("DEBUG: No data in sheets, fetching from Forex Factory...")
                 new_events = get_red_news_from_json_with_rate_limit()
                 if new_events:
                     st.session_state.red_events = new_events
                     st.session_state.last_news_fetch = datetime.now()
-                    st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
-                    # Save to Google Sheets for next time
-                    save_events_to_sheets(new_events)
+                    st.session_state.data_source = 'forex_factory'
+                    # Save to Google Sheets for next time USING REPLACEMENT
+                    st.write("DEBUG: Saving fetched data to Google Sheets (REPLACEMENT)...")
+                    if save_events_to_sheets(new_events):  # This now uses replace
+                        st.success("Fetched new data and REPLACED Google Sheets")
+                    else:
+                        st.error("Fetched new data but failed to REPLACE Google Sheets")
                 else:
                     st.session_state.red_events = []
                     st.session_state.last_news_fetch = None
                     st.session_state.data_source = None
+                    st.warning("No news data available")
 
     red_events = st.session_state.red_events
 

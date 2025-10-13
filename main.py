@@ -20,8 +20,8 @@ import yfinance as yf  # For live FX rates
 import requests
 from typing import Dict, List, Optional
 from globals_manager import set_global, get_global, clear_global
-from datetime import datetime
-
+from datetime import datetime, timedelta
+import pytz
 import gspread
 from google.oauth2.service_account import Credentials
 

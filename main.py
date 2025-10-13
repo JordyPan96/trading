@@ -3703,12 +3703,56 @@ elif st.session_state.current_page == "Active Opps":
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
+    def save_events_to_sheets(events):
+        """Save events to Google Sheets"""
+        if not events:
+            return False
+
+        try:
+            # Convert events to DataFrame for your existing save function
+            df = pd.DataFrame(events)
+
+            # Save using your existing function
+            success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
+            return success
+
+        except Exception as e:
+            st.error(f"Failed to save to Google Sheets: {e}")
+            return False
+
+    def load_events_from_sheets():
+        """Load events from Google Sheets using your existing function"""
+        try:
+            df = load_data_from_sheets(sheet_name="Trade", worksheet_name="News")
+
+            if df is None or df.empty:
+                return None
+
+            # Convert DataFrame back to event format
+            events = df.to_dict('records')
+            return events
+
+        except Exception as e:
+            st.error(f"Failed to load from Google Sheets: {e}")
+            return None
+
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.button("Refresh News", key="refresh_red_news_json", use_container_width=True):
             with st.spinner("Checking for high impact news..."):
-                st.session_state.red_events = get_red_news_from_json_with_rate_limit()
-                st.session_state.last_news_fetch = datetime.now()
+                # Fetch new data
+                new_events = get_red_news_from_json_with_rate_limit()
+
+                if new_events:
+                    # Save to Google Sheets
+                    if save_events_to_sheets(new_events):
+                        st.session_state.red_events = new_events
+                        st.session_state.last_news_fetch = datetime.now()
+                        st.success("News updated and saved to Google Sheets!")
+                    else:
+                        st.error("Failed to save news to Google Sheets")
+                else:
+                    st.warning("No new events fetched")
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -3716,14 +3760,31 @@ elif st.session_state.current_page == "Active Opps":
         else:
             st.write("Click refresh")
 
-    # Initial load
+    # Initial load - try session state, then Google Sheets, then fetch new
     if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
-            st.session_state.red_events = get_red_news_from_json_with_rate_limit()
-            st.session_state.last_news_fetch = datetime.now()
+            # First try to load from Google Sheets
+            sheet_events = load_events_from_sheets()
+
+            if sheet_events:
+                st.session_state.red_events = sheet_events
+                st.session_state.last_news_fetch = datetime.now()
+                st.info("Loaded news from Google Sheets")
+            else:
+                # If no data in sheets, fetch new data
+                new_events = get_red_news_from_json_with_rate_limit()
+                if new_events:
+                    st.session_state.red_events = new_events
+                    st.session_state.last_news_fetch = datetime.now()
+                    # Save to Google Sheets for next time
+                    save_events_to_sheets(new_events)
+                else:
+                    st.session_state.red_events = []
+                    st.session_state.last_news_fetch = None
 
     red_events = st.session_state.red_events
 
+    # Rest of your existing display code remains exactly the same...
     if red_events:
         now_melb = datetime.now(melbourne_tz)
 

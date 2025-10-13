@@ -2294,32 +2294,25 @@ elif st.session_state.current_page == "Risk Calculation":
                 # Get the most recent trade date in the group
                 most_recent_date = recent_trades['Date'].max()
 
-                # Get current date (no time component)
-                current_date = datetime.now().date()
+                # Get current datetime in Melbourne timezone
+                melbourne_tz = pytz.timezone('Australia/Melbourne')
+                current_melbourne = datetime.now(melbourne_tz)
 
-                # Calculate when cooldown ends (trade date + 2 days)
-                # If trade was on Oct 13, cooldown ends on Oct 15
-                cooldown_end_date = most_recent_date.date() + timedelta(days=cooldown_days + 1)
+                # Calculate cooldown end datetime (trade date + 1 day at 3 PM)
+                cooldown_end_datetime = melbourne_tz.localize(
+                    datetime(most_recent_date.year, most_recent_date.month, most_recent_date.day, 15, 0, 0)
+                ) + timedelta(days=1)
 
                 # Check if we're still in cooldown period
-                if current_date < cooldown_end_date:
-                    # Calculate hours remaining until midnight of cooldown end date
-                    melbourne_tz = pytz.timezone('Australia/Melbourne')
-                    current_melbourne = datetime.now(melbourne_tz)
-
-                    # Create datetime for midnight of cooldown end date in Melbourne
-                    cooldown_midnight = melbourne_tz.localize(
-                        datetime(cooldown_end_date.year, cooldown_end_date.month, cooldown_end_date.day, 0, 0, 0)
-                    )
-
-                    time_remaining = cooldown_midnight - current_melbourne
+                if current_melbourne < cooldown_end_datetime:
+                    # Calculate time remaining until cooldown ends at 3 PM next day
+                    time_remaining = cooldown_end_datetime - current_melbourne
                     total_hours = max(0, int(time_remaining.total_seconds() // 3600))
+                    remaining_minutes = max(0, int((time_remaining.total_seconds() % 3600) // 60))
 
                     error_msg = (
                         f"Group {selected_group} Cooldown period active! "
-                        #f"Most recent: {most_recent_date.strftime('%Y-%m-%d')}. "
-                        #f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
-                        f"({total_hours} hours remaining)"
+                        f"({total_hours}h {remaining_minutes}m remaining)"
                     )
                     return False, error_msg  # BLOCK the order
                 else:

@@ -3688,12 +3688,12 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
-    # Inject CSS to color the expander header text red
+    # Inject CSS to color the expander header text blue
     st.markdown("""
         <style>
         /* Target expander label text */
         [data-testid="stExpander"] > details > summary {
-            color: red !important;
+            color: #007BFF !important;  /* Bootstrap blue */
             font-weight: bold !important;
             font-size: 1.1rem;
         }
@@ -3758,7 +3758,7 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
                     else:
                         st.error("Failed to save news to Google Sheets")
-                
+
 
     with col2:
         if st.session_state.last_news_fetch:

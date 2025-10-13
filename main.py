@@ -483,11 +483,11 @@ def clear_persistent_session():
 
 # Initialize persistent session
 initialize_persistent_session()
+if 'current_page' not in st.session_state:
+    st.session_state.current_page = "Home"
 # Initialize session state variables
 if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
-if 'current_page' not in st.session_state:
-    st.session_state.current_page = "Home"
 if 'saved_records' not in st.session_state:
     st.session_state.saved_records = []
 if 'file_processed' not in st.session_state:  # Add this flag
@@ -500,7 +500,9 @@ if 'session_initialized' not in st.session_state:
     initialize_persistent_session()
     st.session_state.session_initialized = True
 
-
+if not st.session_state.current_page:
+    st.session_state.current_page = "Home"
+    
 @st.cache_resource
 def get_google_sheets_client():
     """Initialize Google Sheets connection - supports both Streamlit secrets and GitHub secrets"""

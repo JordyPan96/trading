@@ -3733,6 +3733,40 @@ elif st.session_state.current_page == "Active Opps":
         return False, target_group, []
 
 
+    # ==================== AUTO-DELETE CROSS GROUP SPECULATION FUNCTION ====================
+    def delete_cross_group_speculation(filled_pair, saved_records):
+        """Delete speculation records that belong to the same cross group as a filled order"""
+
+        # Define cross groups
+        cross_groups = [
+            ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
+            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
+        ]
+
+        # Find which group the filled pair belongs to
+        target_group = None
+        for group in cross_groups:
+            if filled_pair in group:
+                target_group = group
+                break
+
+        if not target_group:
+            return saved_records, []  # No cross group restriction for this pair
+
+        # Find speculation records in the same group
+        records_to_delete = []
+        updated_records = []
+
+        for record in saved_records:
+            if (record.get('status') == 'Speculation' and
+                    record['selected_pair'] in target_group):
+                records_to_delete.append(record['selected_pair'])
+            else:
+                updated_records.append(record)
+
+        return updated_records, records_to_delete
+
+
     # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
@@ -3817,6 +3851,8 @@ elif st.session_state.current_page == "Active Opps":
         st.session_state.red_events = []
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
+    if 'last_deleted_pairs' not in st.session_state:
+        st.session_state.last_deleted_pairs = []
 
     # Inject CSS to color the expander header text blue
     st.markdown("""
@@ -4182,7 +4218,7 @@ elif st.session_state.current_page == "Active Opps":
 
 
     def handle_move_record(record_index, new_status):
-        """Handle moving record to new status"""
+        """Handle moving record to new status with cross-group auto-deletion"""
         try:
             # Check if moving to Order Ready and limit is reached
             if new_status == 'Order Ready':
@@ -4192,11 +4228,34 @@ elif st.session_state.current_page == "Active Opps":
                     st.error("Maximum limit of 2 Order Ready orders reached! Cannot move this record to Order Ready.")
                     return False
 
+            # Store the pair for cross-group checking
+            moving_pair = st.session_state.saved_records[record_index]['selected_pair']
+            old_status = st.session_state.saved_records[record_index].get('status')
+
+            # Update the record status
             st.session_state.saved_records[record_index]['status'] = new_status
+
+            # AUTO-DELETE: If moving to Order Filled, delete same-group speculation records
+            deleted_pairs = []
+            if new_status == 'Order Filled':
+                updated_records, deleted_pairs = delete_cross_group_speculation(
+                    moving_pair, st.session_state.saved_records
+                )
+                st.session_state.saved_records = updated_records
+
+                # Show deletion notification
+                if deleted_pairs:
+                    st.warning(f"Auto-deleted speculation records in same cross group: {', '.join(deleted_pairs)}")
+
             success = save_workflow_to_sheets(st.session_state.saved_records)
             if success:
                 sync_with_trade_signals()  # Sync after status change
                 st.session_state.last_action = f"moved_record_{record_index}_to_{new_status}"
+
+                # Store deleted pairs in session state for display
+                if deleted_pairs:
+                    st.session_state.last_deleted_pairs = deleted_pairs
+
                 return True
             return False
         except Exception as e:
@@ -4289,6 +4348,21 @@ elif st.session_state.current_page == "Active Opps":
                 sync_with_trade_signals()
                 st.success("Workflow data loaded and synced!")
 
+    # Clean up speculation records for existing Order Filled records
+    if st.session_state.saved_records:
+        # Get all Order Filled pairs
+        filled_pairs = [r['selected_pair'] for r in st.session_state.saved_records if r.get('status') == 'Order Filled']
+
+        # Delete speculation records for each filled pair's cross group
+        for filled_pair in filled_pairs:
+            updated_records, deleted_pairs = delete_cross_group_speculation(
+                filled_pair, st.session_state.saved_records
+            )
+            st.session_state.saved_records = updated_records
+
+            if deleted_pairs:
+                st.info(f"Cleaned up speculation records for filled order {filled_pair}: {', '.join(deleted_pairs)}")
+
     # Handle action results and force rerun
     if st.session_state.last_action:
         action = st.session_state.last_action
@@ -4298,6 +4372,11 @@ elif st.session_state.current_page == "Active Opps":
             st.success(" Record updated successfully!")
         elif "moved_record" in action:
             st.success(" Record moved successfully!")
+            # Show auto-deletion message if any pairs were deleted
+            if st.session_state.last_deleted_pairs:
+                deleted_pairs = st.session_state.last_deleted_pairs
+                st.warning(f" Auto-deleted speculation records in same cross group: {', '.join(deleted_pairs)}")
+                st.session_state.last_deleted_pairs = []  # Clear after showing
         elif "deleted_record" in action:
             st.success(" Record deleted successfully!")
         elif "loaded_data" in action:
@@ -4438,7 +4517,7 @@ elif st.session_state.current_page == "Active Opps":
     order_placed_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Placed')
     order_filled_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Order Filled')
     # Only count Order Placed and Order Filled as active records (exclude Order Ready)
-    total_active_count =  order_ready_count + order_placed_count + order_filled_count
+    total_active_count = order_ready_count + order_placed_count + order_filled_count
 
     # Display counts with Order Ready limit warning
     # st.write(f"**Order Ready Records:** {order_ready_count}/3")

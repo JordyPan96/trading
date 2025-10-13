@@ -3754,9 +3754,7 @@ elif st.session_state.current_page == "Active Opps":
                         #st.success("News updated and saved to Google Sheets!")
                     else:
                         st.error("Failed to save news to Google Sheets")
-                else:
-                    return None
-                    #st.warning("No new events fetched")
+
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -3773,7 +3771,7 @@ elif st.session_state.current_page == "Active Opps":
             if sheet_events:
                 st.session_state.red_events = sheet_events
                 st.session_state.last_news_fetch = datetime.now()
-                st.info("Loaded news from Google Sheets")
+                #st.info("Loaded news from Google Sheets")
             else:
                 # If no data in sheets, fetch new data
                 new_events = get_red_news_from_json_with_rate_limit()

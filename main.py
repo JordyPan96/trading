@@ -4409,9 +4409,9 @@ elif st.session_state.current_page == "Active Opps":
     total_active_count = order_placed_count + order_filled_count
 
     # Display counts with Order Ready limit warning
-    st.write(f"**Order Ready Records:** {order_ready_count}/3")
-    if order_ready_count >= 3:
-        st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
+    #st.write(f"**Order Ready Records:** {order_ready_count}/3")
+    #if order_ready_count >= 3:
+        #st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
     # st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
     # st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
     # st.write(

@@ -3743,7 +3743,7 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        with st.expander("Upcoming News - Weekly View", expanded=True):
+        with st.expander("Upcoming News - Weekly View", expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:

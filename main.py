@@ -3920,9 +3920,7 @@ elif st.session_state.current_page == "Active Opps":
                 # Now save the new data
                 success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
 
-            if success:
-                #st.success(f"Successfully replaced all news data with {len(events)} events")
-            else:
+            if not success:
                 st.error("Failed to replace news data in Google Sheets")
 
             return success

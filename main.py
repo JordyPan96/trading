@@ -3903,7 +3903,7 @@ elif st.session_state.current_page == "Active Opps":
                             else:
                                 st.write(f"**{time_str}** [{currency}] {event_name}")
 
-                    st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
     else:
         st.info("No high-impact events found.")
 

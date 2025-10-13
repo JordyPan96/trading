@@ -3701,6 +3701,38 @@ elif st.session_state.current_page == "Active Opps":
     from collections import defaultdict
 
 
+    # ==================== CROSS GROUP VALIDATION FUNCTION ====================
+    def check_cross_group_conflict(selected_pair, current_stage_records):
+        """Check if there's already a record from the same cross group in active stages"""
+
+        # Define cross groups
+        cross_groups = [
+            ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
+            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
+        ]
+
+        # Find which group the selected pair belongs to
+        target_group = None
+        for group in cross_groups:
+            if selected_pair in group:
+                target_group = group
+                break
+
+        if not target_group:
+            return False, None  # No cross group restriction for this pair
+
+        # Check if any record in active stages belongs to the same group
+        conflicting_pairs = []
+        for record in current_stage_records:
+            if record['selected_pair'] in target_group:
+                conflicting_pairs.append(record['selected_pair'])
+
+        if conflicting_pairs:
+            return True, target_group, conflicting_pairs
+
+        return False, target_group, []
+
+
     # ==================== ROBUST RED NEWS FUNCTION ====================
     def get_red_news_from_json_with_rate_limit():
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
@@ -4409,9 +4441,9 @@ elif st.session_state.current_page == "Active Opps":
     total_active_count = order_placed_count + order_filled_count
 
     # Display counts with Order Ready limit warning
-    #st.write(f"**Order Ready Records:** {order_ready_count}/3")
-    #if order_ready_count >= 3:
-        #st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
+    # st.write(f"**Order Ready Records:** {order_ready_count}/3")
+    # if order_ready_count >= 3:
+    # st.warning("⚠️ Maximum limit of 3 Order Ready orders reached!")
     # st.write(f"**Total Records:** {len(st.session_state.saved_records)}/5")
     # st.write(f"**Active Records (Order Placed + Order Filled):** {total_active_count}/2")
     # st.write(
@@ -4599,6 +4631,16 @@ elif st.session_state.current_page == "Active Opps":
                         if not target_price_valid:
                             st.error("Target price must be > 0 to move to Order Ready")
 
+                        # NEW: Check cross group conflicts
+                        active_stage_records = [
+                            r for r in st.session_state.saved_records
+                            if r.get('status') in ['Order Ready', 'Order Placed', 'Order Filled']
+                        ]
+
+                        has_cross_group_conflict, conflict_group, conflicting_pairs = check_cross_group_conflict(
+                            record['selected_pair'], active_stage_records
+                        )
+
                         col_update, col_move, col_delete = st.columns(3)
 
                         with col_update:
@@ -4610,7 +4652,14 @@ elif st.session_state.current_page == "Active Opps":
                             # Check Order Ready limit
                             current_order_ready_count = sum(
                                 1 for r in st.session_state.saved_records if r.get('status') == 'Order Ready')
-                            can_move = all_required_fields_valid and total_active_count < 2 and current_order_ready_count < 2
+
+                            # Check all conditions for moving to Order Ready
+                            can_move = (
+                                    all_required_fields_valid and
+                                    total_active_count < 2 and
+                                    current_order_ready_count < 2 and
+                                    not has_cross_group_conflict
+                            )
 
                             if st.button("Move to Order Ready",
                                          key=f"move_{unique_key_base}",
@@ -4619,6 +4668,8 @@ elif st.session_state.current_page == "Active Opps":
                                     st.rerun()
 
                             # Show appropriate error messages
+                            if has_cross_group_conflict:
+                                st.error(f"❌ Cross-group conflict! Same group as: {', '.join(conflicting_pairs)}")
                             if total_active_count >= 2:
                                 st.error("Max 2 active records reached (Order Placed + Order Filled)")
                             elif current_order_ready_count >= 2:

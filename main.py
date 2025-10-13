@@ -3758,8 +3758,7 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
                     else:
                         st.error("Failed to save news to Google Sheets")
-                else:
-                    st.error("No new events fetched")
+                
 
     with col2:
         if st.session_state.last_news_fetch:

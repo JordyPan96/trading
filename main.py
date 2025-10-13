@@ -3931,7 +3931,7 @@ elif st.session_state.current_page == "Active Opps":
             st.write(f"DEBUG: Replacing Google Sheets with {len(events)} new events")
 
             # Use the new replace function instead of save
-            success = replace_data_on_sheets(df, sheet_name="Trade", worksheet_name="News")
+            success = replace_data_on_sheet(df, sheet_name="Trade", worksheet_name="News")
 
             if not success:
                 st.error("Failed to replace news data in Google Sheets")

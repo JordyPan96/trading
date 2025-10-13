@@ -669,6 +669,12 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
             st.write(f"DEBUG: Date range in data: {df['Date'].min()} to {df['Date'].max()}")
             st.write(f"DEBUG: Rows before filtering: {len(df)}")
 
+            # Show which dates are considered past vs future
+            past_dates = df[df["Date"] < today]["Date"].unique()
+            future_dates = df[df["Date"] >= today]["Date"].unique()
+            st.write(f"DEBUG: Past dates being removed: {sorted(past_dates)}")
+            st.write(f"DEBUG: Future dates being kept: {sorted(future_dates)}")
+
             # Keep only rows on or after today
             df = df[df["Date"] >= today]
             df = df.reset_index(drop=True)
@@ -708,7 +714,6 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
     except Exception as e:
         st.sidebar.error(f"Error in replace_data_on_sheet: {e}")
         return False
-
 
 def delete_data_from_sheets(sheet_name="Trade.csv"):
     """Delete data from Google Sheets"""

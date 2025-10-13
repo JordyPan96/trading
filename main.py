@@ -3886,16 +3886,45 @@ elif st.session_state.current_page == "Active Opps":
 
 
     def save_events_to_sheets(events):
-        """Save events to Google Sheets"""
+        """Save events to Google Sheets - COMPLETE REPLACEMENT"""
         if not events:
+            st.warning("No events to save")
             return False
 
         try:
-            # Convert events to DataFrame for your existing save function
+            # Convert events to DataFrame
             df = pd.DataFrame(events)
 
-            # Save using your existing function
+            # Ensure we have the required columns
+            required_columns = ['Date', 'TimeMelbourne', 'Currency', 'Event', 'Forecast', 'Previous', 'Actual',
+                                'Impact']
+            for col in required_columns:
+                if col not in df.columns:
+                    df[col] = ""
+
+            df = df[required_columns]
+
+            st.write(f"DEBUG: Replacing Google Sheets with {len(events)} new events")
+
+            # STRATEGY 1: Try direct replacement first
             success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
+
+            if not success:
+                # STRATEGY 2: If that fails, try clearing first by saving empty then new data
+                st.write("DEBUG: First attempt failed, trying clear-and-replace strategy...")
+
+                # Save empty DataFrame to clear the sheet
+                empty_df = pd.DataFrame(columns=required_columns)
+                save_data_to_sheets(empty_df, sheet_name="Trade", worksheet_name="News")
+
+                # Now save the new data
+                success = save_data_to_sheets(df, sheet_name="Trade", worksheet_name="News")
+
+            if success:
+                #st.success(f"Successfully replaced all news data with {len(events)} events")
+            else:
+                st.error("Failed to replace news data in Google Sheets")
+
             return success
 
         except Exception as e:
@@ -4780,7 +4809,7 @@ elif st.session_state.current_page == "Active Opps":
                                 if handle_delete_record(record_index):
                                     st.rerun()
 
-                                    
+
                     # ORDER READY STAGE ACTIONS
                     elif st.session_state.current_stage == 'Order Ready':
                         col_update, col_spec, col_move, col_delete = st.columns(4)  # Changed to 4 columns

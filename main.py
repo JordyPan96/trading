@@ -3688,6 +3688,18 @@ elif st.session_state.current_page == "Active Opps":
     if 'last_news_fetch' not in st.session_state:
         st.session_state.last_news_fetch = None
 
+    # Inject CSS to color the expander header text red
+    st.markdown("""
+        <style>
+        /* Target expander label text */
+        [data-testid="stExpander"] > details > summary {
+            color: red !important;
+            font-weight: bold !important;
+            font-size: 1.1rem;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Set Melbourne timezone
     melbourne_tz = ZoneInfo('Australia/Melbourne')
 
@@ -3705,7 +3717,7 @@ elif st.session_state.current_page == "Active Opps":
             st.write("Click refresh")
 
     # Initial load
-    if not st.session_state.red_events:
+    if 'red_events' not in st.session_state or not st.session_state.red_events:
         with st.spinner("Loading high impact news..."):
             st.session_state.red_events = get_red_news_from_json_with_rate_limit()
             st.session_state.last_news_fetch = datetime.now()
@@ -3723,7 +3735,6 @@ elif st.session_state.current_page == "Active Opps":
             try:
                 dt_local = isoparse(e['TimeMelbourne'])
                 event_date = dt_local.date()
-
                 if start_of_week <= event_date <= end_of_week:
                     filtered.append((dt_local, e))
             except Exception as ex:
@@ -3732,14 +3743,11 @@ elif st.session_state.current_page == "Active Opps":
 
         filtered.sort(key=lambda x: x[0])  # Sort by time
 
-        # Group events by date
         events_by_day = defaultdict(list)
-
         for dt_local, e in filtered:
             date_key = dt_local.date()
             events_by_day[date_key].append((dt_local, e))
 
-        # Create a 7-day calendar starting today
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
@@ -3748,13 +3756,13 @@ elif st.session_state.current_page == "Active Opps":
             for i, day in enumerate(week_dates):
                 with cols[i]:
                     day_events = events_by_day.get(day, [])
-                    # Format the day label
-                    day_name = day.strftime('%a')  # "Mon"
-                    day_num = day.strftime('%d %b')  # "14 Oct"
+
+                    day_name = day.strftime('%a')
+                    day_num = day.strftime('%d %b')
 
                     # Header styling
                     if day == today:
-                        # Today: Blue background
+                        # Blue for today
                         st.markdown(f"""
                             <div style="
                                 background-color: #007bff;
@@ -3769,7 +3777,7 @@ elif st.session_state.current_page == "Active Opps":
                             </div>
                         """, unsafe_allow_html=True)
                     else:
-                        # Other days: Black background
+                        # Black for other days
                         st.markdown(f"""
                             <div style="
                                 background-color: black;
@@ -3791,25 +3799,21 @@ elif st.session_state.current_page == "Active Opps":
                             time_str = dt_local.strftime('%I:%M %p')
                             event_name = e['Event']
                             currency = e['Currency']
-
                             impact = e.get('Impact', '').upper()
 
-                            # Detect holidays
                             is_holiday = (impact == 'HOLIDAY')
-
-                            # Detect high-impact keywords
                             should_highlight = (
                                     impact == 'HIGH' and any(
                                 keyword.lower() in event_name.lower()
                                 for keyword in [
                                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
-                                    "GDP", "Non-Farm", "CPI", "election", "non farm", "PMI", "Unemployment claims"
+                                    "GDP", "Non-Farm", "CPI", "election", "non farm",
+                                    "PMI", "Unemployment claims"
                                 ]
                             )
                             )
 
                             if is_holiday:
-                                # Grey background for holiday
                                 st.markdown(f"""
                                     <div style="
                                         background-color: #d3d3d3;
@@ -3822,7 +3826,6 @@ elif st.session_state.current_page == "Active Opps":
                                     </div>
                                 """, unsafe_allow_html=True)
                             elif should_highlight:
-                                # Red background for high-impact keywords
                                 st.markdown(f"""
                                     <div style="
                                         background-color: #ff4444;
@@ -3836,6 +3839,7 @@ elif st.session_state.current_page == "Active Opps":
                                 """, unsafe_allow_html=True)
                             else:
                                 st.write(f"**{time_str}** [{currency}] {event_name}")
+
                     st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
     else:
         st.info("No high-impact events found.")

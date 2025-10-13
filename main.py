@@ -3755,7 +3755,8 @@ elif st.session_state.current_page == "Active Opps":
                     else:
                         st.error("Failed to save news to Google Sheets")
                 else:
-                    st.warning("No new events fetched")
+                    return None
+                    #st.warning("No new events fetched")
 
     with col2:
         if st.session_state.last_news_fetch:

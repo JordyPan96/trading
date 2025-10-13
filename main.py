@@ -2294,15 +2294,24 @@ elif st.session_state.current_page == "Risk Calculation":
                 # Get the most recent trade date in the group
                 most_recent_date = recent_trades['Date'].max()
 
-                # Set timezone to Melbourne
+                # Get current time in Melbourne timezone
                 melbourne_tz = pytz.timezone('Australia/Melbourne')
                 current_melbourne_time = datetime.now(melbourne_tz)
 
-                # Calculate cooldown end date (most recent date + cooldown_days + 1) at Melbourne midnight
+                # Calculate cooldown end date (most recent date + cooldown_days + 1)
+                # If trade was on Oct 13, cooldown ends on Oct 15 at midnight Melbourne time
                 cooldown_end_date = most_recent_date + pd.Timedelta(days=cooldown_days + 1)
+
+                # Convert cooldown_end_date to Melbourne timezone at midnight
                 cooldown_end_melbourne = melbourne_tz.localize(
                     datetime(cooldown_end_date.year, cooldown_end_date.month, cooldown_end_date.day, 0, 0, 0)
                 )
+
+                # DEBUG: Print values to see what's happening
+                print(f"DEBUG - Most recent trade: {most_recent_date}")
+                print(f"DEBUG - Current Melbourne time: {current_melbourne_time}")
+                print(f"DEBUG - Cooldown end: {cooldown_end_melbourne}")
+                print(f"DEBUG - Should block: {current_melbourne_time < cooldown_end_melbourne}")
 
                 # Check if we're still in cooldown period
                 if current_melbourne_time < cooldown_end_melbourne:
@@ -2315,11 +2324,12 @@ elif st.session_state.current_page == "Risk Calculation":
                         f"Can trade again on: {cooldown_end_date.strftime('%Y-%m-%d')} "
                         f"({total_hours_remaining} hours remaining)"
                     )
-                    return False, error_msg
+                    return False, error_msg  # Return False to BLOCK the order
                 else:
                     return True, "Cooldown period has passed"
 
             except Exception as e:
+                print(f"DEBUG - Error in cooldown check: {e}")
                 return True, f"Error checking cooldown: {str(e)}"
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")

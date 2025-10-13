@@ -3739,6 +3739,10 @@ elif st.session_state.current_page == "Active Opps":
             return None
 
 
+    # Initialize session state for tracking data source
+    if 'data_source' not in st.session_state:
+        st.session_state.data_source = None  # 'cloud' or 'forex_factory'
+
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.button("Refresh News", key="refresh_red_news_json", use_container_width=True):
@@ -3751,10 +3755,11 @@ elif st.session_state.current_page == "Active Opps":
                     if save_events_to_sheets(new_events):
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
-                        #st.success("News updated and saved to Google Sheets!")
+                        st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
                     else:
                         st.error("Failed to save news to Google Sheets")
-
+                else:
+                    st.error("No new events fetched")
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -3771,22 +3776,31 @@ elif st.session_state.current_page == "Active Opps":
             if sheet_events:
                 st.session_state.red_events = sheet_events
                 st.session_state.last_news_fetch = datetime.now()
-                #st.info("Loaded news from Google Sheets")
+                st.session_state.data_source = 'cloud'  # Set source to Cloud
             else:
                 # If no data in sheets, fetch new data
                 new_events = get_red_news_from_json_with_rate_limit()
                 if new_events:
                     st.session_state.red_events = new_events
                     st.session_state.last_news_fetch = datetime.now()
+                    st.session_state.data_source = 'forex_factory'  # Set source to Forex Factory
                     # Save to Google Sheets for next time
                     save_events_to_sheets(new_events)
                 else:
                     st.session_state.red_events = []
                     st.session_state.last_news_fetch = None
+                    st.session_state.data_source = None
 
     red_events = st.session_state.red_events
 
-    # Rest of your existing display code remains exactly the same...
+    # Determine expander title based on data source
+    if st.session_state.data_source == 'cloud':
+        expander_title = "Upcoming News - Weekly View - Last Loaded from Cloud"
+    elif st.session_state.data_source == 'forex_factory':
+        expander_title = "Upcoming News - Weekly View - Last Loaded from Forex Factory"
+    else:
+        expander_title = "Upcoming News - Weekly View"
+
     if red_events:
         now_melb = datetime.now(melbourne_tz)
 
@@ -3814,7 +3828,8 @@ elif st.session_state.current_page == "Active Opps":
         today = now_melb.date()
         week_dates = [today + timedelta(days=i) for i in range(7)]
 
-        with st.expander("Upcoming News - Weekly View", expanded=False):
+        # Use dynamic expander title
+        with st.expander(expander_title, expanded=False):
             cols = st.columns(7)
             for i, day in enumerate(week_dates):
                 with cols[i]:
@@ -3905,7 +3920,7 @@ elif st.session_state.current_page == "Active Opps":
 
                     st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
     else:
-        st.info("No high-impact events found.")
+        st.write("No high-impact events found.")
 
     # Use your existing Google Sheets functions
     def load_workflow_from_sheets():

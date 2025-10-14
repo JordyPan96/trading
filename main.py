@@ -2953,18 +2953,24 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (risk_multiplier == "1_BNR_TPF"):
                     if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
+                    else:
+                        trend_position_multiplier = 1.05
                 else:
                     trend_position_multiplier = 1.05
             elif (trend_position == "7%-8.99%"):
                 if (risk_multiplier == "1_BNR_TPF"):
                     if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
+                    else:
+                        trend_position_multiplier = 1.1
                 else:
                     trend_position_multiplier = 1.1
             elif (trend_position == "9%-10.99%"):
                 if (risk_multiplier == "1_BNR_TPF"):
                     if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.91
+                    else:
+                        trend_position_multiplier = 1.0
                 else:
                     trend_position_multiplier = 1.0
             elif (trend_position == "11%-12.99%"):

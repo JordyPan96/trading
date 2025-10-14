@@ -2590,7 +2590,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "3%-4.99%1_BNR_TPF": ["559 - 66"],
             "9%-10.99%1_BNR_TPF": [],
             "11%-12.99%1_BNR_TPF": [],
-            ">=13%": ["559 - 66"],
+            ">=13%1_BNR_TPF": ["559 - 66"],
             "EURAUD1_BNR_TPF": ["559 - 66", "66 - 805"],
             "GBPAUD1_BNR_TPF": ["559 - 66", "66 - 805"]
             # Add more restrictions as needed
@@ -2606,9 +2606,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_12 = {
             "3%-4.99%": ['1_BNR'],
-            "XAUUSD5%-6.99%": [''],
-            "XAUUSD>=13%": ['1_BNR', "1_BNR_TPF"],
-            ">=13%": ['1_BNR', "1_BNR_TPF"],
+            "XAUUSD5%-6.99%": [],
+            "XAUUSD>=13%": [],
+            ">=13%": [],
 
         }
 

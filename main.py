@@ -2583,6 +2583,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Wave": ['2_BNR', '1_BNR', '1_BNR_TPF'],
             "9%-10.99%Wave 1": ['1_BNR'],
             "11%-12.99%Wave 1": ['1_BNR', '1_BNR_TPF'],
+            ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             # Add more restrictions as needed
         }
 

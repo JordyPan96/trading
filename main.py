@@ -2568,6 +2568,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "GBPJPY": ["50"],
             "EURJPY": ["50"],
             "USDJPY": ["50"],
+            "AUDJPY": ["50"],
             "USDCAD": ["50"]}
 
         incompatible_map_8 = {

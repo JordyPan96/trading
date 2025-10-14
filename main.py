@@ -2784,9 +2784,10 @@ elif st.session_state.current_page == "Risk Calculation":
                         cad_count = 0
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
+                        cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
 
                         if (any_exist):
-                            cad_count = 0
+                            cad_count = cad_count - cross_eur
                     pair_trades_ASIA = len(current_month_stats[current_month_stats['Symbol'].isin(trade_curr)])
                     cad_count = cad_count - pair_trades_ASIA
                     return cad_count
@@ -2799,9 +2800,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     audusd_count = audusd_count - pair_trades_TRADE
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
+                        cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
 
                         if (any_exist):
-                            audusd_count = 0
+                            audusd_count = audusd_count - cross_eur
                     return audusd_count
 
                 elif (pair in europe_major):
@@ -2809,9 +2811,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     europe_count = europe_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
+                        cross_trade = len(current_month_stats_linked['Symbol'].isin(trade_curr))
 
                         if (any_exist):
-                            europe_count = 0
+                            europe_count = europe_count - cross_trade
                     return europe_count
                 elif (pair in gold_comm):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(gold_comm)])

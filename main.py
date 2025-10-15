@@ -27,7 +27,10 @@ from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
 # Configure page
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="JP Empire",
+    layout="wide" # Optional: Other page configuration options
+)
 
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
@@ -7460,3 +7463,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+

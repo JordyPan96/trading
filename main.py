@@ -4195,17 +4195,19 @@ elif st.session_state.current_page == "Active Opps":
                     if day == today:
                         # Blue for today
                         st.markdown(f"""
-                            <div style="
-                                background-color: #007bff;
-                                color: white;
-                                padding: 10px;
-                                border-radius: 8px;
-                                text-align: center;
-                                font-weight: bold;
-                                margin-bottom: 15px;
-                            ">
-                                {day_name}<br>{day_num}
-                            </div>
+                            <a href="https://www.forexfactory.com/calendar?day=today" target="_blank" style="text-decoration: none;">
+                                <div style="
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px;
+                                    border-radius: 8px;
+                                    text-align: center;
+                                    font-weight: bold;
+                                    margin-bottom: 15px;
+                                ">
+                                    {day_name}<br>{day_num}
+                                </div>
+                            </a>
                         """, unsafe_allow_html=True)
                     else:
                         # Black for other days

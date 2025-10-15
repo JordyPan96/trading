@@ -2779,6 +2779,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def get_pair_sect_count(current_month_stats, pair):
+            current_month_stats_losses = []
             if (len(current_month_stats) > 0):
             # Get focus pair OUTSIDE the loss filter - we need to check all results including Wins and BE
                 focus_pair = get_focus_pair(current_month_stats)  # Use full data, not just losses

@@ -2834,6 +2834,12 @@ elif st.session_state.current_page == "Risk Calculation":
                     cad_count = cad_count - pair_trades_ASIA
                     return cad_count
                 elif (pair == "AUDUSD"):
+                    if(focus_pair!=pair):
+                        if (focus_pair != None):
+                            audusd_count = 0
+                        else:
+                            audusd_count = 2
+                            
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud3 = len(current_month_stats_linked2)
                         if (pair_trades_aud3 >= 2):
@@ -2846,13 +2852,17 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (any_exist):
                             audusd_count = audusd_count - cross_eur
-                    if(focus_pair!=None):
-                        if(focus_pair!=pair):
-                            audusd_count = 0
+
 
                     return audusd_count
 
                 elif (pair == "EURUSD"):
+                    if(focus_pair!=pair):
+                        if (focus_pair != None):
+                            eurusd_count = 0
+                        else:
+                            eurusd_count = 2
+
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
                     eurusd_count = eurusd_count  - pair_trades
                     if (len(current_month_stats_linked) > 0):
@@ -2861,12 +2871,15 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (any_exist):
                             eurusd_count = eurusd_count - cross_trade
-                    if(focus_pair!=None):
-                        if(focus_pair!=pair):
-                            eurusd_count = 0
 
                     return eurusd_count
                 elif (pair == "GBPUSD"):
+                    if(focus_pair!=pair):
+                        if (focus_pair != None):
+                            gbpusd_count = 0
+                        else:
+                            gbpusd_count = 2
+
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
                     gbpusd_count = gbpusd_count  - pair_trades
                     if (len(current_month_stats_linked) > 0):
@@ -2875,9 +2888,6 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (any_exist):
                             gbpusd_count = gbpusd_count - cross_trade
-                    if(focus_pair!=None):
-                        if(focus_pair!=pair):
-                            gbpusd_count = 0
 
                     return gbpusd_count
                 elif (pair in gold_comm):

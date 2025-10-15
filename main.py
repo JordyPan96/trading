@@ -2742,49 +2742,50 @@ elif st.session_state.current_page == "Risk Calculation":
                 return "N"
 
 
+        def get_focus_pair(current_month_stats):
+            """Determine which pair to focus on based on most recent loss"""
+            major_pairs = ["AUDUSD", "GBPUSD", "EURUSD"]
+            focus_pair = None
+
+            if len(current_month_stats) > 0:
+                # Get all trades for major pairs, sorted by date (most recent first)
+                major_trades = current_month_stats[
+                    current_month_stats['Symbol'].isin(major_pairs)
+                ].sort_values('Date', ascending=False)
+
+                if not major_trades.empty:
+                    # Find the most recent loss in these pairs
+                    recent_loss = major_trades[major_trades['Result'] == "Loss"].head(1)
+
+                    if not recent_loss.empty:
+                        focus_pair = recent_loss.iloc[0]['Symbol']
+
+                        # Check if the focus pair has since had a win (which would reset the rule)
+                        # Get ALL trades for the focus pair, sorted by date
+                        pair_trades = current_month_stats[
+                            current_month_stats['Symbol'] == focus_pair
+                            ].sort_values('Date', ascending=False)
+
+                        if not pair_trades.empty:
+                            # Get the most recent trade for this pair
+                            most_recent_trade = pair_trades.iloc[0]
+
+                            # ONLY reset if the most recent trade is a Win
+                            # BE trades do NOT reset the focus rule
+                            if most_recent_trade['Result'] == "Win":
+                                focus_pair = None  # Rule reset
+
+            return focus_pair
+
+
         def get_pair_sect_count(current_month_stats, pair):
-            def get_focus_pair(current_month_stats):
-                """Determine which pair to focus on based on most recent loss"""
-                major_pairs = ["AUDUSD", "GBPUSD", "EURUSD"]
-                focus_pair = None
-
-                if len(current_month_stats) > 0:
-                    # Get all trades for major pairs, sorted by date (most recent first)
-                    major_trades = current_month_stats[
-                        current_month_stats['Symbol'].isin(major_pairs)
-                    ].sort_values('Date', ascending=False)
-
-                    if not major_trades.empty:
-                        # Find the most recent loss in these pairs
-                        recent_loss = major_trades[major_trades['Result'] == "Loss"].head(1)
-
-                        if not recent_loss.empty:
-                            focus_pair = recent_loss.iloc[0]['Symbol']
-
-                            # Check if the focus pair has since had a win (which would reset the rule)
-                            # Get ALL trades for the focus pair, sorted by date
-                            pair_trades = current_month_stats[
-                                current_month_stats['Symbol'] == focus_pair
-                                ].sort_values('Date', ascending=False)
-
-                            if not pair_trades.empty:
-                                # Get the most recent trade for this pair
-                                most_recent_trade = pair_trades.iloc[0]
-
-                                # ONLY reset if the most recent trade is a Win
-                                # BE trades do NOT reset the focus rule
-                                if most_recent_trade['Result'] == "Win":
-                                    focus_pair = None  # Rule reset
-                                # If most recent is BE or Loss, keep the focus rule active
-                                # (BE doesn't reset, Loss would be the same focus pair)
-
-                return focus_pair
-
             if (len(current_month_stats) > 0):
                 current_month_stats = current_month_stats[current_month_stats['Result'] == "Loss"]
                 current_month_stats_linked = current_month_stats[current_month_stats['Symbol'].isin(xxxusd)]
                 current_month_stats_linked2 = current_month_stats[current_month_stats['Symbol'].isin(aud_family1)]
-                focus_pair = get_focus_pair(current_month_stats)
+
+            # Get focus pair OUTSIDE the loss filter - we need to check all results including Wins and BE
+            focus_pair = get_focus_pair(st.session_state.uploaded_data)  # Use full data, not just losses
 
             remain_count = 2
             xxxaud_count = 1
@@ -2797,16 +2798,17 @@ elif st.session_state.current_page == "Risk Calculation":
             gbpusd_count = 2
             gold_count = 2
             pair_trades = 0
+
             if (len(current_month_stats) > 0):
                 if (pair in xxxaud):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(xxxaud)])
-
                     xxxaud_count = xxxaud_count - pair_trades
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud = len(current_month_stats_linked2)
                         if (pair_trades_aud >= 2):
                             xxxaud_count = xxxaud_count - pair_trades_aud
                     return xxxaud_count
+
                 elif (pair == "AUDJPY"):
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud2 = len(current_month_stats_linked2)
@@ -2815,11 +2817,12 @@ elif st.session_state.current_page == "Risk Calculation":
                     YEN_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
                     audjpy_count = audjpy_count - YEN_trades
                     return audjpy_count
+
                 elif (pair in yens):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
                     yen_count = yen_count - pair_trades
-
                     return yen_count
+
                 elif (pair == "USDCAD"):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'] == "USDCAD"])
                     if (pair_trades > 0):
@@ -2827,19 +2830,19 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
                         cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
-
                         if (any_exist):
                             cad_count = cad_count - cross_eur
                     pair_trades_ASIA = len(current_month_stats[current_month_stats['Symbol'].isin(trade_curr)])
                     cad_count = cad_count - pair_trades_ASIA
                     return cad_count
+
                 elif (pair == "AUDUSD"):
-                    if(focus_pair!=pair):
-                        if (focus_pair != None):
-                            audusd_count = 0
-                        else:
-                            audusd_count = 2
-                            
+                    # Apply focus rule - if focus pair exists and it's not this pair, return 0
+                    if focus_pair is not None and focus_pair != "AUDUSD":
+                        return 0
+
+                    audusd_count = 2  # Start with default count
+
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud3 = len(current_month_stats_linked2)
                         if (pair_trades_aud3 >= 2):
@@ -2849,51 +2852,47 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
                         cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
-
                         if (any_exist):
                             audusd_count = audusd_count - cross_eur
-
-
-                    return audusd_count
+                    return max(0, audusd_count)  # Ensure non-negative
 
                 elif (pair == "EURUSD"):
-                    if(focus_pair!=pair):
-                        if (focus_pair != None):
-                            eurusd_count = 0
-                        else:
-                            eurusd_count = 2
+                    # Apply focus rule - if focus pair exists and it's not this pair, return 0
+                    if focus_pair is not None and focus_pair != "EURUSD":
+                        return 0
+
+                    eurusd_count = 2  # Start with default count
 
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
-                    eurusd_count = eurusd_count  - pair_trades
+                    eurusd_count = eurusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
                         cross_trade = len(current_month_stats_linked['Symbol'].isin(trade_curr))
-
                         if (any_exist):
                             eurusd_count = eurusd_count - cross_trade
+                    return max(0, eurusd_count)  # Ensure non-negative
 
-                    return eurusd_count
                 elif (pair == "GBPUSD"):
-                    if(focus_pair!=pair):
-                        if (focus_pair != None):
-                            gbpusd_count = 0
-                        else:
-                            gbpusd_count = 2
+                    # Apply focus rule - if focus pair exists and it's not this pair, return 0
+                    if focus_pair is not None and focus_pair != "GBPUSD":
+                        return 0
+
+                    gbpusd_count = 2  # Start with default count
 
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
-                    gbpusd_count = gbpusd_count  - pair_trades
+                    gbpusd_count = gbpusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
                         cross_trade = len(current_month_stats_linked['Symbol'].isin(trade_curr))
-
                         if (any_exist):
                             gbpusd_count = gbpusd_count - cross_trade
+                    return max(0, gbpusd_count)  # Ensure non-negative
 
-                    return gbpusd_count
                 elif (pair in gold_comm):
                     pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(gold_comm)])
                     gold_count = gold_count - pair_trades
                     return gold_count
+
                 return remain_count
             else:
                 return 2

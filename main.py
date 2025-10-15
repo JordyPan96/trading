@@ -2780,12 +2780,15 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_pair_sect_count(current_month_stats, pair):
             if (len(current_month_stats) > 0):
-                current_month_stats = current_month_stats[current_month_stats['Result'] == "Loss"]
-                current_month_stats_linked = current_month_stats[current_month_stats['Symbol'].isin(xxxusd)]
-                current_month_stats_linked2 = current_month_stats[current_month_stats['Symbol'].isin(aud_family1)]
-
             # Get focus pair OUTSIDE the loss filter - we need to check all results including Wins and BE
-            focus_pair = get_focus_pair(st.session_state.uploaded_data)  # Use full data, not just losses
+                focus_pair = get_focus_pair(current_month_stats)  # Use full data, not just losses
+
+            if (len(current_month_stats) > 0):
+                current_month_stats_losses = current_month_stats[current_month_stats['Result'] == "Loss"]
+                current_month_stats_linked = current_month_stats_losses[current_month_stats_losses['Symbol'].isin(xxxusd)]
+                current_month_stats_linked2 = current_month_stats_losses[current_month_stats_losses['Symbol'].isin(aud_family1)]
+
+
 
             remain_count = 2
             xxxaud_count = 1
@@ -2799,9 +2802,9 @@ elif st.session_state.current_page == "Risk Calculation":
             gold_count = 2
             pair_trades = 0
 
-            if (len(current_month_stats) > 0):
+            if (len(current_month_stats_losses) > 0):
                 if (pair in xxxaud):
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(xxxaud)])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(xxxaud)])
                     xxxaud_count = xxxaud_count - pair_trades
                     if (len(current_month_stats_linked2) > 0):
                         pair_trades_aud = len(current_month_stats_linked2)
@@ -2814,17 +2817,17 @@ elif st.session_state.current_page == "Risk Calculation":
                         pair_trades_aud2 = len(current_month_stats_linked2)
                         if (pair_trades_aud2 >= 2):
                             audjpy_count = audjpy_count - pair_trades_aud2
-                    YEN_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
+                    YEN_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(yens)])
                     audjpy_count = audjpy_count - YEN_trades
                     return audjpy_count
 
                 elif (pair in yens):
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(yens)])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(yens)])
                     yen_count = yen_count - pair_trades
                     return yen_count
 
                 elif (pair == "USDCAD"):
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'] == "USDCAD"])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'] == "USDCAD"])
                     if (pair_trades > 0):
                         cad_count = 0
                     if (len(current_month_stats_linked) > 0):
@@ -2832,7 +2835,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
                         if (any_exist):
                             cad_count = cad_count - cross_eur
-                    pair_trades_ASIA = len(current_month_stats[current_month_stats['Symbol'].isin(trade_curr)])
+                    pair_trades_ASIA = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
                     cad_count = cad_count - pair_trades_ASIA
                     return cad_count
 
@@ -2847,7 +2850,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         pair_trades_aud3 = len(current_month_stats_linked2)
                         if (pair_trades_aud3 >= 2):
                             audusd_count = audusd_count - pair_trades_aud3
-                    pair_trades_TRADE = len(current_month_stats[current_month_stats['Symbol'].isin(trade_curr)])
+                    pair_trades_TRADE = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
                     audusd_count = audusd_count - pair_trades_TRADE
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
@@ -2863,7 +2866,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     eurusd_count = 2  # Start with default count
 
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
                     eurusd_count = eurusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
@@ -2879,7 +2882,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     gbpusd_count = 2  # Start with default count
 
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(europe_major)])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
                     gbpusd_count = gbpusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
@@ -2889,7 +2892,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     return max(0, gbpusd_count)  # Ensure non-negative
 
                 elif (pair in gold_comm):
-                    pair_trades = len(current_month_stats[current_month_stats['Symbol'].isin(gold_comm)])
+                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(gold_comm)])
                     gold_count = gold_count - pair_trades
                     return gold_count
 

@@ -753,6 +753,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**Analysis**")
 create_nav_button("Trading Guidelines", "Guidelines", "Guidelines")
 create_nav_button("Performance Stats", "Stats", "Stats")
+create_nav_button("Screenshots Database", "Screenshots", "Screenshots")
 
 st.sidebar.markdown("---")
 

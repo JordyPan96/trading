@@ -3455,7 +3455,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (pair == "AUDUSD"):
                     return "12 ", "22"
                 elif (pair == "XAUUSD"):
-                    return (12-winning_trade_mae)+round(mae_based_stop_loss/2,0), round(mae_based_stop_loss,0)
+                    return str((12-winning_trade_mae)+round(mae_based_stop_loss/2,0), round(mae_based_stop_loss,0))
                 elif (pair == "USDJPY"):
                     return "12", "18"
                 elif (pair == "USDCAD"):

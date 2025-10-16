@@ -26,12 +26,6 @@ import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseDownload
-from PIL import Image
-import io
-
 # Configure page
 st.set_page_config(
     page_title="JP Empire",
@@ -41,35 +35,6 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def search_and_display_screenshot(date, symbol):
-    """Compact search and display function"""
-    formatted_date = date.strftime("%Y-%m-%d")
-    expected_name = f"{formatted_date}_{symbol}.png"
-
-    service = get_drive_service()
-    folder_id = st.secrets.get("drive_folder_id", "")
-
-    if service:
-        # Search for file
-        query = f"name contains '{formatted_date}_{symbol}' and '{folder_id}' in parents"
-        results = service.files().list(q=query, fields="files(id, name)").execute()
-        files = results.get('files', [])
-
-        if files:
-            # Display image
-            file_bytes = io.BytesIO()
-            request = service.files().get_media(fileId=files[0]['id'])
-            downloader = MediaIoBaseDownload(file_bytes, request)
-            done = False
-            while not done:
-                status, done = downloader.next_chunk()
-            file_bytes.seek(0)
-
-            st.image(Image.open(file_bytes), caption=f"{symbol} - {formatted_date}")
-            st.success(f"Found: {files[0]['name']}")
-        else:
-            st.error(f"No screenshot found for {symbol}")
-            
 def clean_data_for_google_sheets(df):
     """
     Clean data specifically for Google Sheets to avoid JSON serialization errors
@@ -788,7 +753,6 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**Analysis**")
 create_nav_button("Trading Guidelines", "Guidelines", "Guidelines")
 create_nav_button("Performance Stats", "Stats", "Stats")
-create_nav_button("Screenshots Database", "Screenshots", "Screenshots")
 
 st.sidebar.markdown("---")
 
@@ -7149,30 +7113,6 @@ elif st.session_state.current_page == "Stats":
         # Breakeven trades info
         breakeven_count = len(year_data[year_data['Result'] == 'BE'])
         st.caption(f"*Note: Excluded {breakeven_count} breakeven trades from calculations")
-
-elif st.session_state.current_page == "Screenshots":
-    st.title("📸 Screenshot Finder")
-
-    # Your organized symbols
-    symbols = ['XAUUSD', 'USDCAD', 'AUDUSD', 'GBPUSD', 'EURUSD',
-               'GBPJPY', 'EURJPY', 'AUDJPY', 'USDJPY', 'GBPAUD', 'EURAUD']
-
-    # Compact layout
-    col1, col2, col3 = st.columns([2, 2, 1])
-
-    with col1:
-        selected_date = st.date_input("Date", value=datetime.now().date())
-
-    with col2:
-        selected_symbol = st.selectbox("Symbol", symbols)
-
-    with col3:
-        st.write("")
-        st.write("")
-        if st.button("🔍 Search", type="primary"):
-            # Search logic here (same as above)
-            search_and_display_screenshot(selected_date, selected_symbol)
-
 
 
 elif st.session_state.current_page == "Guidelines":

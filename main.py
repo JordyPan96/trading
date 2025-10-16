@@ -98,11 +98,11 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
         else:
             avg_winning_mae = 0
 
-        return suggested_stop_loss, avg_winning_mae, trade_count
+        return suggested_stop_loss, avg_winning_mae
 
     except Exception as e:
         st.error(f"Error calculating MAE recommendations: {e}")
-        return None, None, 0
+        return None, None
 
 def clean_data_for_google_sheets(df):
     """

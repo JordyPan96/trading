@@ -35,6 +35,29 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
+def get_mae_recommendation_values(selected_pair, risk_multiplier):
+    """
+    Get MAE recommendation values without any display
+
+    Parameters:
+    - selected_pair: The trading pair (e.g., 'XAUUSD')
+    - risk_multiplier: The strategy (e.g., '1_BNR')
+
+    Returns:
+    - tuple: (suggested_stop_loss, avg_winning_mae) or (None, None) if not available
+    """
+
+    if not st.session_state.get('mae_analysis_results'):
+        return None, None
+
+    current_mae_key = f"{selected_pair}_{risk_multiplier}"
+
+    if current_mae_key in st.session_state.mae_analysis_results:
+        mae_data = st.session_state.mae_analysis_results[current_mae_key]
+        return mae_data['suggested_stop_loss'], mae_data['avg_winning_mae']
+
+    return None, None
+
 def clean_data_for_google_sheets(df):
     """
     Clean data specifically for Google Sheets to avoid JSON serialization errors
@@ -2092,7 +2115,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades > 20:
+                            if total_trades > 0:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 
@@ -2268,6 +2291,10 @@ elif st.session_state.current_page == "Risk Calculation":
     # Initialize saved_records if not exists
     if 'saved_records' not in st.session_state:
         st.session_state.saved_records = []
+
+    # Initialize MAE analysis results if not exists
+    if 'mae_analysis_results' not in st.session_state:
+        st.session_state.mae_analysis_results = {}
 
     # st.title("Risk Calculation")
     next_risk = 0
@@ -3462,6 +3489,15 @@ elif st.session_state.current_page == "Risk Calculation":
                     return str(desire_target)
 
 
+            suggested_sl, avg_winning_mae = get_mae_recommendation_values(selected_pair, risk_multiplier)
+
+            # Store in variables for later use
+            if suggested_sl is not None:
+                # Use the values in your risk calculations
+                mae_based_stop_loss = suggested_sl
+                winning_trade_mae = avg_winning_mae
+
+
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
             if (risk_multiplier == "1_BNR"):
@@ -3527,7 +3563,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
-                        entry_title = "Entry Guide (Within 64% Optional):"
+                        entry_title = "Entry Guide (Within 64% Optional):" + mae_based_stop_loss
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"

@@ -10,4 +10,8 @@ gspread
 metaapi-cloud-sdk>=7.0.0
 python-dateutil
 gspread_dataframe
+google-api-python-client==2.108.0
+google-auth-httplib2==0.1.1
+google-auth-oauthlib==1.1.0
+
 

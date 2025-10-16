@@ -2150,16 +2150,9 @@ elif st.session_state.current_page == "Symbol Stats":
                                 'With_Suggested_SL': '{:.2f}'
                             }), use_container_width=True)
 
-                        
 
-                        # Download MAE analysis data
-                        csv = detailed_mae.to_csv(index=False).encode('utf-8')
-                        st.download_button(
-                            label="Download MAE Analysis Data",
-                            data=csv,
-                            file_name=f'mae_analysis_{mae_symbol}_{mae_strategy}_{selected_year}.csv',
-                            mime='text/csv',
-                        )
+
+                        
 
     else:
         st.warning("Please upload data first to analyze symbol statistics")

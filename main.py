@@ -1059,11 +1059,10 @@ if st.session_state.current_page == "Home":
 
                 new_rr = st.number_input("RR", value=0.0, step=0.01, key="new_rr")
                 new_pnl = st.number_input("PnL", value=0.0, step=0.01, key="new_pnl")
-                stop_loss_pct = st.number_input("Stop Loss Percentage", value=0.0, step=0.01, key="stop_loss_pct")
-                max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01, key="max_adverse_excursion")
+
 
             # Second row of fields
-            col4, col5, col6 = st.columns(3)
+            col4, col5, col6, col7 = st.columns(4)
             with col4:
                 new_withdrawal_deposit = st.number_input("Withdrawal_Deposit", value=0.0, step=0.01,
                                                          key="new_withdrawal_deposit")
@@ -1083,6 +1082,10 @@ if st.session_state.current_page == "Home":
                                                           key="new_risk_percentage")
                 if 'Lot_Size' in data.columns:
                     new_lot_size = st.number_input("Lot_Size", value=0.0, step=0.01, key="new_lot_size")
+
+            with col7:
+                stop_loss_pct = st.number_input("Stop Loss Percentage", value=0.0, step=0.01, key="stop_loss_pct")
+                max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01, key="max_adverse_excursion")
 
             if st.button("Add Record", type="primary", key="add_record_btn"):
                 # Create new record with exact field names

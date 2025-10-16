@@ -26,14 +26,88 @@ import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
+import io
+import base64
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+
 # Configure page
 st.set_page_config(
     page_title="JP Empire",
     layout="wide" # Optional: Other page configuration options
 )
 
-
 ## Every year change starting_balance =, starting_capital = and base_risk =
+
+def upload_image_to_drive(uploaded_file, filename):
+    """
+    Upload image to Google Drive and return shareable URL
+    """
+    try:
+        # Use the same credentials as Google Sheets
+        credentials = service_account.Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"],
+            scopes=["https://www.googleapis.com/auth/drive.file"]
+        )
+
+        drive_service = build('drive', 'v3', credentials=credentials)
+
+        # Convert uploaded file to bytes
+        file_bytes = io.BytesIO(uploaded_file.getvalue())
+
+        file_metadata = {
+            'name': f"{filename}.{uploaded_file.name.split('.')[-1]}",
+        }
+
+        media = MediaIoBaseUpload(file_bytes,
+                                  mimetype=uploaded_file.type,
+                                  resumable=True)
+
+        file = drive_service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        ).execute()
+
+        # Make the file publicly viewable
+        drive_service.permissions().create(
+            fileId=file.get('id'),
+            body={'type': 'anyone', 'role': 'reader'},
+            fields='id'
+        ).execute()
+
+        # Return the direct image URL
+        return f"https://drive.google.com/uc?id={file.get('id')}"
+
+    except Exception as e:
+        st.error(f"Error uploading to Google Drive: {e}")
+        return None
+
+
+def delete_image_from_drive(image_url):
+    """
+    Delete image from Google Drive using the image URL
+    """
+    try:
+        if not image_url or image_url == '' or image_url == 'nan':
+            return True
+
+        # Extract file ID from Google Drive URL
+        file_id = image_url.split('=')[-1] if '=' in image_url else image_url
+
+        credentials = service_account.Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"],
+            scopes=["https://www.googleapis.com/auth/drive.file"]
+        )
+
+        drive_service = build('drive', 'v3', credentials=credentials)
+        drive_service.files().delete(fileId=file_id).execute()
+        return True
+
+    except Exception as e:
+        st.error(f"Error deleting image from Drive: {e}")
+        return False
 
 def clean_data_for_google_sheets(df):
     """
@@ -48,20 +122,13 @@ def clean_data_for_google_sheets(df):
     if 'Date' in df_clean.columns:
         # Convert to string first
         df_clean['Date'] = df_clean['Date'].astype(str)
-
-        # Remove time components if present and format to YYYY-MM-DD
         df_clean['Date'] = df_clean['Date'].str.split().str[0]
-
-        # Ensure consistent format
         try:
-            # Try to parse and reformat any dates
             dates_parsed = pd.to_datetime(df_clean['Date'], errors='coerce')
             valid_dates = ~dates_parsed.isna()
             df_clean.loc[valid_dates, 'Date'] = dates_parsed[valid_dates].dt.strftime('%Y-%m-%d')
         except:
-            # If parsing fails, keep as is
             pass
-
         df_clean['Date'] = df_clean['Date'].fillna('')
 
     # Ensure Variance is treated as string
@@ -75,6 +142,10 @@ def clean_data_for_google_sheets(df):
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 
+    # Handle Screenshot column - ensure it's string
+    if 'Screenshot' in df_clean.columns:
+        df_clean['Screenshot'] = df_clean['Screenshot'].astype(str).fillna('')
+
     # Convert other datetime columns to strings
     for col in df_clean.columns:
         if col != 'Date' and (pd.api.types.is_datetime64_any_dtype(df_clean[col]) or hasattr(df_clean[col], 'dt')):
@@ -85,7 +156,7 @@ def clean_data_for_google_sheets(df):
         if df_clean[col].dtype == 'object' and col != 'Date':
             df_clean[col] = df_clean[col].astype(str)
 
-    # Convert numeric columns (excluding Variance)
+    # Convert numeric columns
     numeric_columns = ['PnL', 'RR', 'PROP_Pct', 'Risk_Percentage', 'Lot_Size',
                        'Starting_Balance', 'Ending_Balance', 'Withdrawal_Deposit']
 
@@ -104,10 +175,10 @@ def clean_data_for_google_sheets(df):
     return df_clean
 
 
+
 def clean_data_for_calculations(df):
     """
     Clean data to match CSV upload format and ensure proper data types
-    This fixes the Google Sheets vs CSV data type differences
     """
     if df is None or df.empty:
         return df
@@ -125,29 +196,21 @@ def clean_data_for_calculations(df):
 
     string_columns = [
         'Symbol', 'Direction', 'Strategy', 'Result', 'Grade',
-        'Month', 'Year', 'MonthYear', 'Variance', 'Trend Position'
+        'Month', 'Year', 'MonthYear', 'Variance', 'Trend Position', 'Screenshot'
     ]
 
     # Clean numeric columns
     for col in numeric_columns:
         if col in df_clean.columns:
-            # Convert to string first to handle any Google Sheets formatting
             series_str = df_clean[col].astype(str)
-
-            # Remove common non-numeric characters that might come from Google Sheets
             series_clean = series_str.str.replace(r'[^\d.-]', '', regex=True)
-
-            # Handle empty strings and convert to numeric
             series_clean = series_clean.replace('', '0').replace('nan', '0')
-
             df_clean[col] = pd.to_numeric(series_clean, errors='coerce')
             df_clean[col] = df_clean[col].fillna(0)
 
     # Handle Variance as string
     if 'Variance' in df_clean.columns:
-        # Convert to string and handle any numeric values that might be there
         df_clean['Variance'] = df_clean['Variance'].astype(str)
-        # Map any legacy numeric values to their string equivalents
         variance_mapping = {
             '50.0': '50',
             '559.0': '559-66',
@@ -160,30 +223,25 @@ def clean_data_for_calculations(df):
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 
-    # Clean date columns - be more careful not to break existing formats
+    # Handle Screenshot as string
+    if 'Screenshot' in df_clean.columns:
+        df_clean['Screenshot'] = df_clean['Screenshot'].astype(str).fillna('')
+
+    # Clean date columns
     for col in date_columns:
         if col in df_clean.columns:
-            # First, ensure it's string to see what we're working with
             df_clean[col] = df_clean[col].astype(str)
-
-            # Only convert to datetime if it looks like it needs conversion
-            # Check if we have datetime strings with time components
             has_time = df_clean[col].str.contains(r'\d{1,2}:\d{2}:\d{2}', na=False, regex=True)
-
             if has_time.any():
-                # Convert only the ones with time components to datetime and format
                 df_clean.loc[has_time, col] = pd.to_datetime(
                     df_clean.loc[has_time, col], errors='coerce'
                 ).dt.strftime('%Y-%m-%d')
-
-            # Fill any NaT values with empty string
             df_clean[col] = df_clean[col].fillna('')
 
-    # Clean string columns - ensure they're proper strings
+    # Clean string columns
     for col in string_columns:
         if col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str).str.strip()
-            # Replace 'nan' strings with empty string
             df_clean[col] = df_clean[col].replace('nan', '')
             df_clean[col] = df_clean[col].fillna('')
 
@@ -1016,7 +1074,7 @@ if st.session_state.current_page == "Home":
 
         st.write("Your uploaded raw trading data:")
 
-        # Add New Record Form with exact same fields and specific dropdown values
+        # Add New Record Form with Screenshot Upload
         with st.expander("➕ Add New Record", expanded=False):
             st.subheader("Add New Trading Record")
 
@@ -1060,7 +1118,7 @@ if st.session_state.current_page == "Home":
                 new_rr = st.number_input("RR", value=0.0, step=0.01, key="new_rr")
                 new_pnl = st.number_input("PnL", value=0.0, step=0.01, key="new_pnl")
 
-            # Second row of fields
+            # Second row of fields with Screenshot Upload
             col4, col5, col6 = st.columns(3)
             with col4:
                 new_withdrawal_deposit = st.number_input("Withdrawal_Deposit", value=0.0, step=0.01,
@@ -1075,7 +1133,12 @@ if st.session_state.current_page == "Home":
                                                   key="new_trend_position")
 
             with col6:
-                # Optional additional fields that might be in your data
+                # SCREENSHOT UPLOAD FIELD
+                uploaded_screenshot = st.file_uploader("Upload Trade Screenshot",
+                                                       type=['png', 'jpg', 'jpeg'],
+                                                       key="screenshot_uploader")
+
+                # Optional additional fields
                 if 'Risk_Percentage' in data.columns:
                     new_risk_percentage = st.number_input("Risk_Percentage", value=0.0, step=0.01,
                                                           key="new_risk_percentage")
@@ -1088,7 +1151,7 @@ if st.session_state.current_page == "Home":
 
                 # Exact fields as requested
                 if 'Date' in data.columns:
-                    new_record['Date'] = new_date_str  # Use the formatted date string (YYYY-MM-DD)
+                    new_record['Date'] = new_date_str
                 if 'Symbol' in data.columns:
                     new_record['Symbol'] = new_symbol
                 if 'Direction' in data.columns:
@@ -1098,7 +1161,7 @@ if st.session_state.current_page == "Home":
                 if 'Strategy' in data.columns:
                     new_record['Strategy'] = new_strategy
                 if 'Variance' in data.columns:
-                    new_record['Variance'] = new_variance_str  # Use string value instead of numeric
+                    new_record['Variance'] = new_variance_str
                 if 'Result' in data.columns:
                     new_record['Result'] = new_result
                 if 'RR' in data.columns:
@@ -1110,9 +1173,19 @@ if st.session_state.current_page == "Home":
                 if 'PROP_Pct' in data.columns:
                     new_record['PROP_Pct'] = new_prop_pct
 
-                # Trend Position field (existing field with space)
+                # Trend Position field
                 if 'Trend Position' in data.columns:
                     new_record['Trend Position'] = new_trend_position
+
+                # Handle screenshot upload and Google Drive storage
+                screenshot_url = None
+                if uploaded_screenshot is not None:
+                    try:
+                        screenshot_url = upload_image_to_drive(uploaded_screenshot, f"{new_date_str}_{new_symbol}")
+                        if screenshot_url:
+                            new_record['Screenshot'] = screenshot_url
+                    except Exception as e:
+                        st.error(f"Failed to upload screenshot: {e}")
 
                 # Optional additional fields
                 if 'Risk_Percentage' in data.columns:
@@ -1136,12 +1209,99 @@ if st.session_state.current_page == "Home":
                 save_persistent_session()
 
                 st.success(" New record added successfully! Metrics recalculated.")
+                if screenshot_url:
+                    st.success(" Screenshot uploaded to Google Drive!")
                 st.rerun()
 
-        # Configure grid for VIEWING ONLY (no editing)
+        # Custom CSS for image handling
+        st.markdown("""
+        <style>
+        .screenshot-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .screenshot-thumbnail:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .expanded-screenshot {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 3px solid #fff;
+        }
+
+        .no-screenshot {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .image-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+        }
+
+        .image-action-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .image-action-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Configure grid for VIEWING WITH SCREENSHOTS
         gb = GridOptionsBuilder.from_dataframe(data)
 
-        # Define columns to hide (they will still be in the data, just not visible)
+        # Define columns to hide
         columns_to_hide = [
             'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum',
             'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity'
@@ -1153,12 +1313,31 @@ if st.session_state.current_page == "Home":
             paginationPageSize=25,
         )
 
-        # DISABLE editing features
+        # Configure Screenshot column for display
+        if 'Screenshot' in data.columns:
+            gb.configure_column(
+                'Screenshot',
+                headerName="Screenshot",
+                width=100,
+                cellRenderer=""" 
+                function(params) {
+                    if (!params.value || params.value === '' || params.value === 'nan') {
+                        return '<div class="no-screenshot">No Image</div>';
+                    }
+                    return '<img src="' + params.value + '" class="screenshot-thumbnail" onclick="expandScreenshot(this.src)" title="Click to expand">';
+                }
+                """,
+                editable=False,
+                filterable=False,
+                sortable=False
+            )
+
+        # DISABLE editing features for other columns
         gb.configure_default_column(
             filterable=True,
             sortable=True,
             resizable=True,
-            editable=False,  # DISABLE editing for all columns
+            editable=False,
             min_column_width=100
         )
 
@@ -1169,27 +1348,27 @@ if st.session_state.current_page == "Home":
         for column in grid_options['columnDefs']:
             if column['field'] in columns_to_hide:
                 column['hide'] = True
-                column['editable'] = False  # Don't allow editing hidden columns
+                column['editable'] = False
 
         # Display
         st.title("Trading Data Dashboard")
         st.markdown("Use the grid below to explore and filter trading data")
 
         # Delete records - SIMPLIFIED VERSION
-        # st.subheader("Delete Records")
-
-        # Get the current data
         current_data = st.session_state.uploaded_data
 
         if len(current_data) > 0:
-            # Show the most recent record for reference
-            last_record = current_data.iloc[-1].copy()
-            # st.write(
-            # f"**Last record:** Row {len(current_data)} - {last_record['Date']} - {last_record['Symbol']} - {last_record.get('Direction', 'N/A')} - PnL: {last_record.get('PnL', 'N/A')}")
-
             # Delete Last Record button
             if st.button("🗑️ Delete Last Record", type="secondary"):
                 try:
+                    # Get last record to check for screenshot
+                    last_record = current_data.iloc[-1]
+                    screenshot_url = last_record.get('Screenshot', '')
+
+                    # Delete screenshot from Drive if exists
+                    if screenshot_url and screenshot_url not in ['', 'nan']:
+                        delete_image_from_drive(screenshot_url)
+
                     # Remove the last row
                     updated_data = current_data.iloc[:-1].reset_index(drop=True)
 
@@ -1233,6 +1412,68 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
+        # JavaScript for image expansion
+        st.components.v1.html("""
+        <script>
+        function expandScreenshot(src) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'image-overlay';
+            overlay.id = 'screenshotOverlay';
+
+            // Create image
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'expanded-screenshot';
+
+            // Create action buttons container
+            const actions = document.createElement('div');
+            actions.className = 'image-actions';
+
+            // Close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'image-action-btn';
+            closeBtn.innerHTML = '×';
+            closeBtn.title = 'Close';
+            closeBtn.onclick = function(e) {
+                e.stopPropagation();
+                document.body.removeChild(overlay);
+            };
+
+            // Download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'image-action-btn';
+            downloadBtn.innerHTML = '⤓';
+            downloadBtn.title = 'Download';
+            downloadBtn.onclick = function(e) {
+                e.stopPropagation();
+                const link = document.createElement('a');
+                link.href = src;
+                link.download = 'trading-screenshot.jpg';
+                link.click();
+            };
+
+            actions.appendChild(downloadBtn);
+            actions.appendChild(closeBtn);
+
+            overlay.appendChild(img);
+            overlay.appendChild(actions);
+
+            // Close on overlay click
+            overlay.onclick = function(e) {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                }
+            };
+
+            document.body.appendChild(overlay);
+        }
+
+        // Make function globally available
+        window.expandScreenshot = expandScreenshot;
+        </script>
+        """, height=0)
+
         # Display the grid
         grid_response = AgGrid(
             data,
@@ -1240,12 +1481,209 @@ if st.session_state.current_page == "Home":
             height=500,
             width='100%',
             theme='streamlit',
-            update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
+            update_mode=GridUpdateMode.NO_UPDATE,
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
             enable_enterprise_modules=False,
-            reload_data=True
+            reload_data=True,
+            custom_css="""
+            .ag-cell img {
+                border-radius: 4px;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+            .ag-cell img:hover {
+                transform: scale(1.1);
+            }
+            """
         )
+
+        # Screenshot Management Section
+        st.write("---")
+        st.subheader("📸 Screenshot Management")
+
+        # Screenshot statistics
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            total_records = len(current_data)
+            st.metric("Total Records", total_records)
+
+        with col2:
+            records_with_screenshots = current_data[
+                (current_data['Screenshot'].notna()) &
+                (current_data['Screenshot'] != '') &
+                (current_data['Screenshot'] != 'nan')
+                ].shape[0]
+            st.metric("Records with Screenshots", records_with_screenshots)
+
+        with col3:
+            screenshot_percentage = (records_with_screenshots / total_records * 100) if total_records > 0 else 0
+            st.metric("Screenshot Coverage", f"{screenshot_percentage:.1f}%")
+
+        # Screenshot actions
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("Upload/Replace Screenshot")
+
+            # Select record to update
+            if not current_data.empty:
+                record_options = []
+                for idx, row in current_data.iterrows():
+                    display_text = f"{row['Date']} - {row['Symbol']} - {row.get('Strategy', 'N/A')}"
+                    record_options.append((idx, display_text))
+
+                selected_record_idx = st.selectbox(
+                    "Select record to update:",
+                    options=[opt[0] for opt in record_options],
+                    format_func=lambda x: [opt[1] for opt in record_options if opt[0] == x][0],
+                    key="update_screenshot_select"
+                )
+
+                # Image upload for selected record
+                new_screenshot = st.file_uploader(
+                    "Upload new screenshot",
+                    type=['png', 'jpg', 'jpeg'],
+                    key="replace_screenshot_uploader"
+                )
+
+                if st.button("Update Screenshot", type="primary", key="update_screenshot_btn"):
+                    if new_screenshot is not None and selected_record_idx is not None:
+                        try:
+                            # Get record details for filename
+                            record = current_data.iloc[selected_record_idx]
+                            filename = f"{record['Date']}_{record['Symbol']}_update"
+
+                            # Delete old image if exists
+                            old_url = record.get('Screenshot', '')
+                            if old_url and old_url != '' and old_url != 'nan':
+                                delete_image_from_drive(old_url)
+
+                            # Upload new image
+                            new_url = upload_image_to_drive(new_screenshot, filename)
+
+                            if new_url:
+                                # Update the record
+                                updated_data = current_data.copy()
+                                updated_data.at[selected_record_idx, 'Screenshot'] = new_url
+
+                                # Update session state
+                                st.session_state.uploaded_data = updated_data
+                                save_persistent_session()
+
+                                st.success("✅ Screenshot updated successfully!")
+                                st.rerun()
+                            else:
+                                st.error("Failed to upload new screenshot")
+
+                        except Exception as e:
+                            st.error(f"Error updating screenshot: {e}")
+                    else:
+                        st.warning("Please select a record and upload a new screenshot")
+
+        with col2:
+            st.subheader("Delete Screenshot")
+
+            # Show records with screenshots for deletion
+            records_with_screenshots_df = current_data[
+                (current_data['Screenshot'].notna()) &
+                (current_data['Screenshot'] != '') &
+                (current_data['Screenshot'] != 'nan')
+                ]
+
+            if not records_with_screenshots_df.empty:
+                delete_options = []
+                for idx, row in records_with_screenshots_df.iterrows():
+                    display_text = f"{row['Date']} - {row['Symbol']} - {row.get('Strategy', 'N/A')}"
+                    delete_options.append((idx, display_text))
+
+                selected_delete_idx = st.selectbox(
+                    "Select record to delete screenshot:",
+                    options=[opt[0] for opt in delete_options],
+                    format_func=lambda x: [opt[1] for opt in delete_options if opt[0] == x][0],
+                    key="delete_screenshot_select"
+                )
+
+                if st.button("🗑️ Delete Screenshot", type="secondary", key="delete_screenshot_btn"):
+                    if selected_delete_idx is not None:
+                        try:
+                            record = current_data.iloc[selected_delete_idx]
+                            screenshot_url = record.get('Screenshot', '')
+
+                            # Delete from Google Drive
+                            if screenshot_url and screenshot_url != '':
+                                delete_success = delete_image_from_drive(screenshot_url)
+
+                                if delete_success:
+                                    # Update the record
+                                    updated_data = current_data.copy()
+                                    updated_data.at[selected_delete_idx, 'Screenshot'] = ''
+
+                                    # Update session state
+                                    st.session_state.uploaded_data = updated_data
+                                    save_persistent_session()
+
+                                    st.success("✅ Screenshot deleted successfully!")
+                                    st.rerun()
+                                else:
+                                    st.error("Failed to delete screenshot from storage")
+                            else:
+                                st.warning("No screenshot found for this record")
+
+                        except Exception as e:
+                            st.error(f"Error deleting screenshot: {e}")
+            else:
+                st.info("No records with screenshots available for deletion")
+
+        # Quick screenshot viewer
+        st.write("---")
+        st.subheader("🔍 Quick Screenshot Viewer")
+
+        viewer_col1, viewer_col2 = st.columns([1, 2])
+
+        with viewer_col1:
+            # Select record to view
+            view_options = []
+            for idx, row in current_data.iterrows():
+                has_screenshot = row.get('Screenshot', '') not in ['', 'nan'] and pd.notna(row.get('Screenshot'))
+                screenshot_indicator = " 📷" if has_screenshot else ""
+                display_text = f"{row['Date']} - {row['Symbol']}{screenshot_indicator}"
+                view_options.append((idx, display_text, has_screenshot))
+
+            selected_view_idx = st.selectbox(
+                "Select record to view:",
+                options=[opt[0] for opt in view_options],
+                format_func=lambda x: [opt[1] for opt in view_options if opt[0] == x][0],
+                key="view_screenshot_select"
+            )
+
+        with viewer_col2:
+            if selected_view_idx is not None:
+                record = current_data.iloc[selected_view_idx]
+                screenshot_url = record.get('Screenshot', '')
+
+                if screenshot_url and screenshot_url not in ['', 'nan']:
+                    st.image(screenshot_url,
+                             caption=f"Screenshot for {record['Date']} - {record['Symbol']}",
+                             use_column_width=True)
+
+                    # Display record details
+                    st.write("**Record Details:**")
+                    detail_col1, detail_col2 = st.columns(2)
+                    with detail_col1:
+                        st.write(f"**Date:** {record['Date']}")
+                        st.write(f"**Symbol:** {record['Symbol']}")
+                        st.write(f"**Direction:** {record.get('Direction', 'N/A')}")
+                    with detail_col2:
+                        st.write(f"**Strategy:** {record.get('Strategy', 'N/A')}")
+                        st.write(f"**Result:** {record.get('Result', 'N/A')}")
+                        st.write(f"**PnL:** {record.get('PnL', 'N/A')}")
+                else:
+                    st.info("No screenshot available for this record")
+                    st.write("**Record Details:**")
+                    st.write(f"**Date:** {record['Date']}")
+                    st.write(f"**Symbol:** {record['Symbol']}")
+                    st.write(f"**Strategy:** {record.get('Strategy', 'N/A')}")
 
         # Show data stats
         try:

@@ -41,6 +41,35 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
+def search_and_display_screenshot(date, symbol):
+    """Compact search and display function"""
+    formatted_date = date.strftime("%Y-%m-%d")
+    expected_name = f"{formatted_date}_{symbol}.png"
+
+    service = get_drive_service()
+    folder_id = st.secrets.get("drive_folder_id", "")
+
+    if service:
+        # Search for file
+        query = f"name contains '{formatted_date}_{symbol}' and '{folder_id}' in parents"
+        results = service.files().list(q=query, fields="files(id, name)").execute()
+        files = results.get('files', [])
+
+        if files:
+            # Display image
+            file_bytes = io.BytesIO()
+            request = service.files().get_media(fileId=files[0]['id'])
+            downloader = MediaIoBaseDownload(file_bytes, request)
+            done = False
+            while not done:
+                status, done = downloader.next_chunk()
+            file_bytes.seek(0)
+
+            st.image(Image.open(file_bytes), caption=f"{symbol} - {formatted_date}")
+            st.success(f"Found: {files[0]['name']}")
+        else:
+            st.error(f"No screenshot found for {symbol}")
+            
 def clean_data_for_google_sheets(df):
     """
     Clean data specifically for Google Sheets to avoid JSON serialization errors
@@ -7145,34 +7174,6 @@ elif st.session_state.current_page == "Screenshots":
             search_and_display_screenshot(selected_date, selected_symbol)
 
 
-def search_and_display_screenshot(date, symbol):
-    """Compact search and display function"""
-    formatted_date = date.strftime("%Y-%m-%d")
-    expected_name = f"{formatted_date}_{symbol}.png"
-
-    service = get_drive_service()
-    folder_id = st.secrets.get("drive_folder_id", "")
-
-    if service:
-        # Search for file
-        query = f"name contains '{formatted_date}_{symbol}' and '{folder_id}' in parents"
-        results = service.files().list(q=query, fields="files(id, name)").execute()
-        files = results.get('files', [])
-
-        if files:
-            # Display image
-            file_bytes = io.BytesIO()
-            request = service.files().get_media(fileId=files[0]['id'])
-            downloader = MediaIoBaseDownload(file_bytes, request)
-            done = False
-            while not done:
-                status, done = downloader.next_chunk()
-            file_bytes.seek(0)
-
-            st.image(Image.open(file_bytes), caption=f"{symbol} - {formatted_date}")
-            st.success(f"Found: {files[0]['name']}")
-        else:
-            st.error(f"No screenshot found for {symbol}")
 
 elif st.session_state.current_page == "Guidelines":
     st.title("Guidelines to Follow")

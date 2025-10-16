@@ -3524,7 +3524,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (pair == "AUDUSD"):
                         return "12 ", "22"
                     elif (pair == "XAUUSD"):
-                        return "12", "30"
+                        return "12", str(suggested_sl)
                     elif (pair == "USDJPY"):
                         return "12", "18"
                     elif (pair == "USDCAD"):

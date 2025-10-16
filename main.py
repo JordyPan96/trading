@@ -35,7 +35,7 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20):
+def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=0):
     """
     Calculate MAE recommendations dynamically from Google Sheets data
     Fetches last 20 records for the specific symbol+strategy combination
@@ -2225,7 +2225,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                             if suggested_sl > current_avg_sl * 1.1:  # More than 10% larger
                                 st.warning("""
-                                **📈 Consider WIDER Stop Loss:** 
+                                ** Consider WIDER Stop Loss:** 
                                 - Your winning trades typically experience drawdowns up to {:.2f}% before recovering
                                 - Current stop loss ({:.2f}%) may be cutting winners too early
                                 - Wider stop could improve win rate and average profit
@@ -2233,7 +2233,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                             elif suggested_sl < current_avg_sl * 0.9:  # More than 10% smaller
                                 st.info("""
-                                **📉 Consider TIGHTER Stop Loss:**
+                                ** Consider TIGHTER Stop Loss:**
                                 - Your winning trades rarely draw down more than {:.2f}%
                                 - Current stop loss ({:.2f}%) may be too wide
                                 - Tighter stop could reduce risk per trade
@@ -2241,7 +2241,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                             else:
                                 st.success("""
-                                **✅ Current Stop Loss Appears Reasonable:**
+                                ** Current Stop Loss Appears Reasonable:**
                                 - Aligns well with winning trades' behavior
                                 - Good balance between letting winners run and controlling risk
                                 """)

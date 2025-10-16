@@ -2242,7 +2242,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 """)
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades >= 20:
+                            if total_trades >= 0:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 
@@ -2259,7 +2259,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 }
 
                                 st.success(
-                                    f"✅ MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
+                                    f"MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
 
                         else:
                             st.warning(

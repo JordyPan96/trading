@@ -7115,6 +7115,8 @@ elif st.session_state.current_page == "Stats":
         breakeven_count = len(year_data[year_data['Result'] == 'BE'])
         st.caption(f"*Note: Excluded {breakeven_count} breakeven trades from calculations")
 
+elif st.session_state.current_page == "Screenshots":
+    st.write("Test")
 
 elif st.session_state.current_page == "Guidelines":
     st.title("Guidelines to Follow")

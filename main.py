@@ -1059,6 +1059,8 @@ if st.session_state.current_page == "Home":
 
                 new_rr = st.number_input("RR", value=0.0, step=0.01, key="new_rr")
                 new_pnl = st.number_input("PnL", value=0.0, step=0.01, key="new_pnl")
+                stop_loss_pct = st.number_input("Stop Loss Percentage", value=0.0, step=0.01, key="stop_loss_pct")
+                max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01, key="max_adverse_excursion")
 
             # Second row of fields
             col4, col5, col6 = st.columns(3)
@@ -1105,6 +1107,10 @@ if st.session_state.current_page == "Home":
                     new_record['RR'] = new_rr
                 if 'PnL' in data.columns:
                     new_record['PnL'] = new_pnl
+                if 'Stop Loss Percentage' in data.columns:
+                    new_record['Stop Loss Percentage'] = stop_loss_pct
+                if 'Maximum Adverse Excursion' in data.columns:
+                    new_record['Maximum Adverse Excursion'] = max_adverse_excursion
                 if 'Withdrawal_Deposit' in data.columns:
                     new_record['Withdrawal_Deposit'] = new_withdrawal_deposit
                 if 'PROP_Pct' in data.columns:
@@ -2081,7 +2087,8 @@ elif st.session_state.current_page == "Symbol Stats":
                             # What-if analysis with different stop loss levels
                             st.subheader("Stop Loss Scenario Analysis")
 
-                            sl_levels = [mae_percentiles[1], mae_percentiles[2], mae_percentiles[3]]  # 50th, 75th, 90th percentiles
+                            sl_levels = [mae_percentiles[1], mae_percentiles[2],
+                                         mae_percentiles[3]]  # 50th, 75th, 90th percentiles
                             scenario_results = []
 
                             for sl_level in sl_levels:
@@ -2096,7 +2103,8 @@ elif st.session_state.current_page == "Symbol Stats":
                                                               ])
 
                                 total_hypothetical = hypothetical_wins + hypothetical_losses
-                                win_rate_hypothetical = (hypothetical_wins / total_hypothetical * 100) if total_hypothetical > 0 else 0
+                                win_rate_hypothetical = (
+                                            hypothetical_wins / total_hypothetical * 100) if total_hypothetical > 0 else 0
 
                                 scenario_results.append({
                                     'Stop_Loss_Level': sl_level,

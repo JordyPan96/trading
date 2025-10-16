@@ -46,7 +46,7 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
     - min_trades: Minimum number of trades required (default: 20)
 
     Returns:
-    - tuple: (suggested_stop_loss, avg_winning_mae, trade_count) or (None, None, 0)
+    - tuple: (suggested_stop_loss, avg_winning_mae) or (None, None)
     """
 
     try:
@@ -54,7 +54,7 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
         df = load_data_from_sheets("Trade", "Trade.csv")
 
         if df is None or df.empty:
-            return None, None, 0
+            return None, None
 
         # Filter for current symbol and strategy
         filtered_data = df[
@@ -73,19 +73,19 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
         # Check if we have enough trades
         trade_count = len(recent_trades)
         if trade_count < min_trades:
-            return None, None, trade_count
+            return None, None
 
         # Ensure we have the required columns
         required_columns = ['Maximum Adverse Excursion', 'PnL', 'Result']
         if not all(col in recent_trades.columns for col in required_columns):
-            return None, None, trade_count
+            return None, None
 
         # Clean the data - remove any rows with invalid MAE values
         recent_trades = recent_trades.dropna(subset=['Maximum Adverse Excursion'])
 
         # Re-check count after cleaning
         if len(recent_trades) < min_trades:
-            return None, None, len(recent_trades)
+            return None, None
 
         # Calculate MAE percentiles
         mae_percentiles = np.percentile(recent_trades['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])

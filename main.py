@@ -35,7 +35,7 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20):
+def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=10):
     """
     Calculate MAE recommendations dynamically from Google Sheets data
     Fetches last 20 records for the specific symbol+strategy combination
@@ -2247,7 +2247,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 """)
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades > 20:
+                            if total_trades > 10:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 

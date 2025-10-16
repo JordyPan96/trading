@@ -70,7 +70,7 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
         # Take the last 20 records (most recent)
         recent_trades = filtered_data.head(min_trades)
 
-        # Check if we have enough trades
+        # Check if we have enough trades (20 total trades like tab6)
         trade_count = len(recent_trades)
         if trade_count < min_trades:
             return None, None
@@ -87,16 +87,21 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20)
         if len(recent_trades) < min_trades:
             return None, None
 
-        # Calculate MAE percentiles
-        mae_percentiles = np.percentile(recent_trades['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])
-        suggested_stop_loss = mae_percentiles[2]  # 75th percentile
+        # CRITICAL CHANGE: Use only WINNING TRADES for MAE analysis
+        winning_trades = recent_trades[recent_trades['Result'] == 'Win']
+
+        # CRITICAL FIX: Check if we have ANY winning trades (like tab6 does)
+        if winning_trades.empty:
+            return None, None
+
+        # Calculate MAE percentiles from WINNING TRADES only (uncensored data)
+        winning_mae_percentiles = np.percentile(winning_trades['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])
+
+        # Use 90th percentile of WINNING trades (not 75th of all trades)
+        suggested_stop_loss = winning_mae_percentiles[3]  # 90th percentile of winners
 
         # Calculate average winning trade MAE
-        winning_trades = recent_trades[recent_trades['Result'] == 'Win']
-        if not winning_trades.empty:
-            avg_winning_mae = winning_trades['Maximum Adverse Excursion'].mean()
-        else:
-            avg_winning_mae = 0
+        avg_winning_mae = winning_trades['Maximum Adverse Excursion'].mean()
 
         return suggested_stop_loss, avg_winning_mae
 

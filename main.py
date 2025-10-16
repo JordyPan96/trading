@@ -3517,8 +3517,10 @@ elif st.session_state.current_page == "Risk Calculation":
                 mae_based_stop_loss = suggested_sl
                 winning_trade_mae = avg_winning_mae
 
+            target_in = 0
             def getPairEntrySL(pair):
                 if (suggested_sl is None or avg_winning_mae is None):
+                    target_in = 0
                     if (pair == "GBPUSD"):
                         return "12", "18"
                     elif (pair == "EURUSD"):
@@ -3534,7 +3536,9 @@ elif st.session_state.current_page == "Risk Calculation":
                     else:
                         return "12", "30"
 
+
                 else:
+                    target_in = (99 // round(mae_based_stop_loss,0)) + 0.41
                     if (pair == "GBPUSD"):
                         return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "EURUSD"):
@@ -3584,6 +3588,12 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (open_target > desire_target):
                     return str(desire_target)
 
+            def get_one_target_2(target_in, origin_target):
+                if(target_in == 0):
+                    return origin_target
+                else:
+                    return target_in
+
 
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
@@ -3595,28 +3605,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,7.41))
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
 
                 else:
                     if (selected_pair == "XAUUSD"):
@@ -3625,28 +3635,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 4.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,4.41))
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Behind 786 Fib, Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
             elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
@@ -3655,7 +3665,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,7.41))
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -3663,14 +3673,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + "%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair), 8.41)
+                            exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,8.41))
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -3678,14 +3688,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                            exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 20)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,20))
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -3693,14 +3703,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair), 20)
+                            exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,20))
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
 
                         if (Variances == "> 805"):
                             entry_title = "Entry Guide (Within 64% Mandatory):"
@@ -3708,7 +3718,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide:"
                             SL_text = "Entry set to " + sl_pip + " %"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                            exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,7.41))
 
 
                 else:
@@ -3718,28 +3728,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,6.41))
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 4.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,4.41))
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
                     else:
                         entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = compare_target(get_one_target(selected_pair), get_one_target_2(target_in,5.41))
 
 
 

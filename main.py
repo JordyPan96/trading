@@ -2115,7 +2115,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades > 0:
+                            if total_trades > 20:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 

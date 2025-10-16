@@ -35,28 +35,74 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def get_mae_recommendation_values(selected_pair, risk_multiplier):
+def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20):
     """
-    Get MAE recommendation values without any display
+    Calculate MAE recommendations dynamically from Google Sheets data
+    Fetches last 20 records for the specific symbol+strategy combination
 
     Parameters:
-    - selected_pair: The trading pair (e.g., 'XAUUSD')
-    - risk_multiplier: The strategy (e.g., '1_BNR')
+    - selected_pair: The trading pair
+    - risk_multiplier: The strategy
+    - min_trades: Minimum number of trades required (default: 20)
 
     Returns:
-    - tuple: (suggested_stop_loss, avg_winning_mae) or (None, None) if not available
+    - tuple: (suggested_stop_loss, avg_winning_mae, trade_count) or (None, None, 0)
     """
 
-    if not st.session_state.get('mae_analysis_results'):
-        return None, None
+    try:
+        # Load fresh data from Google Sheets
+        df = load_data_from_sheets("Trade", "Trade.csv")
 
-    current_mae_key = f"{selected_pair}_{risk_multiplier}"
+        if df is None or df.empty:
+            return None, None, 0
 
-    if current_mae_key in st.session_state.mae_analysis_results:
-        mae_data = st.session_state.mae_analysis_results[current_mae_key]
-        return mae_data['suggested_stop_loss'], mae_data['avg_winning_mae']
+        # Filter for current symbol and strategy
+        filtered_data = df[
+            (df['Symbol'] == selected_pair) &
+            (df['Strategy'] == risk_multiplier)
+            ].copy()
 
-    return None, None
+        # Sort by date to get most recent trades (newest first)
+        if 'Date' in filtered_data.columns:
+            filtered_data['Date'] = pd.to_datetime(filtered_data['Date'], errors='coerce')
+            filtered_data = filtered_data.sort_values('Date', ascending=False)
+
+        # Take the last 20 records (most recent)
+        recent_trades = filtered_data.head(min_trades)
+
+        # Check if we have enough trades
+        trade_count = len(recent_trades)
+        if trade_count < min_trades:
+            return None, None, trade_count
+
+        # Ensure we have the required columns
+        required_columns = ['Maximum Adverse Excursion', 'PnL', 'Result']
+        if not all(col in recent_trades.columns for col in required_columns):
+            return None, None, trade_count
+
+        # Clean the data - remove any rows with invalid MAE values
+        recent_trades = recent_trades.dropna(subset=['Maximum Adverse Excursion'])
+
+        # Re-check count after cleaning
+        if len(recent_trades) < min_trades:
+            return None, None, len(recent_trades)
+
+        # Calculate MAE percentiles
+        mae_percentiles = np.percentile(recent_trades['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])
+        suggested_stop_loss = mae_percentiles[2]  # 75th percentile
+
+        # Calculate average winning trade MAE
+        winning_trades = recent_trades[recent_trades['Result'] == 'Win']
+        if not winning_trades.empty:
+            avg_winning_mae = winning_trades['Maximum Adverse Excursion'].mean()
+        else:
+            avg_winning_mae = 0
+
+        return suggested_stop_loss, avg_winning_mae, trade_count
+
+    except Exception as e:
+        st.error(f"Error calculating MAE recommendations: {e}")
+        return None, None, 0
 
 def clean_data_for_google_sheets(df):
     """
@@ -2115,7 +2161,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades > 20:
+                            if total_trades > 0:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 
@@ -2132,7 +2178,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 }
 
                                 st.success(
-                                    f"✅ MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
+                                    f"MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
 
                             # What-if analysis with different stop loss levels
                             st.subheader("Stop Loss Scenario Analysis")
@@ -3439,7 +3485,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
 
-            suggested_sl, avg_winning_mae = get_mae_recommendation_values(selected_pair, risk_multiplier)
+            suggested_sl, avg_winning_mae = calculate_mae_recommendations(selected_pair, risk_multiplier)
 
             # Store in variables for later use
             if suggested_sl is not None:

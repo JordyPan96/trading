@@ -2150,27 +2150,7 @@ elif st.session_state.current_page == "Symbol Stats":
                                 'With_Suggested_SL': '{:.2f}'
                             }), use_container_width=True)
 
-                        # Detailed MAE Analysis Table
-                        st.subheader("Detailed MAE Analysis by Trade")
-
-                        detailed_mae = mae_data[[
-                            'Date', 'Direction', 'PnL', 'Result', 'RR',
-                            'Maximum Adverse Excursion', 'Stop Loss Percentage'
-                        ]].copy()
-
-                        detailed_mae = detailed_mae.sort_values('Maximum Adverse Excursion', ascending=False)
-
-                        st.dataframe(
-                            detailed_mae.style.format({
-                                'PnL': '${:.2f}',
-                                'RR': '{:.2f}',
-                                'Maximum Adverse Excursion': '{:.4f}',
-                                'Stop Loss Percentage': '{:.4f}'
-                            }).apply(lambda x: ['background-color: lightgreen' if x['Result'] == 'Win' else
-                                                'background-color: lightcoral' for _ in x], axis=1),
-                            use_container_width=True,
-                            height=400
-                        )
+                        
 
                         # Download MAE analysis data
                         csv = detailed_mae.to_csv(index=False).encode('utf-8')

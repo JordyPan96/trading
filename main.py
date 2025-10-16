@@ -3438,6 +3438,15 @@ elif st.session_state.current_page == "Risk Calculation":
                 position_size_propfirm = 0
 
 
+
+            suggested_sl, avg_winning_mae = get_mae_recommendation_values(selected_pair, risk_multiplier)
+
+            # Store in variables for later use
+            if suggested_sl is not None:
+                # Use the values in your risk calculations
+                mae_based_stop_loss = suggested_sl
+                winning_trade_mae = avg_winning_mae
+
             def getPairEntrySL(pair):
                 if (pair == "GBPUSD"):
                     return "12", "18"
@@ -3446,7 +3455,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (pair == "AUDUSD"):
                     return "12 ", "22"
                 elif (pair == "XAUUSD"):
-                    return "12", "30"
+                    return (12-winning_trade_mae)+round(mae_based_stop_loss/2,0), round(mae_based_stop_loss,0)
                 elif (pair == "USDJPY"):
                     return "12", "18"
                 elif (pair == "USDCAD"):
@@ -3487,15 +3496,6 @@ elif st.session_state.current_page == "Risk Calculation":
                         return "3"
                 elif (open_target > desire_target):
                     return str(desire_target)
-
-
-            suggested_sl, avg_winning_mae = get_mae_recommendation_values(selected_pair, risk_multiplier)
-
-            # Store in variables for later use
-            if suggested_sl is not None:
-                # Use the values in your risk calculations
-                mae_based_stop_loss = suggested_sl
-                winning_trade_mae = avg_winning_mae
 
 
             if (len(a_momemtum_text) < 1):
@@ -3563,7 +3563,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
-                        entry_title = "Entry Guide (Within 64% Optional):" + str(mae_based_stop_loss)
+                        entry_title = "Entry Guide (Within 64% Optional):"
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"

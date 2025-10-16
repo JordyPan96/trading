@@ -1957,6 +1957,10 @@ elif st.session_state.current_page == "Symbol Stats":
             with tab6:
                 st.header("MAE Analysis & Stop Loss Optimization")
 
+                # Initialize session state for MAE results if not exists
+                if 'mae_analysis_results' not in st.session_state:
+                    st.session_state.mae_analysis_results = {}
+
                 # Filters for MAE Analysis
                 col1, col2 = st.columns(2)
 
@@ -2087,6 +2091,26 @@ elif st.session_state.current_page == "Symbol Stats":
                             with col2:
                                 st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
 
+                            # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
+                            if total_trades > 20:
+                                # Create unique key for this symbol+strategy combination
+                                key = f"{mae_symbol}_{mae_strategy}"
+
+                                # Save the analysis results
+                                st.session_state.mae_analysis_results[key] = {
+                                    'symbol': mae_symbol,
+                                    'strategy': mae_strategy,
+                                    'trade_count': total_trades,
+                                    'suggested_stop_loss': suggested_sl,
+                                    'avg_winning_mae': avg_winning_mae,
+                                    'win_rate': win_rate,
+                                    'avg_pnl': avg_pnl,
+                                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                }
+
+                                st.success(
+                                    f"✅ MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
+
                             # What-if analysis with different stop loss levels
                             st.subheader("Stop Loss Scenario Analysis")
 
@@ -2150,9 +2174,69 @@ elif st.session_state.current_page == "Symbol Stats":
                                 'With_Suggested_SL': '{:.2f}'
                             }), use_container_width=True)
 
+                        # Detailed MAE Analysis Table
+                        st.subheader("Detailed MAE Analysis by Trade")
 
+                        detailed_mae = mae_data[[
+                            'Date', 'Direction', 'PnL', 'Result', 'RR',
+                            'Maximum Adverse Excursion', 'Stop Loss Percentage'
+                        ]].copy()
 
-                        
+                        detailed_mae = detailed_mae.sort_values('Maximum Adverse Excursion', ascending=False)
+
+                        st.dataframe(
+                            detailed_mae.style.format({
+                                'PnL': '${:.2f}',
+                                'RR': '{:.2f}',
+                                'Maximum Adverse Excursion': '{:.4f}',
+                                'Stop Loss Percentage': '{:.4f}'
+                            }).apply(lambda x: ['background-color: lightgreen' if x['Result'] == 'Win' else
+                                                'background-color: lightcoral' for _ in x], axis=1),
+                            use_container_width=True,
+                            height=400
+                        )
+
+                        # Download MAE analysis data
+                        csv = detailed_mae.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="Download MAE Analysis Data",
+                            data=csv,
+                            file_name=f'mae_analysis_{mae_symbol}_{mae_strategy}_{selected_year}.csv',
+                            mime='text/csv',
+                        )
+
+                # Display saved MAE results
+                if st.session_state.mae_analysis_results:
+                    st.subheader("Saved MAE Analysis Results")
+
+                    saved_results_list = []
+                    for key, result in st.session_state.mae_analysis_results.items():
+                        saved_results_list.append({
+                            'Symbol': result['symbol'],
+                            'Strategy': result['strategy'],
+                            'Trade_Count': result['trade_count'],
+                            'Suggested_SL': result['suggested_stop_loss'],
+                            'Avg_Winning_MAE': result['avg_winning_mae'],
+                            'Win_Rate': result['win_rate'],
+                            'Avg_PnL': result['avg_pnl'],
+                            'Last_Updated': result['timestamp']
+                        })
+
+                    saved_results_df = pd.DataFrame(saved_results_list)
+                    st.dataframe(
+                        saved_results_df.style.format({
+                            'Suggested_SL': '{:.4f}',
+                            'Avg_Winning_MAE': '{:.4f}',
+                            'Win_Rate': '{:.1f}%',
+                            'Avg_PnL': '${:.2f}'
+                        }),
+                        use_container_width=True
+                    )
+
+                    # Clear saved results button
+                    if st.button("Clear Saved MAE Results"):
+                        st.session_state.mae_analysis_results = {}
+                        st.rerun()
 
     else:
         st.warning("Please upload data first to analyze symbol statistics")

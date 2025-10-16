@@ -2073,8 +2073,11 @@ elif st.session_state.current_page == "Symbol Stats":
                             st.metric("Win Rate", f"{win_rate:.1f}%")
 
                         with col3:
-                            avg_mae = mae_data['Maximum Adverse Excursion'].mean()
-                            st.metric("Avg MAE", f"{avg_mae:.4f}")
+                            # Calculate MAE for WINNING TRADES only (uncensored data)
+                            winning_trades = mae_data[mae_data['Result'] == 'Win']
+                            avg_winning_mae = winning_trades[
+                                'Maximum Adverse Excursion'].mean() if not winning_trades.empty else 0
+                            st.metric("Avg Winning MAE", f"{avg_winning_mae:.4f}")
 
                         with col4:
                             avg_pnl = mae_data['PnL'].mean()
@@ -2120,37 +2123,38 @@ elif st.session_state.current_page == "Symbol Stats":
                             )
                             st.plotly_chart(fig, use_container_width=True)
 
-                        # Stop Loss Optimization Analysis
+                        # Stop Loss Optimization Analysis - CORRECTED VERSION
                         st.subheader("Stop Loss Optimization Analysis")
 
-                        # Calculate optimal stop loss based on MAE
+                        # Calculate optimal stop loss based on MAE of WINNING TRADES only
                         winning_trades = mae_data[mae_data['Result'] == 'Win']
                         losing_trades = mae_data[mae_data['Result'] == 'Loss']
 
-                        if not winning_trades.empty and not losing_trades.empty:
-                            # Analyze MAE percentiles for optimization
-                            mae_percentiles = np.percentile(mae_data['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])
+                        if not winning_trades.empty:
+                            # Analyze MAE percentiles for WINNING TRADES only (uncensored data)
+                            winning_mae_percentiles = np.percentile(winning_trades['Maximum Adverse Excursion'],
+                                                                    [25, 50, 75, 90, 95])
 
                             col1, col2, col3 = st.columns(3)
 
                             with col1:
-                                st.metric("MAE 25th Percentile", f"{mae_percentiles[0]:.4f}")
-                                st.metric("MAE 50th Percentile", f"{mae_percentiles[1]:.4f}")
+                                st.metric("Winners MAE 25th %ile", f"{winning_mae_percentiles[0]:.4f}")
+                                st.metric("Winners MAE 50th %ile", f"{winning_mae_percentiles[1]:.4f}")
 
                             with col2:
-                                st.metric("MAE 75th Percentile", f"{mae_percentiles[2]:.4f}")
-                                st.metric("MAE 90th Percentile", f"{mae_percentiles[3]:.4f}")
+                                st.metric("Winners MAE 75th %ile", f"{winning_mae_percentiles[2]:.4f}")
+                                st.metric("Winners MAE 90th %ile", f"{winning_mae_percentiles[3]:.4f}")
 
                             with col3:
-                                st.metric("MAE 95th Percentile", f"{mae_percentiles[4]:.4f}")
+                                st.metric("Winners MAE 95th %ile", f"{winning_mae_percentiles[4]:.4f}")
                                 avg_winning_mae = winning_trades['Maximum Adverse Excursion'].mean()
                                 st.metric("Avg Winning Trade MAE", f"{avg_winning_mae:.4f}")
 
                             # Current vs Suggested Stop Loss
                             current_avg_sl = mae_data['Stop Loss Percentage'].mean()
 
-                            # Suggest optimal stop loss based on MAE analysis
-                            suggested_sl = mae_percentiles[2]  # 75th percentile
+                            # Suggest optimal stop loss based on 90th percentile of WINNING trades
+                            suggested_sl = winning_mae_percentiles[3]  # 90th percentile of winners
 
                             col1, col2 = st.columns(2)
 
@@ -2158,10 +2162,87 @@ elif st.session_state.current_page == "Symbol Stats":
                                 st.metric("Current Avg Stop Loss", f"{current_avg_sl:.4f}")
 
                             with col2:
-                                st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
+                                st.metric("Suggested Stop Loss (90th %ile Winners)", f"{suggested_sl:.4f}",
+                                          help="Based on 90th percentile of winning trades' MAE")
+
+                            # Winner Survival Analysis - Better approach
+                            st.subheader("Winner Survival Analysis")
+
+                            # Test various stop loss levels from 5% to 50%
+                            stop_levels = np.arange(0.05, 0.51, 0.05)
+                            survival_rates = []
+
+                            for stop_level in stop_levels:
+                                # What % of winning trades would have survived this stop loss?
+                                survivors = len(
+                                    winning_trades[winning_trades['Maximum Adverse Excursion'] > -stop_level])
+                                survival_rate = (survivors / len(winning_trades)) * 100
+                                survival_rates.append({
+                                    'Stop_Level': stop_level,
+                                    'Survival_Rate': survival_rate,
+                                    'Surviving_Trades': survivors,
+                                    'Total_Winners': len(winning_trades)
+                                })
+
+                            survival_df = pd.DataFrame(survival_rates)
+
+                            # Plot survival curve
+                            fig_survival = px.line(
+                                survival_df,
+                                x='Stop_Level',
+                                y='Survival_Rate',
+                                title='Percentage of Winning Trades That Survive Various Stop Loss Levels',
+                                labels={'Stop_Level': 'Stop Loss Level', 'Survival_Rate': 'Winners Surviving (%)'},
+                                markers=True
+                            )
+                            # Add reference lines
+                            fig_survival.add_hline(y=90, line_dash="dash", line_color="red",
+                                                   annotation_text="90% Survival Target")
+                            fig_survival.add_vline(x=current_avg_sl, line_dash="dot", line_color="orange",
+                                                   annotation_text="Current Stop")
+                            fig_survival.add_vline(x=suggested_sl, line_dash="dot", line_color="blue",
+                                                   annotation_text="Suggested Stop")
+
+                            st.plotly_chart(fig_survival, use_container_width=True)
+
+                            # Display survival table
+                            st.dataframe(
+                                survival_df.style.format({
+                                    'Stop_Level': '{:.2f}',
+                                    'Survival_Rate': '{:.1f}%'
+                                }).apply(lambda x: ['background-color: lightgreen' if x['Survival_Rate'] >= 90 else
+                                                    'background-color: lightyellow' for _ in x], axis=1),
+                                use_container_width=True
+                            )
+
+                            # Interpretation Guide
+                            st.subheader("Interpretation Guide")
+
+                            if suggested_sl > current_avg_sl * 1.1:  # More than 10% larger
+                                st.warning("""
+                                **📈 Consider WIDER Stop Loss:** 
+                                - Your winning trades typically experience drawdowns up to {:.2f}% before recovering
+                                - Current stop loss ({:.2f}%) may be cutting winners too early
+                                - Wider stop could improve win rate and average profit
+                                """.format(suggested_sl * 100, current_avg_sl * 100))
+
+                            elif suggested_sl < current_avg_sl * 0.9:  # More than 10% smaller
+                                st.info("""
+                                **📉 Consider TIGHTER Stop Loss:**
+                                - Your winning trades rarely draw down more than {:.2f}%
+                                - Current stop loss ({:.2f}%) may be too wide
+                                - Tighter stop could reduce risk per trade
+                                """.format(suggested_sl * 100, current_avg_sl * 100))
+
+                            else:
+                                st.success("""
+                                **✅ Current Stop Loss Appears Reasonable:**
+                                - Aligns well with winning trades' behavior
+                                - Good balance between letting winners run and controlling risk
+                                """)
 
                             # AUTO-SAVE TO SESSION STATE FOR TRADE COUNT > 20
-                            if total_trades > 0:
+                            if total_trades >= 20:
                                 # Create unique key for this symbol+strategy combination
                                 key = f"{mae_symbol}_{mae_strategy}"
 
@@ -2178,70 +2259,11 @@ elif st.session_state.current_page == "Symbol Stats":
                                 }
 
                                 st.success(
-                                    f"MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
+                                    f"✅ MAE analysis saved for {mae_symbol} - {mae_strategy} (Trade count: {total_trades})")
 
-                            # What-if analysis with different stop loss levels
-                            st.subheader("Stop Loss Scenario Analysis")
-
-                            sl_levels = [mae_percentiles[1], mae_percentiles[2],
-                                         mae_percentiles[3]]  # 50th, 75th, 90th percentiles
-                            scenario_results = []
-
-                            for sl_level in sl_levels:
-                                # Simulate what would happen with this stop loss
-                                hypothetical_wins = len(mae_data[
-                                                            (mae_data['Maximum Adverse Excursion'] > -sl_level) &
-                                                            (mae_data['PnL'] > 0)
-                                                            ])
-                                hypothetical_losses = len(mae_data[
-                                                              (mae_data['Maximum Adverse Excursion'] <= -sl_level) &
-                                                              (mae_data['PnL'] < 0)
-                                                              ])
-
-                                total_hypothetical = hypothetical_wins + hypothetical_losses
-                                win_rate_hypothetical = (
-                                            hypothetical_wins / total_hypothetical * 100) if total_hypothetical > 0 else 0
-
-                                scenario_results.append({
-                                    'Stop_Loss_Level': sl_level,
-                                    'Hypothetical_Wins': hypothetical_wins,
-                                    'Hypothetical_Losses': hypothetical_losses,
-                                    'Hypothetical_Win_Rate': win_rate_hypothetical,
-                                    'Trades_Kept': total_hypothetical
-                                })
-
-                            scenario_df = pd.DataFrame(scenario_results)
-
-                            st.dataframe(
-                                scenario_df.style.format({
-                                    'Stop_Loss_Level': '{:.4f}',
-                                    'Hypothetical_Win_Rate': '{:.1f}%'
-                                }),
-                                use_container_width=True
-                            )
-
-                            # Comparison of actual vs hypothetical performance
-                            st.subheader("Performance Comparison")
-
-                            comparison_data = {
-                                'Metric': ['Win Rate', 'Total Trades', 'Avg PnL per Trade'],
-                                'Actual': [
-                                    win_rate,
-                                    total_trades,
-                                    avg_pnl
-                                ],
-                                'With_Suggested_SL': [
-                                    scenario_results[1]['Hypothetical_Win_Rate'],  # 75th percentile
-                                    scenario_results[1]['Trades_Kept'],
-                                    mae_data['PnL'].mean()  # This would need more sophisticated calculation
-                                ]
-                            }
-
-                            comparison_df = pd.DataFrame(comparison_data)
-                            st.dataframe(comparison_df.style.format({
-                                'Actual': '{:.2f}',
-                                'With_Suggested_SL': '{:.2f}'
-                            }), use_container_width=True)
+                        else:
+                            st.warning(
+                                "No winning trades found for this combination. Cannot perform stop loss optimization.")
 
                         # Detailed MAE Analysis Table
                         st.subheader("Detailed MAE Analysis by Trade")
@@ -2284,21 +2306,16 @@ elif st.session_state.current_page == "Symbol Stats":
                             'Symbol': result['symbol'],
                             'Strategy': result['strategy'],
                             'Trade_Count': result['trade_count'],
-                            'Suggested_SL': result['suggested_stop_loss'],
-                            'Avg_Winning_MAE': result['avg_winning_mae'],
-                            'Win_Rate': result['win_rate'],
-                            'Avg_PnL': result['avg_pnl'],
+                            'Suggested_SL': f"{result['suggested_stop_loss']:.4f}",
+                            'Avg_Winning_MAE': f"{result['avg_winning_mae']:.4f}",
+                            'Win_Rate': f"{result['win_rate']:.1f}%",
+                            'Avg_PnL': f"${result['avg_pnl']:.2f}",
                             'Last_Updated': result['timestamp']
                         })
 
                     saved_results_df = pd.DataFrame(saved_results_list)
                     st.dataframe(
-                        saved_results_df.style.format({
-                            'Suggested_SL': '{:.4f}',
-                            'Avg_Winning_MAE': '{:.4f}',
-                            'Win_Rate': '{:.1f}%',
-                            'Avg_PnL': '${:.2f}'
-                        }),
+                        saved_results_df,
                         use_container_width=True
                     )
 

@@ -3534,17 +3534,17 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 else:
                     if (pair == "GBPUSD"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "EURUSD"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "AUDUSD"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "XAUUSD"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "USDJPY"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     elif (pair == "USDCAD"):
-                        return str(round((round(12-winning_trade_mae,0))+(round(mae_based_stop_loss/2,0))),0), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
                     else:
                         return "12", "30"
 

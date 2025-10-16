@@ -35,7 +35,7 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=20):
+def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=1):
     """
     Calculate MAE recommendations dynamically from Google Sheets data
     Fetches last 20 records for the specific symbol+strategy combination

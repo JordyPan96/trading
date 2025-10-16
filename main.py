@@ -1417,13 +1417,14 @@ elif st.session_state.current_page == "Symbol Stats":
         if year_data.empty:
             st.warning(f"No data found for {selected_year}")
         else:
-            # Create tabs for better organization
-            tab1, tab2, tab3, tab4, tab5 = st.tabs([
+            # Create tabs for better organization - ADDED TAB6
+            tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
                 "Overall Performance",
                 "Monthly Analysis",
                 "Direction Analysis",
                 "Strategy Analysis",
-                "Visualizations"
+                "Visualizations",
+                "MAE Analysis & Stop Loss Optimization"
             ])
 
             with tab1:
@@ -1642,6 +1643,7 @@ elif st.session_state.current_page == "Symbol Stats":
                     file_name=f'group_performance_{selected_year}.csv',
                     mime='text/csv',
                 )
+
             with tab2:
                 # Monthly Performance by Symbol
                 st.header("Monthly Performance by Symbol")
@@ -1942,6 +1944,231 @@ elif st.session_state.current_page == "Symbol Stats":
                 )
                 fig.update_yaxes(tickprefix='$')
                 st.plotly_chart(fig, use_container_width=True)
+
+            with tab6:
+                st.header("MAE Analysis & Stop Loss Optimization")
+
+                # Filters for MAE Analysis
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    mae_symbol = st.selectbox(
+                        "Select Symbol for MAE Analysis",
+                        options=sorted(year_data['Symbol'].unique()),
+                        key="mae_symbol_select"
+                    )
+
+                with col2:
+                    # Get available strategies for the selected symbol
+                    symbol_strategies = year_data[year_data['Symbol'] == mae_symbol]['Strategy'].unique()
+                    mae_strategy = st.selectbox(
+                        "Select Strategy",
+                        options=sorted(symbol_strategies),
+                        key="mae_strategy_select"
+                    )
+
+                if mae_symbol and mae_strategy:
+                    # Filter data for selected symbol and strategy
+                    mae_data = year_data[
+                        (year_data['Symbol'] == mae_symbol) &
+                        (year_data['Strategy'] == mae_strategy)
+                        ].copy()
+
+                    if mae_data.empty:
+                        st.warning(f"No data found for {mae_symbol} with strategy {mae_strategy}")
+                    else:
+                        st.subheader(f"MAE vs PnL Analysis for {mae_symbol} - {mae_strategy}")
+
+                        # Basic statistics
+                        col1, col2, col3, col4 = st.columns(4)
+
+                        with col1:
+                            total_trades = len(mae_data)
+                            st.metric("Total Trades", total_trades)
+
+                        with col2:
+                            win_rate = (mae_data['Result'] == 'Win').sum() / total_trades * 100
+                            st.metric("Win Rate", f"{win_rate:.1f}%")
+
+                        with col3:
+                            avg_mae = mae_data['Maximum Adverse Excursion'].mean()
+                            st.metric("Avg MAE", f"{avg_mae:.4f}")
+
+                        with col4:
+                            avg_pnl = mae_data['PnL'].mean()
+                            st.metric("Avg PnL", f"${avg_pnl:.2f}")
+
+                        # MAE vs PnL Scatter Plot
+                        fig = px.scatter(
+                            mae_data,
+                            x='Maximum Adverse Excursion',
+                            y='PnL',
+                            color='Result',
+                            title=f'MAE vs PnL - {mae_symbol} ({mae_strategy})',
+                            hover_data=['Date', 'RR', 'Stop Loss Percentage'],
+                            color_discrete_map={'Win': 'green', 'Loss': 'red'}
+                        )
+                        fig.add_hline(y=0, line_dash="dash", line_color="black")
+                        fig.add_vline(x=0, line_dash="dash", line_color="black")
+                        st.plotly_chart(fig, use_container_width=True)
+
+                        # MAE Distribution by Result
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            fig = px.box(
+                                mae_data,
+                                x='Result',
+                                y='Maximum Adverse Excursion',
+                                title=f'MAE Distribution by Trade Result',
+                                color='Result',
+                                color_discrete_map={'Win': 'green', 'Loss': 'red'}
+                            )
+                            st.plotly_chart(fig, use_container_width=True)
+
+                        with col2:
+                            fig = px.histogram(
+                                mae_data,
+                                x='Maximum Adverse Excursion',
+                                color='Result',
+                                title='MAE Distribution Histogram',
+                                barmode='overlay',
+                                color_discrete_map={'Win': 'green', 'Loss': 'red'},
+                                opacity=0.7
+                            )
+                            st.plotly_chart(fig, use_container_width=True)
+
+                        # Stop Loss Optimization Analysis
+                        st.subheader("Stop Loss Optimization Analysis")
+
+                        # Calculate optimal stop loss based on MAE
+                        winning_trades = mae_data[mae_data['Result'] == 'Win']
+                        losing_trades = mae_data[mae_data['Result'] == 'Loss']
+
+                        if not winning_trades.empty and not losing_trades.empty:
+                            # Analyze MAE percentiles for optimization
+                            mae_percentiles = np.percentile(mae_data['Maximum Adverse Excursion'], [25, 50, 75, 90, 95])
+
+                            col1, col2, col3 = st.columns(3)
+
+                            with col1:
+                                st.metric("MAE 25th Percentile", f"{mae_percentiles[0]:.4f}")
+                                st.metric("MAE 50th Percentile", f"{mae_percentiles[1]:.4f}")
+
+                            with col2:
+                                st.metric("MAE 75th Percentile", f"{mae_percentiles[2]:.4f}")
+                                st.metric("MAE 90th Percentile", f"{mae_percentiles[3]:.4f}")
+
+                            with col3:
+                                st.metric("MAE 95th Percentile", f"{mae_percentiles[4]:.4f}")
+                                avg_winning_mae = winning_trades['Maximum Adverse Excursion'].mean()
+                                st.metric("Avg Winning Trade MAE", f"{avg_winning_mae:.4f}")
+
+                            # Current vs Suggested Stop Loss
+                            current_avg_sl = mae_data['Stop Loss Percentage'].mean()
+
+                            # Suggest optimal stop loss based on MAE analysis
+                            suggested_sl = mae_percentiles[2]  # 75th percentile
+
+                            col1, col2 = st.columns(2)
+
+                            with col1:
+                                st.metric("Current Avg Stop Loss", f"{current_avg_sl:.4f}")
+
+                            with col2:
+                                st.metric("Suggested Stop Loss (75th %ile)", f"{suggested_sl:.4f}")
+
+                            # What-if analysis with different stop loss levels
+                            st.subheader("Stop Loss Scenario Analysis")
+
+                            sl_levels = [mae_percentiles[1], mae_percentiles[2], mae_percentiles[3]]  # 50th, 75th, 90th percentiles
+                            scenario_results = []
+
+                            for sl_level in sl_levels:
+                                # Simulate what would happen with this stop loss
+                                hypothetical_wins = len(mae_data[
+                                                            (mae_data['Maximum Adverse Excursion'] > -sl_level) &
+                                                            (mae_data['PnL'] > 0)
+                                                            ])
+                                hypothetical_losses = len(mae_data[
+                                                              (mae_data['Maximum Adverse Excursion'] <= -sl_level) &
+                                                              (mae_data['PnL'] < 0)
+                                                              ])
+
+                                total_hypothetical = hypothetical_wins + hypothetical_losses
+                                win_rate_hypothetical = (hypothetical_wins / total_hypothetical * 100) if total_hypothetical > 0 else 0
+
+                                scenario_results.append({
+                                    'Stop_Loss_Level': sl_level,
+                                    'Hypothetical_Wins': hypothetical_wins,
+                                    'Hypothetical_Losses': hypothetical_losses,
+                                    'Hypothetical_Win_Rate': win_rate_hypothetical,
+                                    'Trades_Kept': total_hypothetical
+                                })
+
+                            scenario_df = pd.DataFrame(scenario_results)
+
+                            st.dataframe(
+                                scenario_df.style.format({
+                                    'Stop_Loss_Level': '{:.4f}',
+                                    'Hypothetical_Win_Rate': '{:.1f}%'
+                                }),
+                                use_container_width=True
+                            )
+
+                            # Comparison of actual vs hypothetical performance
+                            st.subheader("Performance Comparison")
+
+                            comparison_data = {
+                                'Metric': ['Win Rate', 'Total Trades', 'Avg PnL per Trade'],
+                                'Actual': [
+                                    win_rate,
+                                    total_trades,
+                                    avg_pnl
+                                ],
+                                'With_Suggested_SL': [
+                                    scenario_results[1]['Hypothetical_Win_Rate'],  # 75th percentile
+                                    scenario_results[1]['Trades_Kept'],
+                                    mae_data['PnL'].mean()  # This would need more sophisticated calculation
+                                ]
+                            }
+
+                            comparison_df = pd.DataFrame(comparison_data)
+                            st.dataframe(comparison_df.style.format({
+                                'Actual': '{:.2f}',
+                                'With_Suggested_SL': '{:.2f}'
+                            }), use_container_width=True)
+
+                        # Detailed MAE Analysis Table
+                        st.subheader("Detailed MAE Analysis by Trade")
+
+                        detailed_mae = mae_data[[
+                            'Date', 'Direction', 'PnL', 'Result', 'RR',
+                            'Maximum Adverse Excursion', 'Stop Loss Percentage'
+                        ]].copy()
+
+                        detailed_mae = detailed_mae.sort_values('Maximum Adverse Excursion', ascending=False)
+
+                        st.dataframe(
+                            detailed_mae.style.format({
+                                'PnL': '${:.2f}',
+                                'RR': '{:.2f}',
+                                'Maximum Adverse Excursion': '{:.4f}',
+                                'Stop Loss Percentage': '{:.4f}'
+                            }).apply(lambda x: ['background-color: lightgreen' if x['Result'] == 'Win' else
+                                                'background-color: lightcoral' for _ in x], axis=1),
+                            use_container_width=True,
+                            height=400
+                        )
+
+                        # Download MAE analysis data
+                        csv = detailed_mae.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="Download MAE Analysis Data",
+                            data=csv,
+                            file_name=f'mae_analysis_{mae_symbol}_{mae_strategy}_{selected_year}.csv',
+                            mime='text/csv',
+                        )
 
     else:
         st.warning("Please upload data first to analyze symbol statistics")

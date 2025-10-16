@@ -3448,7 +3448,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 winning_trade_mae = avg_winning_mae
 
             def getPairEntrySL(pair):
-                if (mae_based_stop_loss is not None and winning_trade_mae is not None):
+                if (suggested_sl is not None and avg_winning_mae is not None):
                     if (pair == "GBPUSD"):
                         return str((12-winning_trade_mae)+round(mae_based_stop_loss/2,0)), str(round(mae_based_stop_loss,0))
                     elif (pair == "EURUSD"):

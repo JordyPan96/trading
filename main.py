@@ -4286,7 +4286,8 @@ elif st.session_state.current_page == "Active Opps":
             if df is not None and not df.empty:
                 if 'timestamp' in df.columns:
                     df['timestamp'] = df['timestamp'].astype(str)
-                numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size']
+                numeric_columns = ['entry_price', 'exit_price', 'target_price', 'stop_pips', 'position_size',
+                                   'stop_loss_pct', 'max_adverse_excursion']  # ADDED NEW FIELDS
                 for col in numeric_columns:
                     if col in df.columns:
                         df[col] = df[col].replace('None', None)
@@ -4307,7 +4308,8 @@ elif st.session_state.current_page == "Active Opps":
                 data_to_save = data.copy()
 
             required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
-                                'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+                                'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
+                                'stop_loss_pct', 'max_adverse_excursion']  # ADDED NEW FIELDS
             for col in required_columns:
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
@@ -4624,7 +4626,8 @@ elif st.session_state.current_page == "Active Opps":
 
                 # Validate required columns
                 required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
-                                    'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+                                    'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
+                                    'stop_loss_pct', 'max_adverse_excursion']  # ADDED NEW FIELDS
 
                 missing_columns = [col for col in required_columns if col not in workflow_csv_data.columns]
 
@@ -4634,7 +4637,8 @@ elif st.session_state.current_page == "Active Opps":
                         "Expected columns: selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
                 else:
                     # Clean the data - handle None values and convert numeric columns
-                    for col in ['position_size', 'stop_pips', 'entry_price', 'exit_price', 'target_price']:
+                    for col in ['position_size', 'stop_pips', 'entry_price', 'exit_price', 'target_price',
+                                'stop_loss_pct', 'max_adverse_excursion']:  # ADDED NEW FIELDS
                         if col in workflow_csv_data.columns:
                             workflow_csv_data[col] = workflow_csv_data[col].replace('None', None)
                             workflow_csv_data[col] = pd.to_numeric(workflow_csv_data[col], errors='coerce').fillna(0.0)
@@ -4699,8 +4703,7 @@ elif st.session_state.current_page == "Active Opps":
             except Exception as e:
                 st.error(f"Error reading workflow CSV: {e}")
                 st.info("Make sure your CSV has the correct format with these columns:")
-                st.code(
-                    "selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp")
+                st.code("selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp, stop_loss_pct, max_adverse_excursion")
 
     # Count records by status
     speculation_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Speculation')
@@ -4746,7 +4749,8 @@ elif st.session_state.current_page == "Active Opps":
         if st.session_state.saved_records:
             csv_data = pd.DataFrame(st.session_state.saved_records)
             column_order = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
-                            'entry_price', 'exit_price', 'target_price', 'status', 'timestamp']
+                            'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
+                            'stop_loss_pct', 'max_adverse_excursion']  # ADDED NEW FIELDS
             for col in column_order:
                 if col not in csv_data.columns:
                     csv_data[col] = None
@@ -5042,9 +5046,31 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"pnl_{unique_key_base}"
                             )
 
-                        # Additional required fields
+                        # NEW: Add the two additional numeric fields
                         col9, col10 = st.columns(2)
                         with col9:
+                            stop_loss_pct = st.number_input(
+                                "Stop Loss Percentage",
+                                value=0.0,
+                                step=0.01,
+                                format="%.2f",
+                                key=f"stop_loss_pct_{unique_key_base}",
+                                help="Stop loss as percentage (e.g., 1.5 for 1.5%)"
+                            )
+
+                        with col10:
+                            max_adverse_excursion = st.number_input(
+                                "Maximum Adverse Excursion",
+                                value=0.0,
+                                step=0.01,
+                                format="%.2f",
+                                key=f"max_adverse_excursion_{unique_key_base}",
+                                help="Maximum adverse excursion as percentage"
+                            )
+
+                        # Additional required fields
+                        col11, col12 = st.columns(2)
+                        with col11:
                             poi_options = ["Weekly", "2_Daily"]
 
                             # Get existing POI value from record and map to dropdown options
@@ -5068,7 +5094,7 @@ elif st.session_state.current_page == "Active Opps":
                             # Store the value for the record
                             new_poi = poi_display
 
-                        with col10:
+                        with col12:
                             st.text_input(
                                 "Strategy",
                                 value=record['risk_multiplier'],
@@ -5100,6 +5126,9 @@ elif st.session_state.current_page == "Active Opps":
                                 st.session_state.saved_records[record_index]['rr'] = new_rr
                                 st.session_state.saved_records[record_index]['pnl'] = new_pnl
                                 st.session_state.saved_records[record_index]['poi'] = new_poi
+                                st.session_state.saved_records[record_index]['stop_loss_pct'] = stop_loss_pct  # NEW
+                                st.session_state.saved_records[record_index][
+                                    'max_adverse_excursion'] = max_adverse_excursion  # NEW
 
                                 success = save_workflow_to_sheets(st.session_state.saved_records)
                                 if success:
@@ -5134,6 +5163,8 @@ elif st.session_state.current_page == "Active Opps":
                                             'Result': new_result,
                                             'RR': new_rr,
                                             'PnL': new_pnl,
+                                            'Stop Loss Percentage': stop_loss_pct,  # NEW FIELD
+                                            'Maximum Adverse Excursion': max_adverse_excursion,  # NEW FIELD
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0
                                         }
@@ -5147,7 +5178,8 @@ elif st.session_state.current_page == "Active Opps":
                                                 # Ensure only the specified columns exist in current data
                                                 required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
                                                                     'POI', 'Strategy', 'Variance', 'Result', 'RR',
-                                                                    'PnL',
+                                                                    'PnL', 'Stop Loss Percentage',
+                                                                    'Maximum Adverse Excursion',  # ADDED NEW COLUMNS
                                                                     'Withdrawal_Deposit', 'PROP_Pct']
 
                                                 # Add missing columns if they don't exist

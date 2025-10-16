@@ -35,7 +35,7 @@ st.set_page_config(
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
 
-def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=0):
+def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=1):
     """
     Calculate MAE recommendations dynamically from Google Sheets data
     Fetches last 20 records for the specific symbol+strategy combination
@@ -3524,7 +3524,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (pair == "AUDUSD"):
                         return "12 ", "22"
                     elif (pair == "XAUUSD"):
-                        return "12", str(suggested_sl)
+                        return "12", "30"
                     elif (pair == "USDJPY"):
                         return "12", "18"
                     elif (pair == "USDCAD"):

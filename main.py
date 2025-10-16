@@ -3506,14 +3506,13 @@ elif st.session_state.current_page == "Risk Calculation":
                 position_size_propfirm = 0
 
 
+            @st.cache_data(ttl=3600)  # Cache for 1 hour
+            def calculate_mae_recommendations_cached(selected_pair, risk_multiplier):
+                return calculate_mae_recommendations(selected_pair, risk_multiplier)
 
-            suggested_sl, avg_winning_mae = calculate_mae_recommendations(selected_pair, risk_multiplier)
 
-            # Store in variables for later use
-            if suggested_sl is not None:
-                # Use the values in your risk calculations
-                mae_based_stop_loss = suggested_sl
-                winning_trade_mae = avg_winning_mae
+            # Your optimized call
+            suggested_sl, avg_winning_mae = calculate_mae_recommendations_cached(selected_pair, risk_multiplier)
 
             def getPairEntrySL(pair):
                 if (suggested_sl is None or avg_winning_mae is None):
@@ -3534,17 +3533,17 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 else:
                     if (pair == "GBPUSD"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     elif (pair == "EURUSD"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     elif (pair == "AUDUSD"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     elif (pair == "XAUUSD"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     elif (pair == "USDJPY"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     elif (pair == "USDCAD"):
-                        return str(round(round(12-winning_trade_mae,0)+round(mae_based_stop_loss/2,0),2)), str(round(mae_based_stop_loss,0))
+                        return str(round(round(12-avg_winning_mae,0)+round(suggested_sl/2,0),2)), str(round(suggested_sl,0))
                     else:
                         return "12", "30"
 

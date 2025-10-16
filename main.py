@@ -3508,7 +3508,7 @@ elif st.session_state.current_page == "Risk Calculation":
             mae_cache_key = f"mae_{selected_pair}_{risk_multiplier}"
 
             if mae_cache_key not in st.session_state:
-                with st.spinner(f"Calculating MAE for {selected_pair}..."):
+                with st.spinner(f"Loading Calc for {selected_pair}..."):
                     st.session_state[mae_cache_key] = calculate_mae_recommendations(selected_pair, risk_multiplier)
 
             suggested_sl, avg_winning_mae = st.session_state[mae_cache_key]

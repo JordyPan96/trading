@@ -3563,7 +3563,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (risk_multiplier == "1_BNR_TPF"):
                 if (within_61 == "Yes"):
                     if (selected_pair == "XAUUSD"):
-                        entry_title = "Entry Guide (Within 64% Optional):" + mae_based_stop_loss
+                        entry_title = "Entry Guide (Within 64% Optional):" + str(mae_based_stop_loss)
                         entry_text = "From ON TPF fib to max " + entry_pip + "% Distance"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"

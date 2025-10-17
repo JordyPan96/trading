@@ -3844,70 +3844,70 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                            entry_text = "From ON 559 or 618 (to 5% before), 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                         elif(risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                            entry_text = "From ON 559 or 618 (to 5% before), 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length):"
-                            entry_text = "From ON 559 to 618, 33% Max"
-                            SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                            SL_text = "Middle of FL and NF (62% Max)"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                     elif (Variances == "66 - 805"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                            entry_text = "From ON 702 (to 5% before), 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                            entry_text = "From ON 702 (to 5% before), 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length):"
-                            entry_text = "From ON 702 (to 5% before), 33% Max"
-                            SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                            SL_text = "Middle of FL and NF (62% Max)"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare better price position from SL Title"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                            SL_text = "Middle of FL and NF (62% Max)"
+                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                            SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3933,48 +3933,48 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                                entry_text = "From ON 559 to 618, 33% Max"
-                                SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare better price position from SL Title"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length):"
-                                entry_text = "From ON 559 or 618 (to 2 $ before), 33% Max"
-                                SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                                SL_text = "Middle of FL and NF (62% Max)"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
                         elif (Variances == "66 - 805"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
-                                entry_text = "From ON 702 (to 2 $ before), 33% Max"
-                                SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare better price position from SL Title"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length):"
-                                entry_text = "From ON 702 (to 2 $ before), 33% Max"
-                                SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                                SL_text = "Middle of FL and NF (62% Max)"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
+                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                                 entry_text = "ON 50, 33% Max"
-                                SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare better price position from SL Title"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                                 entry_text = "ON 50, 33% Max"
-                                SL_title = "SL Guide: Measure From Top of First Leg to Next Fib"
-                                SL_text = "Middle of FL and NF (62% Max)"
+                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
+                                SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 

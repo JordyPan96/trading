@@ -3891,21 +3891,21 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
+                            entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
+                            entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
+                            entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and NF"
                             exit_title = "Target Guide One (RR):"
@@ -3965,14 +3965,14 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                                entry_text = "ON 50, 33% Max"
+                                entry_text = "ON 50, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                                 SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                                entry_text = "ON 50, 33% Max"
+                                entry_text = "ON 50, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                                 SL_text = "Middle of Head and NF"
                                 exit_title = "Target Guide One (RR):"
@@ -3987,11 +3987,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
                                    unsafe_allow_html=True)
                 if (get_global('entry_model') != None):
-                    container.metric("--Note that all Entry must not exceed 33%",
+                    container.metric("--Note that all Entry must not exceed 49%",
                                      "Entry: " + get_global('entry_model') + " ")
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
-                    container.metric("--Note that all Entry must not exceed 33%",
+                    container.metric("--Note that all Entry must not exceed 49%",
                                      "Min Length for " + selected_pair + " is " + base_percent + "%")
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):

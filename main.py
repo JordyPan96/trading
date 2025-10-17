@@ -3847,7 +3847,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                             entry_text = "From ON 559 or 618 (to 5% before), 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3855,7 +3855,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                             entry_text = "From ON 559 or 618 (to 5% before), 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -3871,14 +3871,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                             entry_text = "From ON 702 (to 5% before), 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                             entry_text = "From ON 702 (to 5% before), 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -3893,14 +3893,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 33% Max"
                             SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                            SL_text = "Compare which one is higher from SL Title"
+                            SL_text = "Compare better price position from SL Title"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -3936,7 +3936,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                                 entry_text = "From ON 559 to 618, 33% Max"
                                 SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare which one is higher from SL Title"
+                                SL_text = "Compare better price position from SL Title"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
@@ -3952,7 +3952,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): If left shoulder is before Fib then can go before fib"
                                 entry_text = "From ON 702 (to 2 $ before), 33% Max"
                                 SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare which one is higher from SL Title"
+                                SL_text = "Compare better price position from SL Title"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
@@ -3967,7 +3967,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                                 entry_text = "ON 50, 33% Max"
                                 SL_title = "SL Guide: Top of First Leg to Next Fib (62% Max) / 10% above below LS"
-                                SL_text = "Compare which one is higher from SL Title"
+                                SL_text = "Compare better price position from SL Title"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:

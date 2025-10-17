@@ -7587,6 +7587,7 @@ elif st.session_state.current_page == "Guidelines":
     st.title("Guidelines to Follow")
 
     st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of 559 zone)")
+    st.subheader("2_BNR and 2_BNR_TPF")
 
     table_data = {
         '': ['2_BNR', '2_BNR_TPF'],
@@ -7594,8 +7595,21 @@ elif st.session_state.current_page == "Guidelines":
         'XAUUSD 66 - 786': ['1.19%', '1.19%'],
         'GBPUSD/EURUSD 50 - 66': ['1.49%', '0.99%'],
         'GBPUSD/EURUSD 66 - 786': ['0.99%', '0.99%'],
-        'OTHER 50 - 66': ['0.99%', '0.5%'],
-        'OTHER 66 - 786': ['0.99%', '0.5%']
+        'OTHER 50 - 66': ['0.99%', '0.99%'],
+        'OTHER 66 - 786': ['0.99%', '0.99%']
+    }
+
+    st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of Shoulder next fib zone)")
+    st.subheader("2_BNR_TPF")
+
+    table_data = {
+        '': ['2_BNR_TPF'],
+        'XAUUSD 50 - 66': ['2.4%'],
+        'XAUUSD 66 - 786': ['2.4%'],
+        'GBPUSD/EURUSD 50 - 66': ['2%'],
+        'GBPUSD/EURUSD 66 - 786': ['2%'],
+        'OTHER 50 - 66': ['2%'],
+        'OTHER 66 - 786': ['2%']
     }
 
     st.table(table_data)

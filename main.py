@@ -3847,7 +3847,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3855,14 +3855,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3871,21 +3871,21 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
@@ -3893,21 +3893,21 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                             entry_text = "ON 50, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and NF"
+                            SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3936,14 +3936,14 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -3952,14 +3952,14 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
@@ -3967,14 +3967,14 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                                 entry_text = "ON 50, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
                                 entry_text = "ON 50, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and NF"
+                                SL_text = "Middle of Head and Next SL Fib"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 

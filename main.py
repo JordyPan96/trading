@@ -7599,10 +7599,12 @@ elif st.session_state.current_page == "Guidelines":
         'OTHER 66 - 786': ['0.99%', '0.99%']
     }
 
+    st.table(table_data)
+
     st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of Shoulder next fib zone)")
     st.subheader("2_BNR_TPF")
 
-    table_data = {
+    table_data2 = {
         '': ['2_BNR_TPF'],
         'XAUUSD 50 - 66': ['2.4%'],
         'XAUUSD 66 - 786': ['2.4%'],
@@ -7612,7 +7614,7 @@ elif st.session_state.current_page == "Guidelines":
         'OTHER 66 - 786': ['2%']
     }
 
-    st.table(table_data)
+    st.table(table_data2)
 
     st.subheader("BE Rules")
     table_data2 = {

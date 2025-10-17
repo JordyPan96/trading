@@ -3844,7 +3844,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and Next SL Fib"
@@ -3852,7 +3852,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
 
                         elif(risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and Next SL Fib"
@@ -3868,14 +3868,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "66 - 805"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and Next SL Fib"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                             entry_text = "ON Next Entry Fib in Blue, 49% Max"
                             SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                             SL_text = "Middle of Head and Next SL Fib"
@@ -3933,7 +3933,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                                 SL_text = "Middle of Head and Next SL Fib"
@@ -3949,7 +3949,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         elif (Variances == "66 - 805"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder is above Entry Fib"
+                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
                                 entry_text = "ON Next Entry Fib in Blue, 49% Max"
                                 SL_title = "SL Guide: From Head to Next SL Fib in Orange"
                                 SL_text = "Middle of Head and Next SL Fib"

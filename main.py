@@ -7278,7 +7278,7 @@ elif st.session_state.current_page == "Trade Signal":
                             # Display current SL (which may change) but fixed BE and First Trail prices
                             st.write(f"**Stop Loss:** {current_sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
-                            st.write(f"**BE Price (2.5R):** {be_price:.5f}")
+                            st.write(f"**BE Price:** {be_price:.5f}")
                             st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
                         # MODIFY SL ONLY SECTION

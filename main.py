@@ -7614,9 +7614,9 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data2 = {
         '': ['2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['3.6%'],
+        'XAUUSD 50 - 66': ['2.4%'],
         'XAUUSD 66 - 786': ['2.4%'],
-        'GBPUSD/EURUSD 50 - 66': ['3%'],
+        'GBPUSD/EURUSD 50 - 66': ['2%'],
         'GBPUSD/EURUSD 66 - 786': ['2%'],
         'OTHER 50 - 66': ['2%'],
         'OTHER 66 - 786': ['2%']

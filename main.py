@@ -7584,6 +7584,14 @@ elif st.session_state.current_page == "Stats":
 
 
 elif st.session_state.current_page == "Guidelines":
+    st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 1rem; /* Reduce top padding */
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
     st.title("Guidelines to Follow")
 
     st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of 559 zone)")

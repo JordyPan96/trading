@@ -1706,13 +1706,13 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Target_Pct': '{:.2f}%',
                         'Remain_$': '${:,.2f}',
                         'Target_$': '${:,.2f}'  # Add formatting for the new Target $ column
-                    }).apply(lambda x: ['background-color: lightblue' if x['Symbol'] == 'PROP' else
-                                        'background-color: lightcoral' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
-                                        'background-color: lightred' if x['Total_PnL'] < 0 else
-                                        'background-color: lightblue' if x['Total_PnL'] > 0 else
-                                        'background-color: lightgreen' if x['Target'] == 'Completed' else
-                                        'background-color: ' if x['Target'] == 'In Progress' else
-                                        'background-color: lightgray' if x['Symbol'] == 'SUMMARY' else
+                    }).apply(lambda x: ['background-color: deepskyblue' if x['Symbol'] == 'PROP' else
+                                        'background-color: crimson' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
+                                        'background-color: red' if x['Total_PnL'] < 0 else
+                                        'background-color: limegreen' if x['Total_PnL'] > 0 else
+                                        'background-color: mediumseagreen' if x['Target'] == 'Completed' else
+                                        'background-color: darkorange' if x['Target'] == 'In Progress' else
+                                        'background-color: gray' if x['Symbol'] == 'SUMMARY' else
                                         '' for _ in x], axis=1),
                     use_container_width=True,
                     height=400

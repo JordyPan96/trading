@@ -3819,7 +3819,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    if (selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                    if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
+                        if(trend_position == "9%-10.99%" and within_61 == "Yes"):
+                            targeting = get_open_target(selected_pair)
+                        else:
+                            targeting = 5.41
+                    elif (selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
                         if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                             if (big_risk_multiplier > 1):
                                 total_target = get_sum_target()

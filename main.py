@@ -3937,8 +3937,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
 
                     if (selected_pair == "XAUUSD"):
-                        if (
-                                trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
+                        if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
                             if (trend_position == "9%-10.99%" and within_61 == "Yes"):
                                 targeting = get_open_target(selected_pair)
                             elif (trend_position == "11%-12.99%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
@@ -3947,7 +3946,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 targeting = get_open_target(selected_pair)
                             else:
                                 targeting = 5.41
-                        if (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
+                        elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
                             if (big_risk_multiplier > 1):
                                 total_target = get_sum_target()
                                 compare_target = get_open_target(selected_pair) * 1.725

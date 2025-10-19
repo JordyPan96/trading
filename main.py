@@ -2923,8 +2923,8 @@ elif st.session_state.current_page == "Risk Calculation":
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         within_61 = ["No", "Yes"]
         incompatible_map_4 = {
-            "2_BNR": ["No"],
-            "2_BNR_TPF": ["No"],
+            "2_BNR": [],
+            "2_BNR_TPF": [],
             "3_BNR_TPF": []
         }
         incompatible_map_2 = {

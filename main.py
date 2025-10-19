@@ -4040,11 +4040,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
-                    container.markdown("<br><br>", unsafe_allow_html=True)
+                    container.markdown("<br>", unsafe_allow_html=True)
                     # container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))
                     container.metric("Risk amount exceeded your monthly limit", "$0 (0.0% of Account)")
                 else:
-                    container.markdown("<br><br>", unsafe_allow_html=True)
+                    container.markdown("<br>", unsafe_allow_html=True)
                     container.metric("Your Next risk risk should be:", f"${final_risk} ({Risk_percentage}% of Account)")
                     set_global("final_risk", Risk_percentage)
                     if (position_size > 0):

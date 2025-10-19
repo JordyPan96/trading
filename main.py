@@ -4021,8 +4021,12 @@ elif st.session_state.current_page == "Risk Calculation":
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
                                    unsafe_allow_html=True)
                 if (get_global('entry_model') != None):
-                    container.metric("--Entry must not exceed 33%, Enter Middle of Zone if TPF last 25th Percentile",
-                                     "Entry: " + get_global('entry_model') + " ")
+                    container.markdown(f"""
+                            <div style="color:deepskyblue; font-weight:600;">
+                                --Entry must not exceed 33%, Enter Middle of Zone if TPF last 25th Percentile<br>
+                                Entry: {get_global('entry_model')}
+                            </div>
+                            """, unsafe_allow_html=True)
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.metric("--Entry must not exceed 33%, Enter Middle of Zone if TPF last 25th Percentile",

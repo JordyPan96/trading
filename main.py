@@ -3612,7 +3612,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (pair == "XAUUSD"):
                     return str(30)
                 elif (pair == "USDJPY"):
-                    return str(18)
+                    return str(33)
                 elif (pair == "USDCAD"):
                     return str(18)
                 else:
@@ -3717,7 +3717,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 24%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
@@ -3725,7 +3725,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: 24%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 20)
                     else:
@@ -3764,7 +3764,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 24%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:

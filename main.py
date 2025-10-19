@@ -3602,6 +3602,22 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (open_target > desire_target):
                     return str(desire_target)
 
+            def get_pair_volatile(pair):
+                if (pair == "GBPUSD"):
+                    return str(18)
+                elif (pair == "EURUSD"):
+                    return str(18)
+                elif (pair == "AUDUSD"):
+                    return str(22)
+                elif (pair == "XAUUSD"):
+                    return str(30)
+                elif (pair == "USDJPY"):
+                    return str(18)
+                elif (pair == "USDCAD"):
+                    return str(18)
+                else:
+                    return "30"
+
 
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
@@ -3676,7 +3692,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "> 805"):
-                            entry_title = "Entry Guide: Zone at 886-91 %"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: 30%, Entry zone +6%, 33%"
@@ -3691,7 +3707,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
                         if (Variances == "> 805"):
-                            entry_title = "Entry Guide: Zone at 886-91 %"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: 22%, Entry zone +6%, 33%"
@@ -3706,7 +3722,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
                         if (Variances == "> 805"):
-                            entry_title = "Entry Guide: Zone at 886-91 %"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: 33%, Entry zone +6%, 33%"
@@ -3721,7 +3737,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "> 805"):
-                            entry_title = "Entry Guide: Zone at 886-91 %"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: 18%, Entry zone +6%, 33%"
@@ -3794,26 +3810,26 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 if (selected_pair in minor_yens):
                     if (Variances == "> 805"):
-                        entry_title = "Entry Guide (SL__Entry Length):"
-                        entry_text = "33% from 91 Fib"
-                        SL_title = "SL Guide: Head Fib must be within 31% of wick"
-                        SL_text = "ON 91 Fib"
+                        entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                        entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                        SL_title = "SL Guide:"
+                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "6.41"
 
                     elif (Variances == "559 - 66"):
-                        entry_title = "Entry Guide (SL__Entry Length):"
-                        entry_text = "33% from HEAD(1) Fib"
-                        SL_title = "SL Guide: Head Fib must be within 31% of wick"
-                        SL_text = "On HEAD Fib"
+                        entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                        entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                        SL_title = "SL Guide:"
+                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
                     elif (Variances == "66 - 805"):
-                        entry_title = "Entry Guide (SL__Entry Length):"
-                        entry_text = "33% from HEAD(1) Fib"
-                        SL_title = "SL Guide: Head Fib must be within 31% of wick"
-                        SL_text = "On HEAD Fib"
+                        entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                        entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                        SL_title = "SL Guide:"
+                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
@@ -3821,6 +3837,10 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
                         if(trend_position == "9%-10.99%" and within_61 == "Yes"):
+                            targeting = get_open_target(selected_pair)
+                        elif (trend_position == "11%-12.99%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
+                            targeting = get_open_target(selected_pair)
+                        elif (trend_position == ">=13%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
                         else:
                             targeting = 5.41
@@ -3840,79 +3860,79 @@ elif st.session_state.current_page == "Risk Calculation":
                     else:
                         targeting = get_open_target(selected_pair)
                     if (Variances == "> 805"):
-                        entry_title = "Entry Guide (SL__Entry Length):"
-                        entry_text = "33% from 91 Fib"
+                        entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                        entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                         SL_title = "SL Guide:"
-                        SL_text = "ON 91 Fib"
+                        SL_text = "Middle of: "+get_pair_volatile(selected_pair)+", Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair)+", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                         elif(risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair)+", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                            entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair)+", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                     elif (Variances == "66 - 805"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
-                            entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                            entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                            SL_title = "SL Guide:"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
-                            entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
-                            entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                            entry_text = "ON 50, 33% Max"
-                            SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                            SL_text = "Middle of Head and Next SL Fib"
+                            entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                            entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -3930,56 +3950,56 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             targeting = get_open_target(selected_pair)
                         if (Variances == "> 805"):
-                            entry_title = "Entry Guide (SL__Entry Length):"
-                            entry_text = "33% from 91 Fib"
+                            entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                            entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
                             SL_title = "SL Guide:"
-                            SL_text = "ON 91 Fib"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                                entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                                SL_title = "SL Guide:"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
-                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                                entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                                SL_title = "SL Guide:"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
                         elif (Variances == "66 - 805"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%, Only valid if Left shoulder above Entry"
-                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                                entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                                SL_title = "SL Guide:"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length): For Above Blue Entry Fib the Max is 33%"
-                                entry_text = "ON Next Entry Fib in Blue, 49% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                                entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                                SL_title = "SL Guide:"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
-                                entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                                entry_text = "ON 50, 33% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
+                                entry_text = "TOP or MIDDLE of TPF Zone based on TPF Position"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
-                                entry_title = "Entry Guide (SL__Entry Length): WARNING CAN ONLY ENTER WHEN 618 IS TAPPED"
-                                entry_text = "ON 50, 33% Max"
-                                SL_title = "SL Guide: From Head to Next SL Fib in Orange"
-                                SL_text = "Middle of Head and Next SL Fib"
+                                entry_title = "Entry Guide: One Zone below the First Leg Zone"
+                                entry_text = "TOP or MIDDLE of Zone, or adjust by SL"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair) + ", Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 

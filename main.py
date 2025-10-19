@@ -1708,7 +1708,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Target_$': '${:,.2f}'  # Add formatting for the new Target $ column
                     }).apply(lambda x: ['background-color: lightblue' if x['Symbol'] == 'PROP' else
                                         'background-color: lightcoral' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
-                                        'background-color: lightpink' if x['Total_PnL'] < 0 else
+                                        'background-color: pink' if x['Total_PnL'] < 0 else
                                         'background-color: lightblue' if x['Total_PnL'] > 0 else
                                         'background-color: lightgreen' if x['Target'] == 'Completed' else
                                         'background-color: ' if x['Target'] == 'In Progress' else

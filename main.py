@@ -4026,6 +4026,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --Entry must not exceed 33%<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
                                 --Only Draw Double Zone if <= 27% Combined<br>
+                                --SL MUST at least cover end of zone<br>
                                 --Entry: {get_global('entry_model')}<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -4036,6 +4037,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --Entry must not exceed 33%<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
                                 --Only Draw Double Zone if <= 27% Combined<br>
+                                --SL MUST at least cover end of zone<br>
                                 --Min Length for {selected_pair} is {base_percent}%<br>
                             </div>
                             """, unsafe_allow_html=True)

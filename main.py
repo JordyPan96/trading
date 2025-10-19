@@ -3444,14 +3444,14 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (Variances == "559 - 66"):
                         trend_position_multiplier = 0.81
                     else:
-                        trend_position_multiplier = 0.91
+                        trend_position_multiplier = 0.95
                 else:
-                    trend_position_multiplier = 1.0
+                    trend_position_multiplier = 0.95
             else:
                 if (risk_multiplier == "1_BNR" or risk_multiplier == "1_BNR_TPF"):
                     trend_position_multiplier = 0.81
                 else:
-                    trend_position_multiplier = 0.91
+                    trend_position_multiplier = 0.9
 
             if (Variances == "50"):
                 variance_multiplier = 0.91
@@ -4012,11 +4012,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
                                    unsafe_allow_html=True)
                 if (get_global('entry_model') != None):
-                    container.metric("--Note that all Entry must not exceed 49%",
+                    container.metric("--Note that all Entry must not exceed 33%",
                                      "Entry: " + get_global('entry_model') + " ")
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
-                    container.metric("--Note that all Entry must not exceed 49%",
+                    container.metric("--Note that all Entry must not exceed 33%",
                                      "Min Length for " + selected_pair + " is " + base_percent + "%")
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):

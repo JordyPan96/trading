@@ -2359,33 +2359,32 @@ elif st.session_state.current_page == "Symbol Stats":
 
 elif st.session_state.current_page == "Risk Calculation":
 
-    # Remove all top padding
-    st.markdown(
-        """
-        <style>
-            .block-container {
-                padding-top: 1.5rem;
-                padding-bottom: 0rem;
-                padding-left: 5rem;
-                padding-right: 0rem;
-            }
-            .stApp {
-                margin-top: 15px;  # Adjust this negative value as needed
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
     st.markdown("""
     <style>
+        /* Desktop styles (default) */
+        .block-container {
+            padding-top: 1.5rem;
+            padding-bottom: 0rem;
+            padding-left: 5rem;
+            padding-right: 0rem;
+        }
+        .stApp {
+            margin-top: 15px;
+        }
+
+        /* Mobile styles - will override desktop styles on small screens */
         @media (max-width: 430px) {
-            .main .block-container {
+            .block-container {
                 max-width: 400px !important;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
+                padding-top: 1rem !important;
                 margin-left: auto !important;
                 margin-right: auto !important;
+            }
+
+            .stApp {
+                margin-top: 10px !important;
             }
 
             /* Force centered layout on mobile */
@@ -2394,7 +2393,7 @@ elif st.session_state.current_page == "Risk Calculation":
             }
 
             section.main .block-container {
-                padding: 2rem 1rem !important;
+                padding: 1rem 1rem !important;
             }
         }
     </style>

@@ -4190,25 +4190,26 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Entry must not exceed 33%<br>
+                                --Zone is Defined as Blue Fib to Orange Fib<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
+                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --SL MUST at least cover end of zone<br>
-                                --Entry: {get_global('entry_model')}<br>
                             </div>
                             """, unsafe_allow_html=True)
+                    #--Entry: {get_global('entry_model')}<br>
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Entry must not exceed 33%<br>
+                                --Zone is Defined as Blue Fib to Orange Fib<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
+                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --SL MUST at least cover end of zone<br>
-                                --Min Length for {selected_pair} is {base_percent}%<br>
                             </div>
                             """, unsafe_allow_html=True)
-
+                    #--Min Length for {selected_pair} is {base_percent}%<br>
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
                     container.markdown("<br>", unsafe_allow_html=True)

@@ -2538,7 +2538,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def get_sum_target_remain():
-            sum_target = round(sum_gap / final_risk, 2)
+            sum_target = round(sum_gap,0)
             if (sum_target > 0):
                 return 1.0
             else:

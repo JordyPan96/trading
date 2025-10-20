@@ -2537,6 +2537,13 @@ elif st.session_state.current_page == "Risk Calculation":
         year_data = df[df['Year'] == datetime.now().year]
 
 
+        def get_sum_target_remain():
+            sum_target = round(sum_gap / final_risk, 2)
+            if (sum_target > 0):
+                return 1.0
+            else:
+                return 0.4
+
         def calculate_monthly_stats_2(year_data):
 
             monthly_actual_loss = 0
@@ -3501,7 +3508,7 @@ elif st.session_state.current_page == "Risk Calculation":
             sect_count_multiplier = 1.0
             trend_position_multiplier = 1.0
             cross_fib_multiplier = 1.0
-
+            sum_target_multiplier = 1.0
             big_risk_multiplier = 1.0
             for strategy, metrics in strategy_stats.items():
                 # st.write(strategy)
@@ -3517,6 +3524,8 @@ elif st.session_state.current_page == "Risk Calculation":
                     break
 
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
+            sum_target_multiplier = get_sum_target_remain()
+
             if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
             elif (POI == 'Two_Daily Structure'):
@@ -3612,8 +3621,7 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
-            final_risk_1 = (
-                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier
+            final_risk_1 = (yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05

@@ -210,8 +210,8 @@ def clean_data_for_google_sheets(df):
         df_clean['Variance'] = df_clean['Variance'].astype(str)
         variance_mapping = {
             '50.0': '50',
-            '559.0': '559-66',
-            '66.0': '66-786',
+            '559.0': '559 - 66',
+            '66.0': '66 - 786',
             '786.0': '786-91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
@@ -291,12 +291,12 @@ def clean_data_for_calculations(df):
         # Map any legacy numeric values to their string equivalents
         variance_mapping = {
             '50.0': '50',
-            '559.0': '559-66',
-            '66.0': '66-786',
-            '786.0': '786-91',
+            '559.0': '559 - 66',
+            '66.0': '66 - 786',
+            '786.0': '786 - 91',
             '50': '50',
             '559': '559-66',
-            '66': '66-786',
+            '66': '66 - 786',
             '786': '786-91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
@@ -1188,7 +1188,7 @@ if st.session_state.current_page == "Home":
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
-                variance_display = ["50", "559-66", "66-786", "786-91"]
+                variance_display = ["50", "559 - 66", "66 - 786", "786 - 91"]
                 new_variance = st.selectbox("Variance", options=variance_display, key="new_variance")
                 # Store as string directly (no numeric conversion)
                 new_variance_str = new_variance

@@ -26,11 +26,11 @@ import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
-# Configure page for both mobile and desktop
+# Configure page
 st.set_page_config(
     page_title="JP Empire",
-    layout="wide",  # Keep wide for desktop, we'll handle mobile with CSS
-    initial_sidebar_state="expanded",  # Let CSS handle mobile sidebar
+    layout="centered",  # Changed from "wide" to "centered" for mobile
+    initial_sidebar_state="auto"  # Auto-adjusts sidebar for mobile/desktop
 )
 
 # Responsive CSS for both mobile and desktop

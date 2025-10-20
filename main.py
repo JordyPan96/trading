@@ -212,7 +212,7 @@ def clean_data_for_google_sheets(df):
             '50.0': '50',
             '559.0': '559 - 66',
             '66.0': '66 - 786',
-            '786.0': '786-91'
+            '786.0': '786 - 91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 
@@ -295,9 +295,9 @@ def clean_data_for_calculations(df):
             '66.0': '66 - 786',
             '786.0': '786 - 91',
             '50': '50',
-            '559': '559-66',
+            '559': '559 - 66',
             '66': '66 - 786',
-            '786': '786-91'
+            '786': '786 - 91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 

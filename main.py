@@ -4192,7 +4192,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
-                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone
+                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --SL MUST at least cover end of zone<br>
                             </div>
@@ -4204,7 +4204,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib<br>
                                 --Enter Middle of Zone if TPF last 25th Percentile<br>
-                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone
+                                --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --SL MUST at least cover end of zone<br>
                             </div>

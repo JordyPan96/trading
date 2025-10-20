@@ -4152,7 +4152,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
 
 
-            col1, col2, col3 = st.columns([0.03, 2, 0.5], gap="small")
+            col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 
             with col2:
                 Risk_percentage = round(final_risk / account_balance * 100, 2)

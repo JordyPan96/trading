@@ -2624,7 +2624,7 @@ elif st.session_state.current_page == "Risk Calculation":
         filled_equity = df['equity'].ffill()
         equity = filled_equity.iloc[-1]
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns([1, 1, 0.01], gap="small")
 
         with col1:
             st.subheader("Grading Based Risk Multiplier")

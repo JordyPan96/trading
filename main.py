@@ -211,8 +211,8 @@ def clean_data_for_google_sheets(df):
         variance_mapping = {
             '50.0': '50',
             '559.0': '559-66',
-            '66.0': '66-805',
-            '805.0': '>805'
+            '66.0': '66-786',
+            '786.0': '786-91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 
@@ -292,12 +292,12 @@ def clean_data_for_calculations(df):
         variance_mapping = {
             '50.0': '50',
             '559.0': '559-66',
-            '66.0': '66-805',
-            '805.0': '>805',
+            '66.0': '66-786',
+            '786.0': '786-91',
             '50': '50',
             '559': '559-66',
-            '66': '66-805',
-            '805': '>805'
+            '66': '66-786',
+            '786': '786-91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
 
@@ -1188,7 +1188,7 @@ if st.session_state.current_page == "Home":
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
-                variance_display = ["50", "559-66", "66-805", ">805"]
+                variance_display = ["50", "559-66", "66-786", "786-91"]
                 new_variance = st.selectbox("Variance", options=variance_display, key="new_variance")
                 # Store as string directly (no numeric conversion)
                 new_variance_str = new_variance
@@ -3056,15 +3056,15 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_1b": [">=11.41"],
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
-        Variance = ["50", "559 - 66", "66 - 805", "> 805"]
+        Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
         incompatible_map_3 = {
-            "1_TPF": ["50", "> 805"],
-            "1_BNR": ["50", "559 - 66", "> 805"],
+            "1_TPF": ["50", "786 - 91"],
+            "1_BNR": ["50", "559 - 66", "786 - 91"],
             "1_BNR_TPF": ["50"],
             "2_BNR": [""],
             "2_BNR_TPF": [""],
-            "3_BNR_TPF": ["50", "> 805", "66 - 805"], }
+            "3_BNR_TPF": ["50", "786 - 91", "66 - 786"], }
         incompatible_map_5 = {
             "GBPAUD": ["No"],
             "EURAUD": ["No"],
@@ -3074,7 +3074,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_6 = {
-            "> 805": ["No"],
+            "786 - 91": ["No"],
         }
 
         incompatible_map_7 = {
@@ -3108,8 +3108,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "9%-10.99%1_BNR_TPF": [],
             "11%-12.99%1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
-            "EURAUD1_BNR_TPF": ["559 - 66", "66 - 805"],
-            "GBPAUD1_BNR_TPF": ["559 - 66", "66 - 805"]
+            "EURAUD1_BNR_TPF": ["559 - 66", "66 - 786"],
+            "GBPAUD1_BNR_TPF": ["559 - 66", "66 - 786"]
             # Add more restrictions as needed
         }
 
@@ -3579,7 +3579,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 variance_multiplier = 0.91
             elif (Variances == "559 - 66"):
                 variance_multiplier = 1.0
-            elif (Variances == "66 - 805"):
+            elif (Variances == "66 - 786"):
                 variance_multiplier = 1.0
             else:
                 variance_multiplier = 1.0
@@ -3831,7 +3831,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
-                        if (Variances == "> 805"):
+                        if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
@@ -3846,7 +3846,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
-                        if (Variances == "> 805"):
+                        if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
@@ -3861,7 +3861,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
-                        if (Variances == "> 805"):
+                        if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
@@ -3876,7 +3876,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
-                        if (Variances == "> 805"):
+                        if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
@@ -3976,7 +3976,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 if (selected_pair in minor_yens):
-                    if (Variances == "> 805"):
+                    if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
@@ -3992,7 +3992,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
-                    elif (Variances == "66 - 805"):
+                    elif (Variances == "66 - 786"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
@@ -4026,7 +4026,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             targeting = get_open_target(selected_pair)
                     else:
                         targeting = get_open_target(selected_pair)
-                    if (Variances == "> 805"):
+                    if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
@@ -4058,7 +4058,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
-                    elif (Variances == "66 - 805"):
+                    elif (Variances == "66 - 786"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
@@ -4125,7 +4125,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 targeting = get_open_target(selected_pair)
                         else:
                             targeting = get_open_target(selected_pair)
-                        if (Variances == "> 805"):
+                        if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
@@ -4148,7 +4148,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
-                        elif (Variances == "66 - 805"):
+                        elif (Variances == "66 - 786"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"

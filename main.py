@@ -54,7 +54,7 @@ st.markdown("""
             padding-left: 1rem !important;
             padding-right: 1rem !important;
             padding-top: 1rem !important;
-            padding-bottom: 3rem !important;  /* Added bottom padding */
+            padding-bottom: 5rem !important;  /* Added bottom padding */
             margin-left: auto !important;
             margin-right: auto !important;
         }
@@ -69,7 +69,7 @@ st.markdown("""
         }
 
         section.main .block-container {
-            padding: 1rem 1rem 3rem 1rem !important;  /* Added bottom padding here too */
+            padding: 1rem 1rem 5rem 1rem !important;  /* Added bottom padding here too */
         }
 
         /* Fix metric containers to prevent text truncation */

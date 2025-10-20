@@ -33,14 +33,25 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# Add this right after your page config
+# Add this CSS to properly center on mobile
 st.markdown("""
 <style>
     @media (max-width: 768px) {
         .main .block-container {
-            max-width: 700px;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            max-width: 95% !important;
+            padding-left: 2.5% !important;
+            padding-right: 2.5% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        /* Force centered layout on mobile */
+        .reportview-container .main {
+            max-width: 100% !important;
+        }
+
+        .css-1v0mbdj.egzxvld1 {
+            margin: 0 auto !important;
         }
     }
 </style>

@@ -29,77 +29,8 @@ from gspread_dataframe import set_with_dataframe, get_as_dataframe
 # Configure page
 st.set_page_config(
     page_title="JP Empire",
-    layout="centered",  # Changed from "wide" to "centered" for mobile
-    initial_sidebar_state="auto"  # Auto-adjusts sidebar for mobile/desktop
+    layout="wide" # Optional: Other page configuration options
 )
-
-# Responsive CSS for both mobile and desktop
-st.markdown("""
-<style>
-    /* Base styles that work for both mobile and desktop */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    /* Mobile styles (applies only to screens smaller than 768px) */
-    @media (max-width: 768px) {
-        /* Center everything and adjust padding for mobile */
-        .main .block-container {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            max-width: 100% !important;
-        }
-
-        /* Make sidebar more compact on mobile */
-        .css-1d391kg {
-            padding: 1rem 0.5rem;
-        }
-
-        /* Improve touch targets for mobile */
-        .stButton > button {
-            min-height: 44px;
-            font-size: 16px;
-        }
-
-        /* Better form elements on mobile */
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div,
-        .stNumberInput > div > div > input {
-            font-size: 16px !important;
-        }
-
-        /* Make data display better on mobile */
-        .stDataFrame {
-            font-size: 12px;
-        }
-
-        /* Adjust metric spacing for mobile */
-        [data-testid="metric-container"] {
-            min-width: unset !important;
-        }
-    }
-
-    /* Desktop styles (768px and larger) */
-    @media (min-width: 768px) {
-        .main .block-container {
-            padding-left: 5rem;
-            padding-right: 5rem;
-            max-width: 100%;
-        }
-    }
-
-    /* Ensure content doesn't overflow on mobile */
-    .reportview-container .main .block-container {
-        max-width: 100%;
-    }
-
-    /* Make sure all content is visible on mobile */
-    div[data-testid="stVerticalBlock"] {
-        gap: 0.5rem;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 
 ## Every year change starting_balance =, starting_capital = and base_risk =

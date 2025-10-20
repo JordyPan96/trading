@@ -3932,6 +3932,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 def get_open_target(selected_pair):
                     open_target = 0
+                    total_target = 0
                     if (selected_pair in yens):
                         open_target = round(JPY_Pairs_gap / final_risk, 2)
                         if (open_target > 3):
@@ -3940,10 +3941,13 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 3
                     elif (selected_pair in gold_comm):
                         open_target = round(XAUUSD_gap / final_risk, 2)
+                        total_target = round(get_sum_target(),2)
                         if (open_target >= 5.41):
                             return open_target
+                        elif(total_target >= 5.41):
+                            return total_target
                         else:
-                            return get_sum_target()
+                            return 5.41
                     elif (selected_pair in xxxaud):
                         open_target = round(GBPAUD_EURAUD_gap / final_risk, 2)
                         if (open_target > 3):
@@ -3952,16 +3956,22 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 3
                     elif (selected_pair in europe_major):
                         open_target = round(GBPUSD_EURUSD_gap / final_risk, 2)
+                        total_target = round(get_sum_target(), 2)
                         if (open_target >= 5.41):
                             return open_target
+                        elif (total_target >= 5.41):
+                            return total_target
                         else:
-                            return get_sum_target()
+                            return 5.41
                     elif (selected_pair in trade_curr):
                         open_target = round(USDCAD_AUDUSD_gap / final_risk, 2)
+                        total_target = round(get_sum_target(), 2)
                         if (open_target >= 4.41):
                             return open_target
+                        elif (total_target >= 4.41):
+                            return total_target
                         else:
-                            return get_sum_target()
+                            return 4.41
 
 
 

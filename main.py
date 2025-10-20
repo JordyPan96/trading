@@ -2396,24 +2396,37 @@ elif st.session_state.current_page == "Risk Calculation":
                 padding: 1rem 1rem !important;
             }
 
-            /* Make metric containers fit screen and auto-size text */
+            /* Fix metric containers to prevent text truncation */
             [data-testid="metric-container"] {
                 min-width: unset !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 10px !important;
-            }
-
-            /* Auto-size metric text */
-            [data-testid="metric-container"] > div {
-                font-size: clamp(12px, 4vw, 16px) !important;
+                padding: 8px !important;
                 word-wrap: break-word !important;
-                overflow-wrap: break-word !important;
+                white-space: normal !important;
+                overflow: visible !important;
             }
 
-            /* Adjust metric value size */
-            [data-testid="metric-container"] label {
-                font-size: clamp(14px, 5vw, 24px) !important;
+            /* Prevent text truncation in metric labels and values */
+            [data-testid="metric-container"] * {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
+                word-wrap: break-word !important;
+                word-break: break-word !important;
+            }
+
+            /* Specific targeting for metric text */
+            [data-testid="metric-container"] div {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
+            }
+
+            /* Make sure the container doesn't restrict content */
+            .stMetric {
+                min-width: unset !important;
+                max-width: 100% !important;
             }
         }
     </style>

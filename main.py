@@ -35,77 +35,78 @@ st.set_page_config(
 
 # Add this CSS specifically for iPhone Pro Max and other mobile devices
 st.markdown("""
-    <style>
-        /* Desktop styles (default) */
+<style>
+    /* Desktop styles (default) */
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 0rem;
+    }
+    .stApp {
+        margin-top: 15px;
+    }
+
+    /* Mobile styles - will override desktop styles on small screens */
+    @media (max-width: 430px) {
         .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 0rem;
-            padding-left: 5rem;
-            padding-right: 0rem;
+            max-width: 400px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 2rem !important;  /* Added bottom padding */
+            margin-left: auto !important;
+            margin-right: auto !important;
         }
+
         .stApp {
-            margin-top: 15px;
+            margin-top: 10px !important;
         }
 
-        /* Mobile styles - will override desktop styles on small screens */
-        @media (max-width: 430px) {
-            .block-container {
-                max-width: 400px !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                padding-top: 1rem !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-
-            .stApp {
-                margin-top: 10px !important;
-            }
-
-            /* Force centered layout on mobile */
-            .reportview-container .main {
-                max-width: 100% !important;
-            }
-
-            section.main .block-container {
-                padding: 1rem 1rem !important;
-            }
-
-            /* Fix metric containers to prevent text truncation */
-            [data-testid="metric-container"] {
-                min-width: unset !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 8px !important;
-                word-wrap: break-word !important;
-                white-space: normal !important;
-                overflow: visible !important;
-            }
-
-            /* Prevent text truncation in metric labels and values */
-            [data-testid="metric-container"] * {
-                white-space: normal !important;
-                overflow: visible !important;
-                text-overflow: unset !important;
-                word-wrap: break-word !important;
-                word-break: break-word !important;
-            }
-
-            /* Specific targeting for metric text */
-            [data-testid="metric-container"] div {
-                white-space: normal !important;
-                overflow: visible !important;
-                text-overflow: unset !important;
-            }
-
-            /* Make sure the container doesn't restrict content */
-            .stMetric {
-                min-width: unset !important;
-                max-width: 100% !important;
-            }
+        /* Force centered layout on mobile */
+        .reportview-container .main {
+            max-width: 100% !important;
         }
-    </style>
-    """, unsafe_allow_html=True)
+
+        section.main .block-container {
+            padding: 1rem 1rem 2rem 1rem !important;  /* Added bottom padding here too */
+        }
+
+        /* Fix metric containers to prevent text truncation */
+        [data-testid="metric-container"] {
+            min-width: unset !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 8px !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+            overflow: visible !important;
+        }
+
+        /* Prevent text truncation in metric labels and values */
+        [data-testid="metric-container"] * {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+        }
+
+        /* Specific targeting for metric text */
+        [data-testid="metric-container"] div {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+        }
+
+        /* Make sure the container doesn't restrict content */
+        .stMetric {
+            min-width: unset !important;
+            max-width: 100% !important;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
 
 
 ## Every year change starting_balance =, starting_capital = and base_risk =

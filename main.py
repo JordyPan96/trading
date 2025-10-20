@@ -36,16 +36,7 @@ st.set_page_config(
 # Add this CSS specifically for iPhone Pro Max and other mobile devices
 st.markdown("""
 <style>
-    /* Desktop styles (default) */
-    .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 0rem;
-        padding-left: 5rem;
-        padding-right: 0rem;
-    }
-    .stApp {
-        margin-top: 15px;
-    }
+    
 
     /* Mobile styles - will override desktop styles on small screens */
     @media (max-width: 430px) {

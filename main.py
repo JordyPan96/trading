@@ -4489,7 +4489,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                             st.rerun()
 
-                        st.markdown("<div style='height:220px;'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
 
 
 elif st.session_state.current_page == "Active Opps":

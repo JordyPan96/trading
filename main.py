@@ -26,11 +26,25 @@ import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
 
-# Configure page
+# Configure page - keep it as wide for desktop
 st.set_page_config(
     page_title="JP Empire",
-    layout="wide" # Optional: Other page configuration options
+    layout="wide",  # Keep wide for desktop
+    initial_sidebar_state="auto"
 )
+
+# Add this right after your page config
+st.markdown("""
+<style>
+    @media (max-width: 768px) {
+        .main .block-container {
+            max-width: 700px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
 
 
 ## Every year change starting_balance =, starting_capital = and base_risk =

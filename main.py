@@ -4167,9 +4167,23 @@ elif st.session_state.current_page == "Risk Calculation":
                         container.metric("Your Calculated lot size should be:", "Please Enter stop pips")
 
                     if (risk_multiplier == "1_BNR_TPF" or risk_multiplier == "1_BNR" or risk_multiplier == "3_BNR_TPF"):
-                        container.metric(entry_title, entry_text)
-                        container.metric(SL_title, SL_text)
-                        container.metric(exit_title, exit_text)
+                        # Use custom HTML for mobile-friendly metrics
+                        st.markdown(f"""
+                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
+                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{entry_title}</div>
+                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{entry_text}</div>
+                            </div>
+                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
+                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{SL_title}</div>
+                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{SL_text}</div>
+                            </div>
+                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
+                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{exit_title}</div>
+                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{exit_text}</div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                         # Determine if button should be disabled
                         add_order_disabled = False

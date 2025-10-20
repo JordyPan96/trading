@@ -35,27 +35,77 @@ st.set_page_config(
 
 # Add this CSS specifically for iPhone Pro Max and other mobile devices
 st.markdown("""
-<style>
-    @media (max-width: 430px) {
-        .main .block-container {
-            max-width: 400px !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
+    <style>
+        /* Desktop styles (default) */
+        .block-container {
+            padding-top: 1.5rem;
+            padding-bottom: 0rem;
+            padding-left: 5rem;
+            padding-right: 0rem;
+        }
+        .stApp {
+            margin-top: 15px;
         }
 
-        /* Force centered layout on mobile */
-        .reportview-container .main {
-            max-width: 100% !important;
-        }
+        /* Mobile styles - will override desktop styles on small screens */
+        @media (max-width: 430px) {
+            .block-container {
+                max-width: 400px !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                padding-top: 1rem !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
 
-        section.main .block-container {
-            padding: 2rem 1rem !important;
+            .stApp {
+                margin-top: 10px !important;
+            }
+
+            /* Force centered layout on mobile */
+            .reportview-container .main {
+                max-width: 100% !important;
+            }
+
+            section.main .block-container {
+                padding: 1rem 1rem !important;
+            }
+
+            /* Fix metric containers to prevent text truncation */
+            [data-testid="metric-container"] {
+                min-width: unset !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 8px !important;
+                word-wrap: break-word !important;
+                white-space: normal !important;
+                overflow: visible !important;
+            }
+
+            /* Prevent text truncation in metric labels and values */
+            [data-testid="metric-container"] * {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
+                word-wrap: break-word !important;
+                word-break: break-word !important;
+            }
+
+            /* Specific targeting for metric text */
+            [data-testid="metric-container"] div {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
+            }
+
+            /* Make sure the container doesn't restrict content */
+            .stMetric {
+                min-width: unset !important;
+                max-width: 100% !important;
+            }
         }
-    }
-</style>
-""", unsafe_allow_html=True)
+    </style>
+    """, unsafe_allow_html=True)
 
 
 ## Every year change starting_balance =, starting_capital = and base_risk =
@@ -4167,23 +4217,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         container.metric("Your Calculated lot size should be:", "Please Enter stop pips")
 
                     if (risk_multiplier == "1_BNR_TPF" or risk_multiplier == "1_BNR" or risk_multiplier == "3_BNR_TPF"):
-                        # Use custom HTML for mobile-friendly metrics
-                        st.markdown(f"""
-                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
-                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{entry_title}</div>
-                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{entry_text}</div>
-                            </div>
-                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
-                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{SL_title}</div>
-                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{SL_text}</div>
-                            </div>
-                            <div style="background: #f0f2f6; padding: 15px; border-radius: 10px; text-align: center; word-wrap: break-word; white-space: normal;">
-                                <div style="font-size: 14px; font-weight: bold; color: #31333F;">{exit_title}</div>
-                                <div style="font-size: 18px; font-weight: 800; color: #31333F;">{exit_text}</div>
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        container.metric(entry_title, entry_text)
+                        container.metric(SL_title, SL_text)
+                        container.metric(exit_title, exit_text)
 
                         # Determine if button should be disabled
                         add_order_disabled = False

@@ -33,14 +33,14 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# Add this CSS to properly center on mobile
+# Add this CSS specifically for iPhone Pro Max and other mobile devices
 st.markdown("""
 <style>
-    @media (max-width: 768px) {
+    @media (max-width: 430px) {
         .main .block-container {
-            max-width: 95% !important;
-            padding-left: 2.5% !important;
-            padding-right: 2.5% !important;
+            max-width: 400px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
             margin-left: auto !important;
             margin-right: auto !important;
         }
@@ -50,8 +50,8 @@ st.markdown("""
             max-width: 100% !important;
         }
 
-        .css-1v0mbdj.egzxvld1 {
-            margin: 0 auto !important;
+        section.main .block-container {
+            padding: 2rem 1rem !important;
         }
     }
 </style>

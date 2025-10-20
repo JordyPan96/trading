@@ -2377,6 +2377,29 @@ elif st.session_state.current_page == "Risk Calculation":
         unsafe_allow_html=True
     )
 
+    st.markdown("""
+    <style>
+        @media (max-width: 430px) {
+            .main .block-container {
+                max-width: 400px !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            /* Force centered layout on mobile */
+            .reportview-container .main {
+                max-width: 100% !important;
+            }
+
+            section.main .block-container {
+                padding: 2rem 1rem !important;
+            }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     # Initialize session state for saved selections if not exists
     if 'saved_selections' not in st.session_state:
         st.session_state.saved_selections = {}

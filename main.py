@@ -3833,7 +3833,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone at 886 - 91%"
-                            entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                            entry_text = "TOP to BOTTOM of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 30%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3848,7 +3848,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone at 886 - 91%"
-                            entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                            entry_text = "TOP to BOTTOM of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 22%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3863,7 +3863,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone at 886 - 91%"
-                            entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                            entry_text = "TOP to BOTTOM of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 18%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3878,7 +3878,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone at 886 - 91%"
-                            entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                            entry_text = "TOP to BOTTOM of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 18%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3978,7 +3978,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (selected_pair in minor_yens):
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone at 886 - 91%"
-                        entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                        entry_text = "TOP to BOTTOM of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "Middle of: 33%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
@@ -4028,7 +4028,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         targeting = get_open_target(selected_pair)
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone at 886 - 91%"
-                        entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                        entry_text = "TOP to BOTTOM of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
@@ -4127,7 +4127,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             targeting = get_open_target(selected_pair)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone at 886 - 91%"
-                            entry_text = "TOP or MIDDLE or BOTTOM of TPF Zone"
+                            entry_text = "TOP to BOTTOM of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"

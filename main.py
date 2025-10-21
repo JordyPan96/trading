@@ -1220,9 +1220,9 @@ if st.session_state.current_page == "Home":
                                                   key="new_trend_position")
 
             with col6:
-                # NEW: within_61 dropdown - UPDATED OPTIONS
-                within_61_options = ["Yes", "No"]
-                new_within_61 = st.selectbox("Within 61", options=within_61_options, key="new_within_61")
+                # NEW: within_64 dropdown - UPDATED OPTIONS
+                within_64_options = ["Yes", "No"]
+                new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
                 cross_fib_options = ["Cross Wave", "Wave 1", "Wave 2+"]
@@ -1277,8 +1277,8 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
-                if 'within_61' in data.columns:
-                    new_record['within_61'] = new_within_61
+                if 'within_64' in data.columns:
+                    new_record['within_64'] = new_within_64
 
                 # Trend Position field (existing field with space)
                 if 'Trend Position' in data.columns:
@@ -3070,7 +3070,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
-        within_61 = ["No", "Yes"]
+        within_64 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": [],
             "2_BNR_TPF": [],
@@ -3202,19 +3202,19 @@ elif st.session_state.current_page == "Risk Calculation":
             return [s for s in potential_rr if s not in disabled_rr]
 
 
-        def get_available_61(strategy):
-            disabled_61 = incompatible_map_4.get(strategy, [])
-            return [s for s in within_61 if s not in disabled_61]
+        def get_available_64(strategy):
+            disabled_64 = incompatible_map_4.get(strategy, [])
+            return [s for s in within_64 if s not in disabled_64]
 
 
-        def get_available_61_2(pair, list_available):
-            diabled_61 = incompatible_map_5.get(pair, [])
-            return [s for s in list_available if s not in diabled_61]
+        def get_available_64_2(pair, list_available):
+            diabled_64 = incompatible_map_5.get(pair, [])
+            return [s for s in list_available if s not in diabled_64]
 
 
-        def get_available_61_3(position, list_available):
-            diabled_61 = incompatible_map_6.get(position, [])
-            return [s for s in list_available if s not in diabled_61]
+        def get_available_64_3(position, list_available):
+            diabled_64 = incompatible_map_6.get(position, [])
+            return [s for s in list_available if s not in diabled_64]
 
 
         def get_available_strategies(pair):
@@ -3500,14 +3500,14 @@ elif st.session_state.current_page == "Risk Calculation":
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk
             # available_rr = get_available_rr(risk_multiplier)
-            available_61 = get_available_61(risk_multiplier)
+            available_64 = get_available_64(risk_multiplier)
             # Potential = st.selectbox("Potential RR", available_rr)
 
-            available_61 = get_available_61(risk_multiplier)
-            available_61_2 = get_available_61_2(selected_pair, available_61)
-            available_61_3 = get_available_61_3(Variances, available_61_2)
+            available_64 = get_available_64(risk_multiplier)
+            available_64_2 = get_available_64_2(selected_pair, available_64)
+            available_64_3 = get_available_64_3(Variances, available_64_2)
 
-            within_61 = st.selectbox("Price Within 64", available_61_3)
+            within_64 = st.selectbox("Price Within 64", available_64_3)
             st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)
@@ -3551,7 +3551,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (POI == 'Two_Daily Structure'):
                 POI_multiplier = 0.91
 
-            if (within_61 == 'Yes'):
+            if (within_64 == 'Yes'):
                 sixone_multiplier = 1.1
             else:
                 sixone_multiplier = 1.0
@@ -3752,39 +3752,39 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif (open_target > desire_target):
                     return str(desire_target)
 
-            def get_pair_volatile(pair, within_61):
+            def get_pair_volatile(pair, within_64):
                 if (pair == "GBPUSD"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(18)
                     else:
                         return str(33)
                 elif (pair == "EURUSD"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(18)
                     else:
                         return str(33)
                 elif (pair == "AUDUSD"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(22)
                     else:
                         return str(33)
                 elif (pair == "XAUUSD"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(30)
                     else:
                         return str(33)
                 elif (pair == "USDJPY"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(30)
                     else:
                         return str(33)
                 elif (pair == "USDCAD"):
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(18)
                     else:
                         return str(33)
                 else:
-                    if (within_61 == 'Yes'):
+                    if (within_64 == 'Yes'):
                         return str(30)
                     else:
                         return str(33)
@@ -3793,7 +3793,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
             if (risk_multiplier == "1_BNR"):
-                if (within_61 == "Yes"):
+                if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "From 786 to ON 744 Fib, Max " + entry_pip + "% Distance"
@@ -3853,7 +3853,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
             elif (risk_multiplier == "1_BNR_TPF"):
-                if (within_61 == "Yes"):
+                if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
@@ -4034,11 +4034,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 else:
                     if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
-                        if(trend_position == "9%-10.99%" and within_61 == "Yes"):
+                        if(trend_position == "9%-10.99%" and within_64 == "Yes"):
                             targeting = get_open_target(selected_pair)
-                        elif (trend_position == "11%-12.99%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
+                        elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
-                        elif (trend_position == ">=13%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
+                        elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
                         else:
                             targeting = 5.41
@@ -4061,7 +4061,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone at 886 - 91%"
                         entry_text = "TOP/BOTTOM or Adjust by SL"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
@@ -4070,7 +4070,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4078,14 +4078,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4094,53 +4094,53 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                     if (selected_pair == "XAUUSD"):
                         if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
-                            if (trend_position == "9%-10.99%" and within_61 == "Yes"):
+                            if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                                 targeting = get_open_target(selected_pair)
-                            elif (trend_position == "11%-12.99%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
+                            elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
-                            elif (trend_position == ">=13%" and within_61 == "Yes" and selected_pair == "XAUUSD"):
+                            elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
                             else:
                                 targeting = 5.41
@@ -4160,7 +4160,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone at 886 - 91%"
                             entry_text = "TOP/BOTTOM or Adjust by SL"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
@@ -4168,14 +4168,14 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -4184,29 +4184,29 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
-                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
-                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_61)+"%, Entry zone +6%, 33%"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -4324,7 +4324,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'risk_multiplier': risk_multiplier,
                                                 'Variances': Variances,
                                                 'stop_pips': stop_pips,
-                                                'within_61': within_61,
+                                                'within_64': within_64,
                                                 'final_risk': final_risk,  # This is important for comparison
                                                 'position_size': position_size,
                                                 'position_size_propfirm': position_size_propfirm,
@@ -4469,7 +4469,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'stop_pips': stop_pips,
 
-                                                'within_61': within_61,
+                                                'within_64': within_64,
 
                                                 'final_risk': final_risk,  # This is important for comparison
 
@@ -5883,7 +5883,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Maximum Adverse Excursion': max_adverse_excursion,
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             'HH_LL': record['HH_LL'],  # Already exists in record
-                                            'within_61': record['within_61'],  # Already exists in record
+                                            'within_64': record['within_64'],  # Already exists in record
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0
                                         }
@@ -5899,7 +5899,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'POI', 'Strategy', 'Variance', 'Result', 'RR',
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
-                                                                    'cross_fib', 'HH_LL', 'within_61',  # ADDED FIELDS
+                                                                    'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct']
 
                                                 # Add missing columns if they don't exist

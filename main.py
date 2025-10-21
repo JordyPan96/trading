@@ -3073,8 +3073,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "2_BNR_TPF": [""],
             "3_BNR_TPF": ["50", "786 - 91", "66 - 786"], }
         incompatible_map_5 = {
-            "GBPAUD": ["No"],
-            "EURAUD": ["No"],
+            "GBPAUD": [],
+            "EURAUD": [],
             "GBPJPY": ["No"],
             "EURJPY": ["No"],
             "AUDJPY": ["No"]
@@ -3737,17 +3737,17 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(24)
+                        return str(30)
                 elif (pair == "EURUSD"):
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(24)
+                        return str(30)
                 elif (pair == "AUDUSD"):
                     if (within_61 == 'Yes'):
                         return str(22)
                     else:
-                        return str(24)
+                        return str(28)
                 elif (pair == "XAUUSD"):
                     if (within_61 == 'Yes'):
                         return str(30)
@@ -3762,9 +3762,12 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(24)
+                        return str(28)
                 else:
-                    return "30"
+                    if (within_61 == 'Yes'):
+                        return str(30)
+                    else:
+                        return str(33)
 
 
             if (len(a_momemtum_text) < 1):

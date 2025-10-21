@@ -1158,7 +1158,7 @@ if st.session_state.current_page == "Home":
         st.write("Your uploaded raw trading data:")
 
         # Add New Record Form with exact same fields and specific dropdown values
-        with st.expander("➕ Add New Record", expanded=False):
+        with st.expander(" Add New Record", expanded=False):
             st.subheader("Add New Trading Record")
 
             # First row of fields
@@ -1201,12 +1201,15 @@ if st.session_state.current_page == "Home":
                 new_rr = st.number_input("RR", value=0.0, step=0.01, key="new_rr")
                 new_pnl = st.number_input("PnL", value=0.0, step=0.01, key="new_pnl")
 
-
             # Second row of fields
             col4, col5, col6, col7 = st.columns(4)
             with col4:
                 new_withdrawal_deposit = st.number_input("Withdrawal_Deposit", value=0.0, step=0.01,
                                                          key="new_withdrawal_deposit")
+
+                # NEW: HH_LL dropdown - UPDATED OPTIONS
+                hh_ll_options = ["Yes", "No"]
+                new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
             with col5:
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
@@ -1217,6 +1220,14 @@ if st.session_state.current_page == "Home":
                                                   key="new_trend_position")
 
             with col6:
+                # NEW: within_61 dropdown - UPDATED OPTIONS
+                within_61_options = ["Yes", "No"]
+                new_within_61 = st.selectbox("Within 61", options=within_61_options, key="new_within_61")
+
+                # NEW: cross_fib dropdown - UPDATED OPTIONS
+                cross_fib_options = ["Cross Wave", "Wave 1", "Wave 2+"]
+                new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
+
                 # Optional additional fields that might be in your data
                 if 'Risk_Percentage' in data.columns:
                     new_risk_percentage = st.number_input("Risk_Percentage", value=0.0, step=0.01,
@@ -1226,7 +1237,8 @@ if st.session_state.current_page == "Home":
 
             with col7:
                 stop_loss_pct = st.number_input("Stop Loss Percentage", value=0.0, step=0.01, key="stop_loss_pct")
-                max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01, key="max_adverse_excursion")
+                max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01,
+                                                        key="max_adverse_excursion")
 
             if st.button("Add Record", type="primary", key="add_record_btn"):
                 # Create new record with exact field names
@@ -1259,6 +1271,14 @@ if st.session_state.current_page == "Home":
                     new_record['Withdrawal_Deposit'] = new_withdrawal_deposit
                 if 'PROP_Pct' in data.columns:
                     new_record['PROP_Pct'] = new_prop_pct
+
+                # NEW: Add the three fields
+                if 'cross_fib' in data.columns:
+                    new_record['cross_fib'] = new_cross_fib
+                if 'HH_LL' in data.columns:
+                    new_record['HH_LL'] = new_hh_ll
+                if 'within_61' in data.columns:
+                    new_record['within_61'] = new_within_61
 
                 # Trend Position field (existing field with space)
                 if 'Trend Position' in data.columns:

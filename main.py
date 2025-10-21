@@ -3737,17 +3737,17 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(30)
+                        return str(33)
                 elif (pair == "EURUSD"):
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(30)
+                        return str(33)
                 elif (pair == "AUDUSD"):
                     if (within_61 == 'Yes'):
                         return str(22)
                     else:
-                        return str(28)
+                        return str(33)
                 elif (pair == "XAUUSD"):
                     if (within_61 == 'Yes'):
                         return str(30)
@@ -3762,7 +3762,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_61 == 'Yes'):
                         return str(18)
                     else:
-                        return str(28)
+                        return str(33)
                 else:
                     if (within_61 == 'Yes'):
                         return str(30)

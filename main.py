@@ -5859,8 +5859,11 @@ elif st.session_state.current_page == "Active Opps":
                                             'Result': new_result,
                                             'RR': new_rr,
                                             'PnL': new_pnl,
-                                            'Stop Loss Percentage': stop_loss_pct,  # NEW FIELD
-                                            'Maximum Adverse Excursion': max_adverse_excursion,  # NEW FIELD
+                                            'Stop Loss Percentage': stop_loss_pct,
+                                            'Maximum Adverse Excursion': max_adverse_excursion,
+                                            'cross_fib': record['cross_fib'],  # Already exists in record
+                                            'HH_LL': record['HH_LL'],  # Already exists in record
+                                            'within_61': record['within_61'],  # Already exists in record
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0
                                         }
@@ -5875,7 +5878,8 @@ elif st.session_state.current_page == "Active Opps":
                                                 required_columns = ['Date', 'Symbol', 'Direction', 'Trend Position',
                                                                     'POI', 'Strategy', 'Variance', 'Result', 'RR',
                                                                     'PnL', 'Stop Loss Percentage',
-                                                                    'Maximum Adverse Excursion',  # ADDED NEW COLUMNS
+                                                                    'Maximum Adverse Excursion',
+                                                                    'cross_fib', 'HH_LL', 'within_61',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct']
 
                                                 # Add missing columns if they don't exist

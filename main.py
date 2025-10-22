@@ -4248,7 +4248,7 @@ elif st.session_state.current_page == "Risk Calculation":
             col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 
             with col2:
-                Risk_percentage = round(final_risk / account_balance * 100, 2)
+                Risk_percentage = round(final_risk / starting_balance * 100, 2)
                 container = st.container()
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
                                    unsafe_allow_html=True)

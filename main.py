@@ -1535,7 +1535,7 @@ elif st.session_state.current_page == "Account Overview":
         # Performance Metrics2
         col1, col2, col3, col4, col5 = st.columns(5)
         # col1.metric("Net Trade PNL", f"${df['PnL'].sum():.2f}")
-        col1.metric("Longest Losing Streak", f"{longest_losing_streak}")
+        col1.metric("Max Drawdown (Trades/RR)", f"{longest_losing_streak}")
         col2.metric("Max Drawdown", f"{max_drawdown:.2%}")
         col3.metric("Total R Gain including BE", f"{df['RR'].sum():.2f}")
 
@@ -7763,7 +7763,7 @@ elif st.session_state.current_page == "Stats":
         # Calculate monthly stats with chained balances
         def calculate_monthly_stats(year_data):
             monthly_stats = []
-            starting_balance = 0  # Initial balance - REPLACE WITH YOUR ACTUAL STARTING BALANCE
+            starting_balance = 0  # Initial balance - DONT CHANGE THIS ONE FOR PRESENTATION PURPOSE
             prev_month_balance = starting_balance
             # Get all months in order
             months = year_data.groupby(['MonthNum', 'Month']).size().reset_index().sort_values('MonthNum')

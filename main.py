@@ -1514,8 +1514,8 @@ elif st.session_state.current_page == "Account Overview":
         filtered_trades = df[df['Result'] != "BE"]
         filtered_be = df[df['Result'] == "BE"]
 
-        filtered_win = df[df['Result'] == "Win"]
-        filtered_loss = df[df['Result'] == "Loss"]
+        filtered_win = filtered_trades[filtered_trades['Result'] == "Win"]
+        filtered_loss = filtered_trades[filtered_trades['Result'] == "Loss"]
 
         total_trades = len(filtered_trades)
 

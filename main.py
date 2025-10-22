@@ -3567,32 +3567,32 @@ elif st.session_state.current_page == "Risk Calculation":
                 trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
-                if (risk_multiplier == "1_BNR_TPF"):
-                    if (Variances == "559 - 66"):
+                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
                         trend_position_multiplier = 1.0
                     else:
                         trend_position_multiplier = 1.05
                 else:
                     trend_position_multiplier = 1.05
             elif (trend_position == "7%-8.99%"):
-                if (risk_multiplier == "1_BNR_TPF"):
-                    if (Variances == "559 - 66"):
+                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
                         trend_position_multiplier = 1.05
                     else:
                         trend_position_multiplier = 1.1
                 else:
                     trend_position_multiplier = 1.1
             elif (trend_position == "9%-10.99%"):
-                if (risk_multiplier == "1_BNR_TPF"):
-                    if (Variances == "559 - 66"):
+                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
                         trend_position_multiplier = 0.95
                     else:
                         trend_position_multiplier = 1.0
                 else:
                     trend_position_multiplier = 1.0
             elif (trend_position == "11%-12.99%"):
-                if (risk_multiplier == "1_BNR" or risk_multiplier == "1_BNR_TPF"):
-                    if (Variances == "559 - 66"):
+                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
                         trend_position_multiplier = 0.90
                     else:
                         trend_position_multiplier = 0.95
@@ -3601,6 +3601,11 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 if (risk_multiplier == "1_BNR" or risk_multiplier == "1_BNR_TPF"):
                     trend_position_multiplier = 0.85
+                elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
+                        trend_position_multiplier = 0.85
+                    else:
+                        trend_position_multiplier = 0.9
                 else:
                     trend_position_multiplier = 0.9
 

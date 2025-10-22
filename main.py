@@ -4248,6 +4248,7 @@ elif st.session_state.current_page == "Risk Calculation":
             col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 
             with col2:
+                starting_balance = 50000
                 Risk_percentage = round(final_risk / starting_balance * 100, 2)
                 container = st.container()
                 container.markdown("<div style='height: 70px; padding: 0px; margin-left: 2000px;'></div>",
@@ -7774,7 +7775,7 @@ elif st.session_state.current_page == "Stats":
         # Calculate monthly stats with chained balances
         def calculate_monthly_stats(year_data):
             monthly_stats = []
-            starting_balance = 0  # Initial balance - DONT CHANGE THIS ONE FOR PRESENTATION PURPOSE
+            starting_balance = 0  # DONT CHANGE THIS ONE FOR PRESENTATION PURPOSE
             prev_month_balance = starting_balance
             # Get all months in order
             months = year_data.groupby(['MonthNum', 'Month']).size().reset_index().sort_values('MonthNum')

@@ -4115,21 +4115,21 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
-                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
@@ -4198,14 +4198,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
-                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
-                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 648 ZONE TO BE TAPPED"
+                                SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting

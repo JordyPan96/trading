@@ -1547,7 +1547,7 @@ elif st.session_state.current_page == "Account Overview":
         col1, col2, col3, col4, col5 = st.columns(5)
         # col1.metric("Net Trade PNL", f"${df['PnL'].sum():.2f}")
         col1.metric("Max Drawdown (Trades/RR)", f"{longest_losing_streak}")
-        col2.metric("Expectancy", f"{expectancy:.2%}")
+        col2.metric("Expectancy", f"${expectancy:.2f}")
         col3.metric("Total R Gain including BE", f"{df['RR'].sum():.2f}")
 
         win_pnl = filtered_trades[filtered_trades['PnL'] > 0]

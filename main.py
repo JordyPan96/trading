@@ -3564,7 +3564,15 @@ elif st.session_state.current_page == "Risk Calculation":
             # elif (Potential == '>=11.41'):
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
-                trend_position_multiplier = 1.0
+                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
+                    if (Variances == "559 - 66" and within_64 == "No"):
+                        trend_position_multiplier = 0.95
+                    elif (Variances == "50" and within_64 == "No"):
+                        trend_position_multiplier = 0.90
+                    else:
+                        trend_position_multiplier = 1.0
+                else:
+                    trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
                 if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):

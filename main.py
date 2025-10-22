@@ -1463,6 +1463,7 @@ elif st.session_state.current_page == "Account Overview":
         df['Drawdown'] = (df['equity'] - df['Peak']) / starting_capital
         total_return = df['equity'].iloc[-1] / abs(df['equity'].iloc[0]) if abs(df['equity'].iloc[0]) > 0 else 0
         max_drawdown = df['Drawdown'].min()
+
         sharpe_ratio = df['Returns'].mean() / df['Returns'].std() * np.sqrt(252) if 'Returns' in df.columns and df[
             'Returns'].std() != 0 else 0
 
@@ -1513,13 +1514,23 @@ elif st.session_state.current_page == "Account Overview":
         filtered_trades = df[df['Result'] != "BE"]
         filtered_be = df[df['Result'] == "BE"]
 
+        filtered_win = df[df['Result'] == "Win"]
+        filtered_loss = df[df['Result'] == "Loss"]
+
         total_trades = len(filtered_trades)
 
         if total_trades > 0:
             wins = len(filtered_trades[filtered_trades['Result'] == "Win"])
+            average_win = (filtered_win['PnL'].sum())/wins
+            loses = len(filtered_trades[filtered_trades['Result'] == "Loss"])
+            average_loss = (filtered_loss['PnL'].sum())/loses
+
             winrate = (wins / total_trades) * 100
+            lossrate = (loses / total_trades) * 100
+            expectancy = (winrate * average_win) - (lossrate * average_loss)
         else:
             winrate = 0
+            expectancy = 0
         col2.metric("Win Rate (Without BE Stat)", f"{winrate:.1f}%")
 
         winner_pnl = filtered_trades[filtered_trades['PnL'] > 0]
@@ -1536,7 +1547,7 @@ elif st.session_state.current_page == "Account Overview":
         col1, col2, col3, col4, col5 = st.columns(5)
         # col1.metric("Net Trade PNL", f"${df['PnL'].sum():.2f}")
         col1.metric("Max Drawdown (Trades/RR)", f"{longest_losing_streak}")
-        col2.metric("Max Drawdown", f"{max_drawdown:.2%}")
+        col2.metric("Expectancy", f"{expectancy:.2%}")
         col3.metric("Total R Gain including BE", f"{df['RR'].sum():.2f}")
 
         win_pnl = filtered_trades[filtered_trades['PnL'] > 0]

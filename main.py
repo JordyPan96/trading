@@ -7763,7 +7763,7 @@ elif st.session_state.current_page == "Stats":
         # Calculate monthly stats with chained balances
         def calculate_monthly_stats(year_data):
             monthly_stats = []
-            starting_balance = 45000  # Initial balance - REPLACE WITH YOUR ACTUAL STARTING BALANCE
+            starting_balance = 0  # Initial balance - REPLACE WITH YOUR ACTUAL STARTING BALANCE
             prev_month_balance = starting_balance
             # Get all months in order
             months = year_data.groupby(['MonthNum', 'Month']).size().reset_index().sort_values('MonthNum')

@@ -4221,11 +4221,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Fib Zone is Defined as Blue Fib to Orange Fib<br>
-                                --Enter Middle of Zone if TPF last 25th Percentile<br>
+                                --Zone is Defined as Blue Fib to Orange Fib<br>
+                                --SL MUST at least cover end of zone<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
-                                --SL MUST at least cover end of zone<br>
+                                --For TPF Enter Middle of Zone if TPF last 25th Percentile<br>
                             </div>
                             """, unsafe_allow_html=True)
                     #--Entry: {get_global('entry_model')}<br>
@@ -4233,11 +4233,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Fib Zone is Defined as Blue Fib to Orange Fib<br>
-                                --Enter Middle of Zone if TPF last 25th Percentile<br>
+                                --Zone is Defined as Blue Fib to Orange Fib<br>
+                                --SL MUST at least cover end of zone<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
-                                --SL MUST at least cover end of zone<br>
+                                --For TPF Enter Middle of Zone if TPF last 25th Percentile<br>
                             </div>
                             """, unsafe_allow_html=True)
                     #--Min Length for {selected_pair} is {base_percent}%<br>

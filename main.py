@@ -1520,14 +1520,14 @@ elif st.session_state.current_page == "Account Overview":
         total_trades = len(filtered_trades)
 
         if total_trades > 0:
-            wins = len(filtered_trades[filtered_trades['Result'] == "Win"])
-            average_win = (filtered_win['PnL'].sum())/wins
-            loses = len(filtered_trades[filtered_trades['Result'] == "Loss"])
-            average_loss = (filtered_loss['PnL'].sum())/loses
+            wins = len(filtered_win)
+            average_win = filtered_win['PnL'].mean() if wins > 0 else 0
+            loses = len(filtered_loss)
+            average_loss = abs(filtered_loss['PnL'].mean()) if loses > 0 else 0
 
             winrate = (wins / total_trades) * 100
             lossrate = (loses / total_trades) * 100
-            expectancy = (winrate * average_win) - (lossrate * average_loss)
+            expectancy = ((winrate / 100) * average_win) - ((lossrate / 100) * average_loss)
         else:
             winrate = 0
             expectancy = 0

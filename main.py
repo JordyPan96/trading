@@ -518,10 +518,8 @@ def analyze_strategy(group):
     })
 
 
-def ensure_all_strategies_in_results(results_df):
-    """
-    Add missing predefined strategies to the results dataframe with zero trades
-    """
+def ensure_all_strategies_analyzed(df):
+    """Ensure analyze_strategy is called for all predefined strategies"""
     predefined_strategies = {
         '1_BNR': ("A", 0.91),
         '1_BNR_TPF': ("A", 1.0),
@@ -529,26 +527,37 @@ def ensure_all_strategies_in_results(results_df):
         '2_BNR_TPF': ("A", 1.2),
     }
 
-    # Find which predefined strategies are missing from results
-    missing_strategies = []
-    for strategy, (grade, multiplier) in predefined_strategies.items():
-        if strategy not in results_df.index:
-            missing_strategies.append(strategy)
+    # First, analyze strategies that have actual data
+    if len(df) > 0:
+        actual_results = df.groupby('Strategy').apply(analyze_strategy)
+    else:
+        actual_results = pd.DataFrame()
 
-    # Add missing strategies with zero values
-    for strategy in missing_strategies:
-        grade, multiplier = predefined_strategies[strategy]
-        results_df.loc[strategy] = {
-            'Win Rate (%)': 0,
-            'Total Trades': 0,
-            'Total Return': 0,
-            'Avg Win RR': 0,
-            'Grade': grade,
-            'Multiplier': multiplier
-        }
-        print(f"Added missing strategy: {strategy} with grade {grade} and multiplier {multiplier}")
+    # Create empty DataFrames for each predefined strategy and analyze them
+    all_results = actual_results.copy() if len(actual_results) > 0 else pd.DataFrame()
 
-    return results_df
+    for strategy in predefined_strategies.keys():
+        if strategy not in all_results.index:
+            # Create empty group for this strategy and run analyze_strategy on it
+            empty_group = pd.DataFrame(columns=df.columns)
+            empty_group.name = strategy  # Set the group name
+
+            # Run analyze_strategy on empty data
+            strategy_result = analyze_strategy(empty_group)
+
+            # Add to results
+            if len(all_results) == 0:
+                all_results = pd.DataFrame([strategy_result], index=[strategy])
+            else:
+                all_results.loc[strategy] = strategy_result
+
+    # Add any strategies not in predefined list but present in data
+    if len(actual_results) > 0:
+        for strategy in actual_results.index:
+            if strategy not in predefined_strategies and strategy not in all_results.index:
+                all_results.loc[strategy] = actual_results.loc[strategy]
+
+    return all_results
 
 
 def calculate_be_rate(len_be, len_df):
@@ -2710,8 +2719,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
         with col1:
             st.subheader("Grading Based Risk Multiplier")
-            strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
-            strategy_stats = ensure_all_strategies_in_results(strategy_stats)
+            #strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
+            strategy_stats = ensure_all_strategies_analyzed(df)
             strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 
             # Format display

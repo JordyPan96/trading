@@ -7873,7 +7873,7 @@ elif st.session_state.current_page == "Stats":
                 # cash_flow = withdraw_deposit.sum()
 
                 # Calculate monthly percentage gain compared to previous month
-                if prev_month_balance != 0:
+                if prev_month_balance >= 0:
                     #monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
                     monthly_pct_gain = ((ending_balance - prev_month_balance) / starting_capital) * 100
                     set_global("monthly_limit_left", starting_balance * 0.08)

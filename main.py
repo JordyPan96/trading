@@ -1541,7 +1541,16 @@ elif st.session_state.current_page == "Account Overview":
         # Add horizontal zero line
         fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
-        # Layout customization with zoomed-out x-axis
+        # Calculate extended date range to simulate "zoom out once"
+        if len(df) > 0:
+            date_range = df['Date'].max() - df['Date'].min()
+            # Add 20% padding on both sides to simulate one zoom-out click
+            extended_start = df['Date'].min() - date_range * 0.2
+            extended_end = df['Date'].max() + date_range * 0.2
+
+            fig.update_xaxes(range=[extended_start, extended_end])
+
+        # Layout customization
         fig.update_layout(
             height=500,
             title_text="Equity Curve (Pure Trade PnL)",
@@ -1551,7 +1560,7 @@ elif st.session_state.current_page == "Account Overview":
         # Y-axis label
         fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
 
-        # Display the plot with config that includes zoom buttons
+        # Display the plot
         st.plotly_chart(fig, use_container_width=True)
 
         # Performance Metrics

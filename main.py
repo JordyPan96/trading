@@ -3941,12 +3941,24 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
             elif (risk_multiplier == "1_BNR_TPF"):
+                def get_entry_zone_plus_(pair_volatile, selected_pair):
+
+                    pair_mult = 0.5
+                    pair_volatile = float(pair_volatile)
+                    if(selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
+                        pair_mult = 0.5
+                    elif(selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
+                        pair_mult = 0.3
+                    else:
+                        pair_mult = 0.5
+                    entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
+                    return entry_plus
                 if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 30%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 

@@ -7850,6 +7850,7 @@ elif st.session_state.current_page == "Stats":
 
         # Calculate monthly stats with chained balances
         def calculate_monthly_stats(year_data):
+            starting_capital = 50000
             monthly_stats = []
             starting_balance = 0  # DONT CHANGE THIS ONE FOR PRESENTATION PURPOSE
             prev_month_balance = starting_balance
@@ -7921,7 +7922,8 @@ elif st.session_state.current_page == "Stats":
                         'Ending_Trade_Balance': df.iloc[-1]['Ending_Trade_Balance'],
                         'Total_PnL': df['Total_PnL'].sum(),
                         # 'Monthly_Pct_Gain': round(abs((df.iloc[0]['Starting_Balance']-df.iloc[-1]['Ending_Trade_Balance'])/df.iloc[0]['Starting_Balance'])*100,1),  # Not meaningful as a total
-                        'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (df.iloc[0]['Starting_Balance']) * 100,
+                        #'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (df.iloc[0]['Starting_Balance']) * 100,
+                        'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (starting_capital) * 100,
                         'Cash_Flow': df['Cash_Flow'].sum()
                     }
 

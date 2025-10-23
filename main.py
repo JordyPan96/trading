@@ -4044,10 +4044,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     pair_mult = 0.5
                     pair_volatile = float(pair_volatile)
-                    if(selected_pair == "GBPUSD"):
-                        entry_plus = "+"+str(int(round(pair_volatile * pair_mult,0)))+"%,"
+                    if(selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
+                        pair_mult = 0.5
+                    elif(selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
+                        pair_mult = 0.3
                     else:
-                        entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
+                        pair_mult = 0.5
+                    entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
 
                 def get_sum_target():

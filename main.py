@@ -1517,8 +1517,8 @@ elif st.session_state.current_page == "Account Overview":
         df['Loss_Streak'] = df['Is_Loss'].groupby((~df['Is_Loss']).cumsum()).cumsum()
         longest_losing_streak = df['Loss_Streak'].max()
 
-        # Create figure with subplots
-        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05, row_heights=[0.7, 0.3])
+        # Create figure with subplots (now only 1 row since we removed drawdown)
+        fig = make_subplots(rows=1, cols=1)
 
         # Equity Curve (Pure PnL)
         fig.add_trace(
@@ -1538,27 +1538,18 @@ elif st.session_state.current_page == "Account Overview":
                 row=1, col=1
             )
 
-        # Drawdown
-        fig.add_trace(
-            go.Scatter(x=df['Date'], y=df['Drawdown'],
-                       fill='tozeroy', fillcolor='rgba(255,0,0,0.2)',
-                       line=dict(color='red'), name='Drawdown'),
-            row=2, col=1
-        )
-
-        # Add horizontal zero line (this is the fix!)
+        # Add horizontal zero line
         fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
         # Layout customization
         fig.update_layout(
-            height=700,
-            title_text="Equity Curve (Pure Trade PnL) with Drawdown",
+            height=500,  # Reduced height since we only have one chart now
+            title_text="Equity Curve (Pure Trade PnL)",
             hovermode='x unified'
         )
 
-        # Y-axis labels
+        # Y-axis label
         fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
-        fig.update_yaxes(title_text="Drawdown", tickformat=".1%", row=2, col=1)
 
         # Display the plot
         st.plotly_chart(fig, use_container_width=True)

@@ -1527,6 +1527,16 @@ elif st.session_state.current_page == "Account Overview":
             row=1, col=1
         )
 
+        # Add connecting line from 0 to first data point
+        if len(df) > 0:
+            fig.add_trace(
+                go.Scatter(x=[df['Date'].iloc[0], df['Date'].iloc[0]],
+                           y=[0, df['equity'].iloc[0]],
+                           line=dict(color='royalblue', dash='dash'),
+                           showlegend=False),
+                row=1, col=1
+            )
+
         # Drawdown
         fig.add_trace(
             go.Scatter(x=df['Date'], y=df['Drawdown'],
@@ -1535,7 +1545,7 @@ elif st.session_state.current_page == "Account Overview":
             row=2, col=1
         )
 
-        # Add zero line instead of starting capital line
+        # Add zero line
         fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
         # Layout customization

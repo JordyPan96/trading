@@ -4042,7 +4042,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 def get_entry_zone_plus(pair_volatile):
                     pair_volatile = int(pair_volatile)
-                    entry_plus = str(round(pair_volatile * 0.5,0))
+                    entry_plus = "+"+str(round(pair_volatile * 0.5,0))+"%,"
                     return entry_plus
 
                 def get_sum_target():

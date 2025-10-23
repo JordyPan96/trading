@@ -1541,30 +1541,17 @@ elif st.session_state.current_page == "Account Overview":
         # Add horizontal zero line
         fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
-        # Calculate y-axis range to zoom out by adding 10% padding
-        if len(df) > 0:
-            y_min = df['equity'].min()
-            y_max = df['equity'].max()
-            y_range = y_max - y_min
-            padding = y_range * 0.1  # 10% padding on both sides
-
-            fig.update_yaxes(
-                range=[y_min - padding, y_max + padding],
-                title_text="Pure PnL ($)",
-                row=1,
-                col=1
-            )
-        else:
-            fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
-
-        # Layout customization
+        # Layout customization with zoomed-out x-axis
         fig.update_layout(
-            height=500,  # Reduced height since we only have one chart now
+            height=500,
             title_text="Equity Curve (Pure Trade PnL)",
             hovermode='x unified'
         )
 
-        # Display the plot
+        # Y-axis label
+        fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
+
+        # Display the plot with config that includes zoom buttons
         st.plotly_chart(fig, use_container_width=True)
 
         # Performance Metrics

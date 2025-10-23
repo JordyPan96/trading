@@ -1527,10 +1527,11 @@ elif st.session_state.current_page == "Account Overview":
             row=1, col=1
         )
 
-        # Add connecting line from 0 to first data point
+        # Add connecting line from 0 to first data point starting from 2025-01-01
         if len(df) > 0:
+            start_date = '2025-01-01'
             fig.add_trace(
-                go.Scatter(x=[df['Date'].iloc[0], df['Date'].iloc[0]],
+                go.Scatter(x=[start_date, df['Date'].iloc[0]],
                            y=[0, df['equity'].iloc[0]],
                            line=dict(color='royalblue', dash='dash'),
                            showlegend=False),
@@ -1545,8 +1546,10 @@ elif st.session_state.current_page == "Account Overview":
             row=2, col=1
         )
 
-        # Add zero line
-        fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
+        # Add zero line starting from 2025-01-01
+        start_date = '2025-01-01'
+        fig.add_vline(x=start_date, line_dash="dash", line_color="green",
+                      annotation_text="Zero Baseline", row=1, col=1)
 
         # Layout customization
         fig.update_layout(

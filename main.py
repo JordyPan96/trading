@@ -36,7 +36,7 @@ st.set_page_config(
 # Add this CSS specifically for iPhone Pro Max and other mobile devices
 st.markdown("""
 <style>
-    
+
 
     /* Mobile styles - will override desktop styles on small screens */
     @media (max-width: 430px) {
@@ -175,6 +175,7 @@ def calculate_mae_recommendations(selected_pair, risk_multiplier, min_trades=10)
     except Exception as e:
         st.error(f"Error calculating MAE recommendations: {e}")
         return None, None
+
 
 def clean_data_for_google_sheets(df):
     """
@@ -512,6 +513,48 @@ def analyze_strategy(group):
     })
 
 
+def ensure_all_strategies_analyzed(df):
+    """Ensure analyze_strategy is called for all predefined strategies"""
+    predefined_strategies = {
+        '1_BNR': ("A", 0.91),
+        '1_BNR_TPF': ("A", 1.0),
+        '2_BNR': ("A", 1.1),
+        '2_BNR_TPF': ("A", 1.2),
+    }
+
+    # First, analyze strategies that have actual data
+    if len(df) > 0:
+        actual_results = df.groupby('Strategy').apply(analyze_strategy)
+    else:
+        actual_results = pd.DataFrame()
+
+    # Create empty DataFrames for each predefined strategy and analyze them
+    all_results = actual_results.copy() if len(actual_results) > 0 else pd.DataFrame()
+
+    for strategy in predefined_strategies.keys():
+        if strategy not in all_results.index:
+            # Create empty group for this strategy and run analyze_strategy on it
+            empty_group = pd.DataFrame(columns=df.columns)
+            empty_group.name = strategy  # Set the group name
+
+            # Run analyze_strategy on empty data
+            strategy_result = analyze_strategy(empty_group)
+
+            # Add to results
+            if len(all_results) == 0:
+                all_results = pd.DataFrame([strategy_result], index=[strategy])
+            else:
+                all_results.loc[strategy] = strategy_result
+
+    # Add any strategies not in predefined list but present in data
+    if len(actual_results) > 0:
+        for strategy in actual_results.index:
+            if strategy not in predefined_strategies and strategy not in all_results.index:
+                all_results.loc[strategy] = actual_results.loc[strategy]
+
+    return all_results
+
+
 def calculate_be_rate(len_be, len_df):
     """
     Calculate BE rate percentage where PnL is >= 0 and < 3000
@@ -648,6 +691,7 @@ if 'session_initialized' not in st.session_state:
 if not st.session_state.current_page:
     st.session_state.current_page = "Home"
 
+
 @st.cache_resource
 def get_google_sheets_client():
     """Initialize Google Sheets connection - supports both Streamlit secrets and GitHub secrets"""
@@ -689,13 +733,13 @@ def get_google_sheets_client():
             st.sidebar.error(" Missing required credentials (private_key or client_email)")
             return None
 
-        #st.sidebar.success(f" Service Account: {creds_dict.get('client_email', 'Unknown')}")
+        # st.sidebar.success(f" Service Account: {creds_dict.get('client_email', 'Unknown')}")
 
         # Create credentials
         creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         client = gspread.authorize(creds)
 
-        #st.sidebar.success(" Google Sheets connected successfully!")
+        # st.sidebar.success(" Google Sheets connected successfully!")
         return client
 
     except Exception as e:
@@ -718,7 +762,7 @@ def load_data_from_sheets(sheet_name="Trade", worksheet_name="Trade.csv"):
 
             if records:
                 df = pd.DataFrame(records)
-                #st.sidebar.success(f" Loaded {len(df)} rows from Google Sheets")
+                # st.sidebar.success(f" Loaded {len(df)} rows from Google Sheets")
 
                 # CLEAN THE DATA - This is the key fix!
                 df_clean = clean_data_for_calculations(df)
@@ -852,6 +896,7 @@ def replace_data_on_sheet(data, sheet_name="Trade", worksheet_name="News"):
     except Exception as e:
         st.sidebar.error(f"Error in replace_data_on_sheet: {e}")
         return False
+
 
 def delete_data_from_sheets(sheet_name="Trade.csv"):
     """Delete data from Google Sheets"""
@@ -1805,13 +1850,15 @@ elif st.session_state.current_page == "Symbol Stats":
                         'Remain_$': '${:,.2f}',
                         'Target_$': '${:,.2f}'  # Add formatting for the new Target $ column
                     }).apply(lambda x: ['background-color: dodgerblue; color: white' if x['Symbol'] == 'PROP' else
-                                        'background-color: firebrick; color: white' if x['Yearly_Pct_Gain'] < -x['Target_Pct'] else
+                                        'background-color: firebrick; color: white' if x['Yearly_Pct_Gain'] < -x[
+                                            'Target_Pct'] else
                                         'background-color: darkred; color: white' if x['Total_PnL'] < 0 else
                                         'background-color: forestgreen; color: white' if x['Total_PnL'] > 0 else
                                         'background-color: seagreen; color: white' if x['Target'] == 'Completed' else
-                                        'background-color: darkorange; color: white' if x['Target'] == 'In Progress' else
+                                        'background-color: darkorange; color: white' if x[
+                                                                                            'Target'] == 'In Progress' else
                                         'background-color: dimgray; color: white' if x['Symbol'] == 'SUMMARY' else
-                 '' for _ in x], axis=1),
+                                        '' for _ in x], axis=1),
                     use_container_width=True,
                     height=400
                 )
@@ -2569,11 +2616,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def get_sum_target_remain():
-            sum_target = round(sum_gap,0)
+            sum_target = round(sum_gap, 0)
             if (sum_target > 0):
                 return 1.0
             else:
                 return 0.4
+
 
         def calculate_monthly_stats_2(year_data):
 
@@ -2938,6 +2986,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
             except Exception as e:
                 return True, f"Error checking cooldown: {str(e)}"
+
+
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")
             response = requests.get(url).json()
@@ -3337,10 +3387,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if (len(current_month_stats) > 0):
                 current_month_stats_losses = current_month_stats[current_month_stats['Result'] == "Loss"]
-                current_month_stats_linked = current_month_stats_losses[current_month_stats_losses['Symbol'].isin(xxxusd)]
-                current_month_stats_linked2 = current_month_stats_losses[current_month_stats_losses['Symbol'].isin(aud_family1)]
-
-
+                current_month_stats_linked = current_month_stats_losses[
+                    current_month_stats_losses['Symbol'].isin(xxxusd)]
+                current_month_stats_linked2 = current_month_stats_losses[
+                    current_month_stats_losses['Symbol'].isin(aud_family1)]
 
             remain_count = 2
             xxxaud_count = 1
@@ -3387,7 +3437,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         cross_eur = len(current_month_stats_linked['Symbol'].isin(europe_major))
                         if (any_exist):
                             cad_count = cad_count - cross_eur
-                    pair_trades_ASIA = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
+                    pair_trades_ASIA = len(
+                        current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
                     cad_count = cad_count - pair_trades_ASIA
                     return cad_count
 
@@ -3402,7 +3453,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         pair_trades_aud3 = len(current_month_stats_linked2)
                         if (pair_trades_aud3 >= 2):
                             audusd_count = audusd_count - pair_trades_aud3
-                    pair_trades_TRADE = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
+                    pair_trades_TRADE = len(
+                        current_month_stats_losses[current_month_stats_losses['Symbol'].isin(trade_curr)])
                     audusd_count = audusd_count - pair_trades_TRADE
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(europe_major).any()
@@ -3418,7 +3470,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     eurusd_count = 2  # Start with default count
 
-                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
+                    pair_trades = len(
+                        current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
                     eurusd_count = eurusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
@@ -3434,7 +3487,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     gbpusd_count = 2  # Start with default count
 
-                    pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
+                    pair_trades = len(
+                        current_month_stats_losses[current_month_stats_losses['Symbol'].isin(europe_major)])
                     gbpusd_count = gbpusd_count - pair_trades
                     if (len(current_month_stats_linked) > 0):
                         any_exist = current_month_stats_linked['Symbol'].isin(trade_curr).any()
@@ -3528,7 +3582,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         with col2:
 
-            strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
+            strategy_stats = ensure_all_strategies_analyzed(df)
             # st.write(strategy_stats.items())
             # strategy_stats_df = pd.DataFrame(strategy_stats.tolist(), index=strategy_stats.index)
             multiplier = 1.0
@@ -3541,17 +3595,11 @@ elif st.session_state.current_page == "Risk Calculation":
             cross_fib_multiplier = 1.0
             sum_target_multiplier = 1.0
             big_risk_multiplier = 1.0
-            for strategy, metrics in strategy_stats.items():
-                # st.write(strategy)
-                # st.write(metrics)
-
-                if strategy == "Multiplier":
-                    # multiplier = metrics["Multiplier"]
-                    for Strategy_, Multiplier_ in metrics.items():
-                        if Strategy_ == risk_multiplier:
-                            multiplier = Multiplier_
-                            # st.write(Strategy_,Multiplier_)
-
+            # Iterate through each strategy in the results
+            for strategy, row in strategy_stats.iterrows():
+                # Get the multiplier for this specific strategy
+                if strategy == risk_multiplier:
+                    multiplier = row['Multiplier']
                     break
 
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
@@ -3675,7 +3723,8 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
-            final_risk_1 = (yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier
+            final_risk_1 = (
+                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05
@@ -3702,13 +3751,15 @@ elif st.session_state.current_page == "Risk Calculation":
                 winning_trade_mae = avg_winning_mae
 
             target_in = 0
+
+
             def getPairEntrySL(pair):
                 if (suggested_sl is None or avg_winning_mae is None):
-                    #target_in = 0
+                    # target_in = 0
                     if (pair == "GBPUSD"):
                         base_entry = 12
                         base_sl = 18
-                        return str(base_entry),str(base_sl)
+                        return str(base_entry), str(base_sl)
                     elif (pair == "EURUSD"):
                         base_entry = 12
                         base_sl = 18
@@ -3736,19 +3787,19 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    #target_in = (99 // round(mae_based_stop_loss,0)) + 0.41
+                    # target_in = (99 // round(mae_based_stop_loss,0)) + 0.41
                     if (pair == "GBPUSD"):
-                        return str((round(12-winning_trade_mae,0)+6)), str(18)
+                        return str((round(12 - winning_trade_mae, 0) + 6)), str(18)
                     elif (pair == "EURUSD"):
-                        return str((round(12-winning_trade_mae,0)+6)), str(18)
+                        return str((round(12 - winning_trade_mae, 0) + 6)), str(18)
                     elif (pair == "AUDUSD"):
-                        return str((round(12-winning_trade_mae,0)+6)), str(22)
+                        return str((round(12 - winning_trade_mae, 0) + 6)), str(22)
                     elif (pair == "XAUUSD"):
-                        return str((round(12-winning_trade_mae,0)+6)), str(30)
+                        return str((round(12 - winning_trade_mae, 0) + 6)), str(30)
                     elif (pair == "USDJPY"):
-                        return str((round(12-winning_trade_mae,0)+6)), str(18)
+                        return str((round(12 - winning_trade_mae, 0) + 6)), str(18)
                     elif (pair == "USDCAD"):
-                        str((round(12-winning_trade_mae,0)+6)), str(18)
+                        str((round(12 - winning_trade_mae, 0) + 6)), str(18)
                     else:
                         return "12", "30"
 
@@ -3785,6 +3836,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return "3"
                 elif (open_target > desire_target):
                     return str(desire_target)
+
 
             def get_pair_volatile(pair, within_64):
                 if (pair == "GBPUSD"):
@@ -4006,10 +4058,10 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 3
                     elif (selected_pair in gold_comm):
                         open_target = round(XAUUSD_gap / final_risk, 2)
-                        total_target = round(get_sum_target(),2)
+                        total_target = round(get_sum_target(), 2)
                         if (open_target >= 5.41):
                             return open_target
-                        elif(total_target >= 5.41):
+                        elif (total_target >= 5.41):
                             return total_target
                         else:
                             return 5.41
@@ -4037,7 +4089,6 @@ elif st.session_state.current_page == "Risk Calculation":
                             return total_target
                         else:
                             return 4.41
-
 
 
                 if (selected_pair in minor_yens):
@@ -4068,7 +4119,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 else:
                     if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
-                        if(trend_position == "9%-10.99%" and within_64 == "Yes"):
+                        if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                             targeting = get_open_target(selected_pair)
                         elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
@@ -4076,7 +4127,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             targeting = get_open_target(selected_pair)
                         else:
                             targeting = 5.41
-                    elif (selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                    elif (
+                            selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
                         if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                             if (big_risk_multiplier > 1):
                                 total_target = get_sum_target()
@@ -4095,7 +4147,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone at 886 - 91%"
                         entry_text = "TOP/BOTTOM or Adjust by SL"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone +6%, 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
@@ -4104,22 +4156,25 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
-                        elif(risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
+                        elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4128,21 +4183,24 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
@@ -4150,26 +4208,30 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "TOP or MIDDLE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "TOP or Adjust by SL Cover END of zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
                     if (selected_pair == "XAUUSD"):
-                        if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
+                        if (
+                                trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
                             if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                                 targeting = get_open_target(selected_pair)
                             elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
@@ -4194,7 +4256,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone at 886 - 91%"
                             entry_text = "TOP/BOTTOM or Adjust by SL"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone +6%, 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
@@ -4202,14 +4265,16 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -4218,14 +4283,16 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
@@ -4233,17 +4300,18 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "TOP or MIDDLE of TPF Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "TOP or Adjust by SL Cover END of zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: "+get_pair_volatile(selected_pair,within_64)+"%, Entry zone +6%, 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone +6%, 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
-
 
             col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 
@@ -4263,7 +4331,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --For TPF Enter Middle of Zone if TPF last 25th Percentile<br>
                             </div>
                             """, unsafe_allow_html=True)
-                    #--Entry: {get_global('entry_model')}<br>
+                    # --Entry: {get_global('entry_model')}<br>
                 elif (get_global('entry_model') == None):
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
@@ -4275,7 +4343,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --For TPF Enter Middle of Zone if TPF last 25th Percentile<br>
                             </div>
                             """, unsafe_allow_html=True)
-                    #--Min Length for {selected_pair} is {base_percent}%<br>
+                    # --Min Length for {selected_pair} is {base_percent}%<br>
 
                 if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
                     container.markdown("<br>", unsafe_allow_html=True)
@@ -4332,7 +4400,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     # Check if Stop Loss is 0 or missing
                                     if stop_pips is None or stop_pips == 0:
                                         st.error("Cannot add order: Stop Loss is required and cannot be 0!")
-                                    elif (position_size <= 0 or final_risk <=0):
+                                    elif (position_size <= 0 or final_risk <= 0):
                                         st.error("Position size is required to be greater than 0")
                                     else:
                                         # Check if maximum records reached (only for new records, not updates)
@@ -4845,7 +4913,6 @@ elif st.session_state.current_page == "Active Opps":
                 # Fetch new data
                 new_events = get_red_news_from_json_with_rate_limit()
 
-
                 if new_events:
                     # Save to Google Sheets USING REPLACEMENT
 
@@ -4853,10 +4920,9 @@ elif st.session_state.current_page == "Active Opps":
                         st.session_state.red_events = new_events
                         st.session_state.last_news_fetch = datetime.now()
                         st.session_state.data_source = 'forex_factory'
-                        #st.success("News data REPLACED and updated successfully!")
+                        # st.success("News data REPLACED and updated successfully!")
                     else:
                         st.error("Failed to REPLACE news in Google Sheets")
-
 
     with col2:
         if st.session_state.last_news_fetch:
@@ -4875,7 +4941,7 @@ elif st.session_state.current_page == "Active Opps":
                 st.session_state.red_events = sheet_events
                 st.session_state.last_news_fetch = datetime.now()
                 st.session_state.data_source = 'cloud'
-                #st.success("Loaded news data from Google Sheets")
+                # st.success("Loaded news data from Google Sheets")
             else:
                 # If no data in sheets, fetch new data
 
@@ -5453,7 +5519,8 @@ elif st.session_state.current_page == "Active Opps":
             except Exception as e:
                 st.error(f"Error reading workflow CSV: {e}")
                 st.info("Make sure your CSV has the correct format with these columns:")
-                st.code("selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp, stop_loss_pct, max_adverse_excursion")
+                st.code(
+                    "selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp, stop_loss_pct, max_adverse_excursion")
 
     # Count records by status
     speculation_count = sum(1 for r in st.session_state.saved_records if r.get('status') == 'Speculation')
@@ -5664,7 +5731,6 @@ elif st.session_state.current_page == "Active Opps":
                         has_cross_group_conflict, conflict_groups, conflicting_pairs = check_cross_group_conflict(
                             record['selected_pair'], active_stage_records
                         )
-
 
                         col_update, col_move, col_delete = st.columns(3)
 
@@ -6114,6 +6180,7 @@ elif st.session_state.current_page == "Trade Signal":
                 return 0.0  # Invalid direction
         except:
             return 0.0
+
 
     # Add this new function to calculate first trail price
     def calculate_first_trail_price(entry_price, stop_loss, direction, strategy):
@@ -6580,6 +6647,8 @@ elif st.session_state.current_page == "Trade Signal":
             import traceback
             traceback.print_exc()
             return 0
+
+
     async def fast_order_check(symbol: str, entry_price: float, volume: float):
         """Fast order check with minimal overhead"""
         try:
@@ -7153,8 +7222,6 @@ elif st.session_state.current_page == "Trade Signal":
             if not success:
                 st.error(f"{message}")
 
-
-
     # Auto-connect to MetaApi account
     if not st.session_state.metaapi_connected:
         import asyncio
@@ -7263,9 +7330,7 @@ elif st.session_state.current_page == "Trade Signal":
     if not st.session_state.metaapi_connected:
         st.warning("Not Connected to Trading Account - Trades will not execute")
 
-
-
-    #st.info(" Status changes are automatically saved to Active Opps workflow")
+    # st.info(" Status changes are automatically saved to Active Opps workflow")
 
     st.markdown("---")
 
@@ -7292,7 +7357,7 @@ elif st.session_state.current_page == "Trade Signal":
 
         with tab1:
             st.subheader(" Ready to Order")
-            #st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
+            # st.info("Signals from Active Opps with 'Order Ready' status. Click 'Execute Order' to place trade.")
 
             if not st.session_state.ready_to_order:
                 st.info("No signals ready for ordering.")
@@ -7583,7 +7648,8 @@ elif st.session_state.current_page == "Trade Signal":
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        original_sl_price, direction, strategy)
+                                                                                        original_sl_price, direction,
+                                                                                        strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values

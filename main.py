@@ -1541,14 +1541,25 @@ elif st.session_state.current_page == "Account Overview":
         # Add horizontal zero line
         fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
-        # Calculate extended date range to simulate "zoom out once"
+        # Calculate extended ranges for both x and y axes to simulate "zoom out once"
         if len(df) > 0:
+            # Extend x-axis (dates) by 20% on both sides
             date_range = df['Date'].max() - df['Date'].min()
-            # Add 20% padding on both sides to simulate one zoom-out click
             extended_start = df['Date'].min() - date_range * 0.2
             extended_end = df['Date'].max() + date_range * 0.2
 
+            # Extend y-axis (PnL) by 20% on both sides
+            y_min = df['equity'].min()
+            y_max = df['equity'].max()
+            y_range = y_max - y_min
+            extended_y_min = y_min - y_range * 0.2
+            extended_y_max = y_max + y_range * 0.2
+
+            # Apply the extended ranges
             fig.update_xaxes(range=[extended_start, extended_end])
+            fig.update_yaxes(range=[extended_y_min, extended_y_max], title_text="Pure PnL ($)", row=1, col=1)
+        else:
+            fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
 
         # Layout customization
         fig.update_layout(
@@ -1556,9 +1567,6 @@ elif st.session_state.current_page == "Account Overview":
             title_text="Equity Curve (Pure Trade PnL)",
             hovermode='x unified'
         )
-
-        # Y-axis label
-        fig.update_yaxes(title_text="Pure PnL ($)", row=1, col=1)
 
         # Display the plot
         st.plotly_chart(fig, use_container_width=True)

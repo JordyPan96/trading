@@ -1543,7 +1543,7 @@ elif st.session_state.current_page == "Account Overview":
 
         # Layout customization
         fig.update_layout(
-            height=500,  # Reduced height since we only have one chart now
+            height=700,  # Reduced height since we only have one chart now
             title_text="Equity Curve (Pure Trade PnL)",
             hovermode='x unified'
         )

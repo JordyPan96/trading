@@ -7874,7 +7874,8 @@ elif st.session_state.current_page == "Stats":
 
                 # Calculate monthly percentage gain compared to previous month
                 if prev_month_balance != 0:
-                    monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
+                    #monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
+                    monthly_pct_gain = ((ending_balance - prev_month_balance) / starting_capital) * 100
                     set_global("monthly_limit_left", starting_balance * 0.08)
                 else:
                     monthly_pct_gain = 0

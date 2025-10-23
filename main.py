@@ -1529,11 +1529,7 @@ elif st.session_state.current_page == "Account Overview":
 
         # Add connecting line from 0 to first data point starting from 2025-01-01
         if len(df) > 0:
-            # Create start date that matches the frequency of your Date column
             start_date = pd.Timestamp('2025-01-01')
-
-            # If we need to align with the frequency, we can use the first date minus some days
-            # or just use the start_date directly if it's before your data
             fig.add_trace(
                 go.Scatter(x=[start_date, df['Date'].iloc[0]],
                            y=[0, df['equity'].iloc[0]],
@@ -1550,10 +1546,8 @@ elif st.session_state.current_page == "Account Overview":
             row=2, col=1
         )
 
-        # Add zero line starting from 2025-01-01
-        start_date = pd.Timestamp('2025-01-01')
-        fig.add_vline(x=start_date.timestamp() * 1000, line_dash="dash", line_color="green",
-                      annotation_text="Zero Baseline", row=1, col=1)
+        # Add horizontal zero line (this is the fix!)
+        fig.add_hline(y=0, line_dash="dash", line_color="green", annotation_text="Zero Baseline", row=1, col=1)
 
         # Layout customization
         fig.update_layout(

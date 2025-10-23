@@ -1529,7 +1529,15 @@ elif st.session_state.current_page == "Account Overview":
 
         # Add connecting line from 0 to first data point starting from 2025-01-01
         if len(df) > 0:
-            start_date = '2025-01-01'
+            # Convert start_date to match the type of df['Date']
+            start_date = pd.Timestamp('2025-01-01')
+
+            # Ensure the start_date is compatible with the Date column type
+            if hasattr(df['Date'].iloc[0], 'strftime'):  # If it's datetime-like
+                start_date = pd.Timestamp('2025-01-01')
+            else:  # If it's string or other type
+                start_date = '2025-01-01'
+
             fig.add_trace(
                 go.Scatter(x=[start_date, df['Date'].iloc[0]],
                            y=[0, df['equity'].iloc[0]],
@@ -1547,7 +1555,7 @@ elif st.session_state.current_page == "Account Overview":
         )
 
         # Add zero line starting from 2025-01-01
-        start_date = '2025-01-01'
+        start_date = pd.Timestamp('2025-01-01')
         fig.add_vline(x=start_date, line_dash="dash", line_color="green",
                       annotation_text="Zero Baseline", row=1, col=1)
 

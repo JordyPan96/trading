@@ -4040,6 +4040,10 @@ elif st.session_state.current_page == "Risk Calculation":
                 length_title = "Leg One Length Requirement:"
                 length_text = ""
 
+                def get_entry_zone_plus(pair_volatile):
+                    pair_volatile = int(pair_volatile)
+                    entry_plus = str(round(pair_volatile * 0.5,0))
+                    return entry_plus
 
                 def get_sum_target():
                     sum_target = round(sum_gap / final_risk, 2)
@@ -4098,7 +4102,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone at 886 - 91%"
                         entry_text = "TOP/BOTTOM or Adjust by SL"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33') +" 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "6.41"
 
@@ -4106,7 +4110,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33') +" 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
@@ -4114,7 +4118,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "TOP or MIDDLE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33') +" 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 

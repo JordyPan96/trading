@@ -4153,7 +4153,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone at 886 - 91%"
                         entry_text = "TOP/BOTTOM or Adjust by SL"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone +6%, 33%"
+                        SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64)) +" 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 

@@ -3574,7 +3574,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
-            within_64 = st.selectbox("Price Within 64", available_64_3)
+            within_64 = st.selectbox("Zone Within 64", available_64_3)
             st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)

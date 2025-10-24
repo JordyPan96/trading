@@ -3574,7 +3574,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
-            within_64 = st.selectbox("Zone Within 64", available_64_3)
+            within_64 = st.selectbox("Entry Price Within 64", available_64_3)
             st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)
@@ -4338,7 +4338,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
+                                --IF <=64 Within Zone then entry (EP) MUST be Within 64 (Unless Clear TPF Level Above)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -4350,7 +4350,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
+                                --IF <=64 Within Zone then entry (EP) MUST be Within 64 (Unless Clear TPF Level Above)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>

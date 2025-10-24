@@ -3963,7 +3963,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "786 - 91"):
-                            entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                            entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
@@ -3978,7 +3978,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
                         if (Variances == "786 - 91"):
-                            entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                            entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
@@ -3993,7 +3993,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
                         if (Variances == "786 - 91"):
-                            entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                            entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
@@ -4008,7 +4008,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "786 - 91"):
-                            entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                            entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
@@ -4119,7 +4119,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 if (selected_pair in minor_yens):
                     if (Variances == "786 - 91"):
-                        entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                        entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
@@ -4170,7 +4170,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     else:
                         targeting = get_open_target(selected_pair)
                     if (Variances == "786 - 91"):
-                        entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                        entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
@@ -4270,7 +4270,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             targeting = get_open_target(selected_pair)
                         if (Variances == "786 - 91"):
-                            entry_title = "Entry Guide: Zone at 886 - 91%, can enter 786-886"
+                            entry_title = "Entry Guide:Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"

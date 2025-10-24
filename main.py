@@ -3956,7 +3956,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3971,7 +3971,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -3986,7 +3986,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -4001,7 +4001,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = compare_target(get_one_target(selected_pair), 20)
                     else:
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -4019,28 +4019,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 24%, Entry zone "+get_entry_zone_plus_(24,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
@@ -4128,7 +4128,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "559 - 66"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
                         exit_title = "Target Guide One (RR):"
@@ -4136,7 +4136,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "66 - 786"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                        entry_text = "TOP or MIDDLE of TPF Zone"
+                        entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
                         exit_title = "Target Guide One (RR):"
@@ -4180,7 +4180,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4188,7 +4188,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4204,14 +4204,14 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "66 - 786"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4226,14 +4226,14 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                            entry_text = "TOP or MIDDLE of TPF Zone"
+                            entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4279,7 +4279,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                                entry_text = "TOP or MIDDLE of TPF Zone"
+                                entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"
@@ -4295,7 +4295,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "66 - 786"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                                entry_text = "TOP or MIDDLE of TPF Zone"
+                                entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"
@@ -4310,7 +4310,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
-                                entry_text = "TOP or MIDDLE of TPF Zone"
+                                entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"

@@ -3528,7 +3528,7 @@ elif st.session_state.current_page == "Risk Calculation":
             POI = st.selectbox(
                 "POI Type (2_Daily is 2nd to Last on Weekly -- Note that the wick on first weekly Candle need to be >=0.50%)",
                 available_time_frame_2)
-            cross_fib = st.selectbox("Wave Status", ['Wave 2+', 'Wave 1', 'Cross Wave'])
+            cross_fib = st.selectbox("Weekly Wave Status", ['Wave 2+', 'Wave 1', 'Cross Wave'])
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
 
             available_strategies = get_available_strategies(selected_pair)

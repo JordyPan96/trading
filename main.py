@@ -4335,7 +4335,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --IF <=64 WITHIN Zone then entry WITHIN 64<br>
+                                --IF <=64 Within Zone then entry MUST be Wihtin 64<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
@@ -4347,7 +4347,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --IF <=64 WITHIN Zone then entry WITHIN 64<br>
+                                --IF <=64 Within Zone then entry MUST be Wihtin 64<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>

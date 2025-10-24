@@ -4195,7 +4195,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                            entry_text = "TOP or Adjust by SL Cover END of zone"
+                            entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4218,7 +4218,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                            entry_text = "TOP or Adjust by SL Cover END of zone"
+                            entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide:"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4240,7 +4240,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                            entry_text = "TOP or Adjust by SL Cover END of zone"
+                            entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                             exit_title = "Target Guide One (RR):"
@@ -4286,7 +4286,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                                entry_text = "TOP or Adjust by SL Cover END of zone"
+                                entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide:"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"
@@ -4302,7 +4302,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                                entry_text = "TOP or Adjust by SL Cover END of zone"
+                                entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide:"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"
@@ -4317,7 +4317,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
-                                entry_text = "TOP or Adjust by SL Cover END of zone"
+                                entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
                                 exit_title = "Target Guide One (RR):"

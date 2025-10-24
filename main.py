@@ -4334,7 +4334,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Zone is Defined as Blue Fib to Orange Fib<br>
+                                --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
                                 --SL MUST at least cover end of zone<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
@@ -4346,7 +4346,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Zone is Defined as Blue Fib to Orange Fib<br>
+                                --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
                                 --SL MUST at least cover end of zone<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>

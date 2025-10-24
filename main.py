@@ -4335,10 +4335,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
+                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -4347,10 +4347,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
                                 --Double Zone can be 2 Fib Zone or TPF Wick to next Zone<br>
                                 --Only Draw Double Zone (Max 2) if <= 27% Combined<br>
                                 --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
+                                --IF <=64 Within Zone then entry (EP) MUST be Within 64<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>

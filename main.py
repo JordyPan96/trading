@@ -3577,7 +3577,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             within_64 = st.selectbox("Entry Price Within 64", available_64_3)
             Zone_Position = st.selectbox("Zone Position From Leg One",zone_from_leg_one)
-            st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)
             # Pair_prior_result = st.selectbox("Pair Prior Result in Month", pair_result, disabled=True)

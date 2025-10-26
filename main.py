@@ -3148,6 +3148,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
+        zone_from_leg_one = ["NA","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
             "1_BNR": ["50", "559 - 66", "786 - 91"],
@@ -3575,6 +3576,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64", available_64_3)
+            Zone_Position = st.selectbox("Zone Position From Leg One",zone_from_leg_one)
             st.markdown("<div style='height:15px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)

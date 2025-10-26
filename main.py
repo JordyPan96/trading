@@ -3240,6 +3240,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_16 = {
+            "1_BNR": ["+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
+            "1_BNR_TPF":["+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
+            "2_BNR":["NA","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
+            "2_BNR_TPF":["NA"]
+
+        }
+
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -3319,6 +3327,11 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_variance_2(trend, variancelist):
             available_variances = incompatible_map_10.get(trend, [])
             return [s for s in variancelist if s not in available_variances]
+
+
+        def get_available_zone_position(strategy):
+            available_zone_position = incompatible_map_16.get(strategy, [])
+            return [s for s in zone_from_leg_one if s not in available_zone_position]
 
 
         def get_pair_prior_result(current_month_stats, selected_pair):
@@ -3576,7 +3589,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64", available_64_3)
-            Zone_Position = st.selectbox("Zone Position From Leg One",zone_from_leg_one)
+            
+            available_zone_position = get_available_zone_position(risk_multiplier)
+            Zone_Position = st.selectbox("Zone Position From Leg One",available_zone_position)
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)

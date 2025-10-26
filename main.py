@@ -4526,7 +4526,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             st.session_state.current_page = "Active Opps"
                             st.rerun()
 
-                        st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='height:150px;'></div>", unsafe_allow_html=True)
                     elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
                         container.metric(entry_title, entry_text)
 
@@ -4703,7 +4703,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                             st.rerun()
 
-                        st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='height:150px;'></div>", unsafe_allow_html=True)
 
 
 elif st.session_state.current_page == "Active Opps":

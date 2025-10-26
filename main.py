@@ -3589,7 +3589,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64", available_64_3)
-            
+
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Leg One",available_zone_position)
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
@@ -3614,6 +3614,7 @@ elif st.session_state.current_page == "Risk Calculation":
             cross_fib_multiplier = 1.0
             sum_target_multiplier = 1.0
             big_risk_multiplier = 1.0
+            Zone_Position_multiplier = 1.0
             # Iterate through each strategy in the results
             for strategy, row in strategy_stats.iterrows():
                 # Get the multiplier for this specific strategy
@@ -3623,6 +3624,30 @@ elif st.session_state.current_page == "Risk Calculation":
 
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
             sum_target_multiplier = get_sum_target_remain()
+
+            if(Zone_Position == "NA"):
+                Zone_Position_multiplier = 1.0
+            elif(Zone_Position == "+1"):
+                Zone_Position_multiplier = 1.0
+            elif (Zone_Position == "+2"):
+                Zone_Position_multiplier = 0.95
+            elif (Zone_Position == "+3"):
+                Zone_Position_multiplier = 0.90
+            elif (Zone_Position == "+4"):
+                Zone_Position_multiplier = 0.85
+            elif (Zone_Position == "+5"):
+                Zone_Position_multiplier = 0.80
+            elif (Zone_Position == "+6"):
+                Zone_Position_multiplier = 0.75
+            elif (Zone_Position == "+7"):
+                Zone_Position_multiplier = 0.70
+            elif (Zone_Position == "+8"):
+                Zone_Position_multiplier = 0.65
+            elif (Zone_Position == "+9"):
+                Zone_Position_multiplier = 0.60
+            elif (Zone_Position == "+10"):
+                Zone_Position_multiplier = 0.55
+
 
             if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
@@ -3743,7 +3768,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier
+                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05

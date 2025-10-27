@@ -1523,10 +1523,12 @@ elif st.session_state.current_page == "Account Overview":
         # Create sequential x-axis values (equal spacing between trades)
         x_values = list(range(len(df)))
 
-        # Equity Curve (Pure PnL)
+        # Equity Curve (Pure PnL) - use sequential x-values for equal spacing
         fig.add_trace(
             go.Scatter(x=x_values, y=df['equity'],
-                       name='Equity (Pure PnL)', line=dict(color='royalblue')),
+                       name='Equity (Pure PnL)', line=dict(color='royalblue'),
+                       hovertemplate='Date: %{text}<br>Equity: $%{y:.2f}<extra></extra>',
+                       text=df['Date'].dt.strftime('%Y-%m-%d')),
             row=1, col=1
         )
 
@@ -1546,14 +1548,15 @@ elif st.session_state.current_page == "Account Overview":
         # Layout customization
         fig.update_layout(
             height=700,
-            title_text="Equity Curve (Pure Trade PnL) - Trade Sequence",
+            title_text="Equity Curve (Pure Trade PnL) - Equal Trade Spacing",
             hovermode='x unified'
         )
 
-        # Customize x-axis to show trade numbers instead of dates
+        # Customize x-axis to show dates but maintain equal spacing
         fig.update_xaxes(
-            title_text="Trade Sequence Number",
-            tickvals=x_values,  # Show ticks at each trade
+            title_text="Trade Date",
+            tickvals=x_values,  # Ticks at each trade position
+            ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
             row=1, col=1
         )
 

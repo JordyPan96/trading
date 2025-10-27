@@ -1520,18 +1520,20 @@ elif st.session_state.current_page == "Account Overview":
         # Create figure with subplots (now only 1 row since we removed drawdown)
         fig = make_subplots(rows=1, cols=1)
 
+        # Create sequential x-axis values (equal spacing between trades)
+        x_values = list(range(len(df)))
+
         # Equity Curve (Pure PnL)
         fig.add_trace(
-            go.Scatter(x=df['Date'], y=df['equity'],
+            go.Scatter(x=x_values, y=df['equity'],
                        name='Equity (Pure PnL)', line=dict(color='royalblue')),
             row=1, col=1
         )
 
-        # Add connecting line from 0 to first data point starting from 2025-01-01
+        # Add connecting line from 0 to first data point
         if len(df) > 0:
-            start_date = pd.Timestamp('2025-01-01')
             fig.add_trace(
-                go.Scatter(x=[start_date, df['Date'].iloc[0]],
+                go.Scatter(x=[-0.5, 0],  # Start slightly before first trade
                            y=[0, df['equity'].iloc[0]],
                            line=dict(color='royalblue', dash='dash'),
                            showlegend=False),
@@ -1543,9 +1545,16 @@ elif st.session_state.current_page == "Account Overview":
 
         # Layout customization
         fig.update_layout(
-            height=700,  # Reduced height since we only have one chart now
-            title_text="Equity Curve (Pure Trade PnL)",
+            height=700,
+            title_text="Equity Curve (Pure Trade PnL) - Trade Sequence",
             hovermode='x unified'
+        )
+
+        # Customize x-axis to show trade numbers instead of dates
+        fig.update_xaxes(
+            title_text="Trade Sequence Number",
+            tickvals=x_values,  # Show ticks at each trade
+            row=1, col=1
         )
 
         # Y-axis label

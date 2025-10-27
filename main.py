@@ -3199,8 +3199,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "9%-10.99%1_BNR_TPF": [],
             "11%-12.99%1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
-            "EURAUD1_BNR_TPF": ["559 - 66", "66 - 786"],
-            "GBPAUD1_BNR_TPF": ["559 - 66", "66 - 786"]
+            "EURAUD1_BNR_TPF": ["559 - 66"],
+            "GBPAUD1_BNR_TPF": ["559 - 66"]
             # Add more restrictions as needed
         }
 

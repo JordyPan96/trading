@@ -3132,7 +3132,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
-        shapes = ["A Tower","M Top","Z Liquidity Swept"]
+        shapes = ["1A","2A","3A","M Top","Z Liquidity Swept"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3261,6 +3261,16 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_17 = {
+            '1_BNR':["2A", "3A",],
+            '1_BNR_TPF':["2A", "3A","Z Liquidity Swept"],
+            '2_BNR':["1A","3A", "Z Liquidity Swept"],
+            '2_BNR_TPF':["1A", "2A", "Z Liquidity Swept"]
+        }
+
+        def get_available_pattern_trigger(strategy):
+            disabled_strategy = incompatible_map_17.get(strategy, [])
+            return [s for s in shapes if s not in disabled_strategy]
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -3572,7 +3582,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
-            pattern = st.selectbox("Pattern Trigger",shapes)
+            available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
+            pattern = st.selectbox("Pattern Trigger",available_pattern_trigger)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",

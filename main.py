@@ -3132,7 +3132,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
-        shapes = ["A Tower","M Solid Top","Z Liquidity Swept"]
+        shapes = ["A Tower","M Double Top","Z Liquidity Swept"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],

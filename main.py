@@ -3172,9 +3172,9 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_5 = {
             "GBPAUD": [],
             "EURAUD": [],
-            "GBPJPY": ["No"],
-            "EURJPY": ["No"],
-            "AUDJPY": ["No"]
+            "GBPJPY": [],
+            "EURJPY": [],
+            "AUDJPY": []
         }
 
         incompatible_map_6 = {

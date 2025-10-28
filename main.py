@@ -4793,7 +4793,8 @@ elif st.session_state.current_page == "Active Opps":
         # Define cross groups
         cross_groups = [
             ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
-            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
+            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"],
+            ['GBPJPY','USDJPY','AUDJPY','EURJPY']
         ]
 
         # Find ALL groups the selected pair belongs to
@@ -4832,7 +4833,8 @@ elif st.session_state.current_page == "Active Opps":
         # Define cross groups
         cross_groups = [
             ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
-            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"]
+            ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"],
+            ['GBPJPY', 'USDJPY', 'AUDJPY', 'EURJPY']
         ]
 
         # Find ALL groups the filled pair belongs to

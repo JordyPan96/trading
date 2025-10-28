@@ -2737,7 +2737,7 @@ elif st.session_state.current_page == "Risk Calculation":
             display_df['Avg Win RR'] = display_df['Avg Win RR'].map("{:,.2f}".format)
             display_df['Total Return'] = display_df['Total Return'].map("${:,.2f}".format)
 
-            st.dataframe(display_df)
+            #st.dataframe(display_df)
 
         with col2:
             st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)

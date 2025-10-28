@@ -4492,6 +4492,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'HH_LL': HH_LL,
                                                 'risk_multiplier': risk_multiplier,
                                                 'pattern': pattern,
+                                                "Zone_Position":Zone_Position,
                                                 'Variances': Variances,
                                                 'stop_pips': stop_pips,
                                                 'within_64': within_64,
@@ -4635,6 +4636,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'risk_multiplier': risk_multiplier,
 
                                                 'pattern': pattern,
+
+                                                'Zone_Position':Zone_Position,
 
                                                 'Variances': Variances,
 
@@ -5194,7 +5197,7 @@ elif st.session_state.current_page == "Active Opps":
 
             required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                 'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                                'stop_loss_pct', 'max_adverse_excursion',"pattern"]  # ADDED NEW FIELDS
+                                'stop_loss_pct', 'max_adverse_excursion',"pattern","Zone_Position"]  # ADDED NEW FIELDS
             for col in required_columns:
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
@@ -5231,6 +5234,7 @@ elif st.session_state.current_page == "Active Opps":
                     'trend_position': record.get('trend_position', 'Not set'),
                     'variances': record.get('Variances', 'Not set'),
                     'pattern': record.get('pattern', 'Not set'),
+                    'Zone_Position': record.get('Zone_Position','Not set'),
                     'status': 'Order Ready'
                 })
 
@@ -5513,18 +5517,18 @@ elif st.session_state.current_page == "Active Opps":
                 # Validate required columns
                 required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                     'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                                    'stop_loss_pct', 'max_adverse_excursion','pattern']  # ADDED NEW FIELDS
+                                    'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']  # ADDED NEW FIELDS
 
                 missing_columns = [col for col in required_columns if col not in workflow_csv_data.columns]
 
                 if missing_columns:
                     st.error(f"Missing required columns in CSV: {', '.join(missing_columns)}")
                     st.info(
-                        "Expected columns: selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp, pattern")
+                        "Expected columns: selected_pair, risk_multiplier, position_size, stop_pips, entry_price, exit_price, target_price, status, timestamp, pattern, Zone_Position")
                 else:
                     # Clean the data - handle None values and convert numeric columns
                     for col in ['position_size', 'stop_pips', 'entry_price', 'exit_price', 'target_price',
-                                'stop_loss_pct', 'max_adverse_excursion','pattern']:  # ADDED NEW FIELDS
+                                'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']:  # ADDED NEW FIELDS
                         if col in workflow_csv_data.columns:
                             workflow_csv_data[col] = workflow_csv_data[col].replace('None', None)
                             workflow_csv_data[col] = pd.to_numeric(workflow_csv_data[col], errors='coerce').fillna(0.0)
@@ -5637,7 +5641,7 @@ elif st.session_state.current_page == "Active Opps":
             csv_data = pd.DataFrame(st.session_state.saved_records)
             column_order = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                             'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                            'stop_loss_pct', 'max_adverse_excursion','pattern']  # ADDED NEW FIELDS
+                            'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']  # ADDED NEW FIELDS
             for col in column_order:
                 if col not in csv_data.columns:
                     csv_data[col] = None
@@ -6046,6 +6050,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'POI': new_poi,
                                             'Strategy': record['risk_multiplier'],
                                             'Pattern': record['pattern'],
+                                            'Zone_Position': record['Zone_Position'],
                                             'Variance': existing_variance,
                                             'Result': new_result,
                                             'RR': new_rr,
@@ -6071,7 +6076,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
-                                                                    'Withdrawal_Deposit', 'PROP_Pct','Pattern']
+                                                                    'Withdrawal_Deposit', 'PROP_Pct','Pattern','Zone_Position']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:

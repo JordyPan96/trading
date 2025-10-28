@@ -3535,7 +3535,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 return 2
 
 
-        col1, col2, col3,col4,col5 = st.columns(5, gap="small")
+        col1, col2, col3 = st.columns(3, gap="small")
         with col1:
             account_balance = equity
             # account_balance = st.number_input("Account balance", equity)

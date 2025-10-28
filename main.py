@@ -2740,7 +2740,7 @@ elif st.session_state.current_page == "Risk Calculation":
             #st.dataframe(display_df)
 
         with col2:
-            st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
+            #st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
             st.session_state.current_risk = 1.0  # Base risk
 
             # st.subheader("Adaptive Risk Calculation")
@@ -2763,7 +2763,7 @@ elif st.session_state.current_page == "Risk Calculation":
             }).set_index("Metric")
 
             #st.table(result_df)
-            st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
+            #st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
             next_risk = base_risk
 
 

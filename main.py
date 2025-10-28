@@ -3602,8 +3602,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             within_64 = st.selectbox("Entry Price Within 64", available_64_3)
 
-            available_zone_position = get_available_zone_position(risk_multiplier)
-            Zone_Position = st.selectbox("Zone Position From Leg One",available_zone_position)
+
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)
@@ -3611,6 +3610,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
             sect_count = get_pair_sect_count(current_month_stats, selected_pair)
 
+        with col2:
+            available_zone_position = get_available_zone_position(risk_multiplier)
+            Zone_Position = st.selectbox("Zone Position From Leg One", available_zone_position)
         with col3:
 
             strategy_stats = ensure_all_strategies_analyzed(df)

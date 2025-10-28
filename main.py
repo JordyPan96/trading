@@ -3611,7 +3611,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             sect_count = get_pair_sect_count(current_month_stats, selected_pair)
 
-        with col2:
+        with col3:
 
             strategy_stats = ensure_all_strategies_analyzed(df)
             # st.write(strategy_stats.items())

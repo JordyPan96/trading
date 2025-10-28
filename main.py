@@ -2762,7 +2762,7 @@ elif st.session_state.current_page == "Risk Calculation":
                           2)) + "%"]
             }).set_index("Metric")
 
-            st.table(result_df)
+            #st.table(result_df)
             st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
             next_risk = base_risk
 

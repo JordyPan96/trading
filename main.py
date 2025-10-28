@@ -3572,7 +3572,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
-            pattern = st.selectbox("Pattern Variation",shapes)
+            pattern = st.selectbox("Pattern Trigger",shapes)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",

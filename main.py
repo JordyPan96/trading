@@ -2840,6 +2840,34 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 return None
 
+        # PAIR GROUPING FUNCTIONS
+        def get_pair_group_spec(selected_pair):
+            """Determine which group a pair belongs to"""
+            group_one = ["EURAUD", "GBPAUD"]
+            group_two = ["GBPJPY", "EURJPY", "AUDJPY"]
+            group_three = ["AUDUSD"]
+            group_four = ["GBPUSD", "EURUSD"]
+            group_five = ["XAUUSD"]
+            group_six = ["USDJPY"]
+            group_seven = ["USDCAD"]
+
+            if selected_pair in group_one:
+                return "group_one"
+            elif selected_pair in group_two:
+                return "group_two"
+            elif selected_pair in group_three:
+                return "group_three"
+            elif selected_pair in group_four:
+                return "group_four"
+            elif selected_pair in group_five:
+                return "group_five"
+            elif selected_pair in group_six:
+                return "group_six"
+            elif selected_pair in group_seven:
+                return "group_seven"
+            else:
+                return None
+
 
         def get_group_pairs(group_name):
             """Get all pairs in a specific group"""
@@ -2855,7 +2883,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def check_and_handle_group_conflict(new_pair, new_final_risk, saved_records):
             """Check if new pair conflicts with existing pairs in same group and handle accordingly"""
-            new_pair_group = get_pair_group(new_pair)
+            new_pair_group = get_pair_group_spec(new_pair)
 
             if not new_pair_group:
                 return saved_records, None  # No group, no conflict
@@ -2864,7 +2892,7 @@ elif st.session_state.current_page == "Risk Calculation":
             conflicting_records = []
             for i, record in enumerate(saved_records):
                 if (record.get('status') == 'Speculation' and
-                        get_pair_group(record['selected_pair']) == new_pair_group):
+                        get_pair_group_spec(record['selected_pair']) == new_pair_group):
                     conflicting_records.append((i, record, record.get('final_risk', 0)))
 
             if not conflicting_records:

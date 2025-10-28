@@ -3629,6 +3629,7 @@ elif st.session_state.current_page == "Risk Calculation":
             sum_target_multiplier = 1.0
             big_risk_multiplier = 1.0
             Zone_Position_multiplier = 1.0
+            hh_ll_multiplier = 1.0
             # Iterate through each strategy in the results
             for strategy, row in strategy_stats.iterrows():
                 # Get the multiplier for this specific strategy
@@ -3661,6 +3662,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 Zone_Position_multiplier = 0.60
             elif (Zone_Position == "+10"):
                 Zone_Position_multiplier = 0.55
+
+            if(HH_LL == "No"):
+                hh_ll_multiplier = 0.91
+            elif(HH_LL == "Yes"):
+                hh_ll_multiplier = 1.0
 
 
             if (POI == 'Weekly Structure'):
@@ -3782,7 +3788,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier
+                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05

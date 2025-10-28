@@ -4491,6 +4491,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'cross_fib': cross_fib,
                                                 'HH_LL': HH_LL,
                                                 'risk_multiplier': risk_multiplier,
+                                                'pattern': pattern,
                                                 'Variances': Variances,
                                                 'stop_pips': stop_pips,
                                                 'within_64': within_64,
@@ -4632,6 +4633,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'HH_LL': HH_LL,
 
                                                 'risk_multiplier': risk_multiplier,
+
+                                                'pattern': pattern,
 
                                                 'Variances': Variances,
 
@@ -5191,7 +5194,7 @@ elif st.session_state.current_page == "Active Opps":
 
             required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                 'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                                'stop_loss_pct', 'max_adverse_excursion']  # ADDED NEW FIELDS
+                                'stop_loss_pct', 'max_adverse_excursion',"pattern"]  # ADDED NEW FIELDS
             for col in required_columns:
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
@@ -5227,6 +5230,7 @@ elif st.session_state.current_page == "Active Opps":
                     'target_price': record['target_price'],
                     'trend_position': record.get('trend_position', 'Not set'),
                     'variances': record.get('Variances', 'Not set'),
+                    'pattern': record.get('pattern', 'Not set'),
                     'status': 'Order Ready'
                 })
 

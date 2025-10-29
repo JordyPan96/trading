@@ -3414,7 +3414,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_focus_pair(current_month_stats):
             """Determine which pair to focus on based on most recent loss"""
-            major_pairs = ["AUDUSD", "GBPUSD", "EURUSD"]
+            major_pairs = ["GBPUSD", "EURUSD"]
             focus_pair = None
 
             if len(current_month_stats) > 0:
@@ -3511,8 +3511,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 elif (pair == "AUDUSD"):
                     # Apply focus rule - if focus pair exists and it's not this pair, return 0
-                    if focus_pair is not None and focus_pair != "AUDUSD":
-                        return 0
+                    #if focus_pair is not None and focus_pair != "AUDUSD":
+                        #return 0
 
                     audusd_count = 2  # Start with default count
 

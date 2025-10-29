@@ -1267,6 +1267,9 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position", options=trend_position_options,
                                                   key="new_trend_position")
 
+                Zone_Position_options = ["NA","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
+                new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options, key="new_Zone_Position")
+
             with col6:
                 # NEW: within_64 dropdown - UPDATED OPTIONS
                 within_64_options = ["Yes", "No"]
@@ -1329,6 +1332,8 @@ if st.session_state.current_page == "Home":
                     new_record['Pattern'] = new_Pattern
                 if 'within_64' in data.columns:
                     new_record['within_64'] = new_within_64
+                if 'Zone_Position' in data.columns:
+                    new_record['Zone_Position'] = new_Zone_Position
 
                 # Trend Position field (existing field with space)
                 if 'Trend Position' in data.columns:

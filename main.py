@@ -2967,6 +2967,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 'XAUUSD': {'symbols': ['XAUUSD'], 'target': 0},
                 'USDCAD_AUDUSD': {'symbols': ['USDCAD', 'AUDUSD'], 'target': 0},
                 'GBPUSD_EURUSD': {'symbols': ['GBPUSD', 'EURUSD'], 'target': 0},
+                'XXXUSD': {'symbols': ['AUDUSD', 'EURUSD','GBPUSD'], 'target': 0},
                 'JPY_Pairs': {'symbols': ['GBPJPY', 'EURJPY', 'AUDJPY', 'USDJPY'], 'target': 0},
                 'GBPAUD_EURAUD': {'symbols': ['GBPAUD', 'EURAUD'], 'target': 0}
             }

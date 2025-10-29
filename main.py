@@ -8134,7 +8134,7 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data2)
 
-    st.subheader("BE Rules")
+    st.subheader("BE Rule - RR Based Refer Below - Structure based if Target below key structure")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
         'Trigger Condition': ["Trigger at 2.5 R",

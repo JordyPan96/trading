@@ -1256,6 +1256,9 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
+                pattern_options = ["1A","2A","3A","M Top","Z Liquidity Swept"]
+                new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
+
             with col5:
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
@@ -1322,6 +1325,8 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
+                if 'Pattern'in data.columns:
+                    new_record['Pattern'] = new_Pattern
                 if 'within_64' in data.columns:
                     new_record['within_64'] = new_within_64
 

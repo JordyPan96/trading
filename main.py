@@ -2533,7 +2533,8 @@ elif st.session_state.current_page == "Symbol Stats":
                     # 2. Basic probability distribution
                     def basic_probability(year_data):
                         st.write("\nBASIC PROBABILITY DISTRIBUTION")
-                        st.write("Head = Correct Thesis, Tail = Wrong Thesis, Edge Outlier = Correct Thesis Liquid Swept by Market")
+                        st.write(
+                            "Head = Correct Thesis, Tail = Wrong Thesis, Edge Outlier = Correct Thesis Liquid Swept by Market")
                         st.write("-" * 40)
 
                         prob_counts = year_data['Probability'].value_counts()
@@ -2546,6 +2547,16 @@ elif st.session_state.current_page == "Symbol Stats":
                         win_rate = (prob_counts.get('Head', 0) / total_trades * 100)
                         st.write(f"\nOverall Win Rate: {win_rate:.2f}%")
                         st.write(f"Total Trades: {total_trades}")
+
+                        # New statistic: Percentage of losers that are "Edge Outlier"
+                        total_losers = prob_counts.get('Tail', 0) + prob_counts.get('Edge Outlier', 0)
+                        edge_outlier_losers = prob_counts.get('Edge Outlier', 0)
+
+                        if total_losers > 0:
+                            edge_outlier_percentage = (edge_outlier_losers / total_losers * 100)
+                            st.write(f"Edge Outlier as % of Losers: {edge_outlier_percentage:.2f}%")
+                        else:
+                            st.write("Edge Outlier as % of Losers: No losing trades")
 
 
                     # 3. Probability by Strategy

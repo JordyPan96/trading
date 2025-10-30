@@ -1674,7 +1674,7 @@ elif st.session_state.current_page == "Symbol Stats":
                 "Direction Analysis",
                 "Strategy Analysis",
                 "Visualizations",
-                "MAE Analysis & Stop Loss Optimization"
+                "MAE Analysis & Stop Loss Optimization",
                 "Winrate Analysis"
             ])
 

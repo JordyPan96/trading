@@ -2680,34 +2680,7 @@ elif st.session_state.current_page == "Symbol Stats":
                     print(rr_stats)
 
 
-                # 7. Export to Excel (optional)
-                def export_probability_analysis(year_data, filename='probability_analysis.xlsx'):
-                    """
-                    Export all probability analysis to Excel
-                    """
-                    with pd.ExcelWriter(filename, engine='openpyxl') as writer:
-                        # Basic probability
-                        prob_basic = pd.crosstab(year_data['Probability'], columns='Count')
-                        prob_basic['Percentage'] = (prob_basic['Count'] / len(year_data) * 100).round(2)
-                        prob_basic.to_excel(writer, sheet_name='Basic_Probability')
-
-                        # Strategy analysis
-                        strategy_table = pd.crosstab(year_data['Strategy'], year_data['Probability'], margins=True)
-                        strategy_table.to_excel(writer, sheet_name='By_Strategy')
-
-                        # Pattern analysis
-                        pattern_table = pd.crosstab(year_data['Pattern'], year_data['Probability'], margins=True)
-                        pattern_table.to_excel(writer, sheet_name='By_Pattern')
-
-                        # Combined analysis
-                        combined_table = year_data.groupby(['Strategy', 'Pattern', 'Probability']).size().unstack(
-                            fill_value=0)
-                        combined_table.to_excel(writer, sheet_name='Strategy_Pattern_Combined')
-
-                    print(f"\n💾 Analysis exported to: {filename}")
-
-
-                # 8. Visualization function (optional - requires matplotlib)
+                # 7. Visualization function (optional - requires matplotlib)
                 def plot_probability_analysis(year_data):
                     """
                     Create visualizations for probability analysis
@@ -2761,9 +2734,6 @@ elif st.session_state.current_page == "Symbol Stats":
 
 
                 analyze_probability_by_strategy_pattern(year_data)
-
-                # Optional: Export to Excel
-                export_probability_analysis(year_data, 'trading_probability_analysis.xlsx')
 
 
     else:

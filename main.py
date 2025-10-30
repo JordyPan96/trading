@@ -44,7 +44,7 @@ st.markdown("""
             max-width: 400px !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
-            padding-top: 2rem !important;
+            padding-top: 2.5rem !important;
             padding-bottom: 5rem !important;  /* Added bottom padding */
             margin-left: auto !important;
             margin-right: auto !important;
@@ -8697,6 +8697,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

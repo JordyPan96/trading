@@ -2733,7 +2733,8 @@ elif st.session_state.current_page == "Symbol Stats":
                         print("Matplotlib or Seaborn not available for plotting")
 
 
-                analyze_probability_by_strategy_pattern(year_data)
+                if True:
+                    analyze_probability_by_strategy_pattern(year_data)
 
 
     else:

@@ -2533,6 +2533,7 @@ elif st.session_state.current_page == "Symbol Stats":
                     # 2. Basic probability distribution
                     def basic_probability(year_data):
                         st.write("\nBASIC PROBABILITY DISTRIBUTION")
+                        st.write("Head = Correct Thesis, Tail = Wrong Thesis, Edge Outlier = Correct Thesis Liquid Swept by Market")
                         st.write("-" * 40)
 
                         prob_counts = year_data['Probability'].value_counts()

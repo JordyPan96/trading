@@ -51,7 +51,7 @@ st.markdown("""
         }
 
         .stApp {
-            margin-top: 10px !important;
+            margin-top: 50px !important;
         }
 
         /* Force centered layout on mobile */

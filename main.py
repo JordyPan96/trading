@@ -2535,7 +2535,6 @@ elif st.session_state.current_page == "Symbol Stats":
                         st.write("\nBASIC PROBABILITY DISTRIBUTION")
                         st.write(
                             "Head = Correct Thesis, Tail = Wrong Thesis, Edge Outlier = Correct Thesis Liquid Swept by Market")
-                        st.write("Benchmark of Liquidity Swept Losing trades: Normal: 40–60%% (early/intermediate stage)   Good: 15–25%    Elite: <10–15%")
                         st.write("-" * 40)
 
                         prob_counts = year_data['Probability'].value_counts()
@@ -2557,10 +2556,18 @@ elif st.session_state.current_page == "Symbol Stats":
                             edge_outlier_percentage = (edge_outlier_losers / total_losers * 100)
                             st.write("-" * 40)
                             st.write(f"Edge Outlier as % of Losers: {edge_outlier_percentage:.2f}%")
+                            st.write("Benchmark of Liquidity Swept Losing trades:")
+                            st.write("Normal: 40–60%% (early/intermediate stage)")
+                            st.write("Good: 25-40%")
+                            st.write("Elite: <20–25%")
                             st.write("-" * 40)
                         else:
                             st.write("-" * 40)
                             st.write("Edge Outlier as % of Losers: No losing trades")
+                            st.write("Benchmark of Liquidity Swept Losing trades:")
+                            st.write("Normal: 40–60%% (early/intermediate stage)")
+                            st.write("Good: 25-40%")
+                            st.write("Elite: <20–25%")
                             st.write("-" * 40)
 
 

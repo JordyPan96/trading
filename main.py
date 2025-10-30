@@ -3652,7 +3652,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
-            within_64 = st.selectbox("Entry Price Within 64", available_64_3)
+            within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Leg One",available_zone_position)
@@ -8478,3 +8478,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+

@@ -2500,240 +2500,198 @@ elif st.session_state.current_page == "Symbol Stats":
                         st.rerun()
 
             with tab7:
-                # 1. Main probability analysis function
-                def analyze_probability_by_strategy_pattern(year_data):
-                    """
-                    Comprehensive probability analysis by Strategy and Pattern
-                    """
-                    print("🎯 COMPREHENSIVE PROBABILITY ANALYSIS")
-                    print("=" * 60)
+                if st.button("Run Probability Analysis") or True:  # Set to True to run automatically
+                    # 1. Main probability analysis function
+                    def analyze_probability_by_strategy_pattern(year_data):
+                        """
+                        Comprehensive probability analysis by Strategy and Pattern
+                        """
+                        st.write("🎯 COMPREHENSIVE PROBABILITY ANALYSIS")
+                        st.write("=" * 60)
 
-                    # Basic probability distribution
-                    basic_probability(year_data)
+                        # Basic probability distribution
+                        basic_probability(year_data)
 
-                    # Strategy analysis
-                    probability_by_strategy(year_data)
+                        # Strategy analysis
+                        if 'Strategy' in year_data.columns:
+                            probability_by_strategy(year_data)
+                        else:
+                            st.warning("'Strategy' column not found for analysis")
 
-                    # Pattern analysis
-                    probability_by_pattern(year_data)
+                        # Pattern analysis
+                        if 'Pattern' in year_data.columns:
+                            probability_by_pattern(year_data)
+                        else:
+                            st.warning("'Pattern' column not found for analysis")
 
-                    # Combined Strategy + Pattern analysis
-                    probability_by_strategy_pattern_combined(year_data)
+                        # Combined Strategy + Pattern analysis
+                        if 'Strategy' in year_data.columns and 'Pattern' in year_data.columns:
+                            probability_by_strategy_pattern_combined(year_data)
 
-                    # Statistical significance
-                    statistical_analysis(year_data)
-
-
-                # 2. Basic probability distribution
-                def basic_probability(year_data):
-                    print("\n📊 BASIC PROBABILITY DISTRIBUTION")
-                    print("-" * 40)
-
-                    prob_counts = year_data['Probability'].value_counts()
-                    total_trades = len(year_data)
-
-                    for prob_type, count in prob_counts.items():
-                        percentage = (count / total_trades * 100)
-                        print(f"{prob_type:15} | {count:3} trades | {percentage:6.2f}%")
-
-                    win_rate = (prob_counts.get('Head', 0) / total_trades * 100)
-                    print(f"\n🏆 Overall Win Rate: {win_rate:.2f}%")
-                    print(f"📈 Total Trades: {total_trades}")
+                        # Statistical significance
+                        statistical_analysis(year_data)
 
 
-                # 3. Probability by Strategy
-                def probability_by_strategy(year_data):
-                    print("\n\n🎯 PROBABILITY BY STRATEGY")
-                    print("=" * 80)
+                    # 2. Basic probability distribution
+                    def basic_probability(year_data):
+                        st.write("\n📊 BASIC PROBABILITY DISTRIBUTION")
+                        st.write("-" * 40)
 
-                    # Create cross tabulation
-                    strategy_cross = pd.crosstab(
-                        year_data['Strategy'],
-                        year_data['Probability'],
-                        margins=True,
-                        margins_name='TOTAL'
-                    )
-
-                    # Calculate percentages
-                    strategy_percent = pd.crosstab(
-                        year_data['Strategy'],
-                        year_data['Probability'],
-                        normalize='index'
-                    ) * 100
-
-                    # Add win rate column
-                    strategy_cross['Win_Rate_%'] = (strategy_percent.get('Head', 0)).round(2)
-                    strategy_cross['Total_Trades'] = strategy_cross.sum(axis=1) - strategy_cross['Win_Rate_%']
-                    strategy_cross['Win_Rate_%'] = strategy_cross['Win_Rate_%'].fillna(0)
-
-                    # Display the table
-                    print("Strategy Probability Distribution:")
-                    print(strategy_cross.round(2))
-
-                    # Best and worst performing strategies
-                    if 'Head' in strategy_percent.columns:
-                        best_strategy = strategy_percent['Head'].idxmax()
-                        best_win_rate = strategy_percent['Head'].max()
-                        worst_strategy = strategy_percent['Head'].idxmin()
-                        worst_win_rate = strategy_percent['Head'].min()
-
-                        print(f"\n⭐ Best Strategy: {best_strategy} ({best_win_rate:.2f}% win rate)")
-                        print(f"📉 Worst Strategy: {worst_strategy} ({worst_win_rate:.2f}% win rate)")
-
-
-                # 4. Probability by Pattern
-                def probability_by_pattern(year_data):
-                    print("\n\n🎨 PROBABILITY BY PATTERN")
-                    print("=" * 80)
-
-                    # Create cross tabulation
-                    pattern_cross = pd.crosstab(
-                        year_data['Pattern'],
-                        year_data['Probability'],
-                        margins=True,
-                        margins_name='TOTAL'
-                    )
-
-                    # Calculate percentages
-                    pattern_percent = pd.crosstab(
-                        year_data['Pattern'],
-                        year_data['Probability'],
-                        normalize='index'
-                    ) * 100
-
-                    # Add win rate column
-                    pattern_cross['Win_Rate_%'] = (pattern_percent.get('Head', 0)).round(2)
-                    pattern_cross['Total_Trades'] = pattern_cross.sum(axis=1) - pattern_cross['Win_Rate_%']
-                    pattern_cross['Win_Rate_%'] = pattern_cross['Win_Rate_%'].fillna(0)
-
-                    # Display the table
-                    print("Pattern Probability Distribution:")
-                    print(pattern_cross.round(2))
-
-                    # Best and worst performing patterns
-                    if 'Head' in pattern_percent.columns:
-                        best_pattern = pattern_percent['Head'].idxmax()
-                        best_win_rate = pattern_percent['Head'].max()
-                        worst_pattern = pattern_percent['Head'].idxmin()
-                        worst_win_rate = pattern_percent['Head'].min()
-
-                        print(f"\n⭐ Best Pattern: {best_pattern} ({best_win_rate:.2f}% win rate)")
-                        print(f"📉 Worst Pattern: {worst_pattern} ({worst_win_rate:.2f}% win rate)")
-
-
-                # 5. Combined Strategy + Pattern analysis
-                def probability_by_strategy_pattern_combined(year_data):
-                    print("\n\n🔗 COMBINED STRATEGY + PATTERN ANALYSIS")
-                    print("=" * 80)
-
-                    # Create combined analysis
-                    combined = year_data.groupby(['Strategy', 'Pattern']).agg({
-                        'Probability': [
-                            ('Total_Trades', 'count'),
-                            ('Wins', lambda x: (x == 'Head').sum()),
-                            ('Losses', lambda x: (x != 'Head').sum())
-                        ]
-                    }).round(2)
-
-                    # Flatten column names
-                    combined.columns = ['Total_Trades', 'Wins', 'Losses']
-
-                    # Calculate win rates
-                    combined['Win_Rate_%'] = (combined['Wins'] / combined['Total_Trades'] * 100).round(2)
-
-                    # Filter only combinations with significant sample size (e.g., at least 3 trades)
-                    significant_combinations = combined[combined['Total_Trades'] >= 3]
-
-                    if not significant_combinations.empty:
-                        print("Significant Strategy-Pattern Combinations (min 3 trades):")
-                        print(significant_combinations.sort_values('Win_Rate_%', ascending=False))
-
-                        # Best combination
-                        best_combo = significant_combinations.loc[significant_combinations['Win_Rate_%'].idxmax()]
-                        best_combo_name = significant_combinations['Win_Rate_%'].idxmax()
-
-                        print(f"\n🏆 Best Combination: {best_combo_name}")
-                        print(f"   Win Rate: {best_combo['Win_Rate_%']}% | Trades: {int(best_combo['Total_Trades'])}")
-                    else:
-                        print("No strategy-pattern combinations with significant sample size (min 3 trades)")
-
-
-                # 6. Statistical analysis
-                def statistical_analysis(year_data):
-                    print("\n\n📈 STATISTICAL ANALYSIS")
-                    print("=" * 60)
-
-                    # PnL analysis by probability type
-                    pnl_stats = year_data.groupby('Probability')['PnL'].agg([
-                        'count', 'mean', 'std', 'min', 'max', 'sum'
-                    ]).round(2)
-
-                    print("PnL Statistics by Probability Type:")
-                    print(pnl_stats)
-
-                    # Risk-Reward analysis
-                    rr_stats = year_data.groupby('Probability')['RR'].agg([
-                        'count', 'mean', 'std', 'min', 'max'
-                    ]).round(2)
-
-                    print("\nRisk-Reward (RR) Statistics by Probability Type:")
-                    print(rr_stats)
-
-
-                # 7. Visualization function (optional - requires matplotlib)
-                def plot_probability_analysis(year_data):
-                    """
-                    Create visualizations for probability analysis
-                    """
-                    try:
-                        import matplotlib.pyplot as plt
-                        import seaborn as sns
-
-                        # Set up the plotting style
-                        plt.style.use('seaborn-v0_8')
-                        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-
-                        # Plot 1: Overall probability distribution
                         prob_counts = year_data['Probability'].value_counts()
-                        axes[0, 0].pie(prob_counts.values, labels=prob_counts.index, autopct='%1.1f%%', startangle=90)
-                        axes[0, 0].set_title('Overall Probability Distribution')
+                        total_trades = len(year_data)
 
-                        # Plot 2: Win rate by strategy
-                        strategy_win_rates = year_data.groupby('Strategy')['Probability'].apply(
-                            lambda x: (x == 'Head').mean() * 100
-                        ).sort_values(ascending=False)
+                        for prob_type, count in prob_counts.items():
+                            percentage = (count / total_trades * 100)
+                            st.write(f"{prob_type:15} | {count:3} trades | {percentage:6.2f}%")
 
-                        axes[0, 1].barh(range(len(strategy_win_rates)), strategy_win_rates.values)
-                        axes[0, 1].set_yticks(range(len(strategy_win_rates)))
-                        axes[0, 1].set_yticklabels(strategy_win_rates.index)
-                        axes[0, 1].set_xlabel('Win Rate (%)')
-                        axes[0, 1].set_title('Win Rate by Strategy')
-
-                        # Plot 3: Win rate by pattern
-                        pattern_win_rates = year_data.groupby('Pattern')['Probability'].apply(
-                            lambda x: (x == 'Head').mean() * 100
-                        ).sort_values(ascending=False)
-
-                        axes[1, 0].barh(range(len(pattern_win_rates)), pattern_win_rates.values)
-                        axes[1, 0].set_yticks(range(len(pattern_win_rates)))
-                        axes[1, 0].set_yticklabels(pattern_win_rates.index)
-                        axes[1, 0].set_xlabel('Win Rate (%)')
-                        axes[1, 0].set_title('Win Rate by Pattern')
-
-                        # Plot 4: Trade count by strategy and probability
-                        strategy_prob_count = pd.crosstab(year_data['Strategy'], year_data['Probability'])
-                        strategy_prob_count.plot(kind='bar', ax=axes[1, 1], stacked=True)
-                        axes[1, 1].set_title('Trade Count by Strategy and Probability')
-                        axes[1, 1].tick_params(axis='x', rotation=45)
-
-                        plt.tight_layout()
-                        plt.show()
-
-                    except ImportError:
-                        print("Matplotlib or Seaborn not available for plotting")
+                        win_rate = (prob_counts.get('Head', 0) / total_trades * 100)
+                        st.write(f"\n🏆 Overall Win Rate: {win_rate:.2f}%")
+                        st.write(f"📈 Total Trades: {total_trades}")
 
 
-                if True:
+                    # 3. Probability by Strategy
+                    def probability_by_strategy(year_data):
+                        st.write("\n\n🎯 PROBABILITY BY STRATEGY")
+                        st.write("=" * 80)
+
+                        # Create cross tabulation
+                        strategy_cross = pd.crosstab(
+                            year_data['Strategy'],
+                            year_data['Probability'],
+                            margins=True,
+                            margins_name='TOTAL'
+                        )
+
+                        # Calculate percentages
+                        strategy_percent = pd.crosstab(
+                            year_data['Strategy'],
+                            year_data['Probability'],
+                            normalize='index'
+                        ) * 100
+
+                        # Add win rate column
+                        strategy_cross['Win_Rate_%'] = (strategy_percent.get('Head', 0)).round(2)
+                        strategy_cross['Total_Trades'] = strategy_cross.sum(axis=1)
+                        strategy_cross['Win_Rate_%'] = strategy_cross['Win_Rate_%'].fillna(0)
+
+                        # Display the table
+                        st.write("Strategy Probability Distribution:")
+                        st.dataframe(strategy_cross.round(2))
+
+                        # Best and worst performing strategies
+                        if 'Head' in strategy_percent.columns:
+                            best_strategy = strategy_percent['Head'].idxmax()
+                            best_win_rate = strategy_percent['Head'].max()
+                            worst_strategy = strategy_percent['Head'].idxmin()
+                            worst_win_rate = strategy_percent['Head'].min()
+
+                            st.write(f"\n⭐ Best Strategy: {best_strategy} ({best_win_rate:.2f}% win rate)")
+                            st.write(f"📉 Worst Strategy: {worst_strategy} ({worst_win_rate:.2f}% win rate)")
+
+
+                    # 4. Probability by Pattern
+                    def probability_by_pattern(year_data):
+                        st.write("\n\n🎨 PROBABILITY BY PATTERN")
+                        st.write("=" * 80)
+
+                        # Create cross tabulation
+                        pattern_cross = pd.crosstab(
+                            year_data['Pattern'],
+                            year_data['Probability'],
+                            margins=True,
+                            margins_name='TOTAL'
+                        )
+
+                        # Calculate percentages
+                        pattern_percent = pd.crosstab(
+                            year_data['Pattern'],
+                            year_data['Probability'],
+                            normalize='index'
+                        ) * 100
+
+                        # Add win rate column
+                        pattern_cross['Win_Rate_%'] = (pattern_percent.get('Head', 0)).round(2)
+                        pattern_cross['Total_Trades'] = pattern_cross.sum(axis=1)
+                        pattern_cross['Win_Rate_%'] = pattern_cross['Win_Rate_%'].fillna(0)
+
+                        # Display the table
+                        st.write("Pattern Probability Distribution:")
+                        st.dataframe(pattern_cross.round(2))
+
+                        # Best and worst performing patterns
+                        if 'Head' in pattern_percent.columns:
+                            best_pattern = pattern_percent['Head'].idxmax()
+                            best_win_rate = pattern_percent['Head'].max()
+                            worst_pattern = pattern_percent['Head'].idxmin()
+                            worst_win_rate = pattern_percent['Head'].min()
+
+                            st.write(f"\n⭐ Best Pattern: {best_pattern} ({best_win_rate:.2f}% win rate)")
+                            st.write(f"📉 Worst Pattern: {worst_pattern} ({worst_win_rate:.2f}% win rate)")
+
+
+                    # 5. Combined Strategy + Pattern analysis
+                    def probability_by_strategy_pattern_combined(year_data):
+                        st.write("\n\n🔗 COMBINED STRATEGY + PATTERN ANALYSIS")
+                        st.write("=" * 80)
+
+                        # Create combined analysis
+                        combined = year_data.groupby(['Strategy', 'Pattern']).agg({
+                            'Probability': [
+                                ('Total_Trades', 'count'),
+                                ('Wins', lambda x: (x == 'Head').sum()),
+                                ('Losses', lambda x: (x != 'Head').sum())
+                            ]
+                        }).round(2)
+
+                        # Flatten column names
+                        combined.columns = ['Total_Trades', 'Wins', 'Losses']
+
+                        # Calculate win rates
+                        combined['Win_Rate_%'] = (combined['Wins'] / combined['Total_Trades'] * 100).round(2)
+
+                        # Filter only combinations with significant sample size (e.g., at least 3 trades)
+                        significant_combinations = combined[combined['Total_Trades'] >= 3]
+
+                        if not significant_combinations.empty:
+                            st.write("Significant Strategy-Pattern Combinations (min 3 trades):")
+                            st.dataframe(significant_combinations.sort_values('Win_Rate_%', ascending=False))
+
+                            # Best combination
+                            best_combo = significant_combinations.loc[significant_combinations['Win_Rate_%'].idxmax()]
+                            best_combo_name = significant_combinations['Win_Rate_%'].idxmax()
+
+                            st.write(f"\n🏆 Best Combination: {best_combo_name}")
+                            st.write(
+                                f"   Win Rate: {best_combo['Win_Rate_%']}% | Trades: {int(best_combo['Total_Trades'])}")
+                        else:
+                            st.write("No strategy-pattern combinations with significant sample size (min 3 trades)")
+
+
+                    # 6. Statistical analysis
+                    def statistical_analysis(year_data):
+                        st.write("\n\n📈 STATISTICAL ANALYSIS")
+                        st.write("=" * 60)
+
+                        # PnL analysis by probability type
+                        if 'PnL' in year_data.columns:
+                            pnl_stats = year_data.groupby('Probability')['PnL'].agg([
+                                'count', 'mean', 'std', 'min', 'max', 'sum'
+                            ]).round(2)
+
+                            st.write("PnL Statistics by Probability Type:")
+                            st.dataframe(pnl_stats)
+
+                        # Risk-Reward analysis
+                        if 'RR' in year_data.columns:
+                            rr_stats = year_data.groupby('Probability')['RR'].agg([
+                                'count', 'mean', 'std', 'min', 'max'
+                            ]).round(2)
+
+                            st.write("\nRisk-Reward (RR) Statistics by Probability Type:")
+                            st.dataframe(rr_stats)
+
+
+                    # Run the analysis
                     analyze_probability_by_strategy_pattern(year_data)
 
 

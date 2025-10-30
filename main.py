@@ -1668,13 +1668,14 @@ elif st.session_state.current_page == "Symbol Stats":
             st.warning(f"No data found for {selected_year}")
         else:
             # Create tabs for better organization - ADDED TAB6
-            tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+            tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
                 "Overall Performance",
                 "Monthly Analysis",
                 "Direction Analysis",
                 "Strategy Analysis",
                 "Visualizations",
                 "MAE Analysis & Stop Loss Optimization"
+                "Winrate Analysis"
             ])
 
             with tab1:
@@ -2497,6 +2498,10 @@ elif st.session_state.current_page == "Symbol Stats":
                     if st.button("Clear Saved MAE Results"):
                         st.session_state.mae_analysis_results = {}
                         st.rerun()
+
+            with tab7:
+                st.header("Winrate Analysis")
+
 
     else:
         st.warning("Please upload data first to analyze symbol statistics")
@@ -8478,4 +8483,3 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-

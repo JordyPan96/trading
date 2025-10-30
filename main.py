@@ -51,7 +51,7 @@ st.markdown("""
         }
 
         .stApp {
-            margin-top: 100px !important;
+            margin-top: 200px !important;
         }
 
         /* Force centered layout on mobile */
@@ -8697,4 +8697,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 

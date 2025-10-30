@@ -2543,7 +2543,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             st.write(f"{prob_type:15} | {count:3} trades | {percentage:6.2f}%")
 
                         win_rate = (prob_counts.get('Head', 0) / total_trades * 100)
-                        st.write(f"\n🏆 Overall Win Rate: {win_rate:.2f}%")
+                        st.write(f"\nOverall Win Rate: {win_rate:.2f}%")
                         st.write(f"Total Trades: {total_trades}")
 
 
@@ -2629,7 +2629,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                     # 5. Combined Strategy + Pattern analysis
                     def probability_by_strategy_pattern_combined(year_data):
-                        st.write("\n\n🔗 COMBINED STRATEGY + PATTERN ANALYSIS")
+                        st.write("\n\nCOMBINED STRATEGY + PATTERN ANALYSIS")
                         st.write("=" * 80)
 
                         # Create combined analysis

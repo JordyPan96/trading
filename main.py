@@ -2506,7 +2506,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         """
                         Comprehensive probability analysis by Strategy and Pattern
                         """
-                        st.write("🎯 COMPREHENSIVE PROBABILITY ANALYSIS")
+                        st.write("COMPREHENSIVE PROBABILITY ANALYSIS")
                         st.write("=" * 60)
 
                         # Basic probability distribution
@@ -2534,7 +2534,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                     # 2. Basic probability distribution
                     def basic_probability(year_data):
-                        st.write("\n📊 BASIC PROBABILITY DISTRIBUTION")
+                        st.write("\nBASIC PROBABILITY DISTRIBUTION")
                         st.write("-" * 40)
 
                         prob_counts = year_data['Probability'].value_counts()
@@ -2546,12 +2546,12 @@ elif st.session_state.current_page == "Symbol Stats":
 
                         win_rate = (prob_counts.get('Head', 0) / total_trades * 100)
                         st.write(f"\n🏆 Overall Win Rate: {win_rate:.2f}%")
-                        st.write(f"📈 Total Trades: {total_trades}")
+                        st.write(f"Total Trades: {total_trades}")
 
 
                     # 3. Probability by Strategy
                     def probability_by_strategy(year_data):
-                        st.write("\n\n🎯 PROBABILITY BY STRATEGY")
+                        st.write("\n\nPROBABILITY BY STRATEGY")
                         st.write("=" * 80)
 
                         # Create cross tabulation
@@ -2585,13 +2585,13 @@ elif st.session_state.current_page == "Symbol Stats":
                             worst_strategy = strategy_percent['Head'].idxmin()
                             worst_win_rate = strategy_percent['Head'].min()
 
-                            st.write(f"\n⭐ Best Strategy: {best_strategy} ({best_win_rate:.2f}% win rate)")
-                            st.write(f"📉 Worst Strategy: {worst_strategy} ({worst_win_rate:.2f}% win rate)")
+                            st.write(f"\nBest Strategy: {best_strategy} ({best_win_rate:.2f}% win rate)")
+                            st.write(f"Worst Strategy: {worst_strategy} ({worst_win_rate:.2f}% win rate)")
 
 
                     # 4. Probability by Pattern
                     def probability_by_pattern(year_data):
-                        st.write("\n\n🎨 PROBABILITY BY PATTERN")
+                        st.write("\n\nPROBABILITY BY PATTERN")
                         st.write("=" * 80)
 
                         # Create cross tabulation
@@ -2625,8 +2625,8 @@ elif st.session_state.current_page == "Symbol Stats":
                             worst_pattern = pattern_percent['Head'].idxmin()
                             worst_win_rate = pattern_percent['Head'].min()
 
-                            st.write(f"\n⭐ Best Pattern: {best_pattern} ({best_win_rate:.2f}% win rate)")
-                            st.write(f"📉 Worst Pattern: {worst_pattern} ({worst_win_rate:.2f}% win rate)")
+                            st.write(f"\nBest Pattern: {best_pattern} ({best_win_rate:.2f}% win rate)")
+                            st.write(f"Worst Pattern: {worst_pattern} ({worst_win_rate:.2f}% win rate)")
 
 
                     # 5. Combined Strategy + Pattern analysis
@@ -2660,7 +2660,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             best_combo = significant_combinations.loc[significant_combinations['Win_Rate_%'].idxmax()]
                             best_combo_name = significant_combinations['Win_Rate_%'].idxmax()
 
-                            st.write(f"\n🏆 Best Combination: {best_combo_name}")
+                            st.write(f"\nBest Combination: {best_combo_name}")
                             st.write(
                                 f"   Win Rate: {best_combo['Win_Rate_%']}% | Trades: {int(best_combo['Total_Trades'])}")
                         else:
@@ -2669,7 +2669,7 @@ elif st.session_state.current_page == "Symbol Stats":
 
                     # 6. Statistical analysis
                     def statistical_analysis(year_data):
-                        st.write("\n\n📈 STATISTICAL ANALYSIS")
+                        st.write("\n\nSTATISTICAL ANALYSIS")
                         st.write("=" * 60)
 
                         # PnL analysis by probability type

@@ -2500,14 +2500,12 @@ elif st.session_state.current_page == "Symbol Stats":
                         st.rerun()
 
             with tab7:
-                if st.button("Run Probability Analysis") or True:  # Set to True to run automatically
+                if True:  # Set to True to run automatically
                     # 1. Main probability analysis function
                     def analyze_probability_by_strategy_pattern(year_data):
                         """
                         Comprehensive probability analysis by Strategy and Pattern
                         """
-                        st.write("COMPREHENSIVE PROBABILITY ANALYSIS")
-                        st.write("=" * 60)
 
                         # Basic probability distribution
                         basic_probability(year_data)

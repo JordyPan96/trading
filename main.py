@@ -1337,6 +1337,7 @@ if st.session_state.current_page == "Home":
                     new_record['within_64'] = new_within_64
                 if 'Zone_Position' in data.columns:
                     new_record['Zone_Position'] = new_Zone_Position
+                new_record['Probability'] = new_probability
 
                 # Trend Position field (existing field with space)
                 if 'Trend Position' in data.columns:

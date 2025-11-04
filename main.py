@@ -1279,6 +1279,9 @@ if st.session_state.current_page == "Home":
                 cross_fib_options = ["Cross Wave", "Wave 1", "Wave 2+"]
                 new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
 
+                probability_options = ['Head','Tail','Edge Outlier']
+                new_probability = st.selectbox("Probability", options=probability_options, key="new_probability")
+
                 # Optional additional fields that might be in your data
                 if 'Risk_Percentage' in data.columns:
                     new_risk_percentage = st.number_input("Risk_Percentage", value=0.0, step=0.01,

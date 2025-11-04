@@ -6268,6 +6268,16 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"strategy_{unique_key_base}",
                                 disabled=True
                             )
+                        col13, col14 = st.columns(2)
+                        with col13:
+                            Probability = ["Head", "Tail", "Edge Outlier"]
+                            new_Probability = st.selectbox(
+                                "Probability",
+                                options=Probability,
+                                index=0,
+                                key=f"probability_{unique_key_base}"
+                            )
+
 
                         # Display existing Trend Position and Variance (read-only)
                         st.write("---")
@@ -6337,6 +6347,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             'HH_LL': record['HH_LL'],  # Already exists in record
                                             'within_64': record['within_64'],  # Already exists in record
+                                            'Probability': record['Probability'],
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0
                                         }
@@ -6353,7 +6364,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
-                                                                    'Withdrawal_Deposit', 'PROP_Pct','Pattern','Zone_Position']
+                                                                    'Withdrawal_Deposit', 'PROP_Pct','Pattern','Zone_Position','Probability']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:
@@ -8697,8 +8708,3 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-

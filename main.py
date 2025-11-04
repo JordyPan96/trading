@@ -1267,7 +1267,7 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["NA","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
+                Zone_Position_options = ["0","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
                 new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options, key="new_Zone_Position")
 
             with col6:

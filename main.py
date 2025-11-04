@@ -1523,11 +1523,9 @@ elif st.session_state.current_page == "Account Overview":
         total_return = df['equity'].iloc[-1] / abs(df['equity'].iloc[0]) if abs(df['equity'].iloc[0]) > 0 else 0
         max_drawdown = df['Drawdown'].min()
 
-        df['Returns'] = df['PnL']  # raw PnL per trade
-
         sharpe_ratio = (
-            df['Returns'].mean() / df['Returns'].std()
-            if df['Returns'].std() != 0 else 0
+            df['PnL'].mean() / df['PnL'].std()
+            if df['PnL'].std() != 0 else 0
         )
 
         # Calculate longest losing streak

@@ -3419,7 +3419,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
-        zone_from_leg_one = ["NA","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
+        zone_from_leg_one = ["0","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
             "1_BNR": ["50", "559 - 66", "786 - 91"],
@@ -3514,8 +3514,8 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_16 = {
             "1_BNR": ["+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
             "1_BNR_TPF":["+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
-            "2_BNR":["NA","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
-            "2_BNR_TPF":["NA"]
+            "2_BNR":["0","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
+            "2_BNR_TPF":["0"]
 
         }
 
@@ -3909,7 +3909,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
             sum_target_multiplier = get_sum_target_remain()
 
-            if(Zone_Position == "NA"):
+            if(Zone_Position == "0"):
                 Zone_Position_multiplier = 1.0
             elif(Zone_Position == "+1"):
                 Zone_Position_multiplier = 1.0
@@ -3931,6 +3931,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 Zone_Position_multiplier = 0.60
             elif (Zone_Position == "+10"):
                 Zone_Position_multiplier = 0.55
+            else:
+                Zone_Position_multiplier = 1.0
 
             if(HH_LL == "No"):
                 hh_ll_multiplier = 0.91

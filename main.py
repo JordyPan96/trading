@@ -6347,7 +6347,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             'HH_LL': record['HH_LL'],  # Already exists in record
                                             'within_64': record['within_64'],  # Already exists in record
-                                            'Probability': record['Probability'],
+                                            'Probability': new_Probability,
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0
                                         }

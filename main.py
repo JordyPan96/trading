@@ -5414,7 +5414,7 @@ elif st.session_state.current_page == "Active Opps":
                                 for keyword in [
                                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
                                     "GDP", "Non-Farm", "CPI", "election", "non farm",
-                                    "PMI", "Unemployment claims"
+                                    "PMI", "Unemployment claims","Bank Rate"
                                 ]
                             )
                             )
@@ -8716,3 +8716,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+

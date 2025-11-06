@@ -8025,6 +8025,8 @@ elif st.session_state.current_page == "Trade Signal":
                             # Initialize storage if not exists
                             if 'be_prices' not in st.session_state:
                                 st.session_state.be_prices = {}
+                            if 'threeR_prices' not in st.session_state:
+                                st.session_state.threeR_prices = {}
                             if 'first_trail_prices' not in st.session_state:
                                 st.session_state.first_trail_prices = {}
                             if 'original_sl_prices' not in st.session_state:

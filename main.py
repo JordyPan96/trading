@@ -8155,6 +8155,9 @@ elif st.session_state.current_page == "Trade Signal":
                                 if is_gold:
                                     be_price = open_price + 2.0  # $2 for gold buy
                                     be_label = f"Break-even (Entry + $2): {be_price:.2f}"
+                                elif symbol.endswith('JPY'):
+                                    be_price = open_price + 0.05  # 5 pips = 0.01 * 5 for JPY pairs
+                                    be_label = f"Break-even (Entry + 5 pips): {be_price:.3f}"
                                 else:
                                     be_price = open_price + 0.0005  # 5 pips for forex buy
                                     be_label = f"Break-even (Entry + 5 pips): {be_price:.5f}"
@@ -8162,6 +8165,9 @@ elif st.session_state.current_page == "Trade Signal":
                                 if is_gold:
                                     be_price = open_price - 2.0  # $2 for gold sell
                                     be_label = f"Break-even (Entry - $2): {be_price:.2f}"
+                                elif symbol.endswith('JPY'):
+                                    be_price = open_price - 0.05  # 5 pips for JPY pairs
+                                    be_label = f"Break-even (Entry - 5 pips): {be_price:.3f}"
                                 else:
                                     be_price = open_price - 0.0005  # 5 pips for forex sell
                                     be_label = f"Break-even (Entry - 5 pips): {be_price:.5f}"

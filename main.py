@@ -8421,12 +8421,12 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data2 = {
         '': ['2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2.4%'],
-        'XAUUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2.4%'],
-        'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
-        'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2%'],
-        'OTHER 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
-        'OTHER 66 - 786': ['Left Leg 1.79%, Mid Leg 2%']
+        'XAUUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2.4%'],
+        'XAUUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2.4%'],
+        'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
+        'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2%'],
+        'OTHER 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
+        'OTHER 66 - 786': ['Left Leg 1.78%, Mid Leg 2%']
     }
 
     st.table(table_data2)

@@ -8383,12 +8383,12 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data2)
 
-    st.subheader("BE Rule - RR Based Refer Below - Structure based if Target below key structure")
+    st.subheader("BE Rule - RR Based Refer Below - 3R Breakeven Rule is for when top of pullback leg to target >=50%")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 2.5 R",
-                              'Trigger at 2.5 R',
-                              'Trigger at 2.0 R', 'Trigger at 2.0 R'],
+        'Trigger Condition': ["Trigger at 2.5 R (3R)",
+                              'Trigger at 2.5 R (3R)',
+                              'Trigger at 2.0 R (3R)', 'Trigger at 2.0 R (3R)'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry"]
     }
@@ -8716,4 +8716,3 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-

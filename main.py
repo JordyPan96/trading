@@ -6553,6 +6553,36 @@ elif st.session_state.current_page == "Trade Signal":
         except:
             return 0.0
 
+    def calculate_threeR_price(entry_price, exit_price, direction, strategy):
+        """Calculate Break-Even Price based on strategy and direction."""
+        try:
+            entry = safe_float(entry_price, 0.0)
+            exit_val = safe_float(exit_price, 0.0)
+
+            if entry == 0 or exit_val == 0:
+                return 0.0
+
+            risk_distance = abs(entry - exit_val)
+
+            # Strategy → Multiplier mapping
+            strategy_multipliers = {
+                '1_BNR': 3.0,
+                '1_BNR_TPF': 3.0,
+                '2_BNR': 3.0,
+                '2_BNR_TPF': 3.0
+            }
+            multiplier = strategy_multipliers.get(strategy, 3.0)
+
+            direction = direction.upper()
+            if direction == 'BUY':
+                return entry + (risk_distance * multiplier)
+            elif direction == 'SELL':
+                return entry - (risk_distance * multiplier)
+            else:
+                return 0.0  # Invalid direction
+        except:
+            return 0.0
+
 
     # Add this new function to calculate first trail price
     def calculate_first_trail_price(entry_price, stop_loss, direction, strategy):
@@ -8024,6 +8054,12 @@ elif st.session_state.current_page == "Trade Signal":
                                                                                         strategy)
                             be_price = st.session_state.be_prices[symbol]
 
+                            if symbol not in st.session_state.threeR_prices:
+                                st.session_state.threeR_prices[symbol] = calculate_threeR_price(original_open_price,
+                                                                                        original_sl_price, direction,
+                                                                                        strategy)
+                            threeR_price = st.session_state.threeR_prices[symbol]
+
                             # Calculate First Trail Price once based on ORIGINAL values
                             if symbol not in st.session_state.first_trail_prices:
                                 st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
@@ -8035,6 +8071,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {current_sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             st.write(f"**BE Price:** {be_price:.5f}")
+                            st.write(f"**3R BE Price (Top of Pullback leg to target >=50%):** {threeR_price:.5f}")
                             st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
                         # MODIFY SL ONLY SECTION

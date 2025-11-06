@@ -8150,12 +8150,13 @@ elif st.session_state.current_page == "Trade Signal":
 
                             # Check if it's a gold instrument
                             is_gold = any(gold_symbol in symbol.upper() for gold_symbol in ['XAU', 'GOLD'])
+                            is_yen = any(yen_symbol in symbol.upper() for yen_symbol in ['JPY', 'jpy'])
 
                             if position_type == 'POSITION_TYPE_BUY':
                                 if is_gold:
                                     be_price = open_price + 2.0  # $2 for gold buy
                                     be_label = f"Break-even (Entry + $2): {be_price:.2f}"
-                                elif symbol.endswith('JPY'):
+                                elif is_yen:
                                     be_price = open_price + 0.05  # 5 pips = 0.01 * 5 for JPY pairs
                                     be_label = f"Break-even (Entry + 5 pips): {be_price:.3f}"
                                 else:
@@ -8165,7 +8166,7 @@ elif st.session_state.current_page == "Trade Signal":
                                 if is_gold:
                                     be_price = open_price - 2.0  # $2 for gold sell
                                     be_label = f"Break-even (Entry - $2): {be_price:.2f}"
-                                elif symbol.endswith('JPY'):
+                                elif is_yen:
                                     be_price = open_price - 0.05  # 5 pips for JPY pairs
                                     be_label = f"Break-even (Entry - 5 pips): {be_price:.3f}"
                                 else:

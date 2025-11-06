@@ -8405,12 +8405,12 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data = {
         '': ['2_BNR', '2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['1.79%', '1.19%'],
-        'XAUUSD 66 - 786': ['1.19%', '1.19%'],
-        'GBPUSD/EURUSD 50 - 66': ['1.49%', '0.99%'],
-        'GBPUSD/EURUSD 66 - 786': ['0.99%', '0.99%'],
-        'OTHER 50 - 66': ['0.99%', '0.99%'],
-        'OTHER 66 - 786': ['0.99%', '0.99%']
+        'XAUUSD 50 - 66': ['1.79%', 'Mid Leg 1.19%'],
+        'XAUUSD 66 - 786': ['1.19%', 'Mid Leg 1.19%'],
+        'GBPUSD/EURUSD 50 - 66': ['1.49%', 'Mid Leg 0.99%'],
+        'GBPUSD/EURUSD 66 - 786': ['0.99%', 'Mid Leg 0.99%'],
+        'OTHER 50 - 66': ['0.99%', 'Mid Leg 0.99%'],
+        'OTHER 66 - 786': ['0.99%', 'Mid Leg 0.99%']
     }
 
     st.table(table_data)
@@ -8421,12 +8421,12 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data2 = {
         '': ['2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['2.4%'],
-        'XAUUSD 66 - 786': ['2.4%'],
-        'GBPUSD/EURUSD 50 - 66': ['2%'],
-        'GBPUSD/EURUSD 66 - 786': ['2%'],
-        'OTHER 50 - 66': ['2%'],
-        'OTHER 66 - 786': ['2%']
+        'XAUUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2.4%'],
+        'XAUUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2.4%'],
+        'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
+        'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2%'],
+        'OTHER 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
+        'OTHER 66 - 786': ['Left Leg 1.79%, Mid Leg 2%']
     }
 
     st.table(table_data2)

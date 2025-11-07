@@ -8053,20 +8053,20 @@ elif st.session_state.current_page == "Trade Signal":
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        st.session_state.be_prices[symbol], direction,
+                                                                                        st.session_state.original_sl_prices[symbol], direction,
                                                                                         strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             if symbol not in st.session_state.threeR_prices:
                                 st.session_state.threeR_prices[symbol] = calculate_threeR_price(original_open_price,
-                                                                                        st.session_state.be_prices[symbol], direction,
+                                                                                        st.session_state.original_sl_prices[symbol], direction,
                                                                                         strategy)
                             threeR_price = st.session_state.threeR_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values
                             if symbol not in st.session_state.first_trail_prices:
                                 st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
-                                    original_open_price, st.session_state.be_prices[symbol], direction, strategy
+                                    original_open_price, st.session_state.original_sl_prices[symbol], direction, strategy
                                 )
                             first_trail_price = st.session_state.first_trail_prices[symbol]
 
@@ -8765,6 +8765,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

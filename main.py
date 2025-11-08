@@ -4680,6 +4680,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Enter <= 64 -> Entry at TOP of ZONE<br>
                                 --<br>
+                                --786 - 886 Zone Count as 2 Zones<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -4694,6 +4695,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Enter <= 64 -> Entry at TOP of ZONE<br>
                                 --<br>
+                                --786 - 886 Zone Count as 2 Zones<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -8769,6 +8771,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

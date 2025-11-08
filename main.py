@@ -1407,7 +1407,7 @@ if st.session_state.current_page == "Home":
 
         # Display
         st.title("Trading Data Dashboard")
-        st.markdown("Use the grid below to explore and filter trading data")
+        #st.markdown("Use the grid below to explore and filter trading data")
 
         import streamlit as st
 
@@ -8801,6 +8801,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

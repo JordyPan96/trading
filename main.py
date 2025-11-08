@@ -1385,12 +1385,13 @@ if st.session_state.current_page == "Home":
 
         # DISABLE editing features
         gb.configure_default_column(
+            wrapText=True,
             filterable=True,
             sortable=True,
             resizable=True,
             editable=False,  # DISABLE editing for all columns
             min_column_width=100,
-            max_column_width=300
+            max_column_width=200
         )
 
         # Build options
@@ -8790,6 +8791,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

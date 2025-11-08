@@ -1470,17 +1470,7 @@ if st.session_state.current_page == "Home":
                 "sortable": True,
                 "filter": True,
                 "flex": 1,  # ensures all columns share available width
-            },
-            # Automatically fit columns when grid loads and when window is resized
-            "onGridReady": JsCode(
-                """
-                function(params) {
-                    
-                    params.api.sizeColumnsToFit();
-                    
-                }
-                """
-            ),
+            }
         }
         
         # Display the grid
@@ -8791,6 +8781,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

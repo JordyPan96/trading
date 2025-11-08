@@ -1477,7 +1477,7 @@ if st.session_state.current_page == "Home":
         grid_response = AgGrid(
             data,
             gridOptions=grid_options,
-            fit_columns_on_grid_load=True,
+            #fit_columns_on_grid_load=True,
             height=500,
             width='100%',
             theme='streamlit',
@@ -8789,6 +8789,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

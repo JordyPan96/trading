@@ -8456,8 +8456,8 @@ elif st.session_state.current_page == "Guidelines":
 
     table_data2 = {
         '': ['2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2.4%'],
-        'XAUUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2.4%'],
+        'XAUUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
+        'XAUUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2%'],
         'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
         'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2%'],
         'OTHER 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
@@ -8799,6 +8799,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

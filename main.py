@@ -8061,24 +8061,31 @@ elif st.session_state.current_page == "Trade Signal":
                             # Store original SL for reference
                             if symbol not in st.session_state.original_sl_prices:
                                 st.session_state.original_sl_prices[symbol] = original_sl_price
+                            else:
+                                # If we found the original SL from in_trade records, use that instead of current SL
+                                if original_sl_price != current_sl_price:  # This means we found the original from in_trade
+                                    st.session_state.original_sl_prices[symbol] = original_sl_price
+                                    
+                            # Use the stored original SL for calculations, NOT the current SL
+                            calculated_original_sl = st.session_state.original_sl_prices[symbol]
 
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        st.session_state.original_sl_prices[symbol], direction,
+                                                                                        calculated_original_sl, direction,
                                                                                         strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             if symbol not in st.session_state.threeR_prices:
                                 st.session_state.threeR_prices[symbol] = calculate_threeR_price(original_open_price,
-                                                                                        st.session_state.original_sl_prices[symbol], direction,
+                                                                                        calculated_original_sl, direction,
                                                                                         strategy)
                             threeR_price = st.session_state.threeR_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values
                             if symbol not in st.session_state.first_trail_prices:
                                 st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
-                                    original_open_price, st.session_state.original_sl_prices[symbol], direction, strategy
+                                    original_open_price, calculated_original_sl, direction, strategy
                                 )
                             first_trail_price = st.session_state.first_trail_prices[symbol]
 
@@ -8777,6 +8784,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

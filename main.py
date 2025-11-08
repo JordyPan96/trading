@@ -4687,8 +4687,8 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
-                                --1_BNR_TPF/2_BNR_TPF: 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Within 64 Check<br>
-                                --2_BNR: Entry cover EOZ (Must) -> Within 64 Check -> Entry at TOP of ZONE<br>
+                                --1_BNR_TPF/2_BNR_TPF: 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Within 64 = Yes<br>
+                                --2_BNR: Entry cover EOZ (Must) -> Within 64 = Yes -> Entry at TOP of ZONE<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -8765,6 +8765,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

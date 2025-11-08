@@ -1397,6 +1397,7 @@ if st.session_state.current_page == "Home":
 
         # Build options
         grid_options = gb.build()
+        grid_options['onGridReady'] = "function(params) { const allColumnIds = params.columnApi.getAllColumns().map(col => col.getColId()); params.columnApi.autoSizeColumns(allColumnIds); }"
 
         # Manually hide the columns in the grid options
         for column in grid_options['columnDefs']:
@@ -1466,15 +1467,6 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
-        # Grid options for responsive width
-        #grid_options = {
-            #"defaultColDef": {
-                #"resizable": True,
-                #"sortable": True,
-                #"filter": True,
-                #"flex": 1,  # ensures all columns share available width
-            #}
-        #}
         
         # Display the grid
         grid_response = AgGrid(
@@ -1486,20 +1478,6 @@ if st.session_state.current_page == "Home":
             theme='streamlit',
             update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
-            #custom_js_code="""
-                #gridOptions.api.sizeColumnsToFit();
-            #""",
-            custom_js_code="""
-                const allColumnIds = gridOptions.columnApi.getAllColumns().map(col => col.getColId());
-                gridOptions.columnApi.autoSizeColumns(allColumnIds);
-
-                // Enforce max column width after auto-sizing
-                gridOptions.columnApi.getAllColumns().forEach(function(column) {
-                    if (column.getActualWidth() > 200) {
-                        gridOptions.columnApi.setColumnWidth(column, 200);
-                    }
-                });
-            """,
             key="home_aggrid_main",
             #enable_enterprise_modules=False,
             #reload_data=True
@@ -8799,6 +8777,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

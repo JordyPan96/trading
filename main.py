@@ -1464,14 +1464,14 @@ if st.session_state.current_page == "Home":
                     st.warning("No data to save")
 
         # Grid options for responsive width
-        #grid_options = {
-            #"defaultColDef": {
-                #"resizable": True,
-                #"sortable": True,
-                #"filter": True,
+        grid_options = {
+            "defaultColDef": {
+                "resizable": True,
+                "sortable": True,
+                "filter": True,
                 #"flex": 1,  # ensures all columns share available width
-            #}
-        #}
+            }
+        }
         
         # Display the grid
         grid_response = AgGrid(
@@ -8781,6 +8781,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

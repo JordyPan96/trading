@@ -1483,6 +1483,9 @@ if st.session_state.current_page == "Home":
             theme='streamlit',
             update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
+            custom_js_code="""
+                gridOptions.api.sizeColumnsToFit();
+            """,
             key="home_aggrid_main",
             #enable_enterprise_modules=False,
             #reload_data=True
@@ -8782,6 +8785,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

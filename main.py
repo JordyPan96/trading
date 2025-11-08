@@ -1491,6 +1491,13 @@ if st.session_state.current_page == "Home":
             custom_js_code="""
                 const allColumnIds = gridOptions.columnApi.getAllColumns().map(col => col.getColId());
                 gridOptions.columnApi.autoSizeColumns(allColumnIds);
+
+                // Enforce max column width after auto-sizing
+                gridOptions.columnApi.getAllColumns().forEach(function(column) {
+                    if (column.getActualWidth() > 300) {
+                        gridOptions.columnApi.setColumnWidth(column, 300);
+                    }
+                });
             """,
             key="home_aggrid_main",
             #enable_enterprise_modules=False,
@@ -8791,6 +8798,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

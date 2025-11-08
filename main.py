@@ -1494,8 +1494,8 @@ if st.session_state.current_page == "Home":
 
                 // Enforce max column width after auto-sizing
                 gridOptions.columnApi.getAllColumns().forEach(function(column) {
-                    if (column.getActualWidth() > 300) {
-                        gridOptions.columnApi.setColumnWidth(column, 300);
+                    if (column.getActualWidth() > 200) {
+                        gridOptions.columnApi.setColumnWidth(column, 200);
                     }
                 });
             """,
@@ -8798,6 +8798,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

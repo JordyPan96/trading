@@ -3878,7 +3878,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                            help="Adjust risk based on trade quality")
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
-            pattern = st.selectbox("Pattern Trigger",available_pattern_trigger)
+            pattern = st.selectbox("Pattern Trigger (At Least on 8H TimeFrame)",available_pattern_trigger)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",
@@ -8799,6 +8799,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

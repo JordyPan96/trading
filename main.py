@@ -1389,7 +1389,7 @@ if st.session_state.current_page == "Home":
             sortable=True,
             resizable=True,
             editable=False,  # DISABLE editing for all columns
-            min_column_width=100
+            #min_column_width=100
         )
 
         # Build options
@@ -1468,13 +1468,14 @@ if st.session_state.current_page == "Home":
             data,
             gridOptions=grid_options,
             height=500,
-            width='100%',
+            #width='100%',
             theme='streamlit',
             update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
             enable_enterprise_modules=False,
-            reload_data=True
+            reload_data=True,
+            fit_columns_on_grid_load=True  # Add this for auto-fitting
         )
 
         # Show data stats
@@ -8771,6 +8772,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -1486,10 +1486,10 @@ if st.session_state.current_page == "Home":
             #custom_js_code="""
                 #gridOptions.api.sizeColumnsToFit();
             #""",
-            #custom_js_code="""
-                #const allColumnIds = gridOptions.columnApi.getAllColumns().map(col => col.getColId());
-                #gridOptions.columnApi.autoSizeColumns(allColumnIds);
-            #""",
+            custom_js_code="""
+                const allColumnIds = gridOptions.columnApi.getAllColumns().map(col => col.getColId());
+                gridOptions.columnApi.autoSizeColumns(allColumnIds);
+            """,
             key="home_aggrid_main",
             #enable_enterprise_modules=False,
             #reload_data=True
@@ -8789,6 +8789,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

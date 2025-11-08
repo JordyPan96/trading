@@ -1389,8 +1389,15 @@ if st.session_state.current_page == "Home":
             sortable=True,
             resizable=True,
             editable=False,  # DISABLE editing for all columns
-            #min_column_width=100
+            
         )
+
+        # Add responsive grid configuration
+        gb.configure_grid_options(
+            domLayout='normal',
+            suppressHorizontalScroll=False
+        )
+
 
         # Build options
         grid_options = gb.build()
@@ -1462,6 +1469,21 @@ if st.session_state.current_page == "Home":
                         st.error(f"Error saving data: {e}")
                 else:
                     st.warning("No data to save")
+                    
+        # Add CSS to force full width responsiveness
+        st.markdown("""
+        <style>
+            .ag-theme-streamlit {
+                width: 100% !important;
+            }
+            .ag-root-wrapper {
+                width: 100% !important;
+            }
+            div[data-testid="stVerticalBlock"] > div:first-child {
+                width: 100% !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
         # Display the grid
         grid_response = AgGrid(
@@ -8772,6 +8794,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

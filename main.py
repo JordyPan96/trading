@@ -4674,7 +4674,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
+                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
                                 <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
                                 --2_BNR:<br>
@@ -4688,7 +4688,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
+                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
                                 <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
                                 --2_BNR:<br>
@@ -8769,6 +8769,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

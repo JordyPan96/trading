@@ -1386,6 +1386,7 @@ if st.session_state.current_page == "Home":
         # DISABLE editing features
         gb.configure_default_column(
             wrapText=True,
+            autoHeight=True,
             filterable=True,
             sortable=True,
             resizable=True,
@@ -8798,6 +8799,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

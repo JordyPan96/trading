@@ -1374,7 +1374,7 @@ if st.session_state.current_page == "Home":
         # Define columns to hide (they will still be in the data, just not visible)
         columns_to_hide = [
             'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum',
-            'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit', 'PROP_Pct'
+            'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity'
         ]
 
         # Pagination
@@ -1389,15 +1389,8 @@ if st.session_state.current_page == "Home":
             sortable=True,
             resizable=True,
             editable=False,  # DISABLE editing for all columns
-            
+            min_column_width=100
         )
-
-        # Add responsive grid configuration
-        gb.configure_grid_options(
-            domLayout='normal',
-            suppressHorizontalScroll=False
-        )
-
 
         # Build options
         grid_options = gb.build()
@@ -1469,57 +1462,19 @@ if st.session_state.current_page == "Home":
                         st.error(f"Error saving data: {e}")
                 else:
                     st.warning("No data to save")
-                    
-        # Add CSS to force full width responsiveness - MORE COMPREHENSIVE VERSION
-        st.markdown("""
-        <style>
-            /* Force the main container to use full width */
-            .main .block-container {
-            max-width: 100% !important;
-            padding-left: 1rem;
-            padding-right: 1rem;
-            }
-
-            /* Target the AgGrid container specifically */
-            .ag-theme-streamlit {
-                width: 100% !important;
-                min-width: 100% !important;
-            }
-
-            .ag-root-wrapper {
-                width: 100% !important;
-                min-width: 100% !important;
-            }
-
-            /* Ensure the Streamlit container doesn't limit width */
-                div[data-testid="stVerticalBlock"] {
-                width: 100% !important;
-            }
-
-            /* Specifically target the AgGrid parent containers */
-                div[data-testid="stVerticalBlock"] > div:first-child,
-                div[data-testid="stVerticalBlockBorderWrapper"] {
-                width: 100% !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
 
         # Display the grid
         grid_response = AgGrid(
             data,
             gridOptions=grid_options,
             height=500,
-            #width='100%',
+            width='100%',
             theme='streamlit',
             update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
             enable_enterprise_modules=False,
-            reload_data=True,
-            fit_columns_on_grid_load=True,  # Add this for auto-fitting
-            # Add these for better responsiveness:
-            enableBrowserTooltips=True,
-            suppressColumnVirtualisation=True
+            reload_data=True
         )
 
         # Show data stats
@@ -8816,11 +8771,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-
 
 
 

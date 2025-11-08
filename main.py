@@ -8433,7 +8433,7 @@ elif st.session_state.current_page == "Guidelines":
     """, unsafe_allow_html=True)
 
     st.title("Guidelines to Follow")
-
+    st.header('Standard Rules')
     st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of 559 zone 1 time for 2_BNR, 2 times for 2_BNR_TPF)")
     st.subheader("TPF MUST be visible on 8H Timeframe")
     st.subheader("2_BNR and 2_BNR_TPF")
@@ -8449,7 +8449,7 @@ elif st.session_state.current_page == "Guidelines":
     }
 
     st.table(table_data)
-
+    st.header('Variant Rules')
     st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of Shoulder next fib zone)")
     st.subheader("TPF MUST be visible on 2 Daily Timeframe")
     st.subheader("2_BNR_TPF")
@@ -8799,6 +8799,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

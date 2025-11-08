@@ -1463,6 +1463,30 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
+        # Grid options for responsive width
+        grid_options = {
+            "defaultColDef": {
+                "resizable": True,
+                "sortable": True,
+                "filter": True,
+                "flex": 1,  # ensures all columns share available width
+            },
+            # Automatically fit columns when grid loads and when window is resized
+            "onGridReady": JsCode(
+                """
+                function(params) {
+                    // Fit columns on load
+                    params.api.sizeColumnsToFit();
+
+                    // Refit columns when window is resized
+                    window.addEventListener('resize', function() {
+                        params.api.sizeColumnsToFit();
+                    });
+                }
+                """
+            ),
+        }
+        
         # Display the grid
         grid_response = AgGrid(
             data,
@@ -8771,6 +8795,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

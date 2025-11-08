@@ -1416,13 +1416,14 @@ if st.session_state.current_page == "Home":
             """
             <a href="https://docs.google.com/spreadsheets/d/1n63j-3EHEdfO_Cgkcfe44MtP0NWlw1WGbgdp22B4Y9k/edit?gid=1854515604#gid=1854515604" target="_blank">
                 <button style="
-                    background-color: #4CAF50;
+                    background-color: #007BFF;
                     color: white;
                     padding: 10px 20px;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
                     font-size: 16px;
+                    margin-bottom: 20px;
                 ">
                     Link to Google Sheet Database
                 </button>
@@ -1445,7 +1446,7 @@ if st.session_state.current_page == "Home":
             # f"**Last record:** Row {len(current_data)} - {last_record['Date']} - {last_record['Symbol']} - {last_record.get('Direction', 'N/A')} - PnL: {last_record.get('PnL', 'N/A')}")
 
             # Delete Last Record button
-            if st.button("🗑️ Delete Last Record", type="secondary"):
+            if st.button("Delete Last Record", type="secondary"):
                 try:
                     # Remove the last row
                     updated_data = current_data.iloc[:-1].reset_index(drop=True)
@@ -8800,6 +8801,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

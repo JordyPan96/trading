@@ -1373,7 +1373,7 @@ if st.session_state.current_page == "Home":
 
         # Define columns to hide (they will still be in the data, just not visible)
         columns_to_hide = [
-            'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum',
+            'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum', 'Maximum Adverse Excursion',
             'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit', 'PROP_Pct', 'Stop Loss Percentage'
         ]
 
@@ -8785,6 +8785,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

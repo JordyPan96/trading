@@ -1470,16 +1470,35 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
                     
-        # Add CSS to force full width responsiveness
+        # Add CSS to force full width responsiveness - MORE COMPREHENSIVE VERSION
         st.markdown("""
         <style>
+            /* Force the main container to use full width */
+            .main .block-container {
+            max-width: 100% !important;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            }
+
+            /* Target the AgGrid container specifically */
             .ag-theme-streamlit {
                 width: 100% !important;
+                min-width: 100% !important;
             }
+
             .ag-root-wrapper {
                 width: 100% !important;
+                min-width: 100% !important;
             }
-            div[data-testid="stVerticalBlock"] > div:first-child {
+
+            /* Ensure the Streamlit container doesn't limit width */
+                div[data-testid="stVerticalBlock"] {
+                width: 100% !important;
+            }
+
+            /* Specifically target the AgGrid parent containers */
+                div[data-testid="stVerticalBlock"] > div:first-child,
+                div[data-testid="stVerticalBlockBorderWrapper"] {
                 width: 100% !important;
             }
         </style>
@@ -1498,6 +1517,9 @@ if st.session_state.current_page == "Home":
             enable_enterprise_modules=False,
             reload_data=True,
             fit_columns_on_grid_load=True  # Add this for auto-fitting
+            # Add these for better responsiveness:
+            enableBrowserTooltips=True,
+            suppressColumnVirtualisation=True
         )
 
         # Show data stats
@@ -8794,6 +8816,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

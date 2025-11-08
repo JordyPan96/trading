@@ -1389,7 +1389,7 @@ if st.session_state.current_page == "Home":
             sortable=True,
             resizable=True,
             editable=False,  # DISABLE editing for all columns
-            min_column_width=100
+            min_column_width=100,
             max_column_width=500
         )
 
@@ -8790,6 +8790,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

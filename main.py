@@ -1469,7 +1469,7 @@ if st.session_state.current_page == "Home":
                 "resizable": True,
                 "sortable": True,
                 "filter": True,
-                "flex": 1,  # ensures all columns share available width
+                #"flex": 1,  # ensures all columns share available width
             }
         }
         
@@ -8781,6 +8781,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

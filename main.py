@@ -1475,13 +1475,9 @@ if st.session_state.current_page == "Home":
             "onGridReady": JsCode(
                 """
                 function(params) {
-                    // Fit columns on load
+                    
                     params.api.sizeColumnsToFit();
-
-                    // Refit columns when window is resized
-                    window.addEventListener('resize', function() {
-                        params.api.sizeColumnsToFit();
-                    });
+                    
                 }
                 """
             ),
@@ -8795,6 +8791,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

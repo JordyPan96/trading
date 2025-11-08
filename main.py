@@ -1483,9 +1483,9 @@ if st.session_state.current_page == "Home":
             theme='streamlit',
             update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
-            custom_js_code="""
+            #custom_js_code="""
                 #gridOptions.api.sizeColumnsToFit();
-            """,
+            #""",
             #custom_js_code="""
                 #const allColumnIds = gridOptions.columnApi.getAllColumns().map(col => col.getColId());
                 #gridOptions.columnApi.autoSizeColumns(allColumnIds);
@@ -8789,6 +8789,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

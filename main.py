@@ -1409,6 +1409,29 @@ if st.session_state.current_page == "Home":
         st.title("Trading Data Dashboard")
         st.markdown("Use the grid below to explore and filter trading data")
 
+        import streamlit as st
+
+        # HTML + CSS styled button link
+        st.markdown(
+            """
+            <a href="https://docs.google.com/spreadsheets/d/1n63j-3EHEdfO_Cgkcfe44MtP0NWlw1WGbgdp22B4Y9k/edit?gid=1854515604#gid=1854515604" target="_blank">
+                <button style="
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                ">
+                    Link to Google Sheet Database
+                </button>
+            </a>
+        """,
+        unsafe_allow_html=True
+    )
+
+
         # Delete records - SIMPLIFIED VERSION
         # st.subheader("Delete Records")
 
@@ -8777,6 +8800,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

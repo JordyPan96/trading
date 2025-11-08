@@ -3,13 +3,14 @@ pandas
 numpy
 requests
 plotly
-streamlit-aggrid
+streamlit-aggrid==1.0.5
 yfinance
 matplotlib
 gspread
 metaapi-cloud-sdk>=7.0.0
 python-dateutil
 gspread_dataframe
+
 
 
 

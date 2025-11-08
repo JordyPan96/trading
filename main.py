@@ -1516,7 +1516,7 @@ if st.session_state.current_page == "Home":
             key="home_aggrid_main",
             enable_enterprise_modules=False,
             reload_data=True,
-            fit_columns_on_grid_load=True  # Add this for auto-fitting
+            fit_columns_on_grid_load=True,  # Add this for auto-fitting
             # Add these for better responsiveness:
             enableBrowserTooltips=True,
             suppressColumnVirtualisation=True
@@ -8816,6 +8816,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4674,11 +4674,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --Zone -> Check within 64 -> 5% from top of TPF -> OMSS/Order Block<br>
+                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
+                                --1_BNR_TPF/2_BNR_TPF: 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Within 64 Check<br>
+                                --2_BNR: Top of Zone -> Entry cover EOZ (Must) -> Within 64 Check<br>
+                                --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
-                                --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64 (Unless Clear TPF Level Above)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -4686,11 +4686,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --Zone is Defined as Blue Fib to Orange Fib (Except 786 - 91 Zone)<br>
-                                --Zone -> Check within 64 -> 5% from top of TPF -> OMSS/Order Block<br>
+                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
+                                --1_BNR_TPF/2_BNR_TPF: 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Within 64 Check<br>
+                                --2_BNR: Top of Zone -> Entry cover EOZ (Must) -> Within 64 Check<br>
+                                --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
-                                --EP (Entry Precision) Line is guided by obvious OB or Wick in Zone<br>
-                                --IF <=64 Within Zone then entry (EP) MUST be Within 64 (Unless Clear TPF Level Above)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -8765,6 +8765,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

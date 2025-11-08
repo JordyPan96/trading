@@ -4676,7 +4676,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
-                                <=5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
+                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Enter <= 64 -> Entry at TOP of ZONE<br>
                                 --<br>
@@ -4690,7 +4690,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
-                                <=5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
+                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64<br>
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Enter <= 64 -> Entry at TOP of ZONE<br>
                                 --<br>
@@ -8769,6 +8769,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

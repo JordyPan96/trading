@@ -4738,7 +4738,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
 
-                if (monthly_loss_limit + monthly_actual_loss - final_risk < 0):
+                if (monthly_loss_limit + monthly_actual_loss - final_risk <= 0):
                     container.markdown("<br>", unsafe_allow_html=True)
                     # container.metric("Risk amount exceeded your monthly limit", "$"+ str(round(final_risk + round(monthly_loss_limit+monthly_actual_loss,2),2)))
                     container.metric("Risk amount exceeded your monthly limit", "$0 (0.0% of Account)")
@@ -8808,6 +8808,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

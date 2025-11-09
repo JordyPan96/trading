@@ -3733,7 +3733,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             remain_count = 2
             xxxaud_count = 1
-            yen_count = 1
+            yen_count = 2
             audjpy_count = 1
             audusd_count = 2
             cad_count = 2
@@ -3764,8 +3764,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 elif (pair in yens):
                     pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(yens)])
-                    yen_count = yen_count - pair_trades
-                    return yen_count
+                    if(pair == "USDJPY"):
+                        yen_count = yen_count - pair_trades
+                        return yen_count
+                    else:
+                        yen_count = yen_count - pair_trades - 1
+                        return yen_count
 
                 elif (pair == "USDCAD"):
                     pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'] == "USDCAD"])
@@ -8804,6 +8808,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3560,11 +3560,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_17 = {
             '1_BNR':["Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"]
+                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
             '1_BNR_TPF':["Order Block","Leg Inducement","TPF Reference","Order Block L1",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"]
+                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
             '2_BNR':["Order Block","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"]
+                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
             '2_BNR_TPF':["Order Block","Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS"]
         }
 
@@ -8804,6 +8804,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

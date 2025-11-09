@@ -3859,7 +3859,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # value=equity,
             # disabled=True  # Disables editing
             # )
-            st.markdown("<div style='height:50px;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
             selected_pair = st.selectbox("Trading Pair", currency_pairs)
             available_trend_position = get_available_trend_position(selected_pair)
             trend_position = st.selectbox("Trend Position", available_trend_position)
@@ -8808,6 +8808,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

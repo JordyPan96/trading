@@ -1497,7 +1497,7 @@ if st.session_state.current_page == "Home":
                     st.warning("No data to save")
 
         # Layout with two columns
-        col1, col2 = st.columns([3, 2])  # left: grid, right: screenshot link/preview
+        col1, col2 = st.columns([3, 1])  # left: grid, right: screenshot link/preview
 
         with col1:
         # Display the grid

@@ -1410,7 +1410,8 @@ if st.session_state.current_page == "Home":
             'Link_to_screenshot',
             headerName='Screenshot',
             wrapText=False,
-            autoHeight=False
+            autoHeight=False,
+            cellRenderer='html'  # ← Add this line to render HTML
         )
 
 

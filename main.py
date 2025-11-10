@@ -1537,36 +1537,6 @@ if st.session_state.current_page == "Home":
         Your data will be available across all pages once loaded.
         """)
 
-        # Display clickable links as a separate section
-        st.subheader("📸 Screenshot Links")
-        # Create a compact grid of buttons
-        cols_per_row = 4
-        visible_data = data[['Date', 'Symbol', 'Link_to_screenshot']].dropna()
-
-        for i in range(0, len(visible_data), cols_per_row):
-            cols = st.columns(cols_per_row)
-            for j, col in enumerate(cols):
-                idx = i + j
-                if idx < len(visible_data):
-                    row = visible_data.iloc[idx]
-                    with col:
-                        st.markdown(f"""
-                        <a href="{row['Link_to_screenshot']}" target="_blank">
-                            <button style="
-                                width: 100%;
-                                background-color: #4CAF50;
-                                color: white;
-                                padding: 6px 8px;
-                                border: none;
-                                border-radius: 4px;
-                                cursor: pointer;
-                                font-size: 11px;
-                                margin: 2px 0;
-                            ">
-                                {row['Date']}<br>{row['Symbol']}
-                            </button>
-                        </a>
-                        """, unsafe_allow_html=True)
 
 
 

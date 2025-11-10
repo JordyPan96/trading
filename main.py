@@ -1397,6 +1397,26 @@ if st.session_state.current_page == "Home":
             max_column_width=1000
         )
 
+        # JavaScript renderer for clickable links
+        link_renderer = JsCode("""
+        function(params) {
+            if (params.value) {
+                return `<a href="${params.value}" target="_blank" onclick="event.stopPropagation();">View Screenshot</a>`;
+            } else {
+                return '';
+            }
+        }
+        """)
+
+        # Configure the column to use the custom renderer
+        gb.configure_column(
+            "Link_to_screenshot",
+            headerName="Screenshot",
+            cellRenderer=link_renderer,
+            autoHeight=True,
+            wrapText=True
+        )
+
 
         # Build options
         grid_options = gb.build()

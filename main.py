@@ -1529,21 +1529,23 @@ if st.session_state.current_page == "Home":
                 row = selected_rows.iloc[0].to_dict()
 
             # ----------------------------
-            # Display thumbnail and zoom
+            # Define the dialog function
             # ----------------------------
             if row and "Link_to_screenshot" in row:
                 link = row["Link_to_screenshot"]
                 trade = row.get("Trade", "Selected Trade")
 
-                # Thumbnail
-                if st.button("🔍 Zoom Screenshot", key=f"zoom_{trade}"):
-                    # Open native Streamlit dialog
-                    with st.dialog(title=f"Screenshot: {trade}"):
-                        st.image(link, caption=trade, use_container_width=True)
-                        st.button("Close")  # optional, dialog can also be closed by clicking outside
 
-                # Always show thumbnail
+                @st.dialog(f"Screenshot: {trade}", width="large")
+                def show_screenshot():
+                    st.image(link, caption=trade, use_container_width=True)
+                    st.button("Close")  # Optional, dialog can also be closed by clicking outside
+
+
+                # Thumbnail + button to open dialog
                 st.image(link, caption=trade, width=200)
+                if st.button(f"🔍 Zoom Screenshot", key=f"zoom_{trade}"):
+                    show_screenshot()
             else:
                 st.info("Select a trade to view its screenshot.")
 

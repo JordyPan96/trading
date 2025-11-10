@@ -1516,7 +1516,7 @@ if st.session_state.current_page == "Home":
                 # reload_data=True
             )
         with col2:
-            st.subheader("📸 Screenshot")
+            st.subheader("Screenshot")
             selected_rows = grid_response.get('selected_rows', [])
 
             # ----------------------------
@@ -1544,7 +1544,7 @@ if st.session_state.current_page == "Home":
 
                 # Thumbnail + button to open dialog
                 st.image(link, caption=trade, width=200)
-                if st.button(f"🔍 Zoom Screenshot", key=f"zoom_{trade}"):
+                if st.button(f"Zoom Screenshot", key=f"zoom_{trade}"):
                     show_screenshot()
             else:
                 st.info("Select a trade to view its screenshot.")

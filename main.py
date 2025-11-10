@@ -1529,23 +1529,25 @@ if st.session_state.current_page == "Home":
                 row = selected_rows.iloc[0].to_dict()
 
             # ----------------------------
-            # Define the dialog function
+            # Display dialog + thumbnail safely
             # ----------------------------
-            if row and "Link_to_screenshot" in row:
-                link = row["Link_to_screenshot"]
+            if row:
+                link = row.get("Link_to_screenshot")
                 trade = row.get("Trade", "Selected Trade")
 
+                if link:  # Only proceed if link is not empty or None
+                    @st.dialog(f"Screenshot: {trade}", width="large")
+                    def show_screenshot():
+                        st.image(link, caption=trade, use_container_width=True)
+                        st.button("Close")  # Optional
 
-                @st.dialog(f"Screenshot: {trade}", width="large")
-                def show_screenshot():
-                    st.image(link, caption=trade, use_container_width=True)
-                    st.button("Close")  # Optional, dialog can also be closed by clicking outside
 
-
-                # Thumbnail + button to open dialog
-                st.image(link, caption=trade, width=200)
-                if st.button(f"Zoom Screenshot", key=f"zoom_{trade}"):
-                    show_screenshot()
+                    # Thumbnail + button to open dialog
+                    st.image(link, caption=trade, width=200)
+                    if st.button(f"Zoom Screenshot", key=f"zoom_{trade}"):
+                        show_screenshot()
+                else:
+                    st.warning("No screenshot")
             else:
                 st.info("Select a trade")
 
@@ -8901,7 +8903,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

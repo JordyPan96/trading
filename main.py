@@ -1518,29 +1518,36 @@ if st.session_state.current_page == "Home":
             st.subheader("Screenshot")
             selected_rows = grid_response['selected_rows']
 
-            if selected_rows is not None and len(selected_rows) > 0:
-                # Handle all possible types from st-aggrid
+            row = None
+            if selected_rows and len(selected_rows) > 0:
                 if isinstance(selected_rows, pd.DataFrame):
                     row = selected_rows.iloc[0].to_dict()
                 elif isinstance(selected_rows, list):
                     row = selected_rows[0]
                 elif isinstance(selected_rows, str):
+                    import json
+
                     try:
                         parsed = json.loads(selected_rows)
                         row = parsed[0] if parsed else None
                     except json.JSONDecodeError:
                         row = None
-                else:
-                    row = None
 
-                # Only proceed if we successfully extracted a row
-                if isinstance(row, dict) and "Link_to_screenshot" in row:
-                    link = row["Link_to_screenshot"]
-                    trade = row.get("Trade", "Selected Trade")
-                    st.markdown(f"[Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
+            if row and "Link_to_screenshot" in row:
+                link = row["Link_to_screenshot"]
+                trade = row.get("Trade", "Selected Trade")
+
+                # Show thumbnail
+                st.image(link, caption=trade, width=200)
+
+                # Button to open modal
+                if st.button("Zoom Screenshot"):
+                    zoom_modal.open()
+
+                # Modal content
+                with zoom_modal.container():
                     st.image(link, caption=trade, use_container_width=True)
-                else:
-                    st.warning("Could not parse selected row correctly.")
+
             else:
                 st.info("Select a trade to view its screenshot.")
 

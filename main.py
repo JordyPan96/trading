@@ -1517,11 +1517,22 @@ if st.session_state.current_page == "Home":
         with col2:
             st.subheader("📸 Screenshot")
             selected_rows = grid_response['selected_rows']
-            if selected_rows:
-                row = selected_rows[0]
-                link = row["Link_to_screenshot"]
-                st.markdown(f"[🔗 Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
-                st.image(link, caption=row["Trade"], use_container_width=True)
+
+            if selected_rows is not None and len(selected_rows) > 0:
+                # Handle the first selected row
+                if isinstance(selected_rows, pd.DataFrame):
+                    # Convert DataFrame row to dict
+                    row = selected_rows.iloc[0].to_dict()
+                elif isinstance(selected_rows, list):
+                    row = selected_rows[0]
+                else:
+                    st.warning("Unexpected selected_rows type")
+                    row = None
+
+                if row:
+                    link = row["Link_to_screenshot"]
+                    st.markdown(f"[🔗 Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
+                    st.image(link, caption=row["Trade"], use_container_width=True)
             else:
                 st.info("Select a trade to view its screenshot.")
 

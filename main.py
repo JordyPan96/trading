@@ -1516,7 +1516,7 @@ if st.session_state.current_page == "Home":
                 # reload_data=True
             )
         with col2:
-            st.subheader("Screenshot")
+            st.subheader("Trade Screenshot")
             selected_rows = grid_response.get('selected_rows', [])
 
             # ----------------------------

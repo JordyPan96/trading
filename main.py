@@ -1260,7 +1260,7 @@ if st.session_state.current_page == "Home":
 
                 pattern_options = ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1",
                                    "Left V TPF", "Left V TPF_OMSS",
-                                   "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
+                                   "Standard_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
             with col5:
@@ -3475,7 +3475,7 @@ elif st.session_state.current_page == "Risk Calculation":
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
         shapes = ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1", "Left V TPF",
                   "Left V TPF_OMSS",
-                  "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
+                  "Standard_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -8903,6 +8903,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

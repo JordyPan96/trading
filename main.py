@@ -1492,6 +1492,31 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
+        # Configure grid options to make links clickable - PRESERVE EXISTING COLUMNS
+        # First, let's get all column names from your data
+        column_names = data.columns.tolist()
+
+        # Create column definitions that preserve all existing columns
+        column_defs = []
+        for col in column_names:
+            if col == 'Link_to_screenshot':
+                # Special handling for screenshot column to make it clickable
+                column_defs.append({
+                    'field': col,
+                    'headerName': 'Screenshot',
+                    'cellRenderer': 'markdown',  # This will render markdown links as clickable
+                    'autoHeight': True,
+                    'wrapText': True
+                })
+            else:
+                # Keep all other columns as they were
+                column_defs.append({'field': col})
+
+        # Update grid_options with the column definitions
+        if 'grid_options' not in locals():
+            grid_options = {}
+        grid_options['columnDefs'] = column_defs
+
         
         # Display the grid
         grid_response = AgGrid(

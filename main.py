@@ -1397,18 +1397,22 @@ if st.session_state.current_page == "Home":
             max_column_width=1000
         )
 
-        # JavaScript renderer for clickable links
+        # JavaScript renderer — note the use of `return` with backticks and the stopPropagation
         link_renderer = JsCode("""
         function(params) {
             if (params.value) {
-                return `<a href="${params.value}" target="_blank" onclick="event.stopPropagation();">View Screenshot</a>`;
+                return `<a href="${params.value}" target="_blank" rel="noopener noreferrer"
+                            style="color:#1f77b4;text-decoration:underline;"
+                            onclick="event.stopPropagation();">
+                            View Screenshot
+                        </a>`;
             } else {
                 return '';
             }
         }
         """)
 
-        # Configure the column to use the custom renderer
+        # Configure the column
         gb.configure_column(
             "Link_to_screenshot",
             headerName="Screenshot",

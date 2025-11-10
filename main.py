@@ -1396,20 +1396,20 @@ if st.session_state.current_page == "Home":
             max_column_width=1000
         )
 
-        # ADD THIS: Configure the screenshot column to be clickable
-        gb.configure_column(
-            'Link_to_screenshot',
-            headerName='Screenshot',
-            cellRenderer='''function(params) {
-                if (params.value && params.value.startsWith('http')) {
-                    return '<a href="' + params.value + '" target="_blank" style="color: #007BFF; text-decoration: none; font-weight: 500;">📷 View</a>';
-                }
-                return params.value || '';
-            }'''
-        )
 
         # Build options
         grid_options = gb.build()
+
+        # THEN modify the column definition for Link_to_screenshot
+        for col_def in grid_options['columnDefs']:
+            if col_def['field'] == 'Link_to_screenshot':
+                col_def['cellRenderer'] = '''function(params) {
+                    if (params.value && params.value.startsWith('http')) {
+                        return '<a href="' + params.value + '" target="_blank" style="color: #007BFF; text-decoration: none; font-weight: 500;">📷 View</a>';
+                    }
+                    return params.value || '';
+                }'''
+                break
         grid_options['onGridReady'] = "function(params) { const allColumnIds = params.columnApi.getAllColumns().map(col => col.getColId()); params.columnApi.autoSizeColumns(allColumnIds); }"
 
         # Manually hide the columns in the grid options

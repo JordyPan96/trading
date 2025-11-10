@@ -1378,7 +1378,7 @@ if st.session_state.current_page == "Home":
         columns_to_hide = [
             'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum', 'Maximum Adverse Excursion',
             'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit',
-            'PROP_Pct', 'Stop Loss Percentage'
+            'PROP_Pct', 'Stop Loss Percentage','Link_to_screenshot'
         ]
 
         # Pagination
@@ -1515,7 +1515,7 @@ if st.session_state.current_page == "Home":
                 # reload_data=True
             )
         with col2:
-            st.subheader("📸 Screenshot")
+            st.subheader("Screenshot")
             selected_rows = grid_response['selected_rows']
 
             if selected_rows is not None and len(selected_rows) > 0:
@@ -1537,7 +1537,7 @@ if st.session_state.current_page == "Home":
                 if isinstance(row, dict) and "Link_to_screenshot" in row:
                     link = row["Link_to_screenshot"]
                     trade = row.get("Trade", "Selected Trade")
-                    st.markdown(f"[🔗 Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
+                    st.markdown(f"[Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
                     st.image(link, caption=trade, use_container_width=True)
                 else:
                     st.warning("Could not parse selected row correctly.")

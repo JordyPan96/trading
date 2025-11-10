@@ -1506,7 +1506,7 @@ if st.session_state.current_page == "Home":
             update_mode=GridUpdateMode.SELECTION_CHANGED,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
-            # enable_enterprise_modules=False,
+            enable_enterprise_modules=True,
             # reload_data=True
         )
 

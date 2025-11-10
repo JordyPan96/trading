@@ -1519,20 +1519,28 @@ if st.session_state.current_page == "Home":
             selected_rows = grid_response['selected_rows']
 
             if selected_rows is not None and len(selected_rows) > 0:
-                # Handle the first selected row
+                # Handle all possible types from st-aggrid
                 if isinstance(selected_rows, pd.DataFrame):
-                    # Convert DataFrame row to dict
                     row = selected_rows.iloc[0].to_dict()
                 elif isinstance(selected_rows, list):
                     row = selected_rows[0]
+                elif isinstance(selected_rows, str):
+                    try:
+                        parsed = json.loads(selected_rows)
+                        row = parsed[0] if parsed else None
+                    except json.JSONDecodeError:
+                        row = None
                 else:
-                    st.warning("Unexpected selected_rows type")
                     row = None
 
-                if row:
+                # Only proceed if we successfully extracted a row
+                if isinstance(row, dict) and "Link_to_screenshot" in row:
                     link = row["Link_to_screenshot"]
+                    trade = row.get("Trade", "Selected Trade")
                     st.markdown(f"[🔗 Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
-                    st.image(link, caption=row["Trade"], use_container_width=True)
+                    st.image(link, caption=trade, use_container_width=True)
+                else:
+                    st.warning("Could not parse selected row correctly.")
             else:
                 st.info("Select a trade to view its screenshot.")
 

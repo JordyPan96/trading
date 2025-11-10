@@ -1547,7 +1547,7 @@ if st.session_state.current_page == "Home":
                 if st.button(f"Zoom Screenshot", key=f"zoom_{trade}"):
                     show_screenshot()
             else:
-                st.info("Select a trade to view its screenshot.")
+                st.info("Select a trade")
 
         # Show data stats
         try:

@@ -1513,7 +1513,7 @@ if st.session_state.current_page == "Home":
         
         # Display the grid
         grid_response = AgGrid(
-            data,
+            display_data,
             gridOptions=grid_options,
             #fit_columns_on_grid_load=True,
             height=500,

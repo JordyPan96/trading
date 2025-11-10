@@ -1400,6 +1400,7 @@ if st.session_state.current_page == "Home":
         )
 
         # Build options
+        gb.configure_selection(selection_mode="single", use_checkbox=True)
         grid_options = gb.build()
         grid_options[
             'onGridReady'] = "function(params) { const allColumnIds = params.columnApi.getAllColumns().map(col => col.getColId()); params.columnApi.autoSizeColumns(allColumnIds); }"
@@ -1495,20 +1496,34 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
+        # Layout with two columns
+        col1, col2 = st.columns([3, 2])  # left: grid, right: screenshot link/preview
+
+        with col1:
         # Display the grid
-        grid_response = AgGrid(
-            data,
-            gridOptions=grid_options,
-            # fit_columns_on_grid_load=True,
-            height=500,
-            width='100%',
-            theme='streamlit',
-            update_mode=GridUpdateMode.SELECTION_CHANGED,  # No updates since editing is disabled
-            allow_unsafe_jscode=True,
-            key="home_aggrid_main",
-            enable_enterprise_modules=True,
-            # reload_data=True
-        )
+            grid_response = AgGrid(
+                data,
+                gridOptions=grid_options,
+                # fit_columns_on_grid_load=True,
+                height=500,
+                width='100%',
+                theme='streamlit',
+                update_mode=GridUpdateMode.SELECTION_CHANGED,  # No updates since editing is disabled
+                allow_unsafe_jscode=True,
+                key="home_aggrid_main",
+                enable_enterprise_modules=True,
+                # reload_data=True
+            )
+        with col2:
+            st.subheader("📸 Screenshot")
+            selected_rows = grid_response['selected_rows']
+            if selected_rows:
+                row = selected_rows[0]
+                link = row["Link_to_screenshot"]
+                st.markdown(f"[🔗 Open Screenshot in New Tab]({link})", unsafe_allow_html=True)
+                st.image(link, caption=row["Trade"], use_container_width=True)
+            else:
+                st.info("Select a trade to view its screenshot.")
 
         # Show data stats
         try:
@@ -8862,7 +8877,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

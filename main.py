@@ -25,7 +25,7 @@ import pytz
 import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
-from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, JsCode
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode
 
 # Configure page - keep it as wide for desktop
 st.set_page_config(
@@ -1257,8 +1257,9 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["Order Block","OMSS","Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"]
+                pattern_options = ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1",
+                                   "Left V TPF", "Left V TPF_OMSS",
+                                   "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
             with col5:
@@ -1269,8 +1270,9 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["0","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
-                new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options, key="new_Zone_Position")
+                Zone_Position_options = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+                new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options,
+                                                 key="new_Zone_Position")
 
             with col6:
                 # NEW: within_64 dropdown - UPDATED OPTIONS
@@ -1281,7 +1283,7 @@ if st.session_state.current_page == "Home":
                 cross_fib_options = ["Cross Wave", "Wave 1", "Wave 2+"]
                 new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
 
-                probability_options = ['Head','Tail','Edge Outlier']
+                probability_options = ['Head', 'Tail', 'Edge Outlier']
                 new_probability = st.selectbox("Probability", options=probability_options, key="new_probability")
 
                 # Optional additional fields that might be in your data
@@ -1333,7 +1335,7 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
-                if 'Pattern'in data.columns:
+                if 'Pattern' in data.columns:
                     new_record['Pattern'] = new_Pattern
                 if 'within_64' in data.columns:
                     new_record['within_64'] = new_within_64
@@ -1369,14 +1371,14 @@ if st.session_state.current_page == "Home":
                 st.success(" New record added successfully! Metrics recalculated.")
                 st.rerun()
 
-
         # Configure grid for VIEWING ONLY (no editing)
         gb = GridOptionsBuilder.from_dataframe(data)
 
         # Define columns to hide (they will still be in the data, just not visible)
         columns_to_hide = [
             'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum', 'Maximum Adverse Excursion',
-            'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit', 'PROP_Pct', 'Stop Loss Percentage'
+            'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit',
+            'PROP_Pct', 'Stop Loss Percentage'
         ]
 
         # Pagination
@@ -1397,10 +1399,10 @@ if st.session_state.current_page == "Home":
             max_column_width=1000
         )
 
-
         # Build options
         grid_options = gb.build()
-        grid_options['onGridReady'] = "function(params) { const allColumnIds = params.columnApi.getAllColumns().map(col => col.getColId()); params.columnApi.autoSizeColumns(allColumnIds); }"
+        grid_options[
+            'onGridReady'] = "function(params) { const allColumnIds = params.columnApi.getAllColumns().map(col => col.getColId()); params.columnApi.autoSizeColumns(allColumnIds); }"
 
         # Manually hide the columns in the grid options
         for column in grid_options['columnDefs']:
@@ -1410,7 +1412,7 @@ if st.session_state.current_page == "Home":
 
         # Display
         st.title("Trading Data Dashboard")
-        #st.markdown("Use the grid below to explore and filter trading data")
+        # st.markdown("Use the grid below to explore and filter trading data")
 
         import streamlit as st
 
@@ -1432,9 +1434,8 @@ if st.session_state.current_page == "Home":
                 </button>
             </a>
         """,
-        unsafe_allow_html=True
-    )
-
+            unsafe_allow_html=True
+        )
 
         # Delete records - SIMPLIFIED VERSION
         # st.subheader("Delete Records")
@@ -1494,20 +1495,19 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
-        
         # Display the grid
         grid_response = AgGrid(
             data,
             gridOptions=grid_options,
-            #fit_columns_on_grid_load=True,
+            # fit_columns_on_grid_load=True,
             height=500,
             width='100%',
             theme='streamlit',
-            update_mode=GridUpdateMode.SELECTION_CHANGED,
+            update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
-            #enable_enterprise_modules=False,
-            #reload_data=True
+            # enable_enterprise_modules=False,
+            # reload_data=True
         )
 
         # Show data stats
@@ -3006,10 +3006,10 @@ elif st.session_state.current_page == "Risk Calculation":
             display_df['Avg Win RR'] = display_df['Avg Win RR'].map("{:,.2f}".format)
             display_df['Total Return'] = display_df['Total Return'].map("${:,.2f}".format)
 
-            #st.dataframe(display_df)
+            # st.dataframe(display_df)
 
         with col2:
-            #st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
+            # st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
             st.session_state.current_risk = 1.0  # Base risk
 
             # st.subheader("Adaptive Risk Calculation")
@@ -3031,8 +3031,8 @@ elif st.session_state.current_page == "Risk Calculation":
                           2)) + "%"]
             }).set_index("Metric")
 
-            #st.table(result_df)
-            #st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
+            # st.table(result_df)
+            # st.markdown("&nbsp;" * 20, unsafe_allow_html=True)
             next_risk = base_risk
 
 
@@ -3108,6 +3108,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 return "group_five"
             else:
                 return None
+
 
         # PAIR GROUPING FUNCTIONS
         def get_pair_group_spec(selected_pair):
@@ -3234,9 +3235,9 @@ elif st.session_state.current_page == "Risk Calculation":
             # Define symbol groups
             symbol_groups = {
                 'XAUUSD': {'symbols': ['XAUUSD'], 'target': 0},
-                'XXXUSD': {'symbols': ['USDCAD', 'AUDUSD','EURUSD','GBPUSD'], 'target': 0},
-                #'GBPUSD_EURUSD': {'symbols': ['GBPUSD', 'EURUSD'], 'target': 0},
-                #'XXXUSD': {'symbols': ['AUDUSD', 'EURUSD','GBPUSD'], 'target': 0},
+                'XXXUSD': {'symbols': ['USDCAD', 'AUDUSD', 'EURUSD', 'GBPUSD'], 'target': 0},
+                # 'GBPUSD_EURUSD': {'symbols': ['GBPUSD', 'EURUSD'], 'target': 0},
+                # 'XXXUSD': {'symbols': ['AUDUSD', 'EURUSD','GBPUSD'], 'target': 0},
                 'JPY_Pairs': {'symbols': ['GBPJPY', 'EURJPY', 'AUDJPY', 'USDJPY'], 'target': 0},
                 'GBPAUD_EURAUD': {'symbols': ['GBPAUD', 'EURAUD'], 'target': 0}
             }
@@ -3430,8 +3431,9 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
-        shapes = ["Order Block","OMSS","Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"]
+        shapes = ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1", "Left V TPF",
+                  "Left V TPF_OMSS",
+                  "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3460,7 +3462,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
-        zone_from_leg_one = ["0","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"]
+        zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
             "1_BNR": ["50", "559 - 66", "786 - 91"],
@@ -3553,26 +3555,29 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_16 = {
-            "1_BNR": ["+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"],
-            "1_BNR_TPF":["+2","+3","+4","+5","+6","+7","+8","+9","+10"],
-            "2_BNR":["0","+3","+4","+5","+6","+7","+8","+9","+10"],
-            "2_BNR_TPF":["0"]
+            "1_BNR": ["+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "1_BNR_TPF": ["+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "2_BNR": ["0", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "2_BNR_TPF": ["0"]
 
         }
 
         incompatible_map_17 = {
-            '1_BNR':["Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
-            '1_BNR_TPF':["Order Block","OMSS","Leg Inducement","TPF Reference","Order Block L1",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
-            '2_BNR':["Order Block","OMSS","Left V TPF", "Left V TPF_OMSS",
-                                  "Standard_TPF","Variant_TPF","Standard_TPF_OMSS","Variant_TPF_OMSS"],
-            '2_BNR_TPF':["Order Block","OMSS","Leg Inducement","TPF Reference","Order Block L1","Left V TPF", "Left V TPF_OMSS"]
+            '1_BNR': ["Leg Inducement", "TPF Reference", "Order Block L1", "Left V TPF", "Left V TPF_OMSS",
+                      "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"],
+            '1_BNR_TPF': ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1",
+                          "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"],
+            '2_BNR': ["Order Block", "OMSS", "Left V TPF", "Left V TPF_OMSS",
+                      "Standard_TPF", "Variant_TPF", "Standard_TPF_OMSS", "Variant_TPF_OMSS"],
+            '2_BNR_TPF': ["Order Block", "OMSS", "Leg Inducement", "TPF Reference", "Order Block L1", "Left V TPF",
+                          "Left V TPF_OMSS"]
         }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
             return [s for s in shapes if s not in disabled_strategy]
+
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -3766,7 +3771,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 elif (pair in yens):
                     pair_trades = len(current_month_stats_losses[current_month_stats_losses['Symbol'].isin(yens)])
-                    if(pair == "USDJPY"):
+                    if (pair == "USDJPY"):
                         yen_count = yen_count - pair_trades
                         return yen_count
                     else:
@@ -3789,8 +3794,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 elif (pair == "AUDUSD"):
                     # Apply focus rule - if focus pair exists and it's not this pair, return 0
-                    #if focus_pair is not None and focus_pair != "AUDUSD":
-                        #return 0
+                    # if focus_pair is not None and focus_pair != "AUDUSD":
+                    # return 0
 
                     audusd_count = 2  # Start with default count
 
@@ -3889,7 +3894,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                            help="Adjust risk based on trade quality")
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
-            pattern = st.selectbox("Pattern Trigger (Present At Least on 8H TimeFrame - 4H For Gold)",available_pattern_trigger)
+            pattern = st.selectbox("Pattern Trigger (Present At Least on 8H TimeFrame - 4H For Gold)",
+                                   available_pattern_trigger)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",
@@ -3922,7 +3928,7 @@ elif st.session_state.current_page == "Risk Calculation":
             within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
-            Zone_Position = st.selectbox("Zone Position From Leg One",available_zone_position)
+            Zone_Position = st.selectbox("Zone Position From Leg One", available_zone_position)
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)
@@ -3957,9 +3963,9 @@ elif st.session_state.current_page == "Risk Calculation":
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
             sum_target_multiplier = get_sum_target_remain()
 
-            if(Zone_Position == "0"):
+            if (Zone_Position == "0"):
                 Zone_Position_multiplier = 1.0
-            elif(Zone_Position == "+1"):
+            elif (Zone_Position == "+1"):
                 Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+2"):
                 Zone_Position_multiplier = 0.95
@@ -3982,11 +3988,10 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 Zone_Position_multiplier = 1.0
 
-            if(HH_LL == "No"):
+            if (HH_LL == "No"):
                 hh_ll_multiplier = 0.91
-            elif(HH_LL == "Yes"):
+            elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
-
 
             if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
@@ -4107,7 +4112,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                       yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier
+                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05
@@ -4326,20 +4331,22 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     pair_mult = 0.5
                     pair_volatile = float(pair_volatile)
-                    if(selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
+                    if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
                         pair_mult = 0.5
-                    elif(selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
+                    elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
                         pair_mult = 0.3
                     else:
                         pair_mult = 0.5
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
+
+
                 if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
+                        SL_text = "Middle of: 30%, Entry zone " + get_entry_zone_plus_(30, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
@@ -4347,14 +4354,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
+                            SL_text = "Middle of: 30%, Entry zone " + get_entry_zone_plus_(30, selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
+                        SL_text = "Middle of: 22%, Entry zone " + get_entry_zone_plus_(22, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
@@ -4362,14 +4369,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
+                            SL_text = "Middle of: 22%, Entry zone " + get_entry_zone_plus_(22, selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
+                        SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 20)
 
@@ -4377,14 +4384,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
+                            SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 20)
                     else:
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
+                        SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
@@ -4392,7 +4399,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
+                            SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
@@ -4402,28 +4409,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 30%, Entry zone "+get_entry_zone_plus_(30,selected_pair)+" 33%"
+                        SL_text = "Middle of: 30%, Entry zone " + get_entry_zone_plus_(30, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 22%, Entry zone "+get_entry_zone_plus_(22,selected_pair)+" 33%"
+                        SL_text = "Middle of: 22%, Entry zone " + get_entry_zone_plus_(22, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 24%, Entry zone "+get_entry_zone_plus_(24,selected_pair)+" 33%"
+                        SL_text = "Middle of: 24%, Entry zone " + get_entry_zone_plus_(24, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 18%, Entry zone "+get_entry_zone_plus_(18,selected_pair)+" 33%"
+                        SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
@@ -4433,18 +4440,20 @@ elif st.session_state.current_page == "Risk Calculation":
                 length_title = "Leg One Length Requirement:"
                 length_text = ""
 
+
                 def get_entry_zone_plus(pair_volatile, selected_pair):
 
                     pair_mult = 0.5
                     pair_volatile = float(pair_volatile)
-                    if(selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
+                    if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
                         pair_mult = 0.5
-                    elif(selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
+                    elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
                         pair_mult = 0.3
                     else:
                         pair_mult = 0.5
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
+
 
                 def get_sum_target():
                     sum_target = round(sum_gap / final_risk, 2)
@@ -4503,7 +4512,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
+                        SL_text = "Middle of: 33%, Entry zone " + get_entry_zone_plus('33', selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "6.41"
 
@@ -4511,7 +4520,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
+                        SL_text = "Middle of: 33%, Entry zone " + get_entry_zone_plus('33', selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
@@ -4519,7 +4528,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "Middle of: 33%, Entry zone "+get_entry_zone_plus('33',selected_pair) +" 33%"
+                        SL_text = "Middle of: 33%, Entry zone " + get_entry_zone_plus('33', selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
 
@@ -4554,7 +4563,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                        SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                    within_64) + "%, Entry zone " + get_entry_zone_plus(
+                            get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
@@ -4563,7 +4574,9 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4571,14 +4584,18 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4587,21 +4604,27 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide:"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
@@ -4609,21 +4632,27 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide: One Zone below the First Leg Zone"
                             entry_text = "ON EP LINE (Usually at the TOP)"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -4654,7 +4683,9 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
-                            SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                            SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                        within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
@@ -4662,14 +4693,18 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -4678,14 +4713,18 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide:"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
@@ -4693,14 +4732,18 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                                 entry_text = "ON EP LINE of TPF Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide: One Zone below the First Leg Zone"
                                 entry_text = "ON EP LINE (Usually at the TOP)"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
-                                SL_text = "Middle of: " + get_pair_volatile(selected_pair, within_64) + "%, Entry zone "+get_entry_zone_plus(get_pair_volatile(selected_pair, within_64),selected_pair) +" 33%"
+                                SL_text = "Middle of: " + get_pair_volatile(selected_pair,
+                                                                            within_64) + "%, Entry zone " + get_entry_zone_plus(
+                                    get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -4821,7 +4864,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'HH_LL': HH_LL,
                                                 'risk_multiplier': risk_multiplier,
                                                 'pattern': pattern,
-                                                "Zone_Position":Zone_Position,
+                                                "Zone_Position": Zone_Position,
                                                 'Variances': Variances,
                                                 'stop_pips': stop_pips,
                                                 'within_64': within_64,
@@ -4966,7 +5009,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'pattern': pattern,
 
-                                                'Zone_Position':Zone_Position,
+                                                'Zone_Position': Zone_Position,
 
                                                 'Variances': Variances,
 
@@ -5078,7 +5121,7 @@ elif st.session_state.current_page == "Active Opps":
         cross_groups = [
             ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
             ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"],
-            ['GBPJPY','USDJPY','AUDJPY','EURJPY']
+            ['GBPJPY', 'USDJPY', 'AUDJPY', 'EURJPY']
         ]
 
         # Find ALL groups the selected pair belongs to
@@ -5460,7 +5503,7 @@ elif st.session_state.current_page == "Active Opps":
                                 for keyword in [
                                     "FOMC", "Cash Rate", "Interest Rate", "Unemployment Rate",
                                     "GDP", "Non-Farm", "CPI", "election", "non farm",
-                                    "PMI", "Unemployment claims","Bank Rate"
+                                    "PMI", "Unemployment claims", "Bank Rate"
                                 ]
                             )
                             )
@@ -5528,7 +5571,8 @@ elif st.session_state.current_page == "Active Opps":
 
             required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                 'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                                'stop_loss_pct', 'max_adverse_excursion',"pattern","Zone_Position"]  # ADDED NEW FIELDS
+                                'stop_loss_pct', 'max_adverse_excursion', "pattern",
+                                "Zone_Position"]  # ADDED NEW FIELDS
             for col in required_columns:
                 if col not in data_to_save.columns:
                     data_to_save[col] = None
@@ -5565,7 +5609,7 @@ elif st.session_state.current_page == "Active Opps":
                     'trend_position': record.get('trend_position', 'Not set'),
                     'variances': record.get('Variances', 'Not set'),
                     'pattern': record.get('pattern', 'Not set'),
-                    'Zone_Position': record.get('Zone_Position','Not set'),
+                    'Zone_Position': record.get('Zone_Position', 'Not set'),
                     'status': 'Order Ready'
                 })
 
@@ -5848,7 +5892,8 @@ elif st.session_state.current_page == "Active Opps":
                 # Validate required columns
                 required_columns = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                                     'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                                    'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']  # ADDED NEW FIELDS
+                                    'stop_loss_pct', 'max_adverse_excursion', 'pattern',
+                                    'Zone_Position']  # ADDED NEW FIELDS
 
                 missing_columns = [col for col in required_columns if col not in workflow_csv_data.columns]
 
@@ -5859,7 +5904,8 @@ elif st.session_state.current_page == "Active Opps":
                 else:
                     # Clean the data - handle None values and convert numeric columns
                     for col in ['position_size', 'stop_pips', 'entry_price', 'exit_price', 'target_price',
-                                'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']:  # ADDED NEW FIELDS
+                                'stop_loss_pct', 'max_adverse_excursion', 'pattern',
+                                'Zone_Position']:  # ADDED NEW FIELDS
                         if col in workflow_csv_data.columns:
                             workflow_csv_data[col] = workflow_csv_data[col].replace('None', None)
                             workflow_csv_data[col] = pd.to_numeric(workflow_csv_data[col], errors='coerce').fillna(0.0)
@@ -5972,7 +6018,7 @@ elif st.session_state.current_page == "Active Opps":
             csv_data = pd.DataFrame(st.session_state.saved_records)
             column_order = ['selected_pair', 'risk_multiplier', 'position_size', 'stop_pips',
                             'entry_price', 'exit_price', 'target_price', 'status', 'timestamp',
-                            'stop_loss_pct', 'max_adverse_excursion','pattern','Zone_Position']  # ADDED NEW FIELDS
+                            'stop_loss_pct', 'max_adverse_excursion', 'pattern', 'Zone_Position']  # ADDED NEW FIELDS
             for col in column_order:
                 if col not in csv_data.columns:
                     csv_data[col] = None
@@ -6332,7 +6378,6 @@ elif st.session_state.current_page == "Active Opps":
                                 key=f"probability_{unique_key_base}"
                             )
 
-
                         # Display existing Trend Position and Variance (read-only)
                         st.write("---")
                         col_info1, col_info2 = st.columns(2)
@@ -6418,7 +6463,8 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
-                                                                    'Withdrawal_Deposit', 'PROP_Pct','Pattern','Zone_Position','Probability']
+                                                                    'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
+                                                                    'Zone_Position', 'Probability']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:
@@ -6598,6 +6644,7 @@ elif st.session_state.current_page == "Trade Signal":
                 return 0.0  # Invalid direction
         except:
             return 0.0
+
 
     def calculate_threeR_price(entry_price, exit_price, direction, strategy):
         """Calculate Break-Even Price based on strategy and direction."""
@@ -8098,20 +8145,23 @@ elif st.session_state.current_page == "Trade Signal":
                             # Calculate BE Price once based on ORIGINAL values
                             if symbol not in st.session_state.be_prices:
                                 st.session_state.be_prices[symbol] = calculate_be_price(original_open_price,
-                                                                                        st.session_state.original_sl_prices[symbol], direction,
+                                                                                        st.session_state.original_sl_prices[
+                                                                                            symbol], direction,
                                                                                         strategy)
                             be_price = st.session_state.be_prices[symbol]
 
                             if symbol not in st.session_state.threeR_prices:
                                 st.session_state.threeR_prices[symbol] = calculate_threeR_price(original_open_price,
-                                                                                        st.session_state.original_sl_prices[symbol], direction,
-                                                                                        strategy)
+                                                                                                st.session_state.original_sl_prices[
+                                                                                                    symbol], direction,
+                                                                                                strategy)
                             threeR_price = st.session_state.threeR_prices[symbol]
 
                             # Calculate First Trail Price once based on ORIGINAL values
                             if symbol not in st.session_state.first_trail_prices:
                                 st.session_state.first_trail_prices[symbol] = calculate_first_trail_price(
-                                    original_open_price, st.session_state.original_sl_prices[symbol], direction, strategy
+                                    original_open_price, st.session_state.original_sl_prices[symbol], direction,
+                                    strategy
                                 )
                             first_trail_price = st.session_state.first_trail_prices[symbol]
 
@@ -8328,7 +8378,7 @@ elif st.session_state.current_page == "Stats":
 
                 # Calculate monthly percentage gain compared to previous month
                 if prev_month_balance >= 0:
-                    #monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
+                    # monthly_pct_gain = ((ending_balance - prev_month_balance) / prev_month_balance) * 100
                     monthly_pct_gain = ((ending_balance - prev_month_balance) / starting_capital) * 100
                     set_global("monthly_limit_left", starting_balance * 0.08)
                 else:
@@ -8377,7 +8427,7 @@ elif st.session_state.current_page == "Stats":
                         'Ending_Trade_Balance': df.iloc[-1]['Ending_Trade_Balance'],
                         'Total_PnL': df['Total_PnL'].sum(),
                         # 'Monthly_Pct_Gain': round(abs((df.iloc[0]['Starting_Balance']-df.iloc[-1]['Ending_Trade_Balance'])/df.iloc[0]['Starting_Balance'])*100,1),  # Not meaningful as a total
-                        #'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (df.iloc[0]['Starting_Balance']) * 100,
+                        # 'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (df.iloc[0]['Starting_Balance']) * 100,
                         'Monthly_Pct_Gain': (df['Total_PnL'].sum()) / (starting_capital) * 100,
                         'Cash_Flow': df['Cash_Flow'].sum()
                     }
@@ -8445,7 +8495,8 @@ elif st.session_state.current_page == "Guidelines":
 
     st.title("Guidelines to Follow")
     st.header('Standard Rules')
-    st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of 559 zone 1 time for 2_BNR, 2 times for 2_BNR_TPF)")
+    st.subheader(
+        "Length Requirement for First/Middle Leg (Price squeeze out of 559 zone 1 time for 2_BNR, 2 times for 2_BNR_TPF)")
     st.subheader("TPF MUST be visible on 8H Timeframe")
     st.subheader("2_BNR and 2_BNR_TPF")
 

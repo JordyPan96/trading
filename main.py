@@ -1492,27 +1492,23 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
-        # Configure grid options to make links clickable - PRESERVE EXISTING COLUMNS
-        # First, let's get all column names from your data
+        # Configure grid options to make links clickable - SIMPLER APPROACH
         column_names = data.columns.tolist()
-
-        # Convert raw URLs to markdown links in the screenshot column
-        if 'Link_to_screenshot' in data.columns:
-            data['Link_to_screenshot'] = data['Link_to_screenshot'].apply(
-                lambda x: f'[View Screenshot]({x})' if pd.notna(x) and str(x).startswith('http') else x
-            )
 
         # Create column definitions that preserve all existing columns
         column_defs = []
         for col in column_names:
             if col == 'Link_to_screenshot':
-                # Special handling for screenshot column to make it clickable
+                # Use a custom cell renderer for clickable links
                 column_defs.append({
                     'field': col,
                     'headerName': 'Screenshot',
-                    'cellRenderer': 'markdown',  # This will render markdown links as clickable
-                    'autoHeight': True,
-                    'wrapText': True
+                    'cellRenderer': '''function(params) {
+                        if (params.value) {
+                            return '<a href="' + params.value + '" target="_blank" style="color: #007BFF; text-decoration: none;">View Screenshot</a>';
+                        }
+                        return '';
+                    }'''
                 })
             else:
                 # Keep all other columns as they were

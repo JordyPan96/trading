@@ -1496,6 +1496,12 @@ if st.session_state.current_page == "Home":
         # First, let's get all column names from your data
         column_names = data.columns.tolist()
 
+        # Convert raw URLs to markdown links in the screenshot column
+        if 'Link_to_screenshot' in data.columns:
+            data['Link_to_screenshot'] = data['Link_to_screenshot'].apply(
+                lambda x: f'[View Screenshot]({x})' if pd.notna(x) and str(x).startswith('http') else x
+            )
+
         # Create column definitions that preserve all existing columns
         column_defs = []
         for col in column_names:

@@ -1503,7 +1503,7 @@ if st.session_state.current_page == "Home":
             height=500,
             width='100%',
             theme='streamlit',
-            update_mode=GridUpdateMode.NO_UPDATE,  # No updates since editing is disabled
+            update_mode=GridUpdateMode.SELECTION_CHANGED,  # No updates since editing is disabled
             allow_unsafe_jscode=True,
             key="home_aggrid_main",
             # enable_enterprise_modules=False,

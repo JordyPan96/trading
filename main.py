@@ -1268,7 +1268,7 @@ if st.session_state.current_page == "Home":
 
                 # Trend Position dropdown
                 trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
-                new_trend_position = st.selectbox("Trend Position", options=trend_position_options,
+                new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
                 Zone_Position_options = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
@@ -3955,7 +3955,7 @@ elif st.session_state.current_page == "Risk Calculation":
             concat_trend2 = selected_pair + risk_multiplier
             final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
-            Variances = st.selectbox("Position Variance", final_variance2)
+            Variances = st.selectbox("Position Variance (Fib)", final_variance2)
 
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk
@@ -8903,6 +8903,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

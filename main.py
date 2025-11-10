@@ -25,7 +25,7 @@ import pytz
 import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
-from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, JsCode
 
 # Configure page - keep it as wide for desktop
 st.set_page_config(

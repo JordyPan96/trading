@@ -1518,20 +1518,26 @@ if st.session_state.current_page == "Home":
             st.subheader("Screenshot")
             selected_rows = grid_response['selected_rows']
 
-            row = None
-            if selected_rows and len(selected_rows) > 0:
-                if isinstance(selected_rows, pd.DataFrame):
+            if selected_rows is not None:
+                if isinstance(selected_rows, pd.DataFrame) and len(selected_rows) > 0:
                     row = selected_rows.iloc[0].to_dict()
-                elif isinstance(selected_rows, list):
+                elif isinstance(selected_rows, list) and len(selected_rows) > 0:
                     row = selected_rows[0]
                 elif isinstance(selected_rows, str):
                     import json
 
                     try:
                         parsed = json.loads(selected_rows)
-                        row = parsed[0] if parsed else None
+                        if parsed:
+                            row = parsed[0]
+                        else:
+                            row = None
                     except json.JSONDecodeError:
                         row = None
+                else:
+                    row = None
+            else:
+                row = None
 
             if row and "Link_to_screenshot" in row:
                 link = row["Link_to_screenshot"]

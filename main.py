@@ -1523,38 +1523,27 @@ if st.session_state.current_page == "Home":
             # Safe row extraction
             # ----------------------------
             row = None
-            if isinstance(selected_rows, pd.DataFrame) and len(selected_rows) > 0:
-                row = selected_rows.iloc[0].to_dict()
-            elif isinstance(selected_rows, list) and len(selected_rows) > 0:
+            if isinstance(selected_rows, list) and len(selected_rows) > 0:
                 row = selected_rows[0]
-            elif isinstance(selected_rows, str):
-                import json
-
-                try:
-                    parsed = json.loads(selected_rows)
-                    if parsed:
-                        row = parsed[0]
-                except json.JSONDecodeError:
-                    row = None
+            elif isinstance(selected_rows, pd.DataFrame) and len(selected_rows) > 0:
+                row = selected_rows.iloc[0].to_dict()
 
             # ----------------------------
-            # Display thumbnail and zoom button
+            # Display thumbnail and zoom
             # ----------------------------
             if row and "Link_to_screenshot" in row:
                 link = row["Link_to_screenshot"]
                 trade = row.get("Trade", "Selected Trade")
 
                 # Thumbnail
-                st.image(link, caption=trade, width=200)
-
-                # Button to open modal
-                if st.button("🔍 Zoom Screenshot"):
-                    zoom_modal.open()
-
-                # Modal content — only render if open
-                if zoom_modal.is_open():
-                    with zoom_modal.container():
+                if st.button("🔍 Zoom Screenshot", key=f"zoom_{trade}"):
+                    # Open native Streamlit dialog
+                    with st.dialog(title=f"Screenshot: {trade}"):
                         st.image(link, caption=trade, use_container_width=True)
+                        st.button("Close")  # optional, dialog can also be closed by clicking outside
+
+                # Always show thumbnail
+                st.image(link, caption=trade, width=200)
             else:
                 st.info("Select a trade to view its screenshot.")
 

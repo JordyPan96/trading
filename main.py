@@ -1516,45 +1516,45 @@ if st.session_state.current_page == "Home":
                 # reload_data=True
             )
         with col2:
-            st.subheader("Screenshot")
-            selected_rows = grid_response['selected_rows']
+            st.subheader("📸 Screenshot")
+            selected_rows = grid_response.get('selected_rows', [])
 
-            if selected_rows is not None:
-                if isinstance(selected_rows, pd.DataFrame) and len(selected_rows) > 0:
-                    row = selected_rows.iloc[0].to_dict()
-                elif isinstance(selected_rows, list) and len(selected_rows) > 0:
-                    row = selected_rows[0]
-                elif isinstance(selected_rows, str):
-                    import json
+            # ----------------------------
+            # Safe row extraction
+            # ----------------------------
+            row = None
+            if isinstance(selected_rows, pd.DataFrame) and len(selected_rows) > 0:
+                row = selected_rows.iloc[0].to_dict()
+            elif isinstance(selected_rows, list) and len(selected_rows) > 0:
+                row = selected_rows[0]
+            elif isinstance(selected_rows, str):
+                import json
 
-                    try:
-                        parsed = json.loads(selected_rows)
-                        if parsed:
-                            row = parsed[0]
-                        else:
-                            row = None
-                    except json.JSONDecodeError:
-                        row = None
-                else:
+                try:
+                    parsed = json.loads(selected_rows)
+                    if parsed:
+                        row = parsed[0]
+                except json.JSONDecodeError:
                     row = None
-            else:
-                row = None
 
+            # ----------------------------
+            # Display thumbnail and zoom button
+            # ----------------------------
             if row and "Link_to_screenshot" in row:
                 link = row["Link_to_screenshot"]
                 trade = row.get("Trade", "Selected Trade")
 
-                # Show thumbnail
+                # Thumbnail
                 st.image(link, caption=trade, width=200)
 
                 # Button to open modal
-                if st.button("Zoom Screenshot"):
+                if st.button("🔍 Zoom Screenshot"):
                     zoom_modal.open()
 
-                # Modal content
-                with zoom_modal.container():
-                    st.image(link, caption=trade, use_container_width=True)
-
+                # Modal content — only render if open
+                if zoom_modal.is_open():
+                    with zoom_modal.container():
+                        st.image(link, caption=trade, use_container_width=True)
             else:
                 st.info("Select a trade to view its screenshot.")
 

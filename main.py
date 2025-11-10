@@ -25,6 +25,7 @@ import pytz
 import gspread
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import set_with_dataframe, get_as_dataframe
+from streamlit_modal import Modal
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode
 
 # Configure page - keep it as wide for desktop

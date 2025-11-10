@@ -1492,31 +1492,7 @@ if st.session_state.current_page == "Home":
                 else:
                     st.warning("No data to save")
 
-        # Configure grid options to make links clickable
-        grid_options = {
-            'enableSorting': True,
-            'enableFilter': True,
-            'enableColResize': True,
-            'rowSelection': 'multiple'
-        }
-
-        # Add column definitions to make Link_to_screenshot clickable
-        column_defs = [
-            # Your other column definitions here...
-            {
-                'field': 'Link_to_screenshot',
-                'headerName': 'Screenshot',
-                'cellRenderer': 'markdown',  # This will render markdown links as clickable
-                'autoHeight': True,
-                'wrapText': True
-            }
-        ]
-
-        # If you have existing grid_options, update them:
-        if 'grid_options' not in locals():
-            grid_options = {}
-        grid_options['columnDefs'] = column_defs
-
+        
         # Display the grid
         grid_response = AgGrid(
             data,
@@ -8832,7 +8808,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

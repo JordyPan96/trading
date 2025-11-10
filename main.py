@@ -1369,8 +1369,17 @@ if st.session_state.current_page == "Home":
                 st.success(" New record added successfully! Metrics recalculated.")
                 st.rerun()
 
+        # Create a copy of your data and convert the screenshot column to HTML links
+        display_data = data.copy()
+        if 'Link_to_screenshot' in display_data.columns:
+            display_data['Link_to_screenshot'] = display_data['Link_to_screenshot'].apply(
+                lambda
+                    x: f'<a href="{x}" target="_blank" style="color: #007BFF; text-decoration: none; font-weight: 500;">📷 View</a>'
+                if pd.notna(x) and str(x).startswith('http')
+                else ''
+            )
         # Configure grid for VIEWING ONLY (no editing)
-        gb = GridOptionsBuilder.from_dataframe(data)
+        gb = GridOptionsBuilder.from_dataframe(display_data)
 
         # Define columns to hide (they will still be in the data, just not visible)
         columns_to_hide = [
@@ -1394,6 +1403,14 @@ if st.session_state.current_page == "Home":
             editable=False,  # DISABLE editing for all columns
             min_column_width=100,
             max_column_width=1000
+        )
+
+        # Configure the screenshot column to allow HTML
+        gb.configure_column(
+            'Link_to_screenshot',
+            headerName='Screenshot',
+            wrapText=False,
+            autoHeight=False
         )
 
 

@@ -3995,6 +3995,7 @@ elif st.session_state.current_page == "Risk Calculation":
             big_risk_multiplier = 1.0
             Zone_Position_multiplier = 1.0
             hh_ll_multiplier = 1.0
+            pattern_multiplier = 1.0
             # Iterate through each strategy in the results
             for strategy, row in strategy_stats.iterrows():
                 # Get the multiplier for this specific strategy
@@ -4116,6 +4117,24 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     trend_position_multiplier = 0.9
 
+            if (available_pattern_trigger == "Weekly OB"):
+                pattern_multiplier = 1.2
+            elif (available_pattern_trigger == "2 Daily OB"):
+                pattern_multiplier = 1.1
+            elif (available_pattern_trigger == "Daily OB"):
+                pattern_multiplier = 1.0
+            elif (available_pattern_trigger == "8H OB" or available_pattern_trigger == "4H OB"):
+                pattern_multiplier = 0.91
+            elif (available_pattern_trigger == "Weekly TPF"):
+                pattern_multiplier = 1.2
+            elif (available_pattern_trigger == "2 Daily TPF"):
+                pattern_multiplier = 1.1
+            elif (available_pattern_trigger == "Daily TPF"):
+                pattern_multiplier = 1.0
+            elif (available_pattern_trigger == "8H TPF" or available_pattern_trigger == "4H TPF"):
+                pattern_multiplier = 0.91
+
+
             if (Variances == "50"):
                 variance_multiplier = 0.91
             elif (Variances == "559 - 66"):
@@ -4154,7 +4173,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier
+                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier * pattern_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05

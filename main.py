@@ -436,13 +436,13 @@ def calculate_strategy_grade_static(strategy_name):
     strategy_grades = {
         # 1 Touch - fib>percentage>wick
 
-        '1_BNR': ("A", 0.91),  # Fib + wick/ob
+        '1_BNR': ("A", 1.0),  # Fib + wick/ob
         "1_BNR_TPF": ("A", 1.0),  # wick/ob
 
         # 2 Touch fib>wick>percentage
 
-        "2_BNR": ("A", 1.1),  # Fib + wick/ob
-        "2_BNR_TPF": ("A", 1.2),  # Fake out or wick/ob
+        "2_BNR": ("A", 1.0),  # Fib + wick/ob
+        "2_BNR_TPF": ("A", 1.0),  # Fake out or wick/ob
 
         # 3 Touch  wick>percentage>fib
 
@@ -518,10 +518,10 @@ def analyze_strategy(group):
 def ensure_all_strategies_analyzed(df):
     """Ensure analyze_strategy is called for all predefined strategies"""
     predefined_strategies = {
-        '1_BNR': ("A", 0.91),
+        '1_BNR': ("A", 1.0),
         '1_BNR_TPF': ("A", 1.0),
-        '2_BNR': ("A", 1.1),
-        '2_BNR_TPF': ("A", 1.2),
+        '2_BNR': ("A", 1.0),
+        '2_BNR_TPF': ("A", 1.0),
     }
 
     # First, analyze strategies that have actual data
@@ -8903,7 +8903,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

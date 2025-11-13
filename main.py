@@ -8572,7 +8572,7 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data)
     st.header('Variant Rules')
-    st.subheader("Length Requirement for First/Middle Leg (Left shoulder did not make out of 559 zone)")
+    st.subheader("Length Requirement for First/Middle Leg (Left shoulder did not make out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {

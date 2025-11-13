@@ -8558,7 +8558,6 @@ elif st.session_state.current_page == "Guidelines":
     st.header('Standard Rules')
     st.subheader(
         "Length Requirement for First/Middle Leg (Left shoulder out of 559 zone, Mid leg squeeze out of POI next fib zone)")
-    st.subheader("TPF MUST be visible on 8H Timeframe")
     st.subheader("2_BNR and 2_BNR_TPF")
 
     table_data = {

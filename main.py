@@ -4395,7 +4395,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
                         pair_mult = 0.3
                     elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
-                        pair_mult = 0.2
+                        pair_mult = 0.15
                     else:
                         pair_mult = 0.3
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
@@ -4507,11 +4507,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     pair_mult = 0.5
                     pair_volatile = float(pair_volatile)
                     if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
-                        pair_mult = 0.5
-                    elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
                         pair_mult = 0.3
+                    elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
+                        pair_mult = 0.15
                     else:
-                        pair_mult = 0.5
+                        pair_mult = 0.3
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
 

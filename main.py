@@ -8557,7 +8557,7 @@ elif st.session_state.current_page == "Guidelines":
     st.title("Guidelines to Follow")
     st.header('Standard Rules')
     st.subheader(
-        "Length Requirement for First/Middle Leg (Price squeeze out of 559 zone 1 time for 2_BNR, 2 times for 2_BNR_TPF)")
+        "Length Requirement for First/Middle Leg (Left shoulder out of 559 zone, Mid leg squeeze out of POI next fib zone)")
     st.subheader("TPF MUST be visible on 8H Timeframe")
     st.subheader("2_BNR and 2_BNR_TPF")
 
@@ -8573,18 +8573,17 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data)
     st.header('Variant Rules')
-    st.subheader("Length Requirement for First/Middle Leg (Price squeeze out of Shoulder next fib zone)")
-    st.subheader("TPF MUST be visible on 2 Daily Timeframe")
+    st.subheader("Length Requirement for First/Middle Leg (Left shoulder did not make out of 559 zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {
         '': ['2_BNR_TPF'],
-        'XAUUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
-        'XAUUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2%'],
-        'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
-        'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.78%, Mid Leg 2%'],
-        'OTHER 50 - 66': ['Left Leg 1.78%, Mid Leg 2%'],
-        'OTHER 66 - 786': ['Left Leg 1.78%, Mid Leg 2%']
+        'XAUUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
+        'XAUUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2%'],
+        'GBPUSD/EURUSD 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
+        'GBPUSD/EURUSD 66 - 786': ['Left Leg 1.79%, Mid Leg 2%'],
+        'OTHER 50 - 66': ['Left Leg 1.79%, Mid Leg 2%'],
+        'OTHER 66 - 786': ['Left Leg 1.79%, Mid Leg 2%']
     }
 
     st.table(table_data2)

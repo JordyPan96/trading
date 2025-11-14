@@ -4146,13 +4146,13 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     trend_position_multiplier = 0.9
 
-            if (pattern == "Weekly OB"):
-                pattern_multiplier = 1.2
-            elif (pattern == "2 Daily OB"):
+            if (pattern == "8H OB"):
                 pattern_multiplier = 1.1
-            elif (pattern == "Daily OB"):
+            elif (pattern == "Second 8H Candle from TOP"):
+                pattern_multiplier = 1.1
+            elif (pattern == "4H OB"):
                 pattern_multiplier = 1.0
-            elif (pattern == "8H/4H OB"):
+            elif (pattern == "2H OB"):
                 pattern_multiplier = 0.91
             elif (pattern == "Weekly TPF"):
                 pattern_multiplier = 1.2
@@ -4163,7 +4163,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "8H/4H TPF"):
                 pattern_multiplier = 0.91
             elif (pattern == "Variant 2 Daily TPF"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.0
 
 
             if (Variances == "50"):

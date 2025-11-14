@@ -4940,9 +4940,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                 get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
-                    if(risk_multiplier == "2_BNR"):
-                        exit_title = "Target Guide One:"
-                        exit_text = "-0.1 On 2_BNR Target FIB"
+                    #if(risk_multiplier == "2_BNR"):
+                        #exit_title = "Target Guide One:"
+                        #exit_text = "-0.1 On 2_BNR Target FIB"
 
                     if (selected_pair == "XAUUSD"):
                         if (
@@ -5034,9 +5034,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                     get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
-                        if (risk_multiplier == "2_BNR"):
-                            exit_title = "Target Guide One:"
-                            exit_text = "-0.1 On 2_BNR Target FIB"
+                        #if (risk_multiplier == "2_BNR"):
+                            #exit_title = "Target Guide One:"
+                            #exit_text = "-0.1 On 2_BNR Target FIB"
 
             col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 

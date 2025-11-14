@@ -4134,7 +4134,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "8H/4H TPF"):
                 pattern_multiplier = 0.91
             elif (pattern == "Variant Weekly TPF"):
-                pattern_multiplier = 1.0
+                pattern_multiplier = 1.1
 
 
             if (Variances == "50"):

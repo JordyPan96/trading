@@ -1258,9 +1258,9 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
+                pattern_options = ["8H OB", "Second 8H Candle from TOP","4H OB", "2H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant Weekly TPF"]
+                                   "8H/4H TPF","Variant 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
             with col5:
@@ -3477,9 +3477,9 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
-        shapes = ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
+        shapes = ["8H OB", "Second 8H Candle from TOP","4H OB", "2H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant Weekly TPF"]
+                                   "8H/4H TPF","Variant 2 Daily TPF"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3611,12 +3611,13 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant Weekly TPF"],
-            '1_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Variant Weekly TPF"],
+                                   "8H/4H TPF","Variant 2 Daily TPF"],
+            '1_BNR_TPF': ["8H OB", "Second 8H Candle from TOP","4H OB", "2H OB","Variant 2 Daily TPF"],
             '2_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant Weekly TPF"],
-            '2_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB"]
+                                   "8H/4H TPF","Variant 2 Daily TPF"],
+            '2_BNR_TPF': ["8H OB", "Second 8H Candle from TOP","4H OB", "2H OB",
+                                   "8H/4H TPF"]
         }
 
         incompatible_map_18 = {
@@ -4161,7 +4162,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF"):
                 pattern_multiplier = 0.91
-            elif (pattern == "Variant Weekly TPF"):
+            elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.1
 
 

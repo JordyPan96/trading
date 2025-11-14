@@ -1260,7 +1260,7 @@ if st.session_state.current_page == "Home":
 
                 pattern_options = ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant TPF"]
+                                   "8H/4H TPF","Variant Weekly TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
             with col5:
@@ -3475,7 +3475,7 @@ elif st.session_state.current_page == "Risk Calculation":
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
         shapes = ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant TPF"]
+                                   "8H/4H TPF","Variant Weekly TPF"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3607,11 +3607,11 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant TPF"],
-            '1_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Variant TPF"],
+                                   "8H/4H TPF","Variant Weekly TPF"],
+            '1_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Variant Weekly TPF"],
             '2_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant TPF"],
+                                   "8H/4H TPF","Variant Weekly TPF"],
             '2_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB"]
         }
 
@@ -4133,8 +4133,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF"):
                 pattern_multiplier = 0.91
-            elif (pattern == "Variant TPF"):
-                pattern_multiplier = 0.91
+            elif (pattern == "Variant Weekly TPF"):
+                pattern_multiplier = 1.0
 
 
             if (Variances == "50"):

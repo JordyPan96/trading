@@ -3493,7 +3493,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
-        leg_length = [">=99%", ">=119%",">=149%",">=179%",">=2%"]
+        leg_length = [">=99%", ">=119%",">=149%",">=179%",">=2%","NA"]
         within_64 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": [],
@@ -3651,6 +3651,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_21 = {
             "Variant 2 Daily TPF": [">=99%", ">=119%",">=149%",">=179%"]
+
+        }
+
+        incompatible_map_22 = {
+            "1_BNR": [">=99%", ">=119%",">=149%",">=179%",">=2%"],
+            "1_BNR_TPF": [">=99%", ">=119%", ">=149%", ">=179%", ">=2%"],
+            "2_BNR": ["NA"],
+            "2_BNR_TPF": ["NA"],
 
         }
 

@@ -3042,7 +3042,7 @@ elif st.session_state.current_page == "Risk Calculation":
         col1, col2, col3 = st.columns([1, 1, 0.01], gap="small")
 
         with col1:
-            st.subheader("Grading Based Risk Multiplier")
+            #st.subheader("Grading Based Risk Multiplier")
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
             strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 

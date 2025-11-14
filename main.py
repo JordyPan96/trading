@@ -3786,6 +3786,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_24 = {
+            "Cross Wave": ["Variant 2 Daily TPF"]
+        }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
@@ -3794,6 +3798,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_pattern_trigger2(strat,strat_list):
             disabled_strategy2 = incompatible_map_19.get(strat, [])
             return [s for s in strat_list if s not in disabled_strategy2]
+
+        def get_available_pattern_trigger3(wave,strat_list):
+            disabled_strategy3 = incompatible_map_24.get(wave, [])
+            return [s for s in strat_list if s not in disabled_strategy3]
 
 
         def get_available_timeframe(selected_pair):
@@ -4134,8 +4142,10 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
             pattern_concat = squeeze_559_time + risk_multiplier
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat,available_pattern_trigger)
+            available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
+
             pattern = st.selectbox("Pattern Trigger (Present At Least on 8H TimeFrame - 4H For Gold)",
-                                   available_pattern_trigger2)
+                                   available_pattern_trigger3)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",

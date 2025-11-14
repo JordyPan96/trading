@@ -3635,6 +3635,20 @@ elif st.session_state.current_page == "Risk Calculation":
                                    "8H/4H TPF","786_fib","Variant 2 Daily TPF"]
         }
 
+        incompatible_map_20 = {
+            "AUDUSD":[">=119%",">=149%",">=179%"],
+            "USDCAD": [">=119%", ">=149%", ">=179%"],
+            "GBPUSD": [">=119%", ">=179%"],
+            "EURUSD": [">=119%", ">=179%"],
+            "GBPJPY": [">=119%", ">=149%", ">=179%"],
+            "EURJPY": [">=119%", ">=149%", ">=179%"],
+            "AUDJPY": [">=119%", ">=149%", ">=179%"],
+            "USDJPY": [">=119%", ">=149%", ">=179%"],
+            "GBPAUD": [">=119%", ">=149%", ">=179%"],
+            "EURAUD": [">=119%", ">=149%", ">=179%"],
+            "XAUUSD": [">=99%", ">=149%"]
+        }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
@@ -3727,6 +3741,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_variance_2(trend, variancelist):
             available_variances = incompatible_map_10.get(trend, [])
             return [s for s in variancelist if s not in available_variances]
+
+        def get_available_leg_length(pair):
+            available_leg_length = incompatible_map_20.get(pair, [])
+            return [s for s in leg_length if s not in available_leg_length]
 
 
         def get_available_zone_position(strategy):
@@ -3988,7 +4006,8 @@ elif st.session_state.current_page == "Risk Calculation":
             final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
-            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", leg_length)
+            available_leg_length = get_available_leg_length(selected_pair)
+            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length)
 
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk

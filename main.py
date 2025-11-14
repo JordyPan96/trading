@@ -3649,6 +3649,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "XAUUSD": [">=99%", ">=149%"]
         }
 
+        incompatible_map_21 = {
+            "Variant 2 Daily TPF": [">=99%", ">=119%",">=149%",">=179%"]
+
+        }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
@@ -3745,6 +3750,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_leg_length(pair):
             available_leg_length = incompatible_map_20.get(pair, [])
             return [s for s in leg_length if s not in available_leg_length]
+
+        def get_available_leg_length2(strategy, list):
+            available_leg_length2 = incompatible_map_21.get(strategy, [])
+            return [s for s in list if s not in available_leg_length2]
 
 
         def get_available_zone_position(strategy):
@@ -4007,7 +4016,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
             available_leg_length = get_available_leg_length(selected_pair)
-            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length)
+            get_available_leg_length2 = get_available_leg_length2(risk_multiplier,available_leg_length)
+            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", get_available_leg_length2)
 
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk

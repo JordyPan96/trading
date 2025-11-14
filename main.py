@@ -1298,6 +1298,8 @@ if st.session_state.current_page == "Home":
                 stop_loss_pct = st.number_input("Stop Loss Percentage", value=0.0, step=0.01, key="stop_loss_pct")
                 max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01,
                                                         key="max_adverse_excursion")
+                squeeze_559_time_options = ["0", "1", "2"]
+                new_squeeze_559_time = st.selectbox(" squeeze_559_time", options= squeeze_559_time_options, key="new_squeeze_559_time")
 
             if st.button("Add Record", type="primary", key="add_record_btn"):
                 # Create new record with exact field names
@@ -1340,6 +1342,8 @@ if st.session_state.current_page == "Home":
                     new_record['Pattern'] = new_Pattern
                 if 'within_64' in data.columns:
                     new_record['within_64'] = new_within_64
+                if 'squeeze_559_time' in data.columns:
+                    new_record['squeeze_559_time'] = new_squeeze_559_time
                 if 'Zone_Position' in data.columns:
                     new_record['Zone_Position'] = new_Zone_Position
                 new_record['Probability'] = new_probability
@@ -4949,6 +4953,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'POI': POI,
                                                 'cross_fib': cross_fib,
                                                 'HH_LL': HH_LL,
+                                                'squeeze_559_time':squeeze_559_time,
                                                 'risk_multiplier': risk_multiplier,
                                                 'pattern': pattern,
                                                 "Zone_Position": Zone_Position,
@@ -5091,6 +5096,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'cross_fib': cross_fib,
 
                                                 'HH_LL': HH_LL,
+
+                                                'squeeze_559_time':squeeze_559_time,
 
                                                 'risk_multiplier': risk_multiplier,
 
@@ -6532,6 +6539,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Maximum Adverse Excursion': max_adverse_excursion,
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             'HH_LL': record['HH_LL'],  # Already exists in record
+                                            'squeeze_559_time': record['squeeze_559_time'],
                                             'within_64': record['within_64'],  # Already exists in record
                                             'Probability': new_Probability,
                                             'Withdrawal_Deposit': 0.0,
@@ -6551,7 +6559,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
-                                                                    'Zone_Position', 'Probability']
+                                                                    'Zone_Position', 'Probability','squeeze_559_time']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:

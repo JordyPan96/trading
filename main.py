@@ -3920,6 +3920,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 available_time_frame_2)
             cross_fib = st.selectbox("Weekly Wave Status", ['Wave 2+', 'Wave 1', 'Cross Wave'])
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1','2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)

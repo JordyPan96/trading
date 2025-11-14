@@ -4823,7 +4823,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
-                                <= 3% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Entry on OB -> Enter <= 64 (if can)<br>
                                 --<br>
@@ -4837,7 +4837,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1_BNR_TPF/2_BNR_TPF:<br>
-                                <= 3% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --2_BNR:<br>
                                 Entry cover EOZ (Must) -> Entry on OB -> Enter <= 64 (if can)<br>
                                 --<br>

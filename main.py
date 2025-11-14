@@ -3882,6 +3882,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length3 = incompatible_map_22.get(strategy, [])
             return [s for s in list if s not in available_leg_length3]
 
+        def get_available_leg_length4(concat_text, list):
+            available_leg_length4 = incompatible_map_23.get(concat_text, [])
+            return [s for s in list if s not in available_leg_length4]
 
         def get_available_zone_position(strategy):
             available_zone_position = incompatible_map_16.get(strategy, [])
@@ -4142,10 +4145,14 @@ elif st.session_state.current_page == "Risk Calculation":
             final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
+
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
-            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length3)
+            concat_leg_length = selected_pair + risk_multiplier + Variances
+            available_leg_length4 = get_available_leg_length4(concat_leg_length,available_leg_length3)
+            
+            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
 
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk

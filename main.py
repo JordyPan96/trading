@@ -8606,7 +8606,7 @@ elif st.session_state.current_page == "Guidelines":
     }
 
     st.table(table_data)
-    st.header('Variant Rules')
+    st.header('Variant Rules (Only for weekly TPF')
     st.subheader("Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 

@@ -4354,6 +4354,9 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "786_fib"):
                 pattern_multiplier = 0.81
+            elif (pattern == "No Pattern"):
+                pattern_multiplier = 0.0
+
 
 
             if (Variances == "50"):

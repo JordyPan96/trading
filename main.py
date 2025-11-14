@@ -3615,6 +3615,12 @@ elif st.session_state.current_page == "Risk Calculation":
             '2_BNR_TPF': ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB"]
         }
 
+        incompatible_map_18 = {
+            "0": ["2_BNR","2_BNR_TPF"],
+            "1": ["1_BNR","1_BNR_TPF"],
+            "2": ["1_BNR_TPF","1_BNR","2_BNR"],
+        }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
@@ -3689,6 +3695,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_strategies5(timeframe, stratslist):
             disabled_strategies_5 = incompatible_map_15.get(timeframe, [])
             return [s for s in stratslist if s not in disabled_strategies_5]
+
+        def get_available_strategies6(squeezetime, stratslist):
+            disabled_strategies_6 = incompatible_map_18.get(squeezetime, [])
+            return [s for s in stratslist if s not in disabled_strategies_6]
 
 
         def get_available_variance(entry_model):
@@ -3930,9 +3940,10 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_2 = get_available_strategies3(trend_position, selected_pair, available_strats_crossfib)
             available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
             available_strats_4 = get_available_strategies5(POI, available_strats_3)
+            available_strats_5 = get_available_strategies6(squeeze_559_time,available_strats_4)
 
             risk_multiplier = st.selectbox("Entry Model",
-                                           available_strats_4,
+                                           available_strats_5,
                                            index=0,
                                            help="Adjust risk based on trade quality")
 

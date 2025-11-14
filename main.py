@@ -3656,7 +3656,10 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_21 = {
-            "Variant 2 Daily TPF": [">=99%", ">=119%",">=149%",">=179%"]
+            "Variant 2 Daily TPF": [">=99%", ">=119%",">=149%",">=179%"],
+            "Weekly TPF": [">=2%"],
+            "2 Daily TPF": [">=2%"],
+            "Daily TPF": [">=2%"],
 
         }
 

@@ -3485,7 +3485,7 @@ elif st.session_state.current_page == "Risk Calculation":
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
         shapes = ["8H OB", "4H OB", "2H OB","Second 8H Candle from TOP","786_fib","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","Variant 2 Daily TPF"]
+                                   "8H/4H TPF","Variant 2 Daily TPF","No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         incompatible_map = {
             "USDCAD": ['1_BNR'],

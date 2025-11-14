@@ -3621,10 +3621,18 @@ elif st.session_state.current_page == "Risk Calculation":
             "2": ["1_BNR_TPF","1_BNR","2_BNR"],
         }
 
+        incompatible_map_19 = {
+            "12_BNR_TPF": ["Variant Weekly TPF"]
+        }
+
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
             return [s for s in shapes if s not in disabled_strategy]
+        
+        def get_available_pattern_trigger2(strat,strat_list):
+            disabled_strategy2 = incompatible_map_19.get(strat, [])
+            return [s for s in strat_list if s not in disabled_strategy2]
 
 
         def get_available_timeframe(selected_pair):
@@ -3948,8 +3956,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                            help="Adjust risk based on trade quality")
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
+            pattern_concat = squeeze_559_time + risk_multiplier
+            available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat,available_pattern_trigger)
             pattern = st.selectbox("Pattern Trigger (Present At Least on 8H TimeFrame - 4H For Gold)",
-                                   available_pattern_trigger)
+                                   available_pattern_trigger2)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",

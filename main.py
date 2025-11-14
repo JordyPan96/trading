@@ -4149,7 +4149,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (pattern == "8H OB"):
                 pattern_multiplier = 1.1
             elif (pattern == "Second 8H Candle from TOP"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.0
             elif (pattern == "4H OB"):
                 pattern_multiplier = 1.0
             elif (pattern == "2H OB"):

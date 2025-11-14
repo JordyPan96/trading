@@ -3787,7 +3787,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_24 = {
-            "Cross Wave": ["Variant 2 Daily TPF"]
+            "Cross Wave": []
         }
 
 

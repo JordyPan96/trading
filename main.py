@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["786_fib","8H OB", "4H OB", "2H OB","Second 8H Candle from TOP","Weekly TPF",
+                pattern_options = ["8H OB", "4H OB", "2H OB","Second 8H Candle from TOP","786_fib","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
@@ -3477,7 +3477,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
-        shapes = ["786_fib","8H OB", "4H OB", "2H OB","Second 8H Candle from TOP","Weekly TPF",
+        shapes = ["8H OB", "4H OB", "2H OB","Second 8H Candle from TOP","786_fib","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']

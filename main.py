@@ -6543,7 +6543,8 @@ elif st.session_state.current_page == "Active Opps":
                                             'within_64': record['within_64'],  # Already exists in record
                                             'Probability': new_Probability,
                                             'Withdrawal_Deposit': 0.0,
-                                            'PROP_Pct': 0.0
+                                            'PROP_Pct': 0.0,
+                                            'Link_to_screenshot':'To be updated'
                                         }
 
                                         try:
@@ -6559,7 +6560,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
-                                                                    'Zone_Position', 'Probability','squeeze_559_time']
+                                                                    'Zone_Position', 'Probability','squeeze_559_time','Link_to_screenshot']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:

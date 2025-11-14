@@ -3472,7 +3472,7 @@ elif st.session_state.current_page == "Risk Calculation":
         majors_dollar = ["AUDUSD", "EURUSD", "GBPUSD", "XAUUSD"]
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
-        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF']
+        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
         shapes = ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant Weekly TPF"]

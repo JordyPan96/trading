@@ -1263,6 +1263,10 @@ if st.session_state.current_page == "Home":
                                    "8H/4H TPF","Variant 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
+                leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
+                new_leg_length = st.selectbox("leg_length", options=leg_length_options, key="new_leg_length")
+
+
             with col5:
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
@@ -1338,6 +1342,8 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
+                if'leg_length' in data.columns:
+                    new_record['leg_length'] = new_leg_length
                 if 'Pattern' in data.columns:
                     new_record['Pattern'] = new_Pattern
                 if 'within_64' in data.columns:
@@ -4151,7 +4157,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
             concat_leg_length = selected_pair + risk_multiplier + Variances
             available_leg_length4 = get_available_leg_length4(concat_leg_length,available_leg_length3)
-            
+
             leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
 
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
@@ -5125,6 +5131,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'POI': POI,
                                                 'cross_fib': cross_fib,
                                                 'HH_LL': HH_LL,
+                                                'leg_length': leg_length,
                                                 'squeeze_559_time':squeeze_559_time,
                                                 'risk_multiplier': risk_multiplier,
                                                 'pattern': pattern,
@@ -5268,6 +5275,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'cross_fib': cross_fib,
 
                                                 'HH_LL': HH_LL,
+
+                                                'leg_length': leg_length,
 
                                                 'squeeze_559_time':squeeze_559_time,
 
@@ -6711,6 +6720,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Maximum Adverse Excursion': max_adverse_excursion,
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             'HH_LL': record['HH_LL'],  # Already exists in record
+                                            'leg_length': record['leg_length'],
                                             'squeeze_559_time': record['squeeze_559_time'],
                                             'within_64': record['within_64'],  # Already exists in record
                                             'Probability': new_Probability,
@@ -6732,7 +6742,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
-                                                                    'Zone_Position', 'Probability','squeeze_559_time','Link_to_screenshot']
+                                                                    'Zone_Position', 'Probability','squeeze_559_time','leg_length', 'Link_to_screenshot']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:

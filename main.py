@@ -4420,14 +4420,14 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (risk_multiplier == "1_BNR_TPF"):
                 def get_entry_zone_plus_(pair_volatile, selected_pair):
 
-                    pair_mult = 0.5
+                    pair_mult = 0
                     pair_volatile = float(pair_volatile)
                     if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
-                        pair_mult = 0.3
+                        pair_mult = 0
                     elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
-                        pair_mult = 0.15
+                        pair_mult = 0
                     else:
-                        pair_mult = 0.3
+                        pair_mult = 0
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
 
@@ -4534,14 +4534,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 def get_entry_zone_plus(pair_volatile, selected_pair):
 
-                    pair_mult = 0.5
+                    pair_mult = 0
                     pair_volatile = float(pair_volatile)
                     if (selected_pair == "GBPUSD" or selected_pair == "EURUSD"):
-                        pair_mult = 0.3
+                        pair_mult = 0
                     elif (selected_pair == "AUDUSD" or selected_pair == "USDCAD"):
-                        pair_mult = 0.15
+                        pair_mult = 0
                     else:
-                        pair_mult = 0.3
+                        pair_mult = 0
                     entry_plus = "+" + str(int(round(pair_volatile * pair_mult, 0))) + "%,"
                     return entry_plus
 

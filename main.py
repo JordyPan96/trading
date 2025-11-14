@@ -3493,6 +3493,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
+        leg_length = [">=99%", ">=119%",">=149%",">=179%",">=2%"]
         within_64 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": [],
@@ -3988,6 +3989,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
 
+
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             Adaptive_value = next_risk
             # available_rr = get_available_rr(risk_multiplier)
@@ -3999,6 +4001,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
+            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", leg_length)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)

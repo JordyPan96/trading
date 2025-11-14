@@ -3630,8 +3630,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","786_fib"],
-            "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
-                                   "2 Daily TPF", "Daily TPF",
+            "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB",
                                    "8H/4H TPF","786_fib","Variant 2 Daily TPF"]
         }
 

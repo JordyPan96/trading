@@ -3617,7 +3617,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF","786_fib"],
             '2_BNR_TPF': ["8H OB", "Second 8H Candle from TOP","4H OB", "2H OB",
-                                   "786_fib"]
+                                   "786_fib","8H/4H TPF"]
         }
 
         incompatible_map_18 = {
@@ -3629,7 +3629,10 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","786_fib"]
+                                   "8H/4H TPF","786_fib"],
+            "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
+                                   "2 Daily TPF", "Daily TPF",
+                                   "8H/4H TPF","786_fib","Variant 2 Daily TPF"]
         }
 
 

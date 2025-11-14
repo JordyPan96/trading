@@ -3629,7 +3629,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/4H OB","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
-                                   "8H/4H TPF","785_fib"]
+                                   "8H/4H TPF","786_fib"]
         }
 
 

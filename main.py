@@ -3487,6 +3487,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF","No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
+        _559_time = ['0', '1','2']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
             "GBPAUD": ["1_BNR"],
@@ -3675,6 +3676,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_24 = {
             ">=13%": ['Wave 2+','Cross Wave'],
+            "11%-12.99%": ['Cross Wave']
 
         }
 

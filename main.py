@@ -4196,6 +4196,7 @@ elif st.session_state.current_page == "Risk Calculation":
             pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
                                    available_pattern_trigger3)
 
+            stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
@@ -4204,7 +4205,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
 
-            stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
+
             Adaptive_value = next_risk
             # available_rr = get_available_rr(risk_multiplier)
             available_64 = get_available_64(risk_multiplier)

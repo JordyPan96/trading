@@ -5053,7 +5053,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --1_BNR_TPF/2_BNR_TPF:<br>
                                 <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --2_BNR:<br>
-                                Entry on OB -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                Entry on Trigger Pattern -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -5067,7 +5067,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --1_BNR_TPF/2_BNR_TPF:<br>
                                 <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --2_BNR:<br>
-                                Entry on OB -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                Entry on Trigger Pattern -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>

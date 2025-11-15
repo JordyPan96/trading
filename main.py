@@ -1271,7 +1271,7 @@ if st.session_state.current_page == "Home":
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
                 # Trend Position dropdown
-                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%", ">= 13 % (5 % PullBack)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
@@ -3561,6 +3561,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "9%-10.99%Wave 1": ['1_BNR'],
             "11%-12.99%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
+            ">= 13 % (5 % PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
+
             # Add more restrictions as needed
         }
 
@@ -3569,6 +3571,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "9%-10.99%1_BNR_TPF": [],
             "11%-12.99%1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
+            ">= 13 % (5 % PullBack)1_BNR_TPF": ["559 - 66"],
             "EURAUD1_BNR_TPF": ["559 - 66"],
             "GBPAUD1_BNR_TPF": ["559 - 66"]
             # Add more restrictions as needed
@@ -3676,6 +3679,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_24 = {
             ">=13%": ['Wave 2+','Cross Wave'],
+            ">= 13 % (5 % PullBack)": [],
             "11%-12.99%": ['Cross Wave']
 
         }

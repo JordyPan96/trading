@@ -1258,20 +1258,21 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF Trigger","786_fib","Weekly TPF Trigger",
+                pattern_options = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF", "8H/4H TPF Trigger",
+                                   "786_fib", "Weekly TPF Trigger",
                                    "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF","Variant 2 Daily TPF"]
+                                   "8H/4H TPF", "Variant 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
                 new_leg_length = st.selectbox("leg_length", options=leg_length_options, key="new_leg_length")
 
-
             with col5:
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
                 # Trend Position dropdown
-                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%", ">= 13 % (5 % PullBack)"]
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%",
+                                          ">= 13 % (5 % PullBack)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
@@ -1303,7 +1304,8 @@ if st.session_state.current_page == "Home":
                 max_adverse_excursion = st.number_input("Maximum Adverse Excursion", value=0.0, step=0.01,
                                                         key="max_adverse_excursion")
                 squeeze_559_time_options = ["0", "1", "2"]
-                new_squeeze_559_time = st.selectbox(" squeeze_559_time", options= squeeze_559_time_options, key="new_squeeze_559_time")
+                new_squeeze_559_time = st.selectbox(" squeeze_559_time", options=squeeze_559_time_options,
+                                                    key="new_squeeze_559_time")
 
             if st.button("Add Record", type="primary", key="add_record_btn"):
                 # Create new record with exact field names
@@ -1342,7 +1344,7 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
-                if'leg_length' in data.columns:
+                if 'leg_length' in data.columns:
                     new_record['leg_length'] = new_leg_length
                 if 'Pattern' in data.columns:
                     new_record['Pattern'] = new_Pattern
@@ -1389,7 +1391,7 @@ if st.session_state.current_page == "Home":
         columns_to_hide = [
             'Is_Loss', 'Loss_Streak', 'Year', 'Month', 'MonthNum', 'Maximum Adverse Excursion',
             'Drawdown', 'Peak', 'equity', 'Drawdown_Limit', 'Running_Equity', 'Peak_Equity', 'Withdrawal_Deposit',
-            'PROP_Pct', 'Stop Loss Percentage','Link_to_screenshot'
+            'PROP_Pct', 'Stop Loss Percentage', 'Link_to_screenshot'
         ]
 
         # Pagination
@@ -1511,7 +1513,7 @@ if st.session_state.current_page == "Home":
         col1, col2 = st.columns([4.2, 0.5])  # left: grid, right: screenshot link/preview
 
         with col1:
-        # Display the grid
+            # Display the grid
             grid_response = AgGrid(
                 data,
                 gridOptions=grid_options,
@@ -3048,7 +3050,7 @@ elif st.session_state.current_page == "Risk Calculation":
         col1, col2, col3 = st.columns([1, 1, 0.01], gap="small")
 
         with col1:
-            #st.subheader("Grading Based Risk Multiplier")
+            # st.subheader("Grading Based Risk Multiplier")
             strategy_stats = df.groupby('Strategy').apply(analyze_strategy)
             strategy_stats = strategy_stats.sort_values(by=['Win Rate (%)', 'Total Return'], ascending=False)
 
@@ -3482,12 +3484,13 @@ elif st.session_state.current_page == "Risk Calculation":
         majors_dollar = ["AUDUSD", "EURUSD", "GBPUSD", "XAUUSD"]
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
-        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
-        shapes = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF Trigger","786_fib","Weekly TPF Trigger",
-                                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF","Variant 2 Daily TPF","No Pattern"]
+        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
+        shapes = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF", "8H/4H TPF Trigger", "786_fib",
+                  "Weekly TPF Trigger",
+                  "2 Daily TPF Trigger", "Daily TPF Trigger",
+                  "8H/4H TPF", "Variant 2 Daily TPF", "No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
-        _559_time = ['0', '1','2']
+        _559_time = ['0', '1', '2']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
             "GBPAUD": ["1_BNR"],
@@ -3500,7 +3503,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
-        leg_length = [">=99%", ">=119%",">=149%",">=179%",">=2%","NA"]
+        leg_length = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
         within_64 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": [],
@@ -3515,7 +3518,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
-        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%",">=13% (5% PullBack)"]
+        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%",
+                           ">=13% (5% PullBack)"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
         Wave_status = ['Wave 2+', 'Wave 1', 'Cross Wave']
 
@@ -3623,32 +3627,33 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Trigger",
-                                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF","Variant 2 Daily TPF"],
-            '1_BNR_TPF': ["8H/4H First OB", "8H/4H TPF","8H/4H Second OB", "8H/4H First OB + TPF","Variant 2 Daily TPF","786_fib","8H/4H TPF Trigger"],
+                      "2 Daily TPF Trigger", "Daily TPF Trigger",
+                      "8H/4H TPF", "Variant 2 Daily TPF"],
+            '1_BNR_TPF': ["8H/4H First OB", "8H/4H TPF", "8H/4H Second OB", "8H/4H First OB + TPF",
+                          "Variant 2 Daily TPF", "786_fib", "8H/4H TPF Trigger"],
             '2_BNR': ["Weekly TPF Trigger",
-                                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF","Variant 2 Daily TPF","786_fib"],
+                      "2 Daily TPF Trigger", "Daily TPF Trigger",
+                      "8H/4H TPF", "Variant 2 Daily TPF", "786_fib"],
             '2_BNR_TPF': ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF",
-                                   "786_fib","8H/4H TPF"]
+                          "786_fib", "8H/4H TPF"]
         }
 
         incompatible_map_18 = {
-            "0": ["2_BNR","2_BNR_TPF"],
-            "1": ["1_BNR","1_BNR_TPF"],
-            "2": ["1_BNR_TPF","1_BNR","2_BNR"],
+            "0": ["2_BNR", "2_BNR_TPF"],
+            "1": ["1_BNR", "1_BNR_TPF"],
+            "2": ["1_BNR_TPF", "1_BNR", "2_BNR"],
         }
 
         incompatible_map_19 = {
-            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/8H/4H Second OB","Weekly TPF Trigger",
-                                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF","786_fib","8H/4H TPF Trigger"],
+            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/8H/4H Second OB", "Weekly TPF Trigger",
+                           "2 Daily TPF Trigger", "Daily TPF Trigger",
+                           "8H/4H TPF", "786_fib", "8H/4H TPF Trigger"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "8H/8H/4H Second OB",
-                                   "786_fib","Variant 2 Daily TPF"]
+                           "786_fib", "Variant 2 Daily TPF"]
         }
 
         incompatible_map_20 = {
-            "AUDUSD":[">=119%",">=149%",">=179%"],
+            "AUDUSD": [">=119%", ">=149%", ">=179%"],
             "USDCAD": [">=119%", ">=149%", ">=179%"],
             "GBPUSD": [">=119%", ">=179%"],
             "EURUSD": [">=119%", ">=179%"],
@@ -3662,7 +3667,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_21 = {
-            "Variant 2 Daily TPF": [">=99%", ">=119%",">=149%",">=179%"],
+            "Variant 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
             "Weekly TPF Trigger": [">=2%"],
             "2 Daily TPF Trigger": [">=2%"],
             "Daily TPF Trigger": [">=2%"],
@@ -3670,7 +3675,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_22 = {
-            "1_BNR": [">=99%", ">=119%",">=149%",">=179%",">=2%"],
+            "1_BNR": [">=99%", ">=119%", ">=149%", ">=179%", ">=2%"],
             "1_BNR_TPF": [">=99%", ">=119%", ">=149%", ">=179%", ">=2%"],
             "2_BNR": ["NA"],
             "2_BNR_TPF": ["NA"],
@@ -3678,24 +3683,24 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_24 = {
-            ">=13%": ['Wave 2+','Cross Wave'],
+            ">=13%": ['Wave 2+', 'Cross Wave'],
             ">= 13 % (5 % PullBack)": [],
             "11%-12.99%": ['Cross Wave']
 
         }
 
         incompatible_map_23 = {
-            "XAUUSD2_BNR50": [ ">=119%", ">=149%", ">=2%","NA"],
-            "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%","NA"],
+            "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
+            "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR66 - 786": [">=99%", ">=149%", ">=179%", ">=2%"],
             "XAUUSD2_BNR786 - 91": [">=99%", ">=149%", ">=179%", ">=2%"],
 
-            "XAUUSD2_BNR_TPF50": [ ">=119%", ">=149%", "NA"],
+            "XAUUSD2_BNR_TPF50": [">=119%", ">=149%", "NA"],
             "XAUUSD2_BNR_TPF559 - 66": [">=99%", ">=149%", "NA"],
             "XAUUSD2_BNR_TPF66 - 786": [">=99%", ">=149%", ">=179%"],
             "XAUUSD2_BNR_TPF786 - 91": [">=99%", ">=149%", ">=179%"],
 
-            "AUDUSD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%","NA"],
+            "AUDUSD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3760,7 +3765,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "AUDJPY2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDJPY2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
-            "AUDJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%",  "NA"],
+            "AUDJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
@@ -3775,41 +3780,40 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
             "EURJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
-            "GBPUSD2_BNR50": [ ">=119%", ">=179%", ">=2%"],
-            "GBPUSD2_BNR559 - 66": [ ">=119%", ">=179%", ">=2%"],
+            "GBPUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
+            "GBPUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
             "GBPUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%"],
             "GBPUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
 
-            "GBPUSD2_BNR_TPF50": [ ">=119%", ">=179%"],
-            "GBPUSD2_BNR_TPF559 - 66": [ ">=119%", ">=179%"],
+            "GBPUSD2_BNR_TPF50": [">=119%", ">=179%"],
+            "GBPUSD2_BNR_TPF559 - 66": [">=119%", ">=179%"],
             "GBPUSD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%"],
             "GBPUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
-            "EURUSD2_BNR50": [ ">=119%", ">=179%", ">=2%"],
-            "EURUSD2_BNR559 - 66": [ ">=119%", ">=179%", ">=2%"],
+            "EURUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
+            "EURUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
             "EURUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%"],
             "EU6rUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
 
-            "EURUSD2_BNR_TPF50": [ ">=119%", ">=179%"],
-            "EURUSD2_BNR_TPF559 - 66": [ ">=119%", ">=179%"],
+            "EURUSD2_BNR_TPF50": [">=119%", ">=179%"],
+            "EURUSD2_BNR_TPF559 - 66": [">=119%", ">=179%"],
             "EURUSD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%"],
             "EU6rUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
-
-
         }
-
 
 
         def get_available_pattern_trigger(strategy):
             disabled_strategy = incompatible_map_17.get(strategy, [])
             return [s for s in shapes if s not in disabled_strategy]
-        
-        def get_available_pattern_trigger2(strat,strat_list):
+
+
+        def get_available_pattern_trigger2(strat, strat_list):
             disabled_strategy2 = incompatible_map_19.get(strat, [])
             return [s for s in strat_list if s not in disabled_strategy2]
 
-        def get_available_pattern_trigger3(wave,strat_list):
+
+        def get_available_pattern_trigger3(wave, strat_list):
             disabled_strategy3 = incompatible_map_24.get(wave, [])
             return [s for s in strat_list if s not in disabled_strategy3]
 
@@ -3833,10 +3837,10 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_trend_position = incompatible_map_8.get(pair, [])
             return [s for s in Trend_Positions if s not in disabled_trend_position]
 
+
         def get_available_Wave_status(trend):
             disabled_wave_status = incompatible_map_24.get(trend, [])
             return [s for s in Wave_status if s not in disabled_wave_status]
-
 
 
         def get_available_rr(strategy):
@@ -3888,6 +3892,7 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_strategies_5 = incompatible_map_15.get(timeframe, [])
             return [s for s in stratslist if s not in disabled_strategies_5]
 
+
         def get_available_strategies6(squeezetime, stratslist):
             disabled_strategies_6 = incompatible_map_18.get(squeezetime, [])
             return [s for s in stratslist if s not in disabled_strategies_6]
@@ -3902,21 +3907,26 @@ elif st.session_state.current_page == "Risk Calculation":
             available_variances = incompatible_map_10.get(trend, [])
             return [s for s in variancelist if s not in available_variances]
 
+
         def get_available_leg_length(pair):
             available_leg_length = incompatible_map_20.get(pair, [])
             return [s for s in leg_length if s not in available_leg_length]
+
 
         def get_available_leg_length2(pattern, list):
             available_leg_length2 = incompatible_map_21.get(pattern, [])
             return [s for s in list if s not in available_leg_length2]
 
+
         def get_available_leg_length3(strategy, list):
             available_leg_length3 = incompatible_map_22.get(strategy, [])
             return [s for s in list if s not in available_leg_length3]
 
+
         def get_available_leg_length4(concat_text, list):
             available_leg_length4 = incompatible_map_23.get(concat_text, [])
             return [s for s in list if s not in available_leg_length4]
+
 
         def get_available_zone_position(strategy):
             available_zone_position = incompatible_map_16.get(strategy, [])
@@ -4138,7 +4148,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_wave_status = get_available_Wave_status(trend_position)
             cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
-            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1','2'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)
@@ -4148,7 +4158,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_2 = get_available_strategies3(trend_position, selected_pair, available_strats_crossfib)
             available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
             available_strats_4 = get_available_strategies5(POI, available_strats_3)
-            available_strats_5 = get_available_strategies6(squeeze_559_time,available_strats_4)
+            available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_4)
 
             risk_multiplier = st.selectbox("Entry Model",
                                            available_strats_5,
@@ -4158,13 +4168,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
 
-            available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
-            pattern_concat = squeeze_559_time + risk_multiplier
-            available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat,available_pattern_trigger)
-            available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
 
-            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
-                                   available_pattern_trigger3)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
             #	"Adaptive risk based on streak",
@@ -4184,11 +4188,19 @@ elif st.session_state.current_page == "Risk Calculation":
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
 
+            available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
+            pattern_concat = squeeze_559_time + risk_multiplier
+            available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
+            available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
+
+            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
+                                   available_pattern_trigger3)
+
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
             concat_leg_length = selected_pair + risk_multiplier + Variances
-            available_leg_length4 = get_available_leg_length4(concat_leg_length,available_leg_length3)
+            available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
 
             leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
 
@@ -4203,8 +4215,6 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
-
-
 
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
@@ -4374,8 +4384,6 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 0.91
             elif (pattern == "No Pattern"):
                 pattern_multiplier = 0.0
-
-
 
             if (Variances == "50"):
                 variance_multiplier = 0.91
@@ -4958,9 +4966,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                 get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
-                    #if(risk_multiplier == "2_BNR"):
-                        #exit_title = "Target Guide One:"
-                        #exit_text = "-0.1 On 2_BNR Target FIB"
+                    # if(risk_multiplier == "2_BNR"):
+                    # exit_title = "Target Guide One:"
+                    # exit_text = "-0.1 On 2_BNR Target FIB"
 
                     if (selected_pair == "XAUUSD"):
                         if (
@@ -5052,9 +5060,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                     get_pair_volatile(selected_pair, within_64), selected_pair) + " 33%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
-                        #if (risk_multiplier == "2_BNR"):
-                            #exit_title = "Target Guide One:"
-                            #exit_text = "-0.1 On 2_BNR Target FIB"
+                        # if (risk_multiplier == "2_BNR"):
+                        # exit_title = "Target Guide One:"
+                        # exit_text = "-0.1 On 2_BNR Target FIB"
 
             col1, col2, col3 = st.columns([0.03, 2, 0.01], gap="small")
 
@@ -5172,7 +5180,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'cross_fib': cross_fib,
                                                 'HH_LL': HH_LL,
                                                 'leg_length': leg_length,
-                                                'squeeze_559_time':squeeze_559_time,
+                                                'squeeze_559_time': squeeze_559_time,
                                                 'risk_multiplier': risk_multiplier,
                                                 'pattern': pattern,
                                                 "Zone_Position": Zone_Position,
@@ -5318,7 +5326,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'leg_length': leg_length,
 
-                                                'squeeze_559_time':squeeze_559_time,
+                                                'squeeze_559_time': squeeze_559_time,
 
                                                 'risk_multiplier': risk_multiplier,
 
@@ -6766,7 +6774,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Probability': new_Probability,
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0,
-                                            'Link_to_screenshot':'To be updated'
+                                            'Link_to_screenshot': 'To be updated'
                                         }
 
                                         try:
@@ -6782,7 +6790,8 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'Maximum Adverse Excursion',
                                                                     'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
-                                                                    'Zone_Position', 'Probability','squeeze_559_time','leg_length', 'Link_to_screenshot']
+                                                                    'Zone_Position', 'Probability', 'squeeze_559_time',
+                                                                    'leg_length', 'Link_to_screenshot']
 
                                                 # Add missing columns if they don't exist
                                                 for col in required_columns:
@@ -8829,7 +8838,8 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data)
     st.header('Variant Rules (Only for Weekly TPF Trigger)')
-    st.subheader("Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
+    st.subheader(
+        "Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {
@@ -9177,7 +9187,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

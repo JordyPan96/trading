@@ -3516,6 +3516,8 @@ elif st.session_state.current_page == "Risk Calculation":
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+        Wave_status = ['Wave 2+', 'Wave 1', 'Cross Wave']
+
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
             "1_BNR": ["50", "559 - 66", "786 - 91"],
@@ -3671,6 +3673,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_24 = {
+            ">=13%": ['Wave 2+','Cross Wave'],
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [ ">=119%", ">=149%", ">=2%","NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%","NA"],
@@ -3822,6 +3829,11 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_trend_position(pair):
             disabled_trend_position = incompatible_map_8.get(pair, [])
             return [s for s in Trend_Positions if s not in disabled_trend_position]
+
+        def get_available_Wave_status(trend):
+            disabled_wave_status = incompatible_map_24.get(trend, [])
+            return [s for s in Wave_status if s not in disabled_wave_status]
+
 
 
         def get_available_rr(strategy):
@@ -4120,7 +4132,8 @@ elif st.session_state.current_page == "Risk Calculation":
             POI = st.selectbox(
                 "POI Type (2_Daily is 2nd to Last on Weekly -- Note that the wick on first weekly Candle need to be >=0.50%)",
                 available_time_frame_2)
-            cross_fib = st.selectbox("Weekly Wave Status", ['Wave 2+', 'Wave 1', 'Cross Wave'])
+            available_wave_status = get_available_Wave_status(trend_position)
+            cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
             squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1','2'])
 

@@ -4139,6 +4139,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
+            available_zone_position = get_available_zone_position(risk_multiplier)
+            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
+
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
             pattern_concat = squeeze_559_time + risk_multiplier
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat,available_pattern_trigger)
@@ -4186,8 +4189,7 @@ elif st.session_state.current_page == "Risk Calculation":
             within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
 
 
-            available_zone_position = get_available_zone_position(risk_multiplier)
-            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
+
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 
             pair_result = get_pair_prior_result(current_month_stats, selected_pair)

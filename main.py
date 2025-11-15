@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF","786_fib","Weekly TPF",
+                pattern_options = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF Trigger","786_fib","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
@@ -3483,7 +3483,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF',"No Setup"]
-        shapes = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF","786_fib","Weekly TPF",
+        shapes = ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF","8H/4H TPF Trigger","786_fib","Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF","No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
@@ -3619,12 +3619,12 @@ elif st.session_state.current_page == "Risk Calculation":
             '1_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF"],
-            '1_BNR_TPF': ["8H/4H First OB", "8H/4H TPF","8H/4H Second OB", "8H/4H First OB + TPF","Variant 2 Daily TPF","786_fib","8H/4H TPF"],
+            '1_BNR_TPF': ["8H/4H First OB", "8H/4H TPF","8H/4H Second OB", "8H/4H First OB + TPF","Variant 2 Daily TPF","786_fib","8H/4H TPF Trigger"],
             '2_BNR': ["Weekly TPF",
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF","786_fib"],
             '2_BNR_TPF': ["8H/4H First OB", "8H/4H TPF","8H/4H Second OB", "8H/4H First OB + TPF",
-                                   "786_fib","8H/4H TPF"]
+                                   "786_fib","8H/4H TPF Trigger"]
         }
 
         incompatible_map_18 = {
@@ -4336,7 +4336,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if (pattern == "8H/4H First OB"):
                 pattern_multiplier = 1.1
-            elif (pattern == "8H/4H TPF"):
+            elif (pattern == "8H/4H TPF Trigger"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H Second OB"):
                 pattern_multiplier = 1.0

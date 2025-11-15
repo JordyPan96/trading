@@ -3793,9 +3793,6 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
-        incompatible_map_24 = {
-            "Cross Wave": []
-        }
 
 
         def get_available_pattern_trigger(strategy):

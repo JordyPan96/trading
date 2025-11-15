@@ -4144,7 +4144,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat,available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
 
-            pattern = st.selectbox("Pattern Trigger (Present At Least on 8H TimeFrame - 4H For Gold)",
+            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
                                    available_pattern_trigger3)
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(

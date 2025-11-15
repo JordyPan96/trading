@@ -4196,7 +4196,16 @@ elif st.session_state.current_page == "Risk Calculation":
             pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
                                    available_pattern_trigger3)
 
+            # available_rr = get_available_rr(risk_multiplier)
+            available_64 = get_available_64(risk_multiplier)
+            # Potential = st.selectbox("Potential RR", available_rr)
 
+            available_64 = get_available_64(risk_multiplier)
+            available_64_2 = get_available_64_2(selected_pair, available_64)
+            available_64_3 = get_available_64_3(Variances, available_64_2)
+
+            within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
+            
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
@@ -4207,15 +4216,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
             Adaptive_value = next_risk
-            # available_rr = get_available_rr(risk_multiplier)
-            available_64 = get_available_64(risk_multiplier)
-            # Potential = st.selectbox("Potential RR", available_rr)
 
-            available_64 = get_available_64(risk_multiplier)
-            available_64_2 = get_available_64_2(selected_pair, available_64)
-            available_64_3 = get_available_64_3(Variances, available_64_2)
-
-            within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
 
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)

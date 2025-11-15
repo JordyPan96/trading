@@ -4228,23 +4228,23 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (Zone_Position == "+1"):
                 Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+2"):
-                Zone_Position_multiplier = 0.95
+                Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+3"):
-                Zone_Position_multiplier = 0.90
+                Zone_Position_multiplier = 0.95
             elif (Zone_Position == "+4"):
-                Zone_Position_multiplier = 0.85
+                Zone_Position_multiplier = 0.90
             elif (Zone_Position == "+5"):
-                Zone_Position_multiplier = 0.80
+                Zone_Position_multiplier = 0.85
             elif (Zone_Position == "+6"):
-                Zone_Position_multiplier = 0.75
+                Zone_Position_multiplier = 0.80
             elif (Zone_Position == "+7"):
-                Zone_Position_multiplier = 0.70
+                Zone_Position_multiplier = 0.75
             elif (Zone_Position == "+8"):
-                Zone_Position_multiplier = 0.65
+                Zone_Position_multiplier = 0.70
             elif (Zone_Position == "+9"):
-                Zone_Position_multiplier = 0.60
+                Zone_Position_multiplier = 0.65
             elif (Zone_Position == "+10"):
-                Zone_Position_multiplier = 0.55
+                Zone_Position_multiplier = 0.60
             else:
                 Zone_Position_multiplier = 1.0
 

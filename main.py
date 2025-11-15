@@ -3630,7 +3630,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                    "2 Daily TPF", "Daily TPF",
                                    "8H/4H TPF","Variant 2 Daily TPF","786_fib"],
             '2_BNR_TPF': ["8H/4H First OB", "8H/4H Second OB", "8H/4H First OB + TPF",
-                                   "786_fib","8H/4H TPF Trigger"]
+                                   "786_fib","8H/4H TPF"]
         }
 
         incompatible_map_18 = {

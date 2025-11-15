@@ -4165,9 +4165,16 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
+            available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
+            pattern_concat = squeeze_559_time + risk_multiplier
+            available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
+            available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
+
+            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
+                                   available_pattern_trigger3)
+            
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
-
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
@@ -4188,13 +4195,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
 
-            available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
-            pattern_concat = squeeze_559_time + risk_multiplier
-            available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
-            available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
 
-            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
-                                   available_pattern_trigger3)
 
             # available_rr = get_available_rr(risk_multiplier)
             available_64 = get_available_64(risk_multiplier)
@@ -4205,7 +4206,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
 
             within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
-            
+
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
@@ -4213,7 +4214,6 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
 
             leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
-
 
             Adaptive_value = next_risk
 
@@ -9190,7 +9190,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

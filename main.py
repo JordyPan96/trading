@@ -1271,7 +1271,7 @@ if st.session_state.current_page == "Home":
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
                 # Trend Position dropdown
-                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)", 
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)",
                                           ">=13% (5% PullBack)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
@@ -3518,7 +3518,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
-        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)", 
+        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)",
                            ">=13% (5% PullBack)"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
         Wave_status = ['Wave 2+', 'Wave 1', 'Cross Wave']
@@ -3566,7 +3566,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "11%-12.99% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
-            ">=13% (5% PullBack)Wave 2+": ['1_BNR', '1_BNR_TPF','2_BNR'],
+            ">=13% (5% PullBack)Wave 2+": ['1_BNR', '1_BNR_TPF', '2_BNR'],
             # Add more restrictions as needed
         }
 
@@ -4172,7 +4172,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
                                    available_pattern_trigger3)
-            
+
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
 
@@ -4194,8 +4194,6 @@ elif st.session_state.current_page == "Risk Calculation":
             final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance2)
-
-
 
             # available_rr = get_available_rr(risk_multiplier)
             available_64 = get_available_64(risk_multiplier)
@@ -4848,10 +4846,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    if (trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
+                    if (
+                            trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
                         if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                             targeting = get_open_target(selected_pair)
-                        elif (trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        elif (
+                                trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
                         elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
@@ -4978,7 +4978,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
                             if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                                 targeting = get_open_target(selected_pair)
-                            elif (trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                            elif (
+                                    trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
                             elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
@@ -6882,7 +6883,7 @@ elif st.session_state.current_page == "Trade Signal":
     if 'metaapi_connected' not in st.session_state:
         st.session_state.metaapi_connected = False
     if 'metaapi_account_id' not in st.session_state:
-        st.session_state.metaapi_account_id = "a8776e6a-6bcd-46a5-9e57-9f1d50c6499b"
+        st.session_state.metaapi_account_id = st.secrets["metaapi"]["account_id"]
     if 'metaapi_connection' not in st.session_state:
         st.session_state.metaapi_connection = None
     if 'ready_to_order' not in st.session_state:
@@ -9190,77 +9191,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

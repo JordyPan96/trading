@@ -1409,7 +1409,7 @@ if st.session_state.current_page == "Home":
             resizable=True,
             editable=False,  # DISABLE editing for all columns
             min_column_width=100,
-            max_column_width=1000
+            max_column_width=1500
         )
 
         # Build options

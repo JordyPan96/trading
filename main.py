@@ -1271,7 +1271,7 @@ if st.session_state.current_page == "Home":
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
                 # Trend Position dropdown
-                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", 
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)", 
                                           ">=13% (5% PullBack)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
@@ -3518,7 +3518,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
         Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
-        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", 
+        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)", 
                            ">=13% (5% PullBack)"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
         Wave_status = ['Wave 2+', 'Wave 1', 'Cross Wave']
@@ -3563,7 +3563,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_9 = {
             "Cross Wave": ['2_BNR', '1_BNR', '1_BNR_TPF'],
             "9%-10.99%Wave 1": ['1_BNR'],
-            "11%-12.99%Wave 1": ['1_BNR', '1_BNR_TPF'],
+            "11%-12.99% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PullBack)Wave 2+": ['1_BNR', '1_BNR_TPF','2_BNR'],
@@ -3573,7 +3573,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_10 = {
             "3%-4.99%1_BNR_TPF": ["559 - 66"],
             "9%-10.99%1_BNR_TPF": [],
-            "11%-12.99%1_BNR_TPF": [],
+            "11%-12.99% (5% PullBack)1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
             ">=13% (5% PullBack)1_BNR_TPF": ["559 - 66"],
             "EURAUD1_BNR_TPF": ["559 - 66"],
@@ -3608,7 +3608,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "5%-6.99%": [],
             "7%-8.99%": [],
             "9%-10.99%": [],
-            "11%-12.99%": [],
+            "11%-12.99% (5% PullBack)": [],
             ">=13%": []
         }
 
@@ -3685,7 +3685,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_24 = {
             ">=13%": ['Wave 2+', 'Cross Wave'],
             ">=13% (5% PullBack)": [],
-            "11%-12.99%": []
+            "11%-12.99% (5% PullBack)": []
 
         }
 
@@ -4342,7 +4342,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         trend_position_multiplier = 1.0
                 else:
                     trend_position_multiplier = 1.0
-            elif (trend_position == "11%-12.99%"):
+            elif (trend_position == "11%-12.99% (5% PullBack)"):
                 if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
                     if (Variances == "559 - 66" and within_64 == "No"):
                         trend_position_multiplier = 0.90
@@ -4848,10 +4848,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    if (trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
+                    if (trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
                         if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                             targeting = get_open_target(selected_pair)
-                        elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        elif (trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
                         elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                             targeting = get_open_target(selected_pair)
@@ -4975,10 +4975,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     if (selected_pair == "XAUUSD"):
                         if (
-                                trend_position == "9%-10.99%" or trend_position == "11%-12.99%" or trend_position == ">=13%"):
+                                trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
                             if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                                 targeting = get_open_target(selected_pair)
-                            elif (trend_position == "11%-12.99%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                            elif (trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
                             elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                                 targeting = get_open_target(selected_pair)
@@ -9190,6 +9190,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3034,9 +3034,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
             return current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance
 
-
-        current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance = calculate_monthly_stats_2(
-            year_data)
+        if(len(year_data)>0):
+            current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance = calculate_monthly_stats_2(
+                year_data)
 
         if (df['Withdrawal_Deposit'].sum() != 0):
             cash_flow = df['Withdrawal_Deposit'].cumsum()
@@ -9191,4 +9191,76 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

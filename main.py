@@ -1272,7 +1272,7 @@ if st.session_state.current_page == "Home":
 
                 # Trend Position dropdown
                 trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99%", ">=13%",
-                                          ">= 13 % (5 % PullBack)"]
+                                          ">=13% (5% PullBack)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
@@ -3575,7 +3575,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "9%-10.99%1_BNR_TPF": [],
             "11%-12.99%1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
-            ">= 13 % (5 % PullBack)1_BNR_TPF": ["559 - 66"],
+            ">=13% (5% PullBack)1_BNR_TPF": ["559 - 66"],
             "EURAUD1_BNR_TPF": ["559 - 66"],
             "GBPAUD1_BNR_TPF": ["559 - 66"]
             # Add more restrictions as needed
@@ -3684,7 +3684,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_24 = {
             ">=13%": ['Wave 2+', 'Cross Wave'],
-            ">= 13 % (5 % PullBack)": [],
+            ">=13% (5% PullBack)": ['Cross Wave'],
             "11%-12.99%": ['Cross Wave']
 
         }
@@ -9190,6 +9190,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

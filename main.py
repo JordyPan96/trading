@@ -3689,6 +3689,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_25 = {
+            "2": ['No'],
+
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3861,6 +3867,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_64_3(position, list_available):
             diabled_64 = incompatible_map_6.get(position, [])
             return [s for s in list_available if s not in diabled_64]
+
+        def get_available_64_4(squeeze, list_available):
+            diabled_65 = incompatible_map_25.get(squeeze, [])
+            return [s for s in list_available if s not in diabled_65]
 
 
         def get_available_strategies(pair):
@@ -4202,8 +4212,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64 = get_available_64(risk_multiplier)
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
+            available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
 
-            within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_3)
+            within_64 = st.selectbox("Entry Price Within 64 (DAILY CHART)", available_64_4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)

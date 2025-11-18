@@ -4848,9 +4848,9 @@ elif st.session_state.current_page == "Risk Calculation":
                             base_target = (13 - 5) + base_target
                         elif (trend_position == "9%-10.99%"):
                             base_target = (13 - 6) + base_target
-                        elif (trend_position == "11%-12.99%"):
+                        elif (trend_position == "11%-12.99% (5% PullBack)"):
                             base_target = (13 - 8) + base_target
-                        elif (trend_position == ">=13%"):
+                        elif (trend_position == ">=13% (5% PullBack)"):
                             base_target = (13 - 10) + base_target
                     elif(selected_pair in trade_curr or selected_pair == "USDJPY"):
                         if (trend_position == "3%-4.99%"):
@@ -4861,9 +4861,9 @@ elif st.session_state.current_page == "Risk Calculation":
                             base_target = (13 - 7) + base_target
                         elif (trend_position == "9%-10.99%"):
                             base_target = (13 - 8) + base_target
-                        elif (trend_position == "11%-12.99%"):
+                        elif (trend_position == "11%-12.99% (5% PullBack)"):
                             base_target = (13 - 10) + base_target
-                        elif (trend_position == ">=13%"):
+                        elif (trend_position == ">=13% (5% PullBack)"):
                             base_target = (13 - 11) + base_target
                     else:
                         base_target = 4.41

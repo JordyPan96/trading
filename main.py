@@ -3628,7 +3628,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Trigger",
                       "2 Daily TPF Trigger", "Daily TPF Trigger",
-                      "8H/4H TPF", "Variant 2 Daily TPF","8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF"],
+                      "8H/4H TPF", "Variant 2 Daily TPF","8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF","8H/4H TPF Trigger"],
             '1_BNR_TPF': ["8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF",
                           "Variant 2 Daily TPF",  "8H/4H TPF Trigger","1_BNR_Standard"],
             '2_BNR': ["Weekly TPF Trigger",

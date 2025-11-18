@@ -4318,68 +4318,24 @@ elif st.session_state.current_page == "Risk Calculation":
             # elif (Potential == '>=11.41'):
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
-                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 0.95
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 0.90
-                    else:
-                        trend_position_multiplier = 1.0
-                else:
+                if(cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
-                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 1.0
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 0.95
-                    else:
-                        trend_position_multiplier = 1.05
-                else:
+                if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.05
             elif (trend_position == "7%-8.99%"):
-                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 1.05
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 1.0
-                    else:
-                        trend_position_multiplier = 1.1
-                else:
+                if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.1
             elif (trend_position == "9%-10.99%"):
-                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 0.95
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 0.90
-                    else:
-                        trend_position_multiplier = 1.0
-                else:
-                    trend_position_multiplier = 1.0
+                if (cross_fib == "Wave 1"):
+                    trend_position_multiplier = 1.15
             elif (trend_position == "11%-12.99% (5% PullBack)"):
-                if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 0.90
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 0.85
-                    else:
-                        trend_position_multiplier = 0.95
-                else:
-                    trend_position_multiplier = 0.95
+                if (cross_fib == "Wave 1"):
+                    trend_position_multiplier = 1.2
             else:
-                if (risk_multiplier == "1_BNR" or risk_multiplier == "1_BNR_TPF"):
-                    trend_position_multiplier = 0.85
-                elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "2_BNR"):
-                    if (Variances == "559 - 66" and within_64 == "No"):
-                        trend_position_multiplier = 0.85
-                    elif (Variances == "50" and within_64 == "No"):
-                        trend_position_multiplier = 0.80
-                    else:
-                        trend_position_multiplier = 0.9
-                else:
-                    trend_position_multiplier = 0.9
+                if (cross_fib == "Wave 1"):
+                    trend_position_multiplier = 1.2
 
             if (pattern == "8H/4H OB"):
                 pattern_multiplier = 1.1

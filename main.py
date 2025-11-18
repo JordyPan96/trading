@@ -4811,15 +4811,15 @@ elif st.session_state.current_page == "Risk Calculation":
                                 base_target = 0 + base_target
                         elif(pair in trade_curr or pair == "USDJPY"):
                             if (trend == "3%-4.99%"):
-                                base_target = 15 + base_target
+                                base_target = 10 + base_target
                             elif (trend == "5%-6.99%"):
-                                base_target = 12 + base_target
+                                base_target = 8 + base_target
                             elif (trend == "7%-8.99%"):
-                                base_target = 9 + base_target
-                            elif (trend == "9%-10.99%"):
                                 base_target = 6 + base_target
+                            elif (trend == "9%-10.99%"):
+                                base_target = 4 + base_target
                             elif (trend == "11%-12.99% (5% PullBack)"):
-                                base_target = 3 + base_target
+                                base_target = 2 + base_target
                             elif (trend == ">=13% (5% PullBack)"):
                                 base_target = 0 + base_target
                     elif(wave == "Wave 2+"):
@@ -4838,13 +4838,13 @@ elif st.session_state.current_page == "Risk Calculation":
                                 base_target = 0 + base_target
                         elif (pair in trade_curr or pair == "USDJPY"):
                             if (trend == "3%-4.99%"):
-                                base_target = 12 + base_target
+                                base_target = 8 + base_target
                             elif (trend == "5%-6.99%"):
-                                base_target = 9 + base_target
-                            elif (trend == "7%-8.99%"):
                                 base_target = 6 + base_target
+                            elif (trend == "7%-8.99%"):
+                                base_target = 4 + base_target
                             elif (trend == "9%-10.99%"):
-                                base_target = 3 + base_target
+                                base_target = 2 + base_target
                             elif (trend == "11%-12.99% (5% PullBack)"):
                                 base_target = 0 + base_target
                             elif (trend == ">=13% (5% PullBack)"):

@@ -1261,7 +1261,7 @@ if st.session_state.current_page == "Home":
                 pattern_options = ["1_BNR_Standard","8H/4H OB", "8H/4H OB + TPF", "8H/4H TPF Trigger",
                                     "Weekly TPF Trigger",
                                    "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF", "Variant 2 Daily TPF"]
+                                   "8H/4H TPF", "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -3488,7 +3488,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["1_BNR_Standard","8H/4H OB",  "8H/4H OB + TPF", "8H/4H TPF Trigger",
                   "Weekly TPF Trigger",
                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                  "8H/4H TPF", "Variant 2 Daily TPF", "No Pattern"]
+                  "8H/4H TPF", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -3628,12 +3628,12 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Trigger",
                       "2 Daily TPF Trigger", "Daily TPF Trigger",
-                      "8H/4H TPF", "Variant 2 Daily TPF","8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF","8H/4H TPF Trigger"],
+                      "8H/4H TPF", "Variant 2 Daily TPF","8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF","8H/4H TPF Trigger","Variant Fakeout 2 Daily TPF"],
             '1_BNR_TPF': ["8H/4H OB", "8H/4H TPF",  "8H/4H OB + TPF",
-                          "Variant 2 Daily TPF",  "8H/4H TPF Trigger","1_BNR_Standard"],
+                          "Variant 2 Daily TPF",  "8H/4H TPF Trigger","1_BNR_Standard","Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Trigger",
                       "2 Daily TPF Trigger", "Daily TPF Trigger",
-                      "8H/4H TPF", "Variant 2 Daily TPF","1_BNR_Standard"],
+                      "8H/4H TPF", "Variant 2 Daily TPF","1_BNR_Standard","Variant Fakeout 2 Daily TPF"],
             '2_BNR_TPF': ["8H/4H OB",  "8H/4H OB + TPF",
                            "8H/4H TPF","1_BNR_Standard"]
         }
@@ -3649,7 +3649,7 @@ elif st.session_state.current_page == "Risk Calculation":
                            "2 Daily TPF Trigger", "Daily TPF Trigger",
                            "8H/4H TPF",  "8H/4H TPF Trigger"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                            "Variant 2 Daily TPF"]
+                            "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
         }
 
         incompatible_map_20 = {
@@ -3668,6 +3668,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_21 = {
             "Variant 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
+            "Variant Fakeout 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
             "Weekly TPF Trigger": [">=2%"],
             "2 Daily TPF Trigger": [">=2%"],
             "Daily TPF Trigger": [">=2%"],
@@ -4389,6 +4390,8 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "8H/4H TPF"):
                 pattern_multiplier = 0.91
             elif (pattern == "Variant 2 Daily TPF"):
+                pattern_multiplier = 1.0
+            elif (pattern == "Variant Fakeout 2 Daily TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "1_BNR_Standard"):
                 pattern_multiplier = 0.91
@@ -9200,75 +9203,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

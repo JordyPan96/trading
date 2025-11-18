@@ -4849,6 +4849,13 @@ elif st.session_state.current_page == "Risk Calculation":
                                 base_target = 0 + base_target
                             elif (trend == ">=13% (5% PullBack)"):
                                 base_target = 0 + base_target
+                    elif (wave == "Cross Wave"):
+                        if (pair in europe_major or pair in gold_comm):
+                            base_target = 5.41
+                        elif (pair in trade_curr or pair == "USDJPY"):
+                            base_target = 5.41
+                        else:
+                            base_target = 4.41
                     else:
                         base_target = 5.41
 

@@ -3691,7 +3691,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_25 = {
-            "2": ['No'],
+            "2": [],
 
 
         }
@@ -9304,6 +9304,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 

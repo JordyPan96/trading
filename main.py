@@ -4837,6 +4837,39 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 4.41
 
 
+                def get_potential_target(trend, pair):
+                    base_target = 5.41
+                    if(selected_pair in europe_major or selected_pair in gold_comm):
+                        if(trend_position == "3%-4.99%"):
+                            base_target = (13 - 2) + base_target
+                        elif(trend_position == "5%-6.99%"):
+                            base_target = (13 - 3) + base_target
+                        elif (trend_position == "7%-8.99%"):
+                            base_target = (13 - 5) + base_target
+                        elif (trend_position == "9%-10.99%"):
+                            base_target = (13 - 6) + base_target
+                        elif (trend_position == "11%-12.99%"):
+                            base_target = (13 - 8) + base_target
+                        elif (trend_position == ">=13%"):
+                            base_target = (13 - 10) + base_target
+                    elif(selected_pair in trade_curr or selected_pair == "USDJPY"):
+                        if (trend_position == "3%-4.99%"):
+                            base_target = (13 - 4) + base_target
+                        elif (trend_position == "5%-6.99%"):
+                            base_target = (13 - 5) + base_target
+                        elif (trend_position == "7%-8.99%"):
+                            base_target = (13 - 7) + base_target
+                        elif (trend_position == "9%-10.99%"):
+                            base_target = (13 - 8) + base_target
+                        elif (trend_position == "11%-12.99%"):
+                            base_target = (13 - 10) + base_target
+                        elif (trend_position == ">=13%"):
+                            base_target = (13 - 11) + base_target
+                    else:
+                        base_target = 4.41
+
+                    return base_target
+
                 if (selected_pair in minor_yens):
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
@@ -4864,33 +4897,35 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
                 else:
-                    if (
-                            trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
-                        if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                            targeting = get_open_target(selected_pair)
-                        elif (
-                                trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                            targeting = get_open_target(selected_pair)
-                        elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                            targeting = get_open_target(selected_pair)
-                        else:
-                            targeting = 5.41
-                    elif (
-                            selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
-                        if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
-                            if (big_risk_multiplier > 1):
-                                total_target = get_sum_target()
-                                compare_target = get_open_target(selected_pair) * 1.725
-                                if (compare_target < total_target):
-                                    targeting = round(compare_target, 2)
-                                else:
-                                    targeting = total_target
-                            else:
-                                targeting = get_open_target(selected_pair)
-                        else:
-                            targeting = get_open_target(selected_pair)
-                    else:
-                        targeting = get_open_target(selected_pair)
+
+                    #if (
+                            #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
+                        #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                            #targeting = get_open_target(selected_pair)
+                        #elif (
+                                #trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                            #targeting = get_open_target(selected_pair)
+                        #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                            #targeting = get_open_target(selected_pair)
+                        #else:
+                            #targeting = 5.41
+                    #elif (
+                            #selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                        #if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
+                            #if (big_risk_multiplier > 1):
+                                #total_target = get_sum_target()
+                                #compare_target = get_open_target(selected_pair) * 1.725
+                                #if (compare_target < total_target):
+                                    #targeting = round(compare_target, 2)
+                                #else:
+                                    #targeting = total_target
+                            #else:
+                                #targeting = get_open_target(selected_pair)
+                        #else:
+                            #targeting = get_open_target(selected_pair)
+                    #else:
+                        #targeting = get_open_target(selected_pair)
+                    targeting = get_potential_target(trend_position,selected_pair)
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"

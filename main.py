@@ -3827,7 +3827,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def get_available_pattern_trigger3(wave, strat_list):
-            disabled_strategy3 = incompatible_map_24.get(wave, [])
+            disabled_strategy3 = incompatible_map_26.get(wave, [])
             return [s for s in strat_list if s not in disabled_strategy3]
 
 

@@ -4561,15 +4561,15 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_64 == 'Yes'):
                         return str(18)
                     else:
-                        return str(33)
+                        return str(28)
                 elif (pair == "EURUSD"):
                     if (within_64 == 'Yes'):
                         return str(18)
                     else:
-                        return str(33)
+                        return str(28)
                 elif (pair == "AUDUSD"):
                     if (within_64 == 'Yes'):
-                        return str(22)
+                        return str(23)
                     else:
                         return str(33)
                 elif (pair == "XAUUSD"):
@@ -4586,10 +4586,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (within_64 == 'Yes'):
                         return str(18)
                     else:
-                        return str(33)
+                        return str(28)
                 else:
                     if (within_64 == 'Yes'):
-                        return str(30)
+                        return str(28)
                     else:
                         return str(33)
 
@@ -4866,7 +4866,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (trend_position == ">=13% (5% PullBack)"):
                             base_target = (13 - 11) + base_target
                     else:
-                        base_target = 4.41
+                        base_target = 5.41
 
                     return base_target
 

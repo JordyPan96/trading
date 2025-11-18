@@ -3696,6 +3696,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_26 = {
+            "Wave 1": ['Variant Fakeout 2 Daily TPF'],
+            "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
+            "Cross Wave": ['Variant 2 Daily TPF'],
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],

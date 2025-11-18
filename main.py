@@ -4664,7 +4664,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide:"
                         SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                         exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair), 20)
+                        exit_text = compare_target(get_one_target(selected_pair), 8.41)
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
@@ -4672,7 +4672,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "Middle of: 18%, Entry zone " + get_entry_zone_plus_(18, selected_pair) + " 33%"
                             exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair), 20)
+                            exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     else:
                         entry_title = "Entry Guide: Draw Zone Based on where TPF/OMSS is"
                         entry_text = "ON EP LINE of TPF Zone"

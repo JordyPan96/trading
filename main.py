@@ -4392,7 +4392,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Variant Fakeout 2 Daily TPF"):
-                pattern_multiplier = 1.0
+                pattern_multiplier = 1.05
             elif (pattern == "1_BNR_Standard"):
                 pattern_multiplier = 0.91
             elif (pattern == "No Pattern"):
@@ -9203,7 +9203,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

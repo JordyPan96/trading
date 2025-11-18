@@ -4894,7 +4894,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             elif (trend == ">=13% (5% PullBack)"):
                                 base_target = (13 - 13) + base_target
                     else:
-                        base_target = 5.41
+                        base_target = 6.41
 
                     return base_target
 

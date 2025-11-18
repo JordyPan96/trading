@@ -4484,7 +4484,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(base_entry), str(base_sl)
                     elif (pair == "AUDUSD"):
                         base_entry = 12
-                        base_sl = 22
+                        base_sl = 23
                         return str(base_entry), str(base_sl)
                     elif (pair == "XAUUSD"):
                         base_entry = 12
@@ -4500,7 +4500,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(base_entry), str(base_sl)
                     else:
                         base_entry = 12
-                        base_sl = 30
+                        base_sl = 28
                         return str(base_entry), str(base_sl)
 
 

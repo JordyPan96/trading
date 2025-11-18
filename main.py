@@ -4338,15 +4338,15 @@ elif st.session_state.current_page == "Risk Calculation":
                     trend_position_multiplier = 1.2
 
             if (pattern == "8H/4H OB"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.05
             elif (pattern == "8H/4H TPF Trigger"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H OB + TPF"):
-                pattern_multiplier = 1.2
-            elif (pattern == "Weekly TPF Trigger"):
-                pattern_multiplier = 1.2
-            elif (pattern == "2 Daily TPF Trigger"):
                 pattern_multiplier = 1.1
+            elif (pattern == "Weekly TPF Trigger"):
+                pattern_multiplier = 1.1
+            elif (pattern == "2 Daily TPF Trigger"):
+                pattern_multiplier = 1.05
             elif (pattern == "Daily TPF Trigger"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF"):

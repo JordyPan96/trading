@@ -4894,7 +4894,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             elif (trend == ">=13% (5% PullBack)"):
                                 base_target = (13 - 13) + base_target
                     else:
-                        base_target = wave
+                        base_target = 5.41
 
                     return base_target
 
@@ -4953,7 +4953,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             #targeting = get_open_target(selected_pair)
                     #else:
                         #targeting = get_open_target(selected_pair)
-                    targeting = get_potential_target(trend_position,selected_pair,Wave_status)
+                    targeting = get_potential_target(trend_position,selected_pair,cross_fib)
 
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
@@ -5079,7 +5079,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 #targeting = get_open_target(selected_pair)
                         #else:
                             #targeting = get_open_target(selected_pair)
-                        targeting = get_potential_target(trend_position, selected_pair, Wave_status)
+                        targeting = get_potential_target(trend_position, selected_pair, cross_fib)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"

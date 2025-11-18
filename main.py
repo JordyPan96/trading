@@ -4954,6 +4954,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     #else:
                         #targeting = get_open_target(selected_pair)
                     targeting = get_potential_target(trend_position,selected_pair,Wave_status)
+
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                         entry_text = "ON EP LINE of TPF Zone"
@@ -5055,29 +5056,30 @@ elif st.session_state.current_page == "Risk Calculation":
                     # exit_text = "-0.1 On 2_BNR Target FIB"
 
                     if (selected_pair == "XAUUSD"):
-                        if (
-                                trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
-                            if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                                targeting = get_open_target(selected_pair)
-                            elif (
-                                    trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                                targeting = get_open_target(selected_pair)
-                            elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                                targeting = get_open_target(selected_pair)
-                            else:
-                                targeting = 5.41
-                        elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
-                            if (big_risk_multiplier > 1):
-                                total_target = get_sum_target()
-                                compare_target = get_open_target(selected_pair) * 1.725
-                                if (compare_target < total_target):
-                                    targeting = round(compare_target, 2)
-                                else:
-                                    targeting = total_target
-                            else:
-                                targeting = get_open_target(selected_pair)
-                        else:
-                            targeting = get_open_target(selected_pair)
+                        #if (
+                                #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (5% PullBack)" or trend_position == ">=13%"):
+                            #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                                #targeting = get_open_target(selected_pair)
+                            #elif (
+                                    #trend_position == "11%-12.99% (5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                                #targeting = get_open_target(selected_pair)
+                            #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                                #targeting = get_open_target(selected_pair)
+                            #else:
+                                #targeting = 5.41
+                        #elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
+                            #if (big_risk_multiplier > 1):
+                                #total_target = get_sum_target()
+                                #compare_target = get_open_target(selected_pair) * 1.725
+                                #if (compare_target < total_target):
+                                    #targeting = round(compare_target, 2)
+                                #else:
+                                    #targeting = total_target
+                            #else:
+                                #targeting = get_open_target(selected_pair)
+                        #else:
+                            #targeting = get_open_target(selected_pair)
+                        targeting = get_potential_target(trend_position, selected_pair, Wave_status)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide: Zone is 886 - 91 OR 786 - 886 (SL Behind 91)"
                             entry_text = "ON EP LINE of TPF Zone"

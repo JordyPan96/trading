@@ -4793,71 +4793,138 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 4.41
 
 
-                def get_potential_target(trend, pair, wave):
+                def get_potential_target(trend, pair, wave, strategy):
                     base_target = 5.41
-                    if(wave == "Wave 1"):
-                        if(pair in europe_major or pair in gold_comm):
-                            if(trend == "3%-4.99%"):
-                                base_target = 30 + base_target
-                            elif(trend == "5%-6.99%"):
-                                base_target = 24 + base_target
-                            elif (trend == "7%-8.99%"):
-                                base_target = 18 + base_target
-                            elif (trend == "9%-10.99%"):
-                                base_target = 12 + base_target
-                            elif (trend == "11%-12.99% (5% PullBack)"):
-                                base_target = 6 + base_target
-                            elif (trend == ">=13% (5% PullBack)"):
-                                base_target = 0 + base_target
-                        elif(pair in trade_curr or pair == "USDJPY"):
-                            if (trend == "3%-4.99%"):
-                                base_target = 10 + base_target
-                            elif (trend == "5%-6.99%"):
-                                base_target = 8 + base_target
-                            elif (trend == "7%-8.99%"):
-                                base_target = 6 + base_target
-                            elif (trend == "9%-10.99%"):
-                                base_target = 4 + base_target
-                            elif (trend == "11%-12.99% (5% PullBack)"):
-                                base_target = 2 + base_target
-                            elif (trend == ">=13% (5% PullBack)"):
-                                base_target = 0 + base_target
-                    elif(wave == "Wave 2+"):
-                        if (pair in europe_major or pair in gold_comm):
-                            if (trend == "3%-4.99%"):
-                                base_target = 24 + base_target
-                            elif (trend == "5%-6.99%"):
-                                base_target = 18 + base_target
-                            elif (trend == "7%-8.99%"):
-                                base_target = 12 + base_target
-                            elif (trend == "9%-10.99%"):
-                                base_target = 6 + base_target
-                            elif (trend == "11%-12.99% (5% PullBack)"):
-                                base_target = 0 + base_target
-                            elif (trend == ">=13% (5% PullBack)"):
-                                base_target = 0 + base_target
-                        elif (pair in trade_curr or pair == "USDJPY"):
-                            if (trend == "3%-4.99%"):
-                                base_target = 8 + base_target
-                            elif (trend == "5%-6.99%"):
-                                base_target = 6 + base_target
-                            elif (trend == "7%-8.99%"):
-                                base_target = 4 + base_target
-                            elif (trend == "9%-10.99%"):
-                                base_target = 2 + base_target
-                            elif (trend == "11%-12.99% (5% PullBack)"):
-                                base_target = 0 + base_target
-                            elif (trend == ">=13% (5% PullBack)"):
-                                base_target = 0 + base_target
-                    elif (wave == "Cross Wave"):
-                        if (pair in europe_major or pair in gold_comm):
-                            base_target = 5.41
-                        elif (pair in trade_curr or pair == "USDJPY"):
-                            base_target = 5.41
+                    if(strategy == "2_BNR"):
+                        if(wave == "Wave 1"):
+                            if(pair in europe_major or pair in gold_comm):
+                                if(trend == "3%-4.99%"):
+                                    base_target = 30 + base_target
+                                elif(trend == "5%-6.99%"):
+                                    base_target = 24 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 18 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 12 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 6 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                            elif(pair in trade_curr or pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 10 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 8 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 6 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 4 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 2 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                        elif(wave == "Wave 2+"):
+                            if (pair in europe_major or pair in gold_comm):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 24 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 18 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 12 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 6 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 8 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 6 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 4 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 2 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                        elif (wave == "Cross Wave"):
+                            if (pair in europe_major or pair in gold_comm):
+                                base_target = 5.41
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                base_target = 5.41
+                            else:
+                                base_target = 4.41
                         else:
-                            base_target = 4.41
-                    else:
-                        base_target = 5.41
+                            base_target = 5.41
+
+                    elif (strategy == "2_BNR_TPF"):
+                        if (wave == "Wave 1"):
+                            if (pair in europe_major or pair in gold_comm):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 15 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 12 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 9 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 6 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 3 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 5 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 4 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 3 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 2 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 1 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                        elif (wave == "Wave 2+"):
+                            if (pair in europe_major or pair in gold_comm):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 12 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 9 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 6 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 3 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = 4 + base_target
+                                elif (trend == "5%-6.99%"):
+                                    base_target = 3 + base_target
+                                elif (trend == "7%-8.99%"):
+                                    base_target = 2 + base_target
+                                elif (trend == "9%-10.99%"):
+                                    base_target = 1 + base_target
+                                elif (trend == "11%-12.99% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = 0 + base_target
+                        elif (wave == "Cross Wave"):
+                            if (pair in europe_major or pair in gold_comm):
+                                base_target = 5.41
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                base_target = 5.41
+                            else:
+                                base_target = 4.41
+                        else:
+                            base_target = 5.41
+
 
                     return base_target
 

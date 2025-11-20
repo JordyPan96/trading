@@ -4242,7 +4242,7 @@ elif st.session_state.current_page == "Risk Calculation":
             concat_leg_length = selected_pair + risk_multiplier + Variances
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
 
-            leg_length = st.selectbox("First Leg Length pushing out of 559 Zone", available_leg_length4)
+            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone (99% for left leg)", available_leg_length4)
 
             Adaptive_value = next_risk
 

@@ -3503,7 +3503,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
-        leg_length = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
+        leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
         within_64 = ["No", "Yes"]
         incompatible_map_4 = {
             "2_BNR": [],
@@ -3517,11 +3517,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_1b": [">=11.41"],
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
-        Variance = ["50", "559 - 66", "66 - 786", "786 - 91"]
+        Variance = ["559 - 66", "66 - 786", "786 - 91","50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)",
                            ">=13% (5% PullBack)"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
-        Wave_status = ['Wave 2+', 'Wave 1', 'Cross Wave']
+        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave']
 
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],

@@ -4414,9 +4414,10 @@ elif st.session_state.current_page == "Risk Calculation":
             if (selected_pair in europe_major or selected_pair == "XAUUSD"):
                 if (pair_result == "W"):
                     if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
-                        if (
-                                trend_position == "3%-4.99%" or trend_position == "5%-6.99%" or trend_position == "7%-8.99%"):
-                            big_risk_multiplier = 1.5
+                        if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%" or trend_position == "7%-8.99%"):
+                            if (cross_fib == "Wave 1"):
+                                big_risk_multiplier = 1.5
+
             else:
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital

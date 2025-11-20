@@ -1261,7 +1261,7 @@ if st.session_state.current_page == "Home":
                 pattern_options = ["1_BNR_Standard","8H/4H OB", "8H/4H OB + TPF", "8H/4H TPF Trigger",
                                     "Weekly TPF Trigger",
                                    "2 Daily TPF Trigger", "Daily TPF Trigger",
-                                   "8H/4H TPF", "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
+                                    "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -3488,7 +3488,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["1_BNR_Standard","8H/4H OB",  "8H/4H OB + TPF", "8H/4H TPF Trigger",
                   "Weekly TPF Trigger",
                   "2 Daily TPF Trigger", "Daily TPF Trigger",
-                  "8H/4H TPF", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
+                  "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
         time_frame = ['Weekly Structure', 'Two_Daily Structure']
         _559_time = ['0', '1', '2']
         incompatible_map = {

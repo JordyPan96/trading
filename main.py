@@ -4176,7 +4176,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_wave_status = get_available_Wave_status(trend_position)
             cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
-            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H !! Only legs that meet length requirement !!", ['0', '1', '2'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H !! Only legs that have >= 2 Candles !!", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)
@@ -4242,7 +4242,7 @@ elif st.session_state.current_page == "Risk Calculation":
             concat_leg_length = selected_pair + risk_multiplier + Variances
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
 
-            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone (Same requirement for left leg)", available_leg_length4)
+            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone", available_leg_length4)
 
             Adaptive_value = next_risk
 
@@ -9317,5 +9317,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 

@@ -3704,7 +3704,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_27 = {
             "Variant 2 Daily TPF": ['50','66-786','786-91'],
-            "Variant Fakekout 2 Daily TPF": ['50'],
+            "Variant Fakeout 2 Daily TPF": ['50'],
 
         }
 
@@ -3932,8 +3932,8 @@ elif st.session_state.current_page == "Risk Calculation":
             return [s for s in variancelist if s not in available_variances]
 
         def get_available_variance_3(shape, variancelist):
-            available_variances = incompatible_map_27.get(shape, [])
-            return [s for s in variancelist if s not in available_variances]
+            available_variances2 = incompatible_map_27.get(shape, [])
+            return [s for s in variancelist if s not in available_variances2]
 
 
         def get_available_leg_length(pair):

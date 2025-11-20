@@ -3708,6 +3708,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_28 = {
+            "2": ['>=2%'],
+
+
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -3955,6 +3961,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length4 = incompatible_map_23.get(concat_text, [])
             return [s for s in list if s not in available_leg_length4]
 
+        def get_available_leg_length5(squeeze, list):
+            available_leg_length5 = incompatible_map_28.get(squeeze, [])
+            return [s for s in list if s not in available_leg_length5]
 
         def get_available_zone_position(strategy):
             available_zone_position = incompatible_map_16.get(strategy, [])
@@ -4241,8 +4250,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length3 = get_available_leg_length3(risk_multiplier, available_leg_length2)
             concat_leg_length = selected_pair + risk_multiplier + Variances
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
+            available_leg_length5 = get_available_leg_length5(squeeze_559_time, available_leg_length4)
 
-            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone", available_leg_length4)
+            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone", available_leg_length5)
 
             Adaptive_value = next_risk
 
@@ -9317,4 +9327,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 

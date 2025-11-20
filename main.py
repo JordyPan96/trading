@@ -3702,6 +3702,12 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Wave": ['Variant 2 Daily TPF'],
         }
 
+        incompatible_map_27 = {
+            "Variant 2 Daily TPF": ['50','66-786','786-91'],
+            "Variant Fakekout 2 Daily TPF": ['50'],
+
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -3923,6 +3929,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_available_variance_2(trend, variancelist):
             available_variances = incompatible_map_10.get(trend, [])
+            return [s for s in variancelist if s not in available_variances]
+
+        def get_available_variance_3(shape, variancelist):
+            available_variances = incompatible_map_27.get(shape, [])
             return [s for s in variancelist if s not in available_variances]
 
 
@@ -4211,7 +4221,9 @@ elif st.session_state.current_page == "Risk Calculation":
             concat_trend2 = selected_pair + risk_multiplier
             final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
 
-            Variances = st.selectbox("Position Variance (Fib)", final_variance2)
+            final_variance3 = get_available_variance_3(pattern, final_variance2)
+
+            Variances = st.selectbox("Position Variance (Fib)", final_variance3)
 
             # available_rr = get_available_rr(risk_multiplier)
             available_64 = get_available_64(risk_multiplier)

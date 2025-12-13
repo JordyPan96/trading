@@ -4582,28 +4582,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
@@ -4612,28 +4612,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744,"+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX" 
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

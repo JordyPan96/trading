@@ -4822,7 +4822,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 def get_potential_target(trend, pair, wave, strategy):
                     base_target = 5.41
                     if(strategy == "2_BNR"):
-                        if(wave == "Wave 1"):
+                        if(wave == "Wave 1" or wave == "Cross Wave 3.5 - 4.99"):
                             if(pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
                                     base_target = 30 + base_target
@@ -9328,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

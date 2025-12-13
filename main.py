@@ -4209,7 +4209,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
 
-            pattern = st.selectbox("Pattern Trigger (Forex on 8H TimeFrame - 4H For Gold)",
+            pattern = st.selectbox("Pattern Trigger (Trigger Box drawn to be on same timeframe)",
                                    available_pattern_trigger3)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5217,10 +5217,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
-                                --1_BNR_TPF/2_BNR_TPF:<br>
-                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
-                                --2_BNR:<br>
-                                Entry on Trigger Pattern -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                --1. Identify Entry Fib Zone<br>
+                                --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
+                                --3. Draw EP line middle of the trigger box
+                                
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -5231,10 +5231,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
-                                --1_BNR_TPF/2_BNR_TPF:<br>
-                                <= 5% from top of TPF -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
-                                --2_BNR:<br>
-                                Entry on Trigger Pattern -> Entry cover EOZ (+1 if not) -> Enter <= 64 (if can)<br>
+                                --1. Identify Entry Fib Zone<br>
+                                --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
+                                --3. Draw EP line middle of the trigger box
+                                
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -9328,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

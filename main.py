@@ -4659,7 +4659,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "29%, " + get_entry_zone_plus_(29, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "786 - 91"):
@@ -4667,14 +4667,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "29%, " + get_entry_zone_plus_(29, selected_pair) + " 32%"
-                            exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                            exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "21%, " + get_entry_zone_plus_(21, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
                         if (Variances == "786 - 91"):
@@ -4682,14 +4682,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "21%, " + get_entry_zone_plus_(21, selected_pair) + " 32%"
-                            exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                            exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "17%, " + get_entry_zone_plus_(17, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 8.41)
 
                         if (Variances == "786 - 91"):
@@ -4697,14 +4697,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "17%, " + get_entry_zone_plus_(17, selected_pair) + " 32%"
-                            exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                            exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "17%, " + get_entry_zone_plus_(17, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "786 - 91"):
@@ -4712,7 +4712,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "17%, " + get_entry_zone_plus_(17, selected_pair) + " 32%"
-                            exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                            exit_title = "Target Guide One (RR):"
                             exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
 
@@ -4722,28 +4722,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "29%, " + get_entry_zone_plus_(29, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "21%, " + get_entry_zone_plus_(21, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "23%, " + get_entry_zone_plus_(23, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
                         SL_text = "17%, " + get_entry_zone_plus_(17, selected_pair) + " 32%"
-                        exit_title = "Target Guide One (RR): Adjust TP, SL and Entry if target < 559 Fib"
+                        exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
 
@@ -9328,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

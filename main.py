@@ -3687,7 +3687,7 @@ elif st.session_state.current_page == "Risk Calculation":
             ">=13%": ['Wave 2+', 'Cross Wave'],
             ">=13% (5% PullBack)": [],
             "11%-12.99% (5% PullBack)": [],
-            "3%-4.99%": ['Wave 2+', 'Cross Wave']
+            "3%-4.99%": ['Cross Wave']
         }
 
         incompatible_map_25 = {
@@ -9326,6 +9326,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

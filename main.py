@@ -1286,7 +1286,7 @@ if st.session_state.current_page == "Home":
                 new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
-                cross_fib_options = ["Cross Wave", "Wave 1", "Wave 2+"]
+                cross_fib_options = ["Cross Wave", "Cross Wave 3.5 - 4.99", "Wave 1", "Wave 2+"]
                 new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
 
                 probability_options = ['Head', 'Tail', 'Edge Outlier']
@@ -3521,7 +3521,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)",
                            ">=13% (5% PullBack)"]
         zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
-        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave']
+        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave','Cross Wave 3.5 - 4.99']
 
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
@@ -3562,6 +3562,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_9 = {
             "Cross Wave": ['2_BNR', '1_BNR', '1_BNR_TPF'],
+            "Cross Wave 3.5 - 4.99": ['1_BNR', '1_BNR_TPF'],
             "9%-10.99%Wave 1": ['1_BNR'],
             "11%-12.99% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
@@ -3687,7 +3688,7 @@ elif st.session_state.current_page == "Risk Calculation":
             ">=13%": ['Wave 2+', 'Cross Wave'],
             ">=13% (5% PullBack)": [],
             "11%-12.99% (5% PullBack)": [],
-            "3%-4.99%": ['Cross Wave']
+            "3%-4.99%": ['Cross Wave', "Cross Wave 3.5 - 4.99"]
         }
 
         incompatible_map_25 = {
@@ -3700,6 +3701,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Wave 1": ['Variant Fakeout 2 Daily TPF'],
             "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
             "Cross Wave": ['Variant 2 Daily TPF'],
+            "Cross Wave 3.5 - 4.99": ['Variant 2 Daily TPF'],
         }
 
         incompatible_map_27 = {
@@ -9326,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

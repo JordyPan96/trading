@@ -4180,7 +4180,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             POI = st.selectbox(
-                "POI Type (2_Daily is 2nd to Last on Weekly -- Note that the wick on first weekly Candle need to be >=0.50%)",
+                "POI Type (2_Daily is 2nd to Last on Weekly)",
                 available_time_frame_2)
             available_wave_status = get_available_Wave_status(trend_position)
             cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
@@ -9326,6 +9326,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

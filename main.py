@@ -4887,7 +4887,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             base_target = 5.41
 
                     elif (strategy == "2_BNR_TPF"):
-                        if (wave == "Wave 1" and Zone_Position in ["+1","+2"]):
+                        if (wave == "Wave 1" and Zone_Position in ["0","+1","+2"]):
                             if (pair in europe_major or pair in gold_comm):
                                 if (trend == "3%-4.99%"):
                                     base_target = 14 + base_target
@@ -4914,7 +4914,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = 0 + base_target
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = 0 + base_target
-                        elif (wave == "Wave 2+" and Zone_Position in ["+1","+2"]):
+                        elif (wave == "Wave 2+" and Zone_Position in ["0","+1","+2"]):
                             if (pair in europe_major or pair in gold_comm):
                                 if (trend == "3%-4.99%"):
                                     base_target = 11 + base_target
@@ -4941,7 +4941,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = 0 + base_target
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = 0 + base_target
-                        elif (wave == "Cross Wave" and Zone_Position in ["+1","+2"]):
+                        elif (wave == "Cross Wave" and Zone_Position in ["0","+1","+2"]):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
                             elif (pair in trade_curr or pair == "USDJPY"):
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

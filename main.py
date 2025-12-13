@@ -5219,8 +5219,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1. Identify Entry Fib Zone<br>
                                 --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
-                                --3. Draw EP line middle of the trigger box
-                                
+                                --3. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -5233,8 +5232,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1. Identify Entry Fib Zone<br>
                                 --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
-                                --3. Draw EP line middle of the trigger box
-                                
+                                --3. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -9328,6 +9326,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

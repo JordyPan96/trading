@@ -4243,7 +4243,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
             available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
 
-            within_64 = st.selectbox("Entry Price Within 64 AND SL Covering End of Zone (DAILY CHART)", available_64_4)
+            within_64 = st.selectbox("Entry Price Within 64 AND SL Covering End of FIB Zone (DAILY CHART)", available_64_4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
@@ -9326,6 +9326,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

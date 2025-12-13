@@ -4721,7 +4721,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = "29%, " + "box %" + " 32%"
+                        SL_text = "29%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

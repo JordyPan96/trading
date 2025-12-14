@@ -1276,7 +1276,7 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+                Zone_Position_options = ["NA", "0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
                 new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options,
                                                  key="new_Zone_Position")
 
@@ -3520,7 +3520,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Variance = ["559 - 66", "66 - 786", "786 - 91","50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (5% PullBack)",
                            ">=13% (5% PullBack)"]
-        zone_from_leg_one = ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+        zone_from_leg_one = ["NA", "0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave','Cross Wave 3.5 - 4.99']
 
         incompatible_map_3 = {
@@ -3619,10 +3619,10 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_16 = {
-            "1_BNR": ["+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "1_BNR_TPF": ["+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "2_BNR": ["+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "2_BNR_TPF": []
+            "1_BNR": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "1_BNR_TPF": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "2_BNR": ["NA", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "2_BNR_TPF": ["NA"]
 
         }
 
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

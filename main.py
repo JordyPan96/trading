@@ -3706,7 +3706,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_27 = {
             "Variant 2 Daily TPF": ['50','66 - 786','786 - 91'],
-            "Variant Fakeout 2 Daily TPF": ['50'],
+            "Variant Fakeout 2 Daily TPF": ['50','559 - 66'],
 
         }
 
@@ -9311,6 +9311,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

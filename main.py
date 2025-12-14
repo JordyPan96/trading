@@ -3716,6 +3716,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_29 = {
+            "Wave 2+1: ['2_BNR_TPF']
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -3929,6 +3933,9 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_strategies_6 = incompatible_map_18.get(squeezetime, [])
             return [s for s in stratslist if s not in disabled_strategies_6]
 
+        def get_available_strategies7(wavesqueeze, stratslist):
+            disabled_strategies_7 = incompatible_map_29.get(wavesqueeze, [])
+            return [s for s in stratslist if s not in disabled_strategies_7]
 
         def get_available_variance(entry_model):
             available_variance = incompatible_map_3.get(entry_model, [])
@@ -4199,8 +4206,11 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_4 = get_available_strategies5(POI, available_strats_3)
             available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_4)
 
+            wavesqueeze = cross_fib+squeeze_559_time
+            available_strats_6 = get_available_strategies7(wavesqueeze, available_strats_5)
+
             risk_multiplier = st.selectbox("Entry Model",
-                                           available_strats_5,
+                                           available_strats_6,
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
@@ -9311,6 +9321,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4184,7 +4184,7 @@ elif st.session_state.current_page == "Risk Calculation":
             st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
             selected_pair = st.selectbox("Trading Pair", currency_pairs)
             available_trend_position = get_available_trend_position(selected_pair)
-            trend_position = st.selectbox("Trend Position (+-0.5%)", available_trend_position)
+            trend_position = st.selectbox("Trend Position (+-0.05%)", available_trend_position)
 
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
@@ -9321,6 +9321,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

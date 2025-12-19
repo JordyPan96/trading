@@ -9019,9 +9019,10 @@ elif st.session_state.current_page == "Guidelines":
     st.table(table_data4)
 
     st.subheader("Retake Rules")
-    st.write("1_BNR -> 2_BNR || 1_BNR -> 2_BNR_TPF")
-    st.write("1_BNR_TPF -> 2_BNR || 1_BNR_TPF -> 2_BNR_TPF")
-    st.write("2_BNR -> 2_BNR_TPF || 2_BNR_TPF -> NO RETAKE")
+    st.write("1_BNR -> 2_BNR")
+    st.write("1_BNR_TPF -> NO RETAKE")
+    st.write("2_BNR -> 2_BNR_TPF)
+    st.write("2_BNR_TPF -> NO RETAKE")
 
 if st.session_state.current_page == "Entry Criteria Check":
     st.title("Entry Model Identification")
@@ -9321,6 +9322,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3506,7 +3506,7 @@ elif st.session_state.current_page == "Risk Calculation":
         leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
         within_64 = ["No", "Yes"]
         incompatible_map_4 = {
-            "2_BNR": [],
+            "2_BNR+3": ["No"],
             "2_BNR_TPF": [],
             "3_BNR_TPF": []
         }
@@ -4247,10 +4247,11 @@ elif st.session_state.current_page == "Risk Calculation":
             Variances = st.selectbox("Position Variance (Fib)", final_variance3)
 
             # available_rr = get_available_rr(risk_multiplier)
-            available_64 = get_available_64(risk_multiplier)
+            concat_risk_zone = risk_multiplier+Zone_Position
+            available_64 = get_available_64(concat_risk_zone)
             # Potential = st.selectbox("Potential RR", available_rr)
 
-            available_64 = get_available_64(risk_multiplier)
+            #available_64 = get_available_64(risk_multiplier)
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
             available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
@@ -9322,6 +9323,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

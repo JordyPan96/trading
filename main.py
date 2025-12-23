@@ -1661,9 +1661,9 @@ elif st.session_state.current_page == "Account Overview":
         fig.update_xaxes(
             title_text="Trade Number",
             tickmode='array',
-            tickvals=trade_count,  # Only show ticks at trade numbers 1, 2, 3, ...
-            ticktext=[str(x) for x in trade_count],  # Labels as strings
-            range=[0.8, len(df) + 0.2] if len(df) > 0 else [0, 1],  # Push 0 out of view
+            tickvals=[0] + trade_count,  # Include 0
+            ticktext=['Start'] + [str(x) for x in trade_count],  # Label 0 as "Start"
+             range=[-0.2, len(df) + 0.5],
             row=1, col=1
         )
 
@@ -9328,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

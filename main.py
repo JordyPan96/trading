@@ -5214,10 +5214,11 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1. Identify Entry Fib Zone<br>
-                                --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
+                                --2. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
                                 --3. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
+                                --For 1_BNR_TPF, if it falls in 744-786 fib, follow 1_BNR Entry<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5227,10 +5228,11 @@ elif st.session_state.current_page == "Risk Calculation":
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
                                 --1. Identify Entry Fib Zone<br>
-                                --2. Draw Trigger box based on LAST entry -> FIRST entry<br>
+                                --2. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
                                 --3. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
+                                --For 1_BNR_TPF, if it falls in 744-786 fib, follow 1_BNR Entry<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9323,6 +9325,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

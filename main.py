@@ -1667,8 +1667,8 @@ elif st.session_state.current_page == "Account Overview":
         # Customize x-axis to show trade numbers
         fig.update_xaxes(
             title_text="Trade Number",
-            tickmode='linear',
-            dtick=1,  # Show every trade number (use larger number if many trades)
+            tickmode='array',
+            tickvals=trade_count,  # Explicitly set tick values
             row=1, col=1
         )
 
@@ -9333,6 +9333,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

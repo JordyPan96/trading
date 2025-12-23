@@ -1660,8 +1660,10 @@ elif st.session_state.current_page == "Account Overview":
         # Customize x-axis to show dates but maintain equal spacing
         fig.update_xaxes(
             title_text="Trade Number",
-            tickmode='linear',
-            dtick=1,  # Show every trade number
+            tickmode='array',
+            tickvals=trade_count,  # Only show ticks at trade numbers 1, 2, 3, ...
+            ticktext=[str(x) for x in trade_count],  # Labels as strings
+            range=[0.8, len(df) + 0.2] if len(df) > 0 else [0, 1],  # Push 0 out of view
             row=1, col=1
         )
 
@@ -9326,5 +9328,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 

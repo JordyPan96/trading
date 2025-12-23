@@ -4552,12 +4552,12 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, within_64):
                 if (pair == "GBPUSD"):
                     if (within_64 == 'Yes'):
-                        return str(22)
+                        return str(17)
                     else:
                         return str(27)
                 elif (pair == "EURUSD"):
                     if (within_64 == 'Yes'):
-                        return str(22)
+                        return str(17)
                     else:
                         return str(27)
                 elif (pair == "AUDUSD"):
@@ -4577,7 +4577,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(32)
                 elif (pair == "USDCAD"):
                     if (within_64 == 'Yes'):
-                        return str(19)
+                        return str(17)
                     else:
                         return str(27)
                 else:
@@ -9325,6 +9325,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 

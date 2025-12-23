@@ -1628,6 +1628,9 @@ elif st.session_state.current_page == "Account Overview":
         x_values = list(range(len(df)))
 
         # Equity Curve (Pure PnL) - use sequential x-values for equal spacing
+
+        trade_count = list(range(1, len(df) + 1))
+        
         fig.add_trace(
             go.Scatter(x=x_values, y=df['equity'],
                        name='Equity (Pure PnL)', line=dict(color='royalblue'),
@@ -9333,6 +9336,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

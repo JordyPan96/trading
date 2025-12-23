@@ -1628,9 +1628,6 @@ elif st.session_state.current_page == "Account Overview":
         x_values = list(range(len(df)))
 
         # Equity Curve (Pure PnL) - use sequential x-values for equal spacing
-
-        trade_count = list(range(1, len(df) + 1))
-        
         fig.add_trace(
             go.Scatter(x=x_values, y=df['equity'],
                        name='Equity (Pure PnL)', line=dict(color='royalblue'),
@@ -1660,20 +1657,10 @@ elif st.session_state.current_page == "Account Overview":
         )
 
         # Customize x-axis to show dates but maintain equal spacing
-        #fig.update_xaxes(
-            #title_text="Trade Date",
-            #tickvals=x_values,  # Ticks at each trade position
-            #ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
-            #row=1, col=1
-        #)
-
-        # Customize x-axis to show trade numbers
         fig.update_xaxes(
-            title_text="Trade Number",
-            tickmode='array',
-            tickvals=trade_count,
-            ticktext=[str(x) for x in trade_count],
-            range=[0.5, len(df) + 0.5] if len(df) > 0 else [0, 1],
+            title_text="Trade Date",
+            tickvals=x_values,  # Ticks at each trade position
+            ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
             row=1, col=1
         )
 
@@ -9338,43 +9325,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

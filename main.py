@@ -4562,7 +4562,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(27)
                 elif (pair == "AUDUSD"):
                     if (within_64 == 'Yes'):
-                        return str(22)
+                        return str(21)
                     else:
                         return str(32)
                 elif (pair == "XAUUSD"):
@@ -4753,7 +4753,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "21%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
 
@@ -9325,5 +9325,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 

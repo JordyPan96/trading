@@ -1657,10 +1657,18 @@ elif st.session_state.current_page == "Account Overview":
         )
 
         # Customize x-axis to show dates but maintain equal spacing
+        #fig.update_xaxes(
+            #title_text="Trade Date",
+            #tickvals=x_values,  # Ticks at each trade position
+            #ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
+            #row=1, col=1
+        #)
+
+        # Customize x-axis to show trade numbers
         fig.update_xaxes(
-            title_text="Trade Date",
-            tickvals=x_values,  # Ticks at each trade position
-            ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
+            title_text="Trade Number",
+            tickmode='linear',
+            dtick=1,  # Show every trade number (use larger number if many trades)
             row=1, col=1
         )
 
@@ -9325,6 +9333,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

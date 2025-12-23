@@ -1660,7 +1660,7 @@ elif st.session_state.current_page == "Account Overview":
         fig.update_xaxes(
             title_text="Trade Date",
             tickvals=x_values,  # Ticks at each trade position
-            ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
+            ticktext=[str(i+1) for i in range(len(df))],  # Show 1, 2, 3... for each trade
             row=1, col=1
         )
 
@@ -9325,4 +9325,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 

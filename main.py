@@ -1628,12 +1628,10 @@ elif st.session_state.current_page == "Account Overview":
         x_values = list(range(len(df)))
 
         # Equity Curve (Pure PnL) - use sequential x-values for equal spacing
-        trade_count = [x + 1 for x in x_values]
         fig.add_trace(
-            go.Scatter(x=trade_count,  # Now: 1, 2, 3, ...
-                       name='Equity (Pure PnL)', 
-                       line=dict(color='royalblue'),
-                       hovertemplate='Trade: %{x}<br>Equity: $%{y:.2f}<br>Date: %{text}<extra></extra>',
+            go.Scatter(x=x_values, y=df['equity'],
+                       name='Equity (Pure PnL)', line=dict(color='royalblue'),
+                       hovertemplate='Date: %{text}<br>Equity: $%{y:.2f}<extra></extra>',
                        text=df['Date'].dt.strftime('%Y-%m-%d')),
             row=1, col=1
         )
@@ -1641,10 +1639,10 @@ elif st.session_state.current_page == "Account Overview":
         # Add connecting line from 0 to first data point
         if len(df) > 0:
             fig.add_trace(
-                go.Scatter(x=[0, 1],  # From 0 (before first trade) to trade #1
-                            y=[0, df['equity'].iloc[0]],
-                            line=dict(color='royalblue', dash='dash'),
-                            showlegend=False),
+                go.Scatter(x=[-0.5, 0],  # Start slightly before first trade
+                           y=[0, df['equity'].iloc[0]],
+                           line=dict(color='royalblue', dash='dash'),
+                           showlegend=False),
                 row=1, col=1
             )
 
@@ -1660,10 +1658,9 @@ elif st.session_state.current_page == "Account Overview":
 
         # Customize x-axis to show dates but maintain equal spacing
         fig.update_xaxes(
-            title_text="Trade Number",
-            tickmode='linear',
-            dtick=1,  # Show every trade number
-            range=[0, len(df) + 1] if len(df) > 0 else [0, 1],  # Include 0 for the connecting line start
+            title_text="Trade Date",
+            tickvals=x_values,  # Ticks at each trade position
+            ticktext=df['Date'].dt.strftime('%Y-%m'),  # Show year-month for each trade
             row=1, col=1
         )
 
@@ -9328,8 +9325,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
 

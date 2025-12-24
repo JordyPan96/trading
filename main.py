@@ -4426,7 +4426,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if (selected_pair in europe_major or selected_pair == "XAUUSD"):
                 if (pair_result == "W"):
-                    if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+                    if (risk_multiplier == "2_BNR"):
                         if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%" or trend_position == "7%-8.99%"):
                             if (cross_fib == "Wave 1"):
                                 big_risk_multiplier = 1.5
@@ -9325,6 +9325,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

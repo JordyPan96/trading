@@ -3568,6 +3568,7 @@ elif st.session_state.current_page == "Risk Calculation":
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PullBack)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PullBack)Wave 2+": ['1_BNR', '1_BNR_TPF', '2_BNR'],
+            ">=13% (5% PullBack)Cross Wave 3.5 - 4.99": ['1_BNR', '1_BNR_TPF', '2_BNR'],
             # Add more restrictions as needed
         }
 
@@ -9325,6 +9326,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

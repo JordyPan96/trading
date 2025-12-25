@@ -5215,7 +5215,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Trigger Time Frame
+                                --1. Identify Entry Trigger Time Frame<br>
                                 --2. Identify Entry Fib Zone<br>
                                 --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
                                 --4. Draw EP line middle of the trigger box<br>
@@ -5230,7 +5230,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Trigger Time Frame
+                                --1. Identify Entry Trigger Time Frame<br>
                                 --2. Identify Entry Fib Zone<br>
                                 --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
                                 --4. Draw EP line middle of the trigger box<br>
@@ -9391,6 +9391,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -6636,32 +6636,38 @@ elif st.session_state.current_page == "Active Opps":
                                     pip_size = round(1 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                             elif(entry_price < exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = round(1 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
+                                    set_global(record['selected_pair'],BE_Price)
                                     st.write(BE_Price)
                             
                         # Check required fields
@@ -6881,6 +6887,8 @@ elif st.session_state.current_page == "Active Opps":
                                 index=0,
                                 key=f"probability_{unique_key_base}"
                             )
+                        with col14:
+                            st.write(BE_Price)
 
                         # Display existing Trend Position and Variance (read-only)
                         st.write("---")
@@ -9371,6 +9379,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -9023,7 +9023,7 @@ elif st.session_state.current_page == "Guidelines":
     }
     #st.table(table_data4)
 
-    st.subheader("Retake Rules")
+    st.subheader("Retake Rules - Project Per Fib")
     table_data5 = {
         '': ['1_BNR','1_BNR','1_BNR','','1_BNR_TPF','1_BNR_TPF','1_BNR_TPF','','2_BNR','2_BNR','2_BNR','','2_BNR_TPF','2_BNR_TPF','2_BNR_TPF'],
         'Result': ["Win", 'Loss','BE', '','Win', 'Loss','BE','',"Win", 'Loss','BE','',"Win", 'Loss','BE'],
@@ -9329,6 +9329,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

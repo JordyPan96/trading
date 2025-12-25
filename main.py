@@ -5214,10 +5214,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
-                                --1. Identify Entry Fib Zone<br>
-                                --2. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
-                                --3. Draw EP line middle of the trigger box<br>
+                                --EP (Entry Precision) Steps to Identify Entry <br><br>
+                                --1. Identify Entry Trigger Time Frame
+                                --2. Identify Entry Fib Zone<br>
+                                --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
+                                --4. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                                 --For 1_BNR_TPF, if it falls in 744-786 fib, Choose 1_BNR OR 1_BNR_TPF Entry<br>
@@ -5228,10 +5229,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Line Priority Guide Based on Entry Model<br><br>
-                                --1. Identify Entry Fib Zone<br>
-                                --2. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
-                                --3. Draw EP line middle of the trigger box<br>
+                                --EP (Entry Precision) Steps to Identify Entry <br><br>
+                                --1. Identify Entry Trigger Time Frame
+                                --2. Identify Entry Fib Zone<br>
+                                --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
+                                --4. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                                 --For 1_BNR_TPF, if it falls in 744-786 fib, Choose 1_BNR OR 1_BNR_TPF Entry<br>
@@ -9389,6 +9391,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

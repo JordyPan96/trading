@@ -8977,8 +8977,8 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data)
     st.header('Variant Rules (Only for 2 Daily TPF Left V Leg)')
-    st.subheader(
-        "Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
+    #st.subheader(
+        #"Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {
@@ -9329,6 +9329,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

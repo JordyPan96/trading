@@ -6623,6 +6623,7 @@ elif st.session_state.current_page == "Active Opps":
                                     f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
                                 
                         if expected_stop_pips is not None:
+                            
                             if(entry_price > exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = 1
@@ -6634,7 +6635,7 @@ elif st.session_state.current_page == "Active Opps":
                                     st.write(round(entry_price + expected_stop_pips * pip_size),5)
                                 else:
                                     pip_size = 0.0001
-                                    st.write(entry_price,expected_stop_pips)
+                                    st.write(expected_stop_pips*pip_size)
                                     st.write(round(entry_price + expected_stop_pips * pip_size),5)
                             elif(entry_price < exit_price):
                                 if('XAU' in record['selected_pair']):
@@ -9357,6 +9358,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

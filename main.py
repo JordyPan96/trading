@@ -6623,32 +6623,45 @@ elif st.session_state.current_page == "Active Opps":
                                     f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
                                 
                         if expected_stop_pips is not None:
-                            
+                            be_mult = 0
+                            if(record['risk_multiplier'] == '1_BNR' or record['risk_multiplier'] == '1_BNR_TPF'):
+                                be_mult = 2
+                            elif(record['risk_multiplier'] == '2_BNR'):
+                                be_mult = 3
+                            elif(record['risk_multiplier'] == '2_BNR_TPF'):
+                                be_mult = 2.5
+                                
                             if(entry_price > exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = round(1 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price + pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price + be_distance,5)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price + pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price + be_distance,5)
                                     st.write(BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price + pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price + be_distance,5)
                                     st.write(BE_Price)
                             elif(entry_price < exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = round(1 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price - pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price - be_distance,5)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price - pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price - be_distance,5)
                                     st.write(BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
-                                    BE_Price = round(entry_price - pip_size,5)
+                                    be_distance = round(be_mult * pip_size,5)
+                                    BE_Price = round(entry_price - be_distance,5)
                                     st.write(BE_Price)
                             
                         # Check required fields
@@ -9358,6 +9371,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

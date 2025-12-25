@@ -8996,9 +8996,9 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("BE Rule - RR Based Refer Below - 3R Breakeven Rule is for when top of pullback leg to target >=50%")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
-        'Trigger Condition': ["Trigger at 2.5 R (3R)",
-                              'Trigger at 2.5 R (3R)',
-                              'Trigger at 2.0 R (3R)', 'Trigger at 2.0 R (3R)'],
+        'Trigger Condition': ["Trigger at 2R",
+                              'Trigger at 2R',
+                              'Trigger at 3R', 'Trigger at 2.5R'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry"]
     }
@@ -9012,7 +9012,7 @@ elif st.session_state.current_page == "Guidelines":
                    'Behind first 8H Structure or huge candle, then no further trailing',
                    "Behind first 8H Structure or huge candle", "Behind first 8H Structure or huge candle"]
     }
-    st.table(table_data3)
+    #st.table(table_data3)
 
     st.subheader("Second+ Trail Rules")
     table_data4 = {
@@ -9327,6 +9327,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

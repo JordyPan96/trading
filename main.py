@@ -8588,6 +8588,9 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Entry Price:** {entry_price:.5f}")
                             sl_price = safe_float(trade.get('exit_price'), 0.0)
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
+                            BE_symbol_price = get_global(trade['selected_pair'])
+                            st.write(f"**BE Price:** {BE_symbol_price:.5f}")
+                            
 
                         with col3:
                             tp_price = safe_float(trade.get('target_price'), 0.0)
@@ -9386,6 +9389,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

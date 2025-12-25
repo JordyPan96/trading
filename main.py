@@ -6621,8 +6621,12 @@ elif st.session_state.current_page == "Active Opps":
                             if abs(expected_stop_pips - current_stop_pips) > 0.1:
                                 st.error(
                                     f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
-
-                        st.write(expected_stop_pips)
+                        if expected_stop_pips is not None:
+                            if(entry_price > exit_price):
+                                st.write(entry_price + expected_stop_pips)
+                            elif(entry_price < exit_price):
+                                st.write(entry_price - expected_stop_pips)
+                            
                         # Check required fields
                         entry_price_valid = entry_price > 0
                         exit_price_valid = exit_price > 0
@@ -9330,6 +9334,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

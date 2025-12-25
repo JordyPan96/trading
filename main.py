@@ -9024,11 +9024,12 @@ elif st.session_state.current_page == "Guidelines":
     #st.table(table_data4)
 
     st.subheader("Retake Rules")
-    st.write("1_BNR Win/Loss -> 2_BNR")
-    st.write("1_BNR_TPF Win/Loss -> NO RETAKE")
-    st.write("2_BNR Win -> NO RETAKE")
-    st.write("2_BNR Loss -> 2_BNR_TPF")
-    st.write("2_BNR_TPF -> NO RETAKE")
+    table_data5 = {
+        '': ['1_BNR','1_BNR', '1_BNR_TPF','1_BNR_TPF', '2_BNR','2_BNR', '2_BNR_TPF'，'2_BNR_TPF'],
+        'Result': ["Win", 'Loss', 'Win', 'Loss'，"Win", 'Loss',"Win", 'Loss',],
+        'Retake Rule': ["-> 2_BNR", "-> 2_BNR", "NO RETAKE","NO RETAKE", "NO RETAKE","-> 2_BNR_TPF, "NO RETAKE","NO RETAKE"]
+    }
+    st.table(table_data5)
 
 if st.session_state.current_page == "Entry Criteria Check":
     st.title("Entry Model Identification")
@@ -9328,6 +9329,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

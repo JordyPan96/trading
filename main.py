@@ -6621,13 +6621,28 @@ elif st.session_state.current_page == "Active Opps":
                             if abs(expected_stop_pips - current_stop_pips) > 0.1:
                                 st.error(
                                     f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
+                                
                         if expected_stop_pips is not None:
                             if(entry_price > exit_price):
-                                st.write(entry_price,expected_stop_pips)
-                                st.write(entry_price + expected_stop_pips)
+                                if('XAU' in record['selected_pair']):
+                                    pip_size = 1
+                                    st.write(round(entry_price + expected_stop_pips * pip_size),5)
+                                elif('JPY' in record['selected_pair']):
+                                    pip_size = 0.01
+                                    st.write(round(entry_price + expected_stop_pips * pip_size),5)
+                                else:
+                                    pip_size = 0.0001
+                                    st.write(round(entry_price + expected_stop_pips * pip_size),5)
                             elif(entry_price < exit_price):
-                                st.write(entry_price,expected_stop_pips)
-                                st.write(entry_price - expected_stop_pips)
+                                if('XAU' in record['selected_pair']):
+                                    pip_size = 1
+                                    st.write(round(entry_price - expected_stop_pips * pip_size),5)
+                                elif('JPY' in record['selected_pair']):
+                                    pip_size = 0.01
+                                    st.write(round(entry_price - expected_stop_pips * pip_size),5)
+                                else:
+                                    pip_size = 0.0001
+                                    st.write(round(entry_price - expected_stop_pips * pip_size),5)
                             
                         # Check required fields
                         entry_price_valid = entry_price > 0
@@ -9336,6 +9351,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

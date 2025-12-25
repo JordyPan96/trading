@@ -9026,7 +9026,7 @@ elif st.session_state.current_page == "Guidelines":
     st.subheader("Retake Rules")
     table_data5 = {
         '': ['1_BNR','1_BNR','1_BNR_TPF','1_BNR_TPF','2_BNR','2_BNR','2_BNR_TPF','2_BNR_TPF'],
-        'Result': ["Win", 'Loss', 'Win', 'Loss'，"Win", 'Loss',"Win", 'Loss'],
+        'Result': ["Win", 'Loss', 'Win', 'Loss',"Win", 'Loss',"Win", 'Loss'],
         'Retake Rule': ["-> 2_BNR", "-> 2_BNR", "NO RETAKE","NO RETAKE", "NO RETAKE","-> 2_BNR_TPF, "NO RETAKE","NO RETAKE"]
     }
     st.table(table_data5)
@@ -9329,6 +9329,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

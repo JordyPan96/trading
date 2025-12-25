@@ -9004,7 +9004,7 @@ elif st.session_state.current_page == "Guidelines":
     }
     st.table(table_data2)
 
-    st.subheader("First Trail Rules")
+    #st.subheader("First Trail Rules")
     table_data3 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
         'Trigger Condition': ["Trigger at 4R", 'Trigger at 4R', 'Trigger at 4R', 'Trigger at 4R'],
@@ -9327,6 +9327,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

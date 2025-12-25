@@ -6626,28 +6626,28 @@ elif st.session_state.current_page == "Active Opps":
                             
                             if(entry_price > exit_price):
                                 if('XAU' in record['selected_pair']):
-                                    pip_size = round(1 * expected_stop_pips,2)
+                                    pip_size = round(1 * expected_stop_pips,5)
                                     BE_Price = round(entry_price + pip_size,5)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
-                                    pip_size = round(0.01 * expected_stop_pips,2)
+                                    pip_size = round(0.01 * expected_stop_pips,5)
                                     BE_Price = round(entry_price + pip_size,5)
                                     st.write(BE_Price)
                                 else:
-                                    pip_size = round(0.0001 * expected_stop_pips,2)
+                                    pip_size = round(0.0001 * expected_stop_pips,5)
                                     BE_Price = round(entry_price + pip_size,5)
                                     st.write(BE_Price)
                             elif(entry_price < exit_price):
                                 if('XAU' in record['selected_pair']):
-                                    pip_size = round(1 * expected_stop_pips,2)
+                                    pip_size = round(1 * expected_stop_pips,5)
                                     BE_Price = round(entry_price - pip_size,5)
                                     st.write(BE_Price)
                                 elif('JPY' in record['selected_pair']):
-                                    pip_size = round(0.01 * expected_stop_pips,2)
+                                    pip_size = round(0.01 * expected_stop_pips,5)
                                     BE_Price = round(entry_price - pip_size,5)
                                     st.write(BE_Price)
                                 else:
-                                    pip_size = round(0.0001 * expected_stop_pips,2)
+                                    pip_size = round(0.0001 * expected_stop_pips,5)
                                     BE_Price = round(entry_price - pip_size,5)
                                     st.write(BE_Price)
                             
@@ -9358,6 +9358,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

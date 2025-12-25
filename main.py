@@ -8589,7 +8589,7 @@ elif st.session_state.current_page == "Trade Signal":
                             sl_price = safe_float(trade.get('exit_price'), 0.0)
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             BE_symbol_price = get_global(trade['selected_pair'])
-                            st.write(BE_symbol_price)
+                            st.write("BE Price" + str(BE_symbol_price))
                             
 
                         with col3:
@@ -8694,7 +8694,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {current_sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             BE_symbol_price = get_global(position['symbol'])
-                            st.write(BE_symbol_price)
+                            st.write("BE Price" + str(BE_symbol_price))
                             #st.write(f"**3R BE Price (Top of Pullback leg to target >=50%):** {threeR_price:.5f}")
                             #st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
@@ -9389,6 +9389,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

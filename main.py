@@ -6637,38 +6637,38 @@ elif st.session_state.current_page == "Active Opps":
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price + be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                             elif(entry_price < exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = round(1 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                                 elif('JPY' in record['selected_pair']):
                                     pip_size = round(0.01 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                                 else:
                                     pip_size = round(0.0001 * expected_stop_pips,5)
                                     be_distance = round(be_mult * pip_size,5)
                                     BE_Price = round(entry_price - be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
-                                    st.write(BE_Price)
+                                    st.write("BE Price: " + BE_Price)
                             
                         # Check required fields
                         entry_price_valid = entry_price > 0
@@ -8690,7 +8690,8 @@ elif st.session_state.current_page == "Trade Signal":
                             # Display current SL (which may change) but fixed BE and First Trail prices
                             st.write(f"**Stop Loss:** {current_sl_price:.5f}")
                             st.write(f"**Take Profit:** {tp_price:.5f}")
-                            #st.write(f"**BE Price:** {be_price:.5f}")
+                            BE_symbol_price = get_global(position['symbol'])
+                            st.write(f"**BE Price:** {BE_symbol_price:.5f}")
                             #st.write(f"**3R BE Price (Top of Pullback leg to target >=50%):** {threeR_price:.5f}")
                             #st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
@@ -9385,6 +9386,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

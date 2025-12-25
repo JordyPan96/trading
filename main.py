@@ -9014,19 +9014,20 @@ elif st.session_state.current_page == "Guidelines":
     }
     #st.table(table_data3)
 
-    st.subheader("Second+ Trail Rules")
+    #st.subheader("Second+ Trail Rules")
     table_data4 = {
         '': ['2_BNR', '2_BNR_TPF'],
         'Trigger Condition': ["After every 2 Daily Candle formation", 'After every 2 Daily Candle formation'],
         'Action': ["After 2 Daily huge candle or structure",
                    'After 2 Daily huge candle or structure']
     }
-    st.table(table_data4)
+    #st.table(table_data4)
 
     st.subheader("Retake Rules")
-    st.write("1_BNR -> 2_BNR")
-    st.write("1_BNR_TPF -> NO RETAKE")
-    st.write("2_BNR -> 2_BNR_TPF")
+    st.write("1_BNR Win/Loss -> 2_BNR")
+    st.write("1_BNR_TPF Win/Loss -> NO RETAKE")
+    st.write("2_BNR Win -> NO RETAKE")
+    st.write("2_BNR Loss -> 2_BNR_TPF")
     st.write("2_BNR_TPF -> NO RETAKE")
 
 if st.session_state.current_page == "Entry Criteria Check":
@@ -9327,6 +9328,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

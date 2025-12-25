@@ -6889,7 +6889,12 @@ elif st.session_state.current_page == "Active Opps":
                             )
                         with col14:
                             BE_Price = get_global(record['selected_pair'])
-                            st.write(BE_Price)
+                            st.text_input(
+                                "BE_Price",
+                                value=BE_Price,
+                                key=f"BE_Price{unique_key_base}",
+                                disabled=True
+                            )
 
                         # Display existing Trend Position and Variance (read-only)
                         st.write("---")
@@ -9380,6 +9385,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

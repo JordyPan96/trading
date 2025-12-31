@@ -1259,9 +1259,9 @@ if st.session_state.current_page == "Home":
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
                 pattern_options = ["1_BNR_Standard","8H/4H OB", "8H/4H OB + TPF","8H/4H TPF", "8H/4H TPF Left Leg",
-                                    "Weekly TPF Left Leg",
+                                   "Weekly TPF Left Leg",
                                    "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                                    "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
+                                   "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -3637,7 +3637,7 @@ elif st.session_state.current_page == "Risk Calculation":
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "8H/4H TPF Left Leg", "Variant 2 Daily TPF","1_BNR_Standard","Variant Fakeout 2 Daily TPF"],
             '2_BNR_TPF': ["8H/4H OB",  "8H/4H OB + TPF",
-                           "8H/4H TPF","1_BNR_Standard"]
+                          "8H/4H TPF","1_BNR_Standard"]
         }
 
         incompatible_map_18 = {
@@ -3651,7 +3651,7 @@ elif st.session_state.current_page == "Risk Calculation":
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                            "8H/4H TPF",  "8H/4H TPF Left Leg"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                            "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF","8H/4H TPF"]
+                           "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF","8H/4H TPF"]
         }
 
         incompatible_map_20 = {
@@ -3720,6 +3720,12 @@ elif st.session_state.current_page == "Risk Calculation":
             "Wave 2+1": ['2_BNR_TPF'],
             "Cross Wave1": [],
             "Cross Wave 3.5 - 4.991": []
+        }
+
+        incompatible_map_30 = {
+            "3%-4.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
+            "5%-6.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
+            "7%-8.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
         }
 
 
@@ -3850,6 +3856,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_pattern_trigger3(wave, strat_list):
             disabled_strategy3 = incompatible_map_26.get(wave, [])
             return [s for s in strat_list if s not in disabled_strategy3]
+
+        def get_available_pattern_trigger4(trend, strat_list):
+            disabled_strategy4 = incompatible_map_30.get(trend, [])
+            return [s for s in strat_list if s not in disabled_strategy4]
 
 
         def get_available_timeframe(selected_pair):
@@ -4220,6 +4230,7 @@ elif st.session_state.current_page == "Risk Calculation":
             pattern_concat = squeeze_559_time + risk_multiplier
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
+            available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
 
             pattern = st.selectbox("Pattern Trigger (Trigger Box drawn to be on same timeframe)",
                                    available_pattern_trigger3)
@@ -4600,28 +4611,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (within_64 == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
@@ -4630,28 +4641,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "786->744, "+ entry_pip + "% MAX" 
+                        entry_text = "786->744, "+ entry_pip + "% MAX"
                         SL_title = "SL Guide:"
                         SL_text = "Entry set to " + sl_pip + " %"
                         exit_title = "Target Guide One (RR):"
@@ -5001,32 +5012,32 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
 
                     #if (
-                            #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
-                        #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                            #targeting = get_open_target(selected_pair)
-                        #elif (
-                                #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                            #targeting = get_open_target(selected_pair)
-                        #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                            #targeting = get_open_target(selected_pair)
-                        #else:
-                            #targeting = 5.41
+                    #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
+                    #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                    #targeting = get_open_target(selected_pair)
                     #elif (
-                            #selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
-                        #if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
-                            #if (big_risk_multiplier > 1):
-                                #total_target = get_sum_target()
-                                #compare_target = get_open_target(selected_pair) * 1.725
-                                #if (compare_target < total_target):
-                                    #targeting = round(compare_target, 2)
-                                #else:
-                                    #targeting = total_target
-                            #else:
-                                #targeting = get_open_target(selected_pair)
-                        #else:
-                            #targeting = get_open_target(selected_pair)
+                    #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    #targeting = get_open_target(selected_pair)
+                    #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    #targeting = get_open_target(selected_pair)
                     #else:
-                        #targeting = get_open_target(selected_pair)
+                    #targeting = 5.41
+                    #elif (
+                    #selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                    #if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
+                    #if (big_risk_multiplier > 1):
+                    #total_target = get_sum_target()
+                    #compare_target = get_open_target(selected_pair) * 1.725
+                    #if (compare_target < total_target):
+                    #targeting = round(compare_target, 2)
+                    #else:
+                    #targeting = total_target
+                    #else:
+                    #targeting = get_open_target(selected_pair)
+                    #else:
+                    #targeting = get_open_target(selected_pair)
+                    #else:
+                    #targeting = get_open_target(selected_pair)
                     targeting = get_potential_target(trend_position,selected_pair,cross_fib,risk_multiplier)
 
                     if (Variances == "786 - 91"):
@@ -5034,7 +5045,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
-                                                                    within_64) + "%, " + "box %," + " 32%"
+                                                    within_64) + "%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = targeting
 
@@ -5044,7 +5055,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -5053,7 +5064,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -5061,7 +5072,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
 
@@ -5071,7 +5082,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
@@ -5079,7 +5090,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -5087,7 +5098,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     elif (Variances == "50"):
@@ -5096,7 +5107,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
@@ -5104,7 +5115,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         else:
@@ -5112,7 +5123,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                     # if(risk_multiplier == "2_BNR"):
@@ -5121,35 +5132,35 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     if (selected_pair == "XAUUSD"):
                         #if (
-                                #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
-                            #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                                #targeting = get_open_target(selected_pair)
-                            #elif (
-                                    #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                                #targeting = get_open_target(selected_pair)
-                            #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                                #targeting = get_open_target(selected_pair)
-                            #else:
-                                #targeting = 5.41
-                        #elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
-                            #if (big_risk_multiplier > 1):
-                                #total_target = get_sum_target()
-                                #compare_target = get_open_target(selected_pair) * 1.725
-                                #if (compare_target < total_target):
-                                    #targeting = round(compare_target, 2)
-                                #else:
-                                    #targeting = total_target
-                            #else:
-                                #targeting = get_open_target(selected_pair)
+                        #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
+                        #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                        #targeting = get_open_target(selected_pair)
+                        #elif (
+                        #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        #targeting = get_open_target(selected_pair)
+                        #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        #targeting = get_open_target(selected_pair)
                         #else:
-                            #targeting = get_open_target(selected_pair)
+                        #targeting = 5.41
+                        #elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
+                        #if (big_risk_multiplier > 1):
+                        #total_target = get_sum_target()
+                        #compare_target = get_open_target(selected_pair) * 1.725
+                        #if (compare_target < total_target):
+                        #targeting = round(compare_target, 2)
+                        #else:
+                        #targeting = total_target
+                        #else:
+                        #targeting = get_open_target(selected_pair)
+                        #else:
+                        #targeting = get_open_target(selected_pair)
                         targeting = get_potential_target(trend_position, selected_pair, cross_fib,risk_multiplier)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = get_pair_volatile(selected_pair,
-                                                                        within_64) + "%, " + "box %," + " 32%"
+                                                        within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
@@ -5158,7 +5169,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
@@ -5166,7 +5177,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
 
@@ -5176,7 +5187,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
@@ -5184,7 +5195,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         elif (Variances == "50"):
@@ -5193,7 +5204,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                             else:
@@ -5201,7 +5212,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                                            within_64) + "%, " + "box %," + " 32%"
+                                                            within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
                                 exit_text = targeting
                         # if (risk_multiplier == "2_BNR"):
@@ -6628,7 +6639,7 @@ elif st.session_state.current_page == "Active Opps":
                             if abs(expected_stop_pips - current_stop_pips) > 0.1:
                                 st.error(
                                     f"Stop pips mismatch! Current: {current_stop_pips:.2f}, Expected: {expected_stop_pips:.2f}")
-                                
+
                         if expected_stop_pips is not None:
                             be_mult = 0
                             if(record['risk_multiplier'] == '1_BNR' or record['risk_multiplier'] == '1_BNR_TPF'):
@@ -6637,7 +6648,7 @@ elif st.session_state.current_page == "Active Opps":
                                 be_mult = 3
                             elif(record['risk_multiplier'] == '2_BNR_TPF'):
                                 be_mult = 2.5
-                                
+
                             if(entry_price > exit_price):
                                 if('XAU' in record['selected_pair']):
                                     pip_size = round(1 * expected_stop_pips,5)
@@ -6676,7 +6687,7 @@ elif st.session_state.current_page == "Active Opps":
                                     BE_Price = round(entry_price - be_distance,5)
                                     set_global(record['selected_pair'],BE_Price)
                                     st.write("BE Price: " + str(BE_Price))
-                            
+
                         # Check required fields
                         entry_price_valid = entry_price > 0
                         exit_price_valid = exit_price > 0
@@ -8597,7 +8608,7 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Stop Loss:** {sl_price:.5f}")
                             BE_symbol_price = get_global(trade['selected_pair'])
                             st.write("BE Price: " + str(BE_symbol_price))
-                            
+
 
                         with col3:
                             tp_price = safe_float(trade.get('target_price'), 0.0)
@@ -9045,7 +9056,7 @@ elif st.session_state.current_page == "Guidelines":
     st.table(table_data)
     st.header('Variant Rules (Only for 2 Daily TPF Left V Leg)')
     #st.subheader(
-        #"Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
+    #"Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {
@@ -9396,62 +9407,4 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -3723,15 +3723,18 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_30 = {
-            "3%-4.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
-            "5%-6.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
-            "7%-8.99%": ['Variant Fakeout 2 Daily TPF','Variant 2 Daily TPF'],
+            "3%-4.99%": [],
+            "5%-6.99%": [],
+            "7%-8.99%": [],
         }
 
         incompatible_map_31 = {
-            "3%-4.99%1": ['2_BNR_TPF'],
-            "5%-6.99%1": ['2_BNR_TPF'],
-            "7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Wave3%-4.99%1": ['2_BNR_TPF'],
+            "Cross Wave5%-6.99%1": ['2_BNR_TPF'],
+            "Cross Wave7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Wave 3.5 - 4.993%-4.99%1": ['2_BNR_TPF'],
+            "Cross Wave 3.5 - 4.995%-6.99%1": ['2_BNR_TPF'],
+            "Cross Wave 3.5 - 4.997%-8.99%1": ['2_BNR_TPF'],
         }
 
 
@@ -3955,8 +3958,8 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_strategies_7 = incompatible_map_29.get(wavesqueeze, [])
             return [s for s in stratslist if s not in disabled_strategies_7]
 
-        def get_available_strategies8(trendsqueeze, stratslist):
-            disabled_strategies_8 = incompatible_map_31.get(trendsqueeze, [])
+        def get_available_strategies8(wavetrendsqueeze, stratslist):
+            disabled_strategies_8 = incompatible_map_31.get(wavetrendsqueeze, [])
             return [s for s in stratslist if s not in disabled_strategies_8]
 
         def get_available_variance(entry_model):
@@ -4231,8 +4234,8 @@ elif st.session_state.current_page == "Risk Calculation":
             wavesqueeze = cross_fib+squeeze_559_time
             available_strats_6 = get_available_strategies7(wavesqueeze, available_strats_5)
 
-            trendsqueeze = trend_position+squeeze_559_time
-            available_strats_7 = get_available_strategies8(trendsqueeze, available_strats_6)
+            wavetrendsqueeze = cross_fib+trend_position+squeeze_559_time
+            available_strats_7 = get_available_strategies8(wavetrendsqueeze, available_strats_6)
 
             risk_multiplier = st.selectbox("Entry Model",
                                            available_strats_7,
@@ -9420,5 +9423,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 

@@ -5255,7 +5255,6 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --4. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
-                                --For 1_BNR_TPF, if it falls in 744-786 fib, Choose 1_BNR OR 1_BNR_TPF Entry<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5270,7 +5269,6 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --4. Draw EP line middle of the trigger box<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
-                                --For 1_BNR_TPF, if it falls in 744-786 fib, Choose 1_BNR OR 1_BNR_TPF Entry<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9425,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

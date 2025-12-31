@@ -3718,8 +3718,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_29 = {
             "Wave 2+1": ['2_BNR_TPF'],
-            "Cross Wave1": ['2_BNR_TPF'],
-            "Cross Wave 3.5 - 4.991": ['2_BNR_TPF']
+            "Cross Wave1": [],
+            "Cross Wave 3.5 - 4.991": []
         }
 
 
@@ -9396,6 +9396,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

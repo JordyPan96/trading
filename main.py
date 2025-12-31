@@ -3484,7 +3484,7 @@ elif st.session_state.current_page == "Risk Calculation":
         majors_dollar = ["AUDUSD", "EURUSD", "GBPUSD", "XAUUSD"]
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
-        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
+        strategies = ['1_BNR_TPF', '1_BNR', '2_BNR_TPF', '2_BNR', "No Setup"]
         shapes = ["1_BNR_Standard","8H/4H OB",  "8H/4H OB + TPF","8H/4H TPF", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg",
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
@@ -9425,6 +9425,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3732,9 +3732,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Wave3%-4.99%1": ['2_BNR_TPF'],
             "Cross Wave5%-6.99%1": ['2_BNR_TPF'],
             "Cross Wave7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Wave9%-10.99%1": ['2_BNR_TPF'],
             "Cross Wave 3.5 - 4.993%-4.99%1": ['2_BNR_TPF'],
             "Cross Wave 3.5 - 4.995%-6.99%1": ['2_BNR_TPF'],
             "Cross Wave 3.5 - 4.997%-8.99%1": ['2_BNR_TPF'],
+            "Cross Wave 3.5 - 4.999%-10.99%1": ['2_BNR_TPF'],
         }
 
 
@@ -9423,6 +9425,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4232,7 +4232,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_6 = get_available_strategies7(wavesqueeze, available_strats_5)
 
             trendsqueeze = trend_position+squeeze_559_time
-            available_strats_7 = get_available_strategies8(wavesqueeze, available_strats_6)
+            available_strats_7 = get_available_strategies8(trendsqueeze, available_strats_6)
 
             risk_multiplier = st.selectbox("Entry Model",
                                            available_strats_7,
@@ -9420,4 +9420,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 

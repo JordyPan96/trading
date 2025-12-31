@@ -4233,7 +4233,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
 
             pattern = st.selectbox("Pattern Trigger (Trigger Box drawn to be on same timeframe)",
-                                   available_pattern_trigger3)
+                                   available_pattern_trigger4)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
@@ -9407,4 +9407,5 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 

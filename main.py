@@ -1231,7 +1231,7 @@ if st.session_state.current_page == "Home":
                 new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
-                strategy_options = data['Strategy'].unique() if 'Strategy' in data.columns else []
+                strategy_options = ["1_BNR","1_BNR_TPF","2_BNR","2_BNR_TPF"]
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3592,7 +3592,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_12 = {
-            "3%-4.99%": ['1_BNR'],
+            "3%-4.99%": [],
             "XAUUSD5%-6.99%": [],
             "XAUUSD>=13%": [],
             ">=13%": [],
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

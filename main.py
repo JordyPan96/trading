@@ -2686,7 +2686,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         ) * 100
 
                         # Add win rate column
-                        strategy_cross['Win_Rate_%'] = float((strategy_percent.get('Head', 0.0))).round(2)
+                        strategy_cross['Win_Rate_%'] = round(strategy_percent.get('Head', 0.0),2)
                         strategy_cross['Total_Trades'] = strategy_cross.sum(axis=1)
                         strategy_cross['Win_Rate_%'] = strategy_cross['Win_Rate_%'].fillna(0)
 
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4630,28 +4630,28 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
@@ -4660,28 +4660,28 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = sl_pip + ", box %, " + sl_pip + "%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
@@ -4704,7 +4704,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "29%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
@@ -4719,7 +4719,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "21%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
@@ -4734,7 +4734,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 8.41)
@@ -4749,7 +4749,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
@@ -4767,28 +4767,28 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "29%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "21%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "23%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "21%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
@@ -5013,7 +5013,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "559 - 66"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "32%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
@@ -5021,7 +5021,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "66 - 786"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
-                        SL_title = "SL Guide:"
+                        SL_title = "SL Guide: Take AVERAGE OF the 3"
                         SL_text = "32%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = "5.41"
@@ -5071,7 +5071,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5080,7 +5080,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5088,7 +5088,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5098,7 +5098,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5106,7 +5106,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5114,7 +5114,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
-                            SL_title = "SL Guide:"
+                            SL_title = "SL Guide: Take AVERAGE OF the 3"
                             SL_text = get_pair_volatile(selected_pair,
                                                         within_64) + "%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
@@ -5185,7 +5185,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
                                 entry_text = "ON EP LINE"
-                                SL_title = "SL Guide:"
+                                SL_title = "SL Guide: Take AVERAGE OF the 3"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
@@ -5193,7 +5193,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             else:
                                 entry_title = "Entry Guide:"
                                 entry_text = "ON EP LINE"
-                                SL_title = "SL Guide:"
+                                SL_title = "SL Guide: Take AVERAGE OF the 3"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
@@ -5203,7 +5203,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
                                 entry_text = "ON EP LINE"
-                                SL_title = "SL Guide:"
+                                SL_title = "SL Guide: Take AVERAGE OF the 3"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
@@ -5211,7 +5211,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             else:
                                 entry_title = "Entry Guide:"
                                 entry_text = "ON EP LINE"
-                                SL_title = "SL Guide:"
+                                SL_title = "SL Guide: Take AVERAGE OF the 3"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             within_64) + "%, " + "box %," + " 32%"
                                 exit_title = "Target Guide One (RR):"
@@ -9429,6 +9429,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4499,57 +4499,33 @@ elif st.session_state.current_page == "Risk Calculation":
 
             target_in = 0
 
-
+            #1_BNR
             def getPairEntrySL(pair):
-                if (suggested_sl is None or avg_winning_mae is None):
-                    # target_in = 0
-                    if (pair == "GBPUSD"):
-                        base_entry = "box"
-                        base_sl = 17
-                        return base_entry, str(base_sl)
-                    elif (pair == "EURUSD"):
-                        base_entry = "box"
-                        base_sl = 17
-                        return base_entry, str(base_sl)
-                    elif (pair == "AUDUSD"):
-                        base_entry = "box"
-                        base_sl = 21
-                        return base_entry, str(base_sl)
-                    elif (pair == "XAUUSD"):
-                        base_entry = "box"
-                        base_sl = 32
-                        return str(base_entry), str(base_sl)
-                    elif (pair == "USDJPY"):
-                        base_entry = "box"
-                        base_sl = 17
-                        return str(base_entry), str(base_sl)
-                    elif (pair == "USDCAD"):
-                        base_entry = "box"
-                        base_sl = 17
-                        return str(base_entry), str(base_sl)
-                    else:
-                        base_entry = "box"
-                        base_sl = 27
-                        return str(base_entry), str(base_sl)
-
-
+                # target_in = 0
+                if (pair == "GBPUSD"):
+                    base_entry = "box"
+                    base_sl = 17
+                    return base_entry, str(base_sl)
+                elif (pair == "EURUSD"):
+                    base_entry = "box"
+                    base_sl = 17
+                    return base_entry, str(base_sl)
+                elif (pair == "AUDUSD"):
+                    base_entry = "box"
+                    base_sl = 17
+                    return base_entry, str(base_sl)
+                elif (pair == "XAUUSD"):
+                    base_entry = "box"
+                    base_sl = 24
+                    return str(base_entry), str(base_sl)
+                elif (pair == "USDJPY"):
+                    base_entry = "box"
+                    base_sl = 17
+                    return str(base_entry), str(base_sl)
                 else:
-                    # target_in = (99 // round(mae_based_stop_loss,0)) + 0.41
-                    if (pair == "GBPUSD"):
-                        return str((round(12 - winning_trade_mae, 0) + 6)), str(17)
-                    elif (pair == "EURUSD"):
-                        return str((round(12 - winning_trade_mae, 0) + 6)), str(17)
-                    elif (pair == "AUDUSD"):
-                        return str((round(12 - winning_trade_mae, 0) + 6)), str(21)
-                    elif (pair == "XAUUSD"):
-                        return str((round(12 - winning_trade_mae, 0) + 6)), str(29)
-                    elif (pair == "USDJPY"):
-                        return str((round(12 - winning_trade_mae, 0) + 6)), str(17)
-                    elif (pair == "USDCAD"):
-                        str((round(12 - winning_trade_mae, 0) + 6)), str(17)
-                    else:
-                        return "12", "30"
-
+                    base_entry = "box"
+                    base_sl = "NA"
+                    return str(base_entry), str(base_sl)
 
             entry_title = ""
             entry_text = ""
@@ -9429,6 +9405,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

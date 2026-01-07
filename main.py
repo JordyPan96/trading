@@ -9121,7 +9121,7 @@ elif st.session_state.current_page == "Guidelines":
     table_data5 = {
         '': ['1_BNR','1_BNR','1_BNR','','1_BNR_TPF','1_BNR_TPF','1_BNR_TPF','','2_BNR','2_BNR','2_BNR','','2_BNR_TPF','2_BNR_TPF','2_BNR_TPF'],
         'Result': ["Win", 'Loss','BE', '','Win', 'Loss','BE','',"Win", 'Loss','BE','',"Win", 'Loss','BE'],
-        'Retake Rule': ["-> 1.. 2_BNR", "-> 1.. 2_BNR/2_BNR_TPF (Take only if its a Edge Sweep Full TP not Tail)", '-> 2.. 2_BNR_TPF', '',"NO RETAKE","NO RETAKE", "NO RETAKE",'',"NO RETAKE","-> 2.. 2_BNR_TPF","NO RETAKE", '',"NO RETAKE","NO RETAKE","NO RETAKE"]
+        'Retake Rule': ["-> 1.. 2_BNR", "-> 1.. 2_BNR/2_BNR_TPF (Take only if its a Edge Sweep not Tail)", '-> 2.. 2_BNR_TPF', '',"NO RETAKE","NO RETAKE", "NO RETAKE",'',"NO RETAKE","-> 2.. 2_BNR_TPF","NO RETAKE", '',"NO RETAKE","NO RETAKE","NO RETAKE"]
     }
     st.table(table_data5)
 
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

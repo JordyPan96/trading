@@ -3539,7 +3539,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_6 = {
-            "786 - 91": ["No"],
+            "786 - 91": []
         }
 
         incompatible_map_7 = {
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4516,7 +4516,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         base_sl = 21
                         return str(base_entry), str(base_sl)
                     elif (pair == "XAUUSD"):
-                        base_entry = 12
+                        base_entry = 5
                         base_sl = 32
                         return str(base_entry), str(base_sl)
                     elif (pair == "USDJPY"):
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

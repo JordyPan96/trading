@@ -5249,10 +5249,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Trigger Time Frame<br>
-                                --2. Identify Entry Fib Zone<br>
-                                --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
-                                --4. Draw EP line middle of the trigger box<br>
+                                --1. Identify Entry Model (TPF Based or Support/Resistance Order Block Based)<br>
+                                --2. Identify Entry Time Frame<br>
+                                --3. Locate the two zones to find entry<br>
+                                --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
+                                --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
+                                --6. Note Trigger box can only stay within the two zone, and +20% length of the minimum stop loss<br>
+                                --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -5263,10 +5266,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Trigger Time Frame<br>
-                                --2. Identify Entry Fib Zone<br>
-                                --3. Draw Trigger box based on LAST entry -> FIRST entry (Choose 1 from 3 Combo)<br>
-                                --4. Draw EP line middle of the trigger box<br>
+                                --1. Identify Entry Model (TPF Based or Support/Resistance Order Block Based)<br>
+                                --2. Identify Entry Time Frame<br>
+                                --3. Locate the two zones to find entry<br>
+                                --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
+                                --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
+                                --6. Note Trigger box can only stay within the two zone, and +20% length of the minimum stop loss<br>
+                                --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -9423,6 +9429,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

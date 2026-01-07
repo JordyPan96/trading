@@ -5254,7 +5254,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --3. Locate 1-2 zones to find entry<br>
                                 --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
                                 --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --6. Note Trigger box can only stay within the two zone, if >32% divide by half until <=32%<br>
+                                --6. Note Trigger box can only stay within the two zone, if >Max SL divide by half until <=Max SL<br>
                                 --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
@@ -5271,7 +5271,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --3. Locate 1-2 zones to find entry<br>
                                 --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
                                 --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --6. Note Trigger box can only stay within the two zone, if >32% divide by half until <=32%<br>
+                                --6. Note Trigger box can only stay within the two zone, if >Max SL divide by half until <=Max SL<br>
                                 --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
@@ -9429,6 +9429,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4574,17 +4574,17 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(27)
                 elif (pair == "AUDUSD"):
                     if (within_64 == 'Yes'):
-                        return str(21)
+                        return str(17)
                     else:
-                        return str(32)
+                        return str(27)
                 elif (pair == "XAUUSD"):
                     if (within_64 == 'Yes'):
-                        return str(32)
+                        return str(27)
                     else:
                         return str(32)
                 elif (pair == "USDJPY"):
                     if (within_64 == 'Yes'):
-                        return str(32)
+                        return str(27)
                     else:
                         return str(32)
                 elif (pair == "USDCAD"):
@@ -4594,7 +4594,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(27)
                 else:
                     if (within_64 == 'Yes'):
-                        return str(27)
+                        return str(22)
                     else:
                         return str(32)
 
@@ -9405,6 +9405,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

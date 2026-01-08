@@ -5229,9 +5229,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2. Identify Entry Time Frame<br>
                                 --3. Locate 1-2 zones to find entry<br>
                                 --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
-                                --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --6. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
-                                --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
+                                --5. Base Entry is last resistance/support before the rally. If on same level mark the order block on rally<br>
+                                --6. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
+                                --7. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
+                                --8. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -5246,9 +5247,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2. Identify Entry Time Frame<br>
                                 --3. Locate 1-2 zones to find entry<br>
                                 --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
-                                --5. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --6. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
-                                --7. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
+                                --5. Base Entry is last resistance/support before the rally. If on same level mark the order block on rally<br>
+                                --6. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
+                                --7. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
+                                --8. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
                                 --<br>
                                 --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
@@ -9405,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

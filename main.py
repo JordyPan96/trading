@@ -4607,28 +4607,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
@@ -4637,28 +4637,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 4.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Take AVERAGE OF the 3"
-                        SL_text = sl_pip + ", box %, " + sl_pip + "%"
+                        SL_text = sl_pip + ", box %, " + " 19%"
                         exit_title = "Target Guide One (RR):"
                         exit_text = compare_target(get_one_target(selected_pair), 5.41)
             elif (risk_multiplier == "1_BNR_TPF"):
@@ -9407,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4691,7 +4691,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "24%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair), 8.41)
+                            exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -4706,7 +4706,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "17%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                            exit_text = compare_target(get_one_target(selected_pair), 5.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -4736,7 +4736,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = "24%, " + "box %," + " 32%"
                             exit_title = "Target Guide One (RR):"
-                            exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                            exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
 
                 else:
@@ -4984,7 +4984,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "32%, " + "box %," + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = "6.41"
+                        exit_text = "5.41"
 
                     elif (Variances == "559 - 66"):
                         entry_title = "Entry Guide:"
@@ -9407,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5232,7 +5232,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --6. Draw Trigger box based on Base entry<br>
                                 --   Bnr Trigger Box 48% MAX: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
                                 --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br><br>
-                                --7. Note Trigger box can only stay within the two zone
+                                --7. Note Trigger box can only stay within the two zone<br>
                                 --8. Enter either ON the base entry, or middle of the Trigger Box<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -5251,7 +5251,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --6. Draw Trigger box based on Base entry<br>
                                 --   Bnr Trigger Box 48% MAX: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
                                 --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br><br>
-                                --7. Note Trigger box can only stay within the two zone
+                                --7. Note Trigger box can only stay within the two zone<br>
                                 --8. Enter either ON the base entry, or middle of the Trigger Box<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -9407,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

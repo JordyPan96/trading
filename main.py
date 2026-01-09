@@ -1259,8 +1259,6 @@ if st.session_state.current_page == "Home":
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
                 pattern_options = ["1_BNR_Standard","8H/4H_OB to OB", "8H/4H_OB to TPF","8H/4H TPF", "8H/4H TPF Left Leg",
-                                   "Weekly TPF Left Leg",
-                                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                                    "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -4407,7 +4405,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (pattern == "8H/4H_OB to OB"):
                 pattern_multiplier = 1.05
             elif (pattern == "8H/4H TPF Left Leg"):
-                pattern_multiplier = 1.0
+                pattern_multiplier = 1.1
             elif (pattern == "8H/4H_OB to TPF"):
                 pattern_multiplier = 1.1
             elif (pattern == "Weekly TPF Left Leg"):
@@ -9407,6 +9405,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

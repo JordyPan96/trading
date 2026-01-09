@@ -3637,7 +3637,7 @@ elif st.session_state.current_page == "Risk Calculation":
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "8H/4H TPF Left Leg", "Variant 2 Daily TPF","1_BNR_Standard","Variant Fakeout 2 Daily TPF"],
             '2_BNR_TPF': ["8H/4H_OB to OB",  "8H/4H_OB to TPF",
-                          "8H/4H TPF","1_BNR_Standard"]
+                          "8H/4H TPF","1_BNR_Standard","Weekly TPF Left Leg","2 Daily TPF Left Leg", "Daily TPF Left Leg"]
         }
 
         incompatible_map_18 = {
@@ -9407,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

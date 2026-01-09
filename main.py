@@ -5223,16 +5223,18 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Model (TPF Based or Support/Resistance Order Block Based)<br>
+                                --1. Identify Entry Model<br>
                                 --2. Identify Entry Time Frame<br>
-                                --3. Locate 1-2 zones to find entry<br>
-                                --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
-                                --5. Base Entry is last resistance/support before the rally. If on same level mark the order block on rally<br>
-                                --6. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --7. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
-                                --8. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
+                                --3. Locate 1 - 2 zones to find entry<br>
+                                --4. Locate Base OB/TPF (Red for buy, Blue green for sell)<br>
+                                --   Bnr Base Entry: Last Resistance/Support Order Block before the Rally<br>
+                                --   TPF Base Entry: On Clear TPF identified<br>
+                                --6. Draw Trigger box based on Base entry<br>
+                                --   Bnr Trigger Box 48% MAX: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
+                                --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br>
+                                --7. Note Trigger box can only stay within the two zone
+                                --8. Enter either ON the base entry, or middle of the Trigger Box<br>
                                 --<br>
-                                --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5241,16 +5243,18 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Identify Entry Model (TPF Based or Support/Resistance Order Block Based)<br>
+                                --1. Identify Entry Model<br>
                                 --2. Identify Entry Time Frame<br>
-                                --3. Locate 1-2 zones to find entry<br>
-                                --4. Locate First TPF/OB BASE ENTRY in the Zone of the opposite Colour (Red for buy, Blue green for sell)<br>
-                                --5. Base Entry is last resistance/support before the rally. If on same level mark the order block on rally<br>
-                                --6. Draw Trigger box based on Base entry (TPF or OB) -> (TPF to OB, OB to TPF, OB to OB)<br>
-                                --7. Note Trigger box can only stay within the two zone, TPF entry max 32%, BNR entry max 48%<br>
-                                --8. Enter on the entry closer to the Base entry, Bottom/TOP or Mid which ever closer<br>
+                                --3. Locate 1 - 2 zones to find entry<br>
+                                --4. Locate Base OB/TPF (Red for buy, Blue green for sell)<br>
+                                --   Bnr Base Entry: Last Resistance/Support Order Block before the Rally<br>
+                                --   TPF Base Entry: On Clear TPF identified<br>
+                                --6. Draw Trigger box based on Base entry<br>
+                                --   Bnr Trigger Box 48% MAX: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
+                                --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br>
+                                --7. Note Trigger box can only stay within the two zone
+                                --8. Enter either ON the base entry, or middle of the Trigger Box<br>
                                 --<br>
-                                --50 Zone Must be Merged Top or merged bottom (Double Zone)<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9405,6 +9409,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

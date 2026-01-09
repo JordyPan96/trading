@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB/SR","8H/4H_OB to OB", "8H/4H_OB to TPF","8H/4H TPF", "8H/4H TPF Left Leg",
+                pattern_options = ["8H/4H_OB/SR","8H/4H_OB to OB", "8H/4H_OB to TPF","8H/4H_TPF to OB", "8H/4H TPF Left Leg",
                                    "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -3483,7 +3483,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB/SR","8H/4H_OB to TPF","8H/4H_OB to OB","8H/4H TPF", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H_OB/SR","8H/4H_OB to TPF","8H/4H_OB to OB","8H/4H_TPF to OB", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg",
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
@@ -3628,14 +3628,14 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF", "Variant 2 Daily TPF","8H/4H_OB to OB", "8H/4H TPF",  "8H/4H_OB to TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
-            '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H TPF",  "8H/4H_OB to TPF",
+                      "8H/4H_TPF to OB", "Variant 2 Daily TPF","8H/4H_OB to OB", "8H/4H_TPF to OB",  "8H/4H_OB to TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
+            '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to OB",  "8H/4H_OB to TPF",
                           "Variant 2 Daily TPF",  "8H/4H TPF Left Leg","8H/4H_OB/SR","Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "8H/4H TPF Left Leg", "Variant 2 Daily TPF","8H/4H_OB/SR","Variant Fakeout 2 Daily TPF"],
             '2_BNR_TPF': ["8H/4H_OB to OB",  "8H/4H_OB to TPF",
-                          "8H/4H TPF","8H/4H_OB/SR","Weekly TPF Left Leg","2 Daily TPF Left Leg", "Daily TPF Left Leg"]
+                          "8H/4H_TPF to OB","8H/4H_OB/SR","Weekly TPF Left Leg","2 Daily TPF Left Leg", "Daily TPF Left Leg"]
         }
 
         incompatible_map_18 = {
@@ -3647,9 +3647,9 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",  "Weekly TPF Left Leg",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H TPF",  "8H/4H TPF Left Leg"],
+                           "8H/4H_TPF to OB",  "8H/4H TPF Left Leg"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                           "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF","8H/4H TPF"]
+                           "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF","8H/4H_TPF to OB"]
         }
 
         incompatible_map_20 = {
@@ -4414,7 +4414,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.05
             elif (pattern == "Daily TPF Left Leg"):
                 pattern_multiplier = 1.0
-            elif (pattern == "8H/4H TPF"):
+            elif (pattern == "8H/4H_TPF to OB"):
                 pattern_multiplier = 1.0
             elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.0
@@ -9405,6 +9405,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

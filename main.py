@@ -4905,7 +4905,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             elif (pair in trade_curr or pair == "USDJPY"):
                                 base_target = 5.41
                             else:
-                                base_target = 4.41
+                                base_target = 5.41
                         else:
                             base_target = 5.41
 
@@ -4970,7 +4970,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             elif (pair in trade_curr or pair == "USDJPY"):
                                 base_target = 5.41
                             else:
-                                base_target = 4.41
+                                base_target = 5.41
                         else:
                             base_target = 5.41
 
@@ -9407,6 +9407,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

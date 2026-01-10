@@ -5241,13 +5241,13 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --4. Locate Base OB/TPF (Red for buy, Blue green for sell)<br>
                                 --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
                                 --   TPF Base Entry: On Clear TPF identified<br><br>
-                                --6. Draw Trigger box based on Base entry<br>
+                                --5. Draw Trigger box based on Base entry<br>
                                 --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
                                 --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
-                                --7. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
-                                --8. Calculate STOP loss base on box, min and max value, average it and place between<br>
-                                --9. Enter on first trigger box entry where SL covers the trigger box AND entry zone<br>
-                                --10. If there are two entry zones now narrow it down to one<br>
+                                --6. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
+                                --7. Calculate STOP loss base on box, min and max value, average it and place between<br>
+                                --8. Enter on first trigger box entry where SL covers the trigger box AND entry zone<br>
+                                --9. If there are two entry zones now narrow it down to one<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5262,13 +5262,13 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --4. Locate Base OB/TPF (Red for buy, Blue green for sell)<br>
                                 --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
                                 --   TPF Base Entry: On Clear TPF identified<br><br>
-                                --6. Draw Trigger box based on Base entry<br>
+                                --5. Draw Trigger box based on Base entry<br>
                                 --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
                                 --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
-                                --7. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
-                                --8. Calculate STOP loss base on box, min and max value, average it and place between<br>
-                                --9. Enter on first trigger box entry where SL covers the trigger box AND entry zone<br>
-                                --10. If there are two entry zones now narrow it down to one<br>
+                                --6. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
+                                --7. Calculate STOP loss base on box, min and max value, average it and place between<br>
+                                --8. Enter on first trigger box entry where SL covers the trigger box AND entry zone<br>
+                                --9. If there are two entry zones now narrow it down to one<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9423,6 +9423,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

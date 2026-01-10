@@ -3737,6 +3737,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Wave 3.5 - 4.999%-10.99%1": ['2_BNR_TPF'],
         }
 
+        incompatible_map_32 = {
+            "22_BNR_TPF": ["NA","0","+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -4003,6 +4008,10 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = incompatible_map_16.get(strategy, [])
             return [s for s in zone_from_leg_one if s not in available_zone_position]
 
+        def get_available_zone_position2(squeezeStrat,zone_list):
+            available_zone_position2 = incompatible_map_32.get(squeezeStrat, [])
+            return [s for s in zone_list if s not in available_zone_position2]
+
 
         def get_pair_prior_result(current_month_stats, selected_pair):
             if (len(current_month_stats) > 0):
@@ -4252,7 +4261,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                    available_pattern_trigger4)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
-            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position)
+            squeezeStrat = squeeze_559_time + risk_multiplier
+            available_zone_position2 = get_available_zone_position2(squeezeStrat,available_zone_position)
+            
+            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position2)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
@@ -9409,6 +9421,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

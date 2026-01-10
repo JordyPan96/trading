@@ -5234,6 +5234,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br><br>
                                 --7. Note Trigger box can only stay within the two zone<br>
                                 --8. Enter either ON the base entry, or middle of the Trigger Box<br>
+                                --9. SL MUST Cover Entry Zone
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5253,6 +5254,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   TPF Trigger Box 32% MAX: TPF to OB (Clear Near OB or Fib Level), ON TPF (Stop loss at Min Value)<br><br>
                                 --7. Note Trigger box can only stay within the two zone<br>
                                 --8. Enter either ON the base entry, or middle of the Trigger Box<br>
+                                --9. SL MUST Cover Entry Zone
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9407,6 +9409,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

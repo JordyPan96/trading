@@ -4936,7 +4936,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(550/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(650/32,0)+0.41
-                            elif(pair in trade_curr or pair == "USDJPY"):
+                            elif(pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
                                     base_target = round(200/32,0)+0.41
                                 elif(trend == "5%-6.99%"):
@@ -4949,6 +4949,20 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(275/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(325/32,0)+0.41
+                            elif(pair in trade_curr):
+                                if(trend == "3%-4.99%"):
+                                    base_target = round(200/17,0)+0.41
+                                elif(trend == "5%-6.99%"):
+                                    base_target = round(250/17,0)+0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(350/17,0)+0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(300/17,0)+0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(275/17,0)+0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(325/17,0)+0.41
+                                
                         elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
@@ -4963,7 +4977,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(160/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(1300/32,0)+0.41
-                            elif (pair in trade_curr or pair == "USDJPY"):
+                            elif (pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
                                     base_target = round(200/32,0)+0.41
                                 elif(trend == "5%-6.99%"):
@@ -4976,6 +4990,20 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(160/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(650/32,0)+0.41
+                            elif(pair in trade_curr):
+                                if(trend == "3%-4.99%"):
+                                    base_target = round(200/17,0)+0.41
+                                elif(trend == "5%-6.99%"):
+                                    base_target = round(250/17,0)+0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(350/17,0)+0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(300/17,0)+0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(160/17,0)+0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(650/17,0)+0.41
+                                
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -9424,6 +9452,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5251,7 +5251,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
                                 --6. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
                                 --7. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
-                                --8. Enter Middle of trigger box, only enter at TOP IF SL covers and a key level<br>
+                                --8. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
                                 --9. If there are two entry zones now narrow it down to one<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -5272,7 +5272,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
                                 --6. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
                                 --7. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
-                                --8. Enter Middle of trigger box, only enter at TOP IF SL covers and a key level<br>
+                                --8. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
                                 --9. If there are two entry zones now narrow it down to one<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -9428,6 +9428,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

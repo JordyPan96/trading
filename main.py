@@ -5245,8 +5245,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
                                 --   TPF Base Entry: On Clear TPF identified<br><br>
                                 --3. Draw Trigger box based on Base entry<br>
-                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
-                                --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
+                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Another OB)<br>
+                                --   TPF Trigger Box: TPF to OB (Clear Near Fib Level or OB if any)<br><br>
                                 --4. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
                                 --5. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
                                 --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
@@ -5264,8 +5264,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
                                 --   TPF Base Entry: On Clear TPF identified<br><br>
                                 --3. Draw Trigger box based on Base entry<br>
-                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Fib level)<br>
-                                --   TPF Trigger Box: TPF to OB (Clear Near OB or Fib Level)<br><br>
+                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Another OB)<br>
+                                --   TPF Trigger Box: TPF to OB (Clear Near Fib Level or OB if any)<br><br>
                                 --4. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
                                 --5. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
                                 --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
@@ -9424,6 +9424,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

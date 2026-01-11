@@ -4619,28 +4619,29 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 7.41)
+                        #exit_texte = compare_target(get_one_target(selected_pair), 7.41)
+                        exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = "559 Fib X.41"
 
                 else:
                     if (selected_pair == "XAUUSD"):
@@ -4649,28 +4650,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 6.41)
+                        exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide One (RR):"
-                        exit_text = compare_target(get_one_target(selected_pair), 5.41)
+                        exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
                 def get_entry_zone_plus_(pair_volatile, selected_pair):
 
@@ -9423,6 +9424,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

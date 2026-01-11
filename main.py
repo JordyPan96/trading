@@ -4574,12 +4574,12 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(21)
                     else:
                         return str(17)
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(21)
                     else:
                         return str(17)
                 elif (pair == "AUDUSD"):
@@ -4589,12 +4589,12 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(17)
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(32)
                     else:
                         return str(17)
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(32)
                     else:
                         return str(17)
                 elif (pair == "USDCAD"):
@@ -4604,9 +4604,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(17)
                 else:
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(21)
                     else:
-                        return str(17)
+                        return str(21)
 
 
             if (len(a_momemtum_text) < 1):
@@ -9424,6 +9424,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

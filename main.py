@@ -4860,7 +4860,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if(wave == "Wave 1"):
                             if(pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(900/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4873,7 +4873,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(650/25,0)+0.41
                             elif(pair in trade_curr or pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(450/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4887,7 +4887,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(900/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4900,7 +4900,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(125/25,0)+0.41
                             elif (pair in trade_curr or pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(450/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4925,7 +4925,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (wave == "Wave 1"):
                             if(pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(900/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4938,7 +4938,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(650/25,0)+0.41
                             elif(pair in trade_curr or pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(450/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4952,7 +4952,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(900/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4962,10 +4962,10 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(125/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(1300/25,0)+0.41
                             elif (pair in trade_curr or pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
-                                    base_target = round(450/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif(trend == "5%-6.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "7%-8.99%"):
@@ -4975,7 +4975,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(125/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(650/25,0)+0.41
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -9428,6 +9428,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

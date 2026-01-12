@@ -5270,8 +5270,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
                                 --3. Navigate to Pattern Trigger timeframe<br>
                                 --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
-                                --5. Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
+                                --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
+                                --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --7. Configure SL and target based on calculated or given value<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -5285,8 +5285,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
                                 --3. Navigate to Pattern Trigger timeframe<br>
                                 --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
-                                --5. Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
+                                --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
+                                --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --7. Configure SL and target based on calculated or given value<br>
                             </div>
                             """, unsafe_allow_html=True)
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

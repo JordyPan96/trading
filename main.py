@@ -4866,7 +4866,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(600/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(550/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4879,7 +4879,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(275/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4893,7 +4893,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(700/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(600/25,0)+0.41
+                                    base_target = round(450/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(125/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4906,7 +4906,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(125/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4931,7 +4931,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(700/32,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(600/32,0)+0.41
+                                    base_target = round(450/32,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(550/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4944,7 +4944,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/32,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/32,0)+0.41
+                                    base_target = round(225/32,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(275/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4957,7 +4957,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(275/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4972,7 +4972,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(700/32,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(600/32,0)+0.41
+                                    base_target = round(450/32,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(160/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4985,7 +4985,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/32,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/32,0)+0.41
+                                    base_target = round(225/32,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(160/32,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -4998,7 +4998,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "7%-8.99%"):
                                     base_target = round(350/25,0)+0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(300/25,0)+0.41
+                                    base_target = round(225/25,0)+0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(160/25,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
@@ -9452,6 +9452,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

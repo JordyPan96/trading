@@ -4415,11 +4415,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     trend_position_multiplier = 1.2
 
             if (pattern == "8H/4H_OB to OB"):
-                pattern_multiplier = 1.05
+                pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF Left Leg"):
                 pattern_multiplier = 1.1
             elif (pattern == "8H/4H_OB to TPF"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
                 pattern_multiplier = 1.2
             elif (pattern == "2 Daily TPF Left Leg"):
@@ -9452,6 +9452,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

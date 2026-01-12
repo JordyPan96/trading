@@ -4976,7 +4976,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
                                     base_target = round(7,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(7,0)+0.41
+                                    base_target = round(50,0)+0.41
                             elif(pair == "USDJPY"):
                                 if(trend == "3%-4.99%"):
                                     base_target = round(8,0)+0.41
@@ -9452,6 +9452,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5265,7 +5265,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br>
+                                Steps to enter a trade<br><br>
                                 --1. Do Top Down Analysis W/2D/D to identify entry model<br>
                                 --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
                                 --3. Navigate to Pattern Trigger timeframe<br>
@@ -5280,7 +5280,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br>
+                                Steps to enter a trade<br><br>
                                 --1. Do Top Down Analysis W/2D/D to identify entry model<br>
                                 --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
                                 --3. Navigate to Pattern Trigger timeframe<br>
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

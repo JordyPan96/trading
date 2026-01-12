@@ -436,7 +436,7 @@ def calculate_strategy_grade_static(strategy_name):
     strategy_grades = {
         # 1 Touch - fib>percentage>wick
 
-        '1_BNR': ("A", 1.0),  # Fib + wick/ob
+        '1_BNR': ("A", 0.91),  # Fib + wick/ob
         "1_BNR_TPF": ("A", 1.0),  # wick/ob
 
         # 2 Touch fib>wick>percentage
@@ -9450,6 +9450,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

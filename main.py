@@ -5265,18 +5265,13 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Locate 1 entry Zone for TPF EMs and 2 entry Zones for BNR EMs<br><br>
-                                --2. Locate Base OB/TPF (Red for buy, Green for sell)<br>
-                                --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
-                                --   TPF Base Entry: On Clear TPF identified<br><br>
-                                --3. Draw Trigger box based on Base entry<br>
-                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Another OB)<br>
-                                --   TPF Trigger Box: TPF to OB (Clear Near Fib Level or OB if any)<br><br>
-                                --4. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
-                                --5. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
+                                --1. Do Top Down Analysis W/2D/D to identify entry model<br><br>
+                                --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
+                                --3. Navigate to Pattern Trigger timeframe<br>
+                                --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
+                                --5. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
-                                --7. If there are two entry zones now narrow it down to one<br>
+                                --7. Configure SL and target based on calculated or given value<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5284,18 +5279,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                --EP (Entry Precision) Steps to Identify Entry <br><br>
-                                --1. Locate 1 entry Zone for TPF EMs and 2 entry Zones for BNR EMs<br><br>
-                                --2. Locate Base OB/TPF (Red for buy, Green for sell)<br>
-                                --   Bnr Base Entry: Last Support-Resistance, Order Block before the Rally<br>
-                                --   TPF Base Entry: On Clear TPF identified<br><br>
-                                --3. Draw Trigger box based on Base entry<br>
-                                --   Bnr Trigger Box: OB to TPF (Clear Near TPF structure), OB to OB (Self or Another OB)<br>
-                                --   TPF Trigger Box: TPF to OB (Clear Near Fib Level or OB if any)<br><br>
-                                --4. Note Trigger box can only stay within 2 zones for BNR and 1 zone for TPF<br>
-                                --5. Add 11/7/3 To Box %, and Place between min max value to find SL<br>
+                                --1. Do Top Down Analysis W/2D/D to identify entry model<br><br>
+                                --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
+                                --3. Navigate to Pattern Trigger timeframe<br>
+                                --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
+                                --5. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --6. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
-                                --7. If there are two entry zones now narrow it down to one<br>
+                                --7. Configure SL and target based on calculated or given value<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9450,6 +9440,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

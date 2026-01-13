@@ -4616,7 +4616,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         #exit_texte = compare_target(get_one_target(selected_pair), 7.41)
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
@@ -4624,21 +4624,21 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
 
                 else:
@@ -4647,28 +4647,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
                 def get_entry_zone_plus_(pair_volatile, selected_pair):
@@ -4691,7 +4691,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 8.41)
 
                         if (Variances == "786 - 91"):
@@ -4699,14 +4699,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
                         if (Variances == "786 - 91"):
@@ -4714,14 +4714,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 9.41)
 
                         if (Variances == "786 - 91"):
@@ -4729,14 +4729,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 9.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
                         if (Variances == "786 - 91"):
@@ -4744,7 +4744,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = compare_target(get_one_target(selected_pair), 7.41)
 
 
@@ -4754,28 +4754,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 7.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = compare_target(get_one_target(selected_pair), 6.41)
 
 
@@ -5024,7 +5024,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "32%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
                     elif (Variances == "559 - 66"):
@@ -5032,7 +5032,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "32%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
                     elif (Variances == "66 - 786"):
@@ -5040,7 +5040,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "32%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
 
@@ -5081,7 +5081,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
                                                     risk_multiplier) + "%, " + "box %," + " 32%"
-                        exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                        exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = targeting
 
                     elif (Variances == "559 - 66"):
@@ -5091,7 +5091,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
 
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
@@ -5100,7 +5100,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5108,7 +5108,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
 
                     elif (Variances == "66 - 786"):
@@ -5118,7 +5118,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
@@ -5126,7 +5126,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5134,7 +5134,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
@@ -5143,7 +5143,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
@@ -5151,7 +5151,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5159,7 +5159,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                     # if(risk_multiplier == "2_BNR"):
                     # exit_title = "Target Guide One:"
@@ -5196,7 +5196,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + "%, " + "box %," + " 32%"
-                            exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                            exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
@@ -5205,7 +5205,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5213,7 +5213,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
 
                         elif (Variances == "66 - 786"):
@@ -5223,7 +5223,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5231,7 +5231,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
@@ -5240,7 +5240,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5248,7 +5248,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + "%, " + "box %," + " 32%"
-                                exit_title = "Target Guide Replace With 559 Fib X.41 if not reach 559 Fib"
+                                exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
                         # if (risk_multiplier == "2_BNR"):
                         # exit_title = "Target Guide One:"
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

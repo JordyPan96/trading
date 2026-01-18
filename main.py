@@ -4447,9 +4447,9 @@ elif st.session_state.current_page == "Risk Calculation":
             if (pair_result == "N"):
                 prior_result_multiplier = 1.0
             elif (pair_result == "W"):
-                prior_result_multiplier = 1.15
+                prior_result_multiplier = 1.20
             elif (pair_result == "L"):
-                prior_result_multiplier = 0.91
+                prior_result_multiplier = 0.81
             elif (pair_result == "X"):
                 prior_result_multiplier = 0
 
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

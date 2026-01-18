@@ -4224,7 +4224,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             POI = st.selectbox(
-                "POI Type (Weekly or 2_Daily Fib depends on which one is clean)",
+                "POI Type (Weekly or 2_Daily Fib depends on which one is clean) - Whole Wave consists of at least 2 Weekly Candles",
                 available_time_frame_2)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
@@ -9443,6 +9443,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

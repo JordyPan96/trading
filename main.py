@@ -9111,7 +9111,7 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data2)
 
-    st.subheader("BE Rule - RR Based Refer Below)
+    st.subheader("BE Rule - RR Based Refer Below")
     table_data2 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF','Day Trades <11.41R','Swing Trades >=11.41R'],
         'Trigger Condition': ["Trigger at 2R",
@@ -9447,6 +9447,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

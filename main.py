@@ -6910,7 +6910,7 @@ elif st.session_state.current_page == "Active Opps":
                             if existing_poi == "Weekly Structure" or existing_poi == "Weekly":
                                 poi_display = "Weekly"
                             elif existing_poi == "Partial/Single Weekly Structure (1 Trade Allowed)" or existing_poi == "Partial/Single Weekly":
-                                poi_display = "Partial/Single Weekly"
+                                poi_display = "Partial"
                             elif existing_poi in poi_options:
                                 poi_display = existing_poi
 
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

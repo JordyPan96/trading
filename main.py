@@ -4228,7 +4228,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_wave_status = get_available_Wave_status(trend_position)
             cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
-            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H !! Only legs that have >= 2 Candles !!", ['0', '1', '2'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

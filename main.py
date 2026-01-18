@@ -4377,7 +4377,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
 
-            if (POI == 'Weekly Structure'):
+            if (POI == 'Whole Wave (3 Trade Allowed)'):
                 POI_multiplier = 1.0
             elif (POI == 'Partial Wave (1 Trade Allowed)'):
                 POI_multiplier = 1.0
@@ -9443,6 +9443,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

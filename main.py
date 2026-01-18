@@ -3487,7 +3487,7 @@ elif st.session_state.current_page == "Risk Calculation":
                   "Weekly TPF Left Leg",
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
-        time_frame = ['Weekly Structure', 'Two_Daily Structure']
+        time_frame = ['Weekly Structure', 'Partial/Single Weekly Structure (1 Trade Allowed)']
         _559_time = ['0', '1', '2']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3582,9 +3582,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_11 = {
-            "AUDJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
-            "GBPJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
-            "EURJPY": ['Two_Daily Structure', 'Daily BOS', '8H/4H BOS'],
+            "AUDJPY": ['Partial/Single Weekly Structure (1 Trade Allowed)', 'Daily BOS', '8H/4H BOS'],
+            "GBPJPY": ['Partial/Single Weekly Structure (1 Trade Allowed)', 'Daily BOS', '8H/4H BOS'],
+            "EURJPY": ['Partial/Single Weekly Structure (1 Trade Allowed)', 'Daily BOS', '8H/4H BOS'],
             "EURAUD": ['8H/4H BOS'],
             "GBPAUD": ['8H/4H BOS'],
         }
@@ -3613,7 +3613,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_15 = {
-            "Two_Daily Structure": [],
+            "Partial/Single Weekly Structure (1 Trade Allowed)": [],
 
         }
 
@@ -4379,7 +4379,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
-            elif (POI == 'Two_Daily Structure'):
+            elif (POI == 'Partial/Single Weekly Structure (1 Trade Allowed)'):
                 POI_multiplier = 1.0
 
             if (within_64 == 'Yes'):
@@ -6909,7 +6909,7 @@ elif st.session_state.current_page == "Active Opps":
 
                             if existing_poi == "Weekly Structure" or existing_poi == "Weekly":
                                 poi_display = "Weekly"
-                            elif existing_poi == "Two_Daily Structure" or existing_poi == "2_Daily":
+                            elif existing_poi == "Partial/Single Weekly Structure (1 Trade Allowed)" or existing_poi == "2_Daily":
                                 poi_display = "2_Daily"
                             elif existing_poi in poi_options:
                                 poi_display = existing_poi
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4547,7 +4547,7 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_one_target(selected_pair, wave,trend):
                 open_target_multiplier = 0
                 swing_tpf_pair = ["AUDUSD", "EURUSD", "GBPUSD", "USDJPY"]
-                swing_tpf_trend = ["3%-4.99%","5%-6.99%","7-8.99%"]
+                swing_tpf_trend = ["3%-4.99%","5%-6.99%","7%-8.99%"]
                 if(trend in swing_tpf_trend):
                     if (wave == "Wave 1" or wave == "Cross Wave 3.5 - 4.99"):
                         if (selected_pair in swing_tpf_pair):
@@ -9447,6 +9447,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

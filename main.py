@@ -1227,7 +1227,7 @@ if st.session_state.current_page == "Home":
 
             with col2:
                 # POI dropdown
-                poi_options = ["Weekly", "2_Daily"]
+                poi_options = ["Weekly", "Partial/Single Weekly"]
                 new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
@@ -6901,7 +6901,7 @@ elif st.session_state.current_page == "Active Opps":
                         # Additional required fields
                         col11, col12 = st.columns(2)
                         with col11:
-                            poi_options = ["Weekly", "2_Daily"]
+                            poi_options = ["Weekly", "Partial/Single Weekly"]
 
                             # Get existing POI value from record and map to dropdown options
                             existing_poi = record.get('poi', '')
@@ -6909,8 +6909,8 @@ elif st.session_state.current_page == "Active Opps":
 
                             if existing_poi == "Weekly Structure" or existing_poi == "Weekly":
                                 poi_display = "Weekly"
-                            elif existing_poi == "Partial/Single Weekly Structure (1 Trade Allowed)" or existing_poi == "2_Daily":
-                                poi_display = "2_Daily"
+                            elif existing_poi == "Partial/Single Weekly Structure (1 Trade Allowed)" or existing_poi == "Partial/Single Weekly":
+                                poi_display = "Partial/Single Weekly"
                             elif existing_poi in poi_options:
                                 poi_display = existing_poi
 
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -1227,7 +1227,7 @@ if st.session_state.current_page == "Home":
 
             with col2:
                 # POI dropdown
-                poi_options = ["Whole Wave", "Partial Wave"]
+                poi_options = ["Whole", "Partial"]
                 new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
@@ -6906,16 +6906,16 @@ elif st.session_state.current_page == "Active Opps":
                         # Additional required fields
                         col11, col12 = st.columns(2)
                         with col11:
-                            poi_options = ["Whole Wave", "Partial Wave"]
+                            poi_options = ["Whole", "Partial"]
 
                             # Get existing POI value from record and map to dropdown options
                             existing_poi = record.get('poi', '')
                             poi_display = "Whole Wave"  # Default
 
-                            if existing_poi == "Whole Wave" or existing_poi == "Whole Wave (3 Trade Allowed)":
-                                poi_display = "Whole Wave"
-                            elif existing_poi == "Partial Wave (1 Trade Allowed)" or existing_poi == "Partial Wave":
-                                poi_display = "Partial Wave"
+                            if existing_poi == "Whole" or existing_poi == "Whole Wave (3 Trade Allowed)":
+                                poi_display = "Whole"
+                            elif existing_poi == "Partial Wave (1 Trade Allowed)" or existing_poi == "Partial":
+                                poi_display = "Partial"
                             elif existing_poi in poi_options:
                                 poi_display = existing_poi
 
@@ -9447,6 +9447,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -9117,8 +9117,8 @@ elif st.session_state.current_page == "Guidelines":
         'Trigger Condition': ["BE at 2.5R",
                               'BE at 3R',
                               '', 'Trail Rules','Trail Rules'],
-        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
-                   "Trail 5 Pips Below/Above Entry",'Trail Behind 8H/4H Structures','Trail Behind Weekly Candles']
+        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', 
+                   "",'Trail Behind 8H/4H Structures','Trail Behind Weekly Candles']
     }
     st.table(table_data2)
 
@@ -9447,6 +9447,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

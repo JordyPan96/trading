@@ -9113,10 +9113,10 @@ elif st.session_state.current_page == "Guidelines":
 
     st.subheader("BE Rule - RR Based Refer Below")
     table_data2 = {
-        '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF','Day Trades <11.41R','Swing Trades >=11.41R'],
-        'Trigger Condition': ["Trigger at 2R",
-                              'Trigger at 2R',
-                              'Trigger at 3R', 'Trigger at 2.5R','Trail Rules','Trail Rules'],
+        '': ['Day Trades <11.41R', 'Swing Trades >=11.41R', '', 'Day Trades <11.41R','Swing Trades >=11.41R'],
+        'Trigger Condition': ["BE at 2.5R",
+                              'BE at 3R',
+                              '', 'Trail Rules','Trail Rules'],
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', "Trail 5 Pips Below/Above Entry",
                    "Trail 5 Pips Below/Above Entry",'Trail Behind 8H/4H Structures','Trail Behind Weekly Candles']
     }
@@ -9447,6 +9447,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4380,7 +4380,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (POI == 'Weekly Structure'):
                 POI_multiplier = 1.0
             elif (POI == 'Two_Daily Structure'):
-                POI_multiplier = 0.91
+                POI_multiplier = 1.0
 
             if (within_64 == 'Yes'):
                 sixone_multiplier = 1.1
@@ -9442,6 +9442,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

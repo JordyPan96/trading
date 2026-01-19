@@ -3417,6 +3417,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pip_value = pip_value_usd * aud_usd
             elif "CAD" in pair:
                 pip_value_usd = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
+                pip_value = pip_value_usd * aud_usd
             elif pair == "EURAUD" or pair == "GBPAUD":
                 pip_value_usd = 10 / get_aud_usd()
                 pip_value = pip_value_usd * aud_usd
@@ -3447,7 +3448,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
             elif pair == "EURAUD" or pair == "GBPAUD":
                 pip_value = 10 / get_aud_usd()
-                
+
 
             elif "CHF" in pair:
                 pip_value = 10 / get_usd_chf()

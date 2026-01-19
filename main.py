@@ -3360,17 +3360,6 @@ elif st.session_state.current_page == "Risk Calculation":
             return float(rate)  # Convert string to float!
 
 
-        def get_aud_usd():
-            """Get AUD/USD rate (e.g., 0.65 means 1 AUD = 0.65 USD)"""
-            url = "https://open.er-api.com/v6/latest/AUD"
-            try:
-                data = requests.get(url).json()
-                return float(data["rates"]["USD"])  # Direct AUD/USD rate
-            except:
-                st.warning("Failed to fetch AUD/USD. Using fallback: 0.6500")
-                return 0.65  # Fallback rate
-
-
         def get_usd_cad():
             url = "https://open.er-api.com/v6/latest/USD"
             try:
@@ -3391,17 +3380,6 @@ elif st.session_state.current_page == "Risk Calculation":
                 return 0
 
 
-        def get_aud_jpy():
-            """Get AUD/JPY rate"""
-            url = "https://open.er-api.com/v6/latest/AUD"
-            try:
-                data = requests.get(url).json()
-                return float(data["rates"]["JPY"])
-            except:
-                st.warning("Failed to fetch AUD/JPY. Using fallback: 85.00")
-                return 85.00  # Fallback rate
-
-
         def get_aud_usd():
             url = "https://open.er-api.com/v6/latest/AUD"
             try:
@@ -3412,111 +3390,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 return 0
 
 
-        def calculate_position_size(risk_amount_aud, stop_pips, pair):
-            """Calculate position size for AUD-based account"""
-            lot_size = 100000
-
-            # Get AUD/USD rate for conversions
-            aud_usd = get_aud_usd()
+        def calculate_position_size(risk_amount, stop_pips, pair):
+            lot_size = 100000  # Standard lot size (100,000 units)
 
             if "JPY" in pair:
-                if pair == "USDJPY":
-                    # USD/JPY: pip value in USD, convert to AUD
-                    usd_jpy = get_live_rate("USDJPY")
-                    pip_value_usd = 1000 / usd_jpy  # Pip value in USD
-                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
-                elif pair == "AUDJPY":
-                    # AUD/JPY: pip value in AUD
-                    aud_jpy = get_live_rate("AUDJPY")
-                    pip_value = 1000 / aud_jpy  # Pip value in AUD
-                else:
-                    # Other JPY pairs: get rate and convert to AUD
-                    pair_rate = get_live_rate(pair)
-                    base_currency = pair[:3]
-
-                    if base_currency == "AUD":
-                        # AUD/JPY already handled above
-                        pip_value = 1000 / pair_rate
-                    else:
-                        # Non-AUD base JPY pair (EUR/JPY, GBP/JPY, etc.)
-                        # Pip value in base currency, convert to AUD
-                        pip_value_base = 1000 / pair_rate
-                        # Get base currency to AUD rate
-                        if base_currency == "USD":
-                            pip_value = pip_value_base / aud_usd
-                        elif base_currency == "EUR":
-                            eur_aud = get_live_rate("EURAUD")
-                            pip_value = pip_value_base / eur_aud
-                        elif base_currency == "GBP":
-                            gbp_aud = get_live_rate("GBPAUD")
-                            pip_value = pip_value_base / gbp_aud
-                        else:
-                            # For other currencies, convert via USD
-                            base_usd = get_live_rate(base_currency + "USD")
-                            pip_value_usd = pip_value_base * base_usd
-                            pip_value = pip_value_usd / aud_usd
-
+                current_price = get_live_rate("USDJPY")  # Live rate for accuracy
+                pip_value = 1000 / current_price  # Precise JPY pip value
             elif "XAU" in pair:
-                # XAU/USD: pip value in USD, convert to AUD
-                pip_value_usd = lot_size * 0.001  # $10 per pip
-                pip_value = pip_value_usd / aud_usd  # Convert to AUD
+                # For XAU/USD, 1 pip = $0.01 per ounce for a standard lot
 
+                pip_value = lot_size * 0.001
             elif "CAD" in pair:
-                if pair == "USDCAD":
-                    # USD/CAD: pip value in CAD, convert to USD then AUD
-                    usd_cad = get_usd_cad()
-                    pip_value_cad = 10 / usd_cad  # Actually $10 per pip
-                    pip_value = pip_value_cad / aud_usd  # Convert to AUD
-                elif pair == "AUDCAD":
-                    # AUD/CAD: pip value in AUD
-                    pip_value = 10  # AUD 10 per pip
-                else:
-                    # Other CAD pairs
-                    quote_currency = pair[3:]
-                    if quote_currency == "CAD":
-                        # Base/CAD: pip value in CAD, convert to AUD
-                        # For simplicity, convert via USD
-                        usd_cad = get_usd_cad()
-                        pip_value_cad = 10  # CAD 10 per pip
-                        pip_value_usd = pip_value_cad / usd_cad  # Convert to USD
-                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
-
+                pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
             elif pair == "EURAUD" or pair == "GBPAUD":
-                # These already have AUD as quote currency
-                pip_value = 10  # AUD 10 per pip
+                pip_value = 10 / get_aud_usd()
 
             elif "CHF" in pair:
-                if pair == "USDCHF":
-                    # USD/CHF: pip value in CHF, convert to USD then AUD
-                    usd_chf = get_usd_chf()
-                    pip_value_chf = 10 / usd_chf  # Actually $10 per pip
-                    pip_value = pip_value_chf / aud_usd  # Convert to AUD
-                elif pair == "AUDCHF":
-                    # AUD/CHF: pip value in AUD
-                    pip_value = 10  # AUD 10 per pip
-                else:
-                    # Other CHF pairs
-                    pip_value_usd = 10  # Assume $10 per pip
-                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
-
+                pip_value = 10 / get_usd_chf()
             else:
-                # For other pairs
-                quote_currency = pair[3:]
+                # For other pairs, 1 pip = 0.0001
+                pip_value = lot_size * 0.0001
 
-                if quote_currency == "USD":
-                    # Pair like EUR/USD, GBP/USD, AUD/USD, etc.
-                    # Pip value is $10 per pip, convert to AUD
-                    pip_value_usd = 10
-                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
-                elif quote_currency == "AUD":
-                    # Pair like EUR/AUD, GBP/AUD (handled above)
-                    pip_value = 10  # AUD 10 per pip
-                else:
-                    # For other quote currencies, assume $10 equivalent
-                    pip_value_usd = 10
-                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
-
-            position_size = risk_amount_aud / (stop_pips * pip_value)
+            position_size = risk_amount / (stop_pips * pip_value)
             return round(position_size, 2)
 
 
@@ -3733,7 +3628,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
+                       "Variant 2 Daily TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
             '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib",  "8H/4H_OB to TPF",
                           "Variant 2 Daily TPF",  "8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg",
@@ -4368,7 +4263,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat,available_zone_position)
-
+            
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position2)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
@@ -4663,8 +4558,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         open_target_multiplier = 1
                 else:
                     open_target_multiplier = 1
-
-
+                    
+                
                 return open_target_multiplier
 
 
@@ -5070,7 +4965,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(7,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(7,0)+0.41
-
+                                
                         elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
@@ -5111,7 +5006,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(6,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(6,0)+0.41
-
+                                
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -9222,7 +9117,7 @@ elif st.session_state.current_page == "Guidelines":
         'Trigger Condition': ["BE at 2.5R",
                               'BE at 3R',
                               '', 'Trail Rules','Trail Rules'],
-        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry',
+        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', 
                    "",'Trail Behind 8H/4H Structures','Trail Behind 2_Daily/Weekly Candles']
     }
     st.table(table_data2)
@@ -9552,6 +9447,8 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
+
 
 
 

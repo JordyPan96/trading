@@ -1231,7 +1231,7 @@ if st.session_state.current_page == "Home":
                 new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
-                strategy_options = ["1_BNR","1_BNR_TPF","2_BNR","2_BNR_TPF"]
+                strategy_options = ["1_BNR", "1_BNR_TPF", "2_BNR", "2_BNR_TPF"]
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
@@ -1258,8 +1258,8 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB to OB", "8H/4H_OB to TPF","8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
-                                   "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"]
+                pattern_options = ["8H/4H_OB to OB", "8H/4H_OB to TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+                                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -1658,7 +1658,7 @@ elif st.session_state.current_page == "Account Overview":
         fig.update_xaxes(
             title_text="Trade Date",
             tickvals=x_values,  # Ticks at each trade position
-            ticktext=[str(i+1) for i in range(len(df))],  # Show 1, 2, 3... for each trade
+            ticktext=[str(i + 1) for i in range(len(df))],  # Show 1, 2, 3... for each trade
             row=1, col=1
         )
 
@@ -2684,7 +2684,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         ) * 100
 
                         # Add win rate column
-                        strategy_cross['Win_Rate_%'] = round(strategy_percent.get('Head', 0.0),2)
+                        strategy_cross['Win_Rate_%'] = round(strategy_percent.get('Head', 0.0), 2)
                         strategy_cross['Total_Trades'] = strategy_cross.sum(axis=1)
                         strategy_cross['Win_Rate_%'] = strategy_cross['Win_Rate_%'].fillna(0)
 
@@ -2724,7 +2724,7 @@ elif st.session_state.current_page == "Symbol Stats":
                         ) * 100
 
                         # Add win rate column
-                        pattern_cross['Win_Rate_%'] = round(pattern_percent.get('Head', 0),2)
+                        pattern_cross['Win_Rate_%'] = round(pattern_percent.get('Head', 0), 2)
                         pattern_cross['Total_Trades'] = pattern_cross.sum(axis=1)
                         pattern_cross['Win_Rate_%'] = pattern_cross['Win_Rate_%'].fillna(0)
 
@@ -3032,7 +3032,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
             return current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance
 
-        if(len(year_data)>0):
+
+        if (len(year_data) > 0):
             current_month_stats, monthly_loss_limit, monthly_actual_loss, ending_balance = calculate_monthly_stats_2(
                 year_data)
 
@@ -3360,6 +3361,17 @@ elif st.session_state.current_page == "Risk Calculation":
             return float(rate)  # Convert string to float!
 
 
+        def get_aud_usd():
+            """Get AUD/USD rate (e.g., 0.65 means 1 AUD = 0.65 USD)"""
+            url = "https://open.er-api.com/v6/latest/AUD"
+            try:
+                data = requests.get(url).json()
+                return float(data["rates"]["USD"])
+            except:
+                st.warning("Failed to fetch AUD/USD. Using fallback: 0.6500")
+                return 0.65
+
+
         def get_usd_cad():
             url = "https://open.er-api.com/v6/latest/USD"
             try:
@@ -3392,24 +3404,30 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def calculate_position_size(risk_amount, stop_pips, pair):
             lot_size = 100000  # Standard lot size (100,000 units)
+            aud_usd = get_aud_usd()
 
             if "JPY" in pair:
                 current_price = get_live_rate("USDJPY")  # Live rate for accuracy
-                pip_value = 1000 / current_price  # Precise JPY pip value
+                pip_value_usd = 1000 / current_price  # Precise JPY pip value
+                pip_value = pip_value_usd * aud_usd
             elif "XAU" in pair:
                 # For XAU/USD, 1 pip = $0.01 per ounce for a standard lot
 
-                pip_value = lot_size * 0.001
+                pip_value_usd = lot_size * 0.001
+                pip_value = pip_value_usd * aud_usd
             elif "CAD" in pair:
-                pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
+                pip_value_usd = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
             elif pair == "EURAUD" or pair == "GBPAUD":
-                pip_value = 10 / get_aud_usd()
+                pip_value_usd = 10 / get_aud_usd()
+                pip_value = pip_value_usd * aud_usd
 
             elif "CHF" in pair:
-                pip_value = 10 / get_usd_chf()
+                pip_value_usd = 10 / get_usd_chf()
+                pip_value = pip_value_usd * aud_usd
             else:
                 # For other pairs, 1 pip = 0.0001
-                pip_value = lot_size * 0.0001
+                pip_value_usd = lot_size * 0.0001
+                pip_value = pip_value_usd * aud_usd
 
             position_size = risk_amount / (stop_pips * pip_value)
             return round(position_size, 2)
@@ -3429,6 +3447,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pip_value = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
             elif pair == "EURAUD" or pair == "GBPAUD":
                 pip_value = 10 / get_aud_usd()
+                
 
             elif "CHF" in pair:
                 pip_value = 10 / get_usd_chf()
@@ -3483,7 +3502,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB to TPF","8H/4H_OB to OB","8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H_OB to TPF", "8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg",
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
@@ -3515,11 +3534,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_1b": [">=11.41"],
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
-        Variance = ["559 - 66", "66 - 786", "786 - 91","50"]
+        Variance = ["559 - 66", "66 - 786", "786 - 91", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PullBack)",
                            ">=13% (5% PullBack)"]
         zone_from_leg_one = ["NA", "0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
-        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave','Cross Wave 3.5 - 4.99']
+        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Wave', 'Cross Wave 3.5 - 4.99']
 
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
@@ -3590,7 +3609,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_12 = {
-            "3%-4.99%": ["1_BNR","2_BNR"],
+            "3%-4.99%": ["1_BNR", "2_BNR"],
             "XAUUSD5%-6.99%": [],
             "XAUUSD>=13%": [],
             ">=13%": [],
@@ -3620,7 +3639,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_16 = {
             "1_BNR": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
             "1_BNR_TPF": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "2_BNR": ["NA","0", "+3","+4", "+5", "+6", "+7", "+8", "+9", "+10"],
+            "2_BNR": ["NA", "0", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
             "2_BNR_TPF": ["NA"]
 
         }
@@ -3628,14 +3647,14 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                       "Variant 2 Daily TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
-            '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib",  "8H/4H_OB to TPF",
-                          "Variant 2 Daily TPF",  "8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
+            '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H_OB to TPF",
+                          "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF"],
-            '2_BNR_TPF': ["8H/4H_OB to OB",  "8H/4H_OB to TPF",
-                          "8H/4H_TPF to Fib","Weekly TPF Left Leg","2 Daily TPF Left Leg", "Daily TPF Left Leg"]
+                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"],
+            '2_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_OB to TPF",
+                          "8H/4H_TPF to Fib", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg"]
         }
 
         incompatible_map_18 = {
@@ -3645,11 +3664,11 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_19 = {
-            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",  "Weekly TPF Left Leg",
+            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H_TPF to Fib",  "8H/4H TPF Left Leg"],
+                           "8H/4H_TPF to Fib", "8H/4H TPF Left Leg"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                           "Variant 2 Daily TPF","Variant Fakeout 2 Daily TPF","8H/4H_TPF to Fib"]
+                           "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "8H/4H_TPF to Fib"]
         }
 
         incompatible_map_20 = {
@@ -3692,7 +3711,6 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_25 = {
             "2": [],
 
-
         }
 
         incompatible_map_26 = {
@@ -3703,14 +3721,13 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_27 = {
-            "Variant 2 Daily TPF": ['50','66 - 786','786 - 91'],
-            "Variant Fakeout 2 Daily TPF": ['50','559 - 66'],
+            "Variant 2 Daily TPF": ['50', '66 - 786', '786 - 91'],
+            "Variant Fakeout 2 Daily TPF": ['50', '559 - 66'],
 
         }
 
         incompatible_map_28 = {
             "2": ['>=2%'],
-
 
         }
 
@@ -3738,10 +3755,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_32 = {
-            "22_BNR_TPF": ["NA","0","+4", "+5", "+6", "+7", "+8", "+9", "+10"]
+            "22_BNR_TPF": ["NA", "0", "+4", "+5", "+6", "+7", "+8", "+9", "+10"]
 
         }
-
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -3871,6 +3887,7 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_strategy3 = incompatible_map_26.get(wave, [])
             return [s for s in strat_list if s not in disabled_strategy3]
 
+
         def get_available_pattern_trigger4(trend, strat_list):
             disabled_strategy4 = incompatible_map_30.get(trend, [])
             return [s for s in strat_list if s not in disabled_strategy4]
@@ -3920,6 +3937,7 @@ elif st.session_state.current_page == "Risk Calculation":
             diabled_64 = incompatible_map_6.get(position, [])
             return [s for s in list_available if s not in diabled_64]
 
+
         def get_available_64_4(squeeze, list_available):
             diabled_65 = incompatible_map_25.get(squeeze, [])
             return [s for s in list_available if s not in diabled_65]
@@ -3959,13 +3977,16 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_strategies_6 = incompatible_map_18.get(squeezetime, [])
             return [s for s in stratslist if s not in disabled_strategies_6]
 
+
         def get_available_strategies7(wavesqueeze, stratslist):
             disabled_strategies_7 = incompatible_map_29.get(wavesqueeze, [])
             return [s for s in stratslist if s not in disabled_strategies_7]
 
+
         def get_available_strategies8(wavetrendsqueeze, stratslist):
             disabled_strategies_8 = incompatible_map_31.get(wavetrendsqueeze, [])
             return [s for s in stratslist if s not in disabled_strategies_8]
+
 
         def get_available_variance(entry_model):
             available_variance = incompatible_map_3.get(entry_model, [])
@@ -3975,6 +3996,7 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_variance_2(trend, variancelist):
             available_variances = incompatible_map_10.get(trend, [])
             return [s for s in variancelist if s not in available_variances]
+
 
         def get_available_variance_3(shape, variancelist):
             available_variances2 = incompatible_map_27.get(shape, [])
@@ -4000,15 +4022,18 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length4 = incompatible_map_23.get(concat_text, [])
             return [s for s in list if s not in available_leg_length4]
 
+
         def get_available_leg_length5(squeeze, list):
             available_leg_length5 = incompatible_map_28.get(squeeze, [])
             return [s for s in list if s not in available_leg_length5]
+
 
         def get_available_zone_position(strategy):
             available_zone_position = incompatible_map_16.get(strategy, [])
             return [s for s in zone_from_leg_one if s not in available_zone_position]
 
-        def get_available_zone_position2(squeezeStrat,zone_list):
+
+        def get_available_zone_position2(squeezeStrat, zone_list):
             available_zone_position2 = incompatible_map_32.get(squeezeStrat, [])
             return [s for s in zone_list if s not in available_zone_position2]
 
@@ -4240,10 +4265,10 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_4 = get_available_strategies5(POI, available_strats_3)
             available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_4)
 
-            wavesqueeze = cross_fib+squeeze_559_time
+            wavesqueeze = cross_fib + squeeze_559_time
             available_strats_6 = get_available_strategies7(wavesqueeze, available_strats_5)
 
-            wavetrendsqueeze = cross_fib+trend_position+squeeze_559_time
+            wavetrendsqueeze = cross_fib + trend_position + squeeze_559_time
             available_strats_7 = get_available_strategies8(wavetrendsqueeze, available_strats_6)
 
             risk_multiplier = st.selectbox("Entry Model",
@@ -4262,8 +4287,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier
-            available_zone_position2 = get_available_zone_position2(squeezeStrat,available_zone_position)
-            
+            available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
+
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position2)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
@@ -4288,11 +4313,11 @@ elif st.session_state.current_page == "Risk Calculation":
             Variances = st.selectbox("Position Variance (Fib)", final_variance3)
 
             # available_rr = get_available_rr(risk_multiplier)
-            concat_risk_zone = risk_multiplier+Zone_Position
+            concat_risk_zone = risk_multiplier + Zone_Position
             available_64 = get_available_64(concat_risk_zone)
             # Potential = st.selectbox("Potential RR", available_rr)
 
-            #available_64 = get_available_64(risk_multiplier)
+            # available_64 = get_available_64(risk_multiplier)
             available_64_2 = get_available_64_2(selected_pair, available_64)
             available_64_3 = get_available_64_3(Variances, available_64_2)
             available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
@@ -4395,7 +4420,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # elif (Potential == '>=11.41'):
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
-                if(cross_fib == "Wave 1" or cross_fib == "Wave 2+" or cross_fib == "Cross Wave 3.5 - 4.99"):
+                if (cross_fib == "Wave 1" or cross_fib == "Wave 2+" or cross_fib == "Cross Wave 3.5 - 4.99"):
                     trend_position_multiplier = 0.91
 
             elif (trend_position == "5%-6.99%"):
@@ -4469,10 +4494,10 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (trend_position == "7%-8.99%"):
                             if (cross_fib == "Wave 1"):
                                 big_risk_multiplier = 1.5
-                            elif(cross_fib == "Wave 2+"):
+                            elif (cross_fib == "Wave 2+"):
                                 big_risk_multiplier = 1.1
-                        elif(trend_position == "9%-10.99%"):
-                            if(cross_fib == "Wave 2+"):
+                        elif (trend_position == "9%-10.99%"):
+                            if (cross_fib == "Wave 2+"):
                                 big_risk_multiplier = 1.1
 
             else:
@@ -4507,7 +4532,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
             target_in = 0
 
-            #1_BNR
+
+            # 1_BNR
             def getPairEntrySL(pair):
                 # target_in = 0
                 if (pair == "GBPUSD"):
@@ -4535,6 +4561,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     base_sl = "NA"
                     return str(base_entry), str(base_sl)
 
+
             entry_title = ""
             entry_text = ""
             SL_title = ""
@@ -4544,11 +4571,11 @@ elif st.session_state.current_page == "Risk Calculation":
             entry_pip, sl_pip = getPairEntrySL(selected_pair)
 
 
-            def get_one_target(selected_pair, wave,trend):
+            def get_one_target(selected_pair, wave, trend):
                 open_target_multiplier = 0
                 swing_tpf_pair = ["AUDUSD", "EURUSD", "GBPUSD", "USDJPY"]
-                swing_tpf_trend = ["3%-4.99%","5%-6.99%","7%-8.99%"]
-                if(trend in swing_tpf_trend):
+                swing_tpf_trend = ["3%-4.99%", "5%-6.99%", "7%-8.99%"]
+                if (trend in swing_tpf_trend):
                     if (wave == "Wave 1" or wave == "Cross Wave 3.5 - 4.99"):
                         if (selected_pair in swing_tpf_pair):
                             open_target_multiplier = 3
@@ -4558,19 +4585,18 @@ elif st.session_state.current_page == "Risk Calculation":
                         open_target_multiplier = 1
                 else:
                     open_target_multiplier = 1
-                    
-                
+
                 return open_target_multiplier
 
 
             def compare_target(open_target_multiplier, desire_target):
                 result = 0
-                if(open_target_multiplier <= 1):
-                    result = open_target_multiplier*desire_target
+                if (open_target_multiplier <= 1):
+                    result = open_target_multiplier * desire_target
                     return str(result)
                 elif (open_target_multiplier > 1):
-                    desire_target = desire_target-0.41
-                    result = (open_target_multiplier*desire_target)+0.41
+                    desire_target = desire_target - 0.41
+                    result = (open_target_multiplier * desire_target) + 0.41
                     return str(result)
 
 
@@ -4622,7 +4648,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = sl_pip + ", box %, " + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        #exit_texte = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 7.41)
+                        # exit_texte = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 7.41)
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
@@ -4697,7 +4723,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 8.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 8.41)
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
@@ -4705,14 +4731,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 8.41)
+                            exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 8.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 6.41)
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
@@ -4720,14 +4746,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 6.41)
+                            exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 9.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 9.41)
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
@@ -4735,14 +4761,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 9.41)
+                            exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 9.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 7.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 7.41)
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
@@ -4750,7 +4776,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                             SL_text = "17%, " + "box %," + " 32%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                            exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 7.41)
+                            exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 7.41)
 
 
                 else:
@@ -4760,28 +4786,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 7.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 7.41)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 6.41)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 6.41)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = compare_target(get_one_target(selected_pair,cross_fib,trend_position), 6.41)
+                        exit_text = compare_target(get_one_target(selected_pair, cross_fib, trend_position), 6.41)
 
 
 
@@ -4859,61 +4885,61 @@ elif st.session_state.current_page == "Risk Calculation":
                 def get_potential_target(trend, pair, wave, strategy):
                     base_target = 0.41
                     min_vol = 0.5
-                    if(strategy == "2_BNR"):
-                        if(wave == "Wave 1"):
-                            if(pair in europe_major or pair in gold_comm):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(400/25,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(500/25,0)+0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(700/25,0)+0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(450/25,0)+0.41
-                                elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(550/25,0)+0.41
-                                elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(650/25,0)+0.41
-                            elif(pair in trade_curr or pair == "USDJPY"):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(200/25,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(250/25,0)+0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(350/25,0)+0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(225/25,0)+0.41
-                                elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(275/25,0)+0.41
-                                elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(325/25,0)+0.41
-                        elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
+                    if (strategy == "2_BNR"):
+                        if (wave == "Wave 1"):
                             if (pair in europe_major or pair in gold_comm):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(400/25,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(500/25,0)+0.41
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(400 / 25, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(500 / 25, 0) + 0.41
                                 elif (trend == "7%-8.99%"):
-                                    base_target = round(700/25,0)+0.41
+                                    base_target = round(700 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(450/25,0)+0.41
+                                    base_target = round(450 / 25, 0) + 0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(550 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(650 / 25, 0) + 0.41
                             elif (pair in trade_curr or pair == "USDJPY"):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(200/25,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(250/25,0)+0.41
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(200 / 25, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(250 / 25, 0) + 0.41
                                 elif (trend == "7%-8.99%"):
-                                    base_target = round(350/25,0)+0.41
+                                    base_target = round(350 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(225/25,0)+0.41
+                                    base_target = round(225 / 25, 0) + 0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(275 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(125/25,0)+0.41
+                                    base_target = round(325 / 25, 0) + 0.41
+                        elif (wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
+                            if (pair in europe_major or pair in gold_comm):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(400 / 25, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(500 / 25, 0) + 0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(700 / 25, 0) + 0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(450 / 25, 0) + 0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(125 / 25, 0) + 0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(125 / 25, 0) + 0.41
+                            elif (pair in trade_curr or pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(200 / 25, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(250 / 25, 0) + 0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(350 / 25, 0) + 0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(225 / 25, 0) + 0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(125 / 25, 0) + 0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(125 / 25, 0) + 0.41
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -4926,87 +4952,87 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (strategy == "2_BNR_TPF"):
                         if (wave == "Wave 1"):
-                            if(pair in europe_major or pair in gold_comm):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(8,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(8,0)+0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(8,0)+0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(8,0)+0.41
-                                elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(8,0)+0.41
-                                elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(8,0)+0.41
-                            elif(pair == "USDJPY"):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(9,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(9,0)+0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(9,0)+0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(9,0)+0.41
-                                elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(9,0)+0.41
-                                elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(9,0)+0.41
-                            elif(pair in trade_curr):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(7,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(7,0)+0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(7,0)+0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(7,0)+0.41
-                                elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(7,0)+0.41
-                                elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(7,0)+0.41
-                                
-                        elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(7,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(7,0)+0.41
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(8, 0) + 0.41
                                 elif (trend == "7%-8.99%"):
-                                    base_target = round(7,0)+0.41
+                                    base_target = round(8, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(7,0)+0.41
+                                    base_target = round(8, 0) + 0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(7,0)+0.41
+                                    base_target = round(8, 0) + 0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(50,0)+0.41
-                            elif(pair == "USDJPY"):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(8,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(8,0)+0.41
+                                    base_target = round(8, 0) + 0.41
+                            elif (pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(9, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(9, 0) + 0.41
                                 elif (trend == "7%-8.99%"):
-                                    base_target = round(8,0)+0.41
+                                    base_target = round(9, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(8,0)+0.41
+                                    base_target = round(9, 0) + 0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(8,0)+0.41
+                                    base_target = round(9, 0) + 0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(8,0)+0.41
-                            elif(pair in trade_curr):
-                                if(trend == "3%-4.99%"):
-                                    base_target = round(6,0)+0.41
-                                elif(trend == "5%-6.99%"):
-                                    base_target = round(6,0)+0.41
+                                    base_target = round(9, 0) + 0.41
+                            elif (pair in trade_curr):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(7, 0) + 0.41
                                 elif (trend == "7%-8.99%"):
-                                    base_target = round(6,0)+0.41
+                                    base_target = round(7, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
-                                    base_target = round(6,0)+0.41
+                                    base_target = round(7, 0) + 0.41
                                 elif (trend == "11%-12.99% (3.5% PullBack)"):
-                                    base_target = round(6,0)+0.41
+                                    base_target = round(7, 0) + 0.41
                                 elif (trend == ">=13% (5% PullBack)"):
-                                    base_target = round(6,0)+0.41
-                                
+                                    base_target = round(7, 0) + 0.41
+
+                        elif (wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
+                            if (pair in europe_major or pair in gold_comm):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(7, 0) + 0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(50, 0) + 0.41
+                            elif (pair == "USDJPY"):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(8, 0) + 0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(8, 0) + 0.41
+                            elif (pair in trade_curr):
+                                if (trend == "3%-4.99%"):
+                                    base_target = round(6, 0) + 0.41
+                                elif (trend == "5%-6.99%"):
+                                    base_target = round(6, 0) + 0.41
+                                elif (trend == "7%-8.99%"):
+                                    base_target = round(6, 0) + 0.41
+                                elif (trend == "9%-10.99%"):
+                                    base_target = round(6, 0) + 0.41
+                                elif (trend == "11%-12.99% (3.5% PullBack)"):
+                                    base_target = round(6, 0) + 0.41
+                                elif (trend == ">=13% (5% PullBack)"):
+                                    base_target = round(6, 0) + 0.41
+
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -5017,11 +5043,12 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             base_target = 5.41
 
-                    if(base_target>=5.41):
+                    if (base_target >= 5.41):
                         return base_target
                     else:
                         base_target = 5.41
                         return base_target
+
 
                 if (selected_pair in minor_yens):
                     if (Variances == "786 - 91"):
@@ -5051,34 +5078,34 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 else:
 
-                    #if (
-                    #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
-                    #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                    #targeting = get_open_target(selected_pair)
-                    #elif (
-                    #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                    #targeting = get_open_target(selected_pair)
-                    #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                    #targeting = get_open_target(selected_pair)
-                    #else:
-                    #targeting = 5.41
-                    #elif (
-                    #selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
-                    #if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
-                    #if (big_risk_multiplier > 1):
-                    #total_target = get_sum_target()
-                    #compare_target = get_open_target(selected_pair) * 1.725
-                    #if (compare_target < total_target):
-                    #targeting = round(compare_target, 2)
-                    #else:
-                    #targeting = total_target
-                    #else:
-                    #targeting = get_open_target(selected_pair)
-                    #else:
-                    #targeting = get_open_target(selected_pair)
-                    #else:
-                    #targeting = get_open_target(selected_pair)
-                    targeting = get_potential_target(trend_position,selected_pair,cross_fib,risk_multiplier)
+                    # if (
+                    # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
+                    # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                    # targeting = get_open_target(selected_pair)
+                    # elif (
+                    # trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    # targeting = get_open_target(selected_pair)
+                    # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    # targeting = get_open_target(selected_pair)
+                    # else:
+                    # targeting = 5.41
+                    # elif (
+                    # selected_pair not in minors and selected_pair != "USDJPY" and selected_pair not in trade_curr):
+                    # if (trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
+                    # if (big_risk_multiplier > 1):
+                    # total_target = get_sum_target()
+                    # compare_target = get_open_target(selected_pair) * 1.725
+                    # if (compare_target < total_target):
+                    # targeting = round(compare_target, 2)
+                    # else:
+                    # targeting = total_target
+                    # else:
+                    # targeting = get_open_target(selected_pair)
+                    # else:
+                    # targeting = get_open_target(selected_pair)
+                    # else:
+                    # targeting = get_open_target(selected_pair)
+                    targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier)
 
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide:"
@@ -5171,30 +5198,30 @@ elif st.session_state.current_page == "Risk Calculation":
                     # exit_text = "-0.1 On 2_BNR Target FIB"
 
                     if (selected_pair == "XAUUSD"):
-                        #if (
-                        #trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
-                        #if (trend_position == "9%-10.99%" and within_64 == "Yes"):
-                        #targeting = get_open_target(selected_pair)
-                        #elif (
-                        #trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                        #targeting = get_open_target(selected_pair)
-                        #elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
-                        #targeting = get_open_target(selected_pair)
-                        #else:
-                        #targeting = 5.41
-                        #elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
-                        #if (big_risk_multiplier > 1):
-                        #total_target = get_sum_target()
-                        #compare_target = get_open_target(selected_pair) * 1.725
-                        #if (compare_target < total_target):
-                        #targeting = round(compare_target, 2)
-                        #else:
-                        #targeting = total_target
-                        #else:
-                        #targeting = get_open_target(selected_pair)
-                        #else:
-                        #targeting = get_open_target(selected_pair)
-                        targeting = get_potential_target(trend_position, selected_pair, cross_fib,risk_multiplier)
+                        # if (
+                        # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PullBack)" or trend_position == ">=13%"):
+                        # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                        # targeting = get_open_target(selected_pair)
+                        # elif (
+                        # trend_position == "11%-12.99% (3.5% PullBack)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        # targeting = get_open_target(selected_pair)
+                        # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        # targeting = get_open_target(selected_pair)
+                        # else:
+                        # targeting = 5.41
+                        # elif (trend_position == "7%-8.99%" or trend_position == "5%-6.99%"):
+                        # if (big_risk_multiplier > 1):
+                        # total_target = get_sum_target()
+                        # compare_target = get_open_target(selected_pair) * 1.725
+                        # if (compare_target < total_target):
+                        # targeting = round(compare_target, 2)
+                        # else:
+                        # targeting = total_target
+                        # else:
+                        # targeting = get_open_target(selected_pair)
+                        # else:
+                        # targeting = get_open_target(selected_pair)
+                        targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
@@ -6682,50 +6709,50 @@ elif st.session_state.current_page == "Active Opps":
 
                         if expected_stop_pips is not None:
                             be_mult = 0
-                            if(record['risk_multiplier'] == '1_BNR' or record['risk_multiplier'] == '1_BNR_TPF'):
+                            if (record['risk_multiplier'] == '1_BNR' or record['risk_multiplier'] == '1_BNR_TPF'):
                                 be_mult = 2.5
-                            elif(record['risk_multiplier'] == '2_BNR'):
+                            elif (record['risk_multiplier'] == '2_BNR'):
                                 be_mult = 3
-                            elif(record['risk_multiplier'] == '2_BNR_TPF'):
+                            elif (record['risk_multiplier'] == '2_BNR_TPF'):
                                 be_mult = 2.5
 
-                            if(entry_price > exit_price):
-                                if('XAU' in record['selected_pair']):
-                                    pip_size = round(1 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price + be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
+                            if (entry_price > exit_price):
+                                if ('XAU' in record['selected_pair']):
+                                    pip_size = round(1 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price + be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
                                     st.write("BE Price: " + str(BE_Price))
-                                elif('JPY' in record['selected_pair']):
-                                    pip_size = round(0.01 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price + be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
-                                    st.write("BE Price: " + str(BE_Price))
-                                else:
-                                    pip_size = round(0.0001 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price + be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
-                                    st.write("BE Price: " + str(BE_Price))
-                            elif(entry_price < exit_price):
-                                if('XAU' in record['selected_pair']):
-                                    pip_size = round(1 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price - be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
-                                    st.write("BE Price: " + str(BE_Price))
-                                elif('JPY' in record['selected_pair']):
-                                    pip_size = round(0.01 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price - be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
+                                elif ('JPY' in record['selected_pair']):
+                                    pip_size = round(0.01 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price + be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
                                     st.write("BE Price: " + str(BE_Price))
                                 else:
-                                    pip_size = round(0.0001 * expected_stop_pips,5)
-                                    be_distance = round(be_mult * pip_size,5)
-                                    BE_Price = round(entry_price - be_distance,5)
-                                    set_global(record['selected_pair'],BE_Price)
+                                    pip_size = round(0.0001 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price + be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
+                                    st.write("BE Price: " + str(BE_Price))
+                            elif (entry_price < exit_price):
+                                if ('XAU' in record['selected_pair']):
+                                    pip_size = round(1 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price - be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
+                                    st.write("BE Price: " + str(BE_Price))
+                                elif ('JPY' in record['selected_pair']):
+                                    pip_size = round(0.01 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price - be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
+                                    st.write("BE Price: " + str(BE_Price))
+                                else:
+                                    pip_size = round(0.0001 * expected_stop_pips, 5)
+                                    be_distance = round(be_mult * pip_size, 5)
+                                    BE_Price = round(entry_price - be_distance, 5)
+                                    set_global(record['selected_pair'], BE_Price)
                                     st.write("BE Price: " + str(BE_Price))
 
                         # Check required fields
@@ -8649,7 +8676,6 @@ elif st.session_state.current_page == "Trade Signal":
                             BE_symbol_price = get_global(trade['selected_pair'])
                             st.write("BE Price: " + str(BE_symbol_price))
 
-
                         with col3:
                             tp_price = safe_float(trade.get('target_price'), 0.0)
                             st.write(f"**Take Profit:** {tp_price:.5f}")
@@ -8753,8 +8779,8 @@ elif st.session_state.current_page == "Trade Signal":
                             st.write(f"**Take Profit:** {tp_price:.5f}")
                             BE_symbol_price = get_global(position['symbol'])
                             st.write("BE Price: " + str(BE_symbol_price))
-                            #st.write(f"**3R BE Price (Top of Pullback leg to target >=50%):** {threeR_price:.5f}")
-                            #st.write(f"**First Trail Price:** {first_trail_price:.5f}")
+                            # st.write(f"**3R BE Price (Top of Pullback leg to target >=50%):** {threeR_price:.5f}")
+                            # st.write(f"**First Trail Price:** {first_trail_price:.5f}")
 
                         # MODIFY SL ONLY SECTION
                         st.markdown("---")
@@ -9095,8 +9121,8 @@ elif st.session_state.current_page == "Guidelines":
 
     st.table(table_data)
     st.header('Variant Rules (Only for 2 Daily TPF Left V Leg)')
-    #st.subheader(
-    #"Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
+    # st.subheader(
+    # "Length Requirement for First/Middle Leg (Left shoulder rejected out of 559 zone, Mid leg out of POI next fib zone)")
     st.subheader("2_BNR_TPF")
 
     table_data2 = {
@@ -9113,16 +9139,16 @@ elif st.session_state.current_page == "Guidelines":
 
     st.subheader("BE Rule - RR Based Refer Below")
     table_data2 = {
-        '': ['Day Trades <11.41R', 'Swing Trades >=11.41R', '', 'Day Trades <11.41R','Swing Trades >=11.41R'],
+        '': ['Day Trades <11.41R', 'Swing Trades >=11.41R', '', 'Day Trades <11.41R', 'Swing Trades >=11.41R'],
         'Trigger Condition': ["BE at 2.5R",
                               'BE at 3R',
-                              '', 'Trail Rules','Trail Rules'],
-        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', 
-                   "",'Trail Behind 8H/4H Structures','Trail Behind 2_Daily/Weekly Candles']
+                              '', 'Trail Rules', 'Trail Rules'],
+        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry',
+                   "", 'Trail Behind 8H/4H Structures', 'Trail Behind 2_Daily/Weekly Candles']
     }
     st.table(table_data2)
 
-    #st.subheader("First Trail Rules")
+    # st.subheader("First Trail Rules")
     table_data3 = {
         '': ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF'],
         'Trigger Condition': ["Trigger at 4R", 'Trigger at 4R', 'Trigger at 4R', 'Trigger at 4R'],
@@ -9130,22 +9156,25 @@ elif st.session_state.current_page == "Guidelines":
                    'Behind first 8H Structure or huge candle, then no further trailing',
                    "Behind first 8H Structure or huge candle", "Behind first 8H Structure or huge candle"]
     }
-    #st.table(table_data3)
+    # st.table(table_data3)
 
-    #st.subheader("Second+ Trail Rules")
+    # st.subheader("Second+ Trail Rules")
     table_data4 = {
         '': ['2_BNR', '2_BNR_TPF'],
         'Trigger Condition': ["After every 2 Daily Candle formation", 'After every 2 Daily Candle formation'],
         'Action': ["After 2 Daily huge candle or structure",
                    'After 2 Daily huge candle or structure']
     }
-    #st.table(table_data4)
+    # st.table(table_data4)
 
     st.subheader("Retake Rules - Project Per Fib")
     table_data5 = {
-        '': ['1_BNR','1_BNR','1_BNR','','1_BNR_TPF','1_BNR_TPF','1_BNR_TPF','','2_BNR','2_BNR','2_BNR','','2_BNR_TPF','2_BNR_TPF','2_BNR_TPF'],
-        'Result': ["Win", 'Loss','BE', '','Win', 'Loss','BE','',"Win", 'Loss','BE','',"Win", 'Loss','BE'],
-        'Retake Rule': ["-> 1.. 2_BNR", "-> 1.. 2_BNR/2_BNR_TPF (Take only if its a Edge Sweep not Tail)", '-> 2.. 2_BNR_TPF', '',"NO RETAKE","NO RETAKE", "NO RETAKE",'',"NO RETAKE","-> 2.. 2_BNR_TPF","NO RETAKE", '',"NO RETAKE","NO RETAKE","NO RETAKE"]
+        '': ['1_BNR', '1_BNR', '1_BNR', '', '1_BNR_TPF', '1_BNR_TPF', '1_BNR_TPF', '', '2_BNR', '2_BNR', '2_BNR', '',
+             '2_BNR_TPF', '2_BNR_TPF', '2_BNR_TPF'],
+        'Result': ["Win", 'Loss', 'BE', '', 'Win', 'Loss', 'BE', '', "Win", 'Loss', 'BE', '', "Win", 'Loss', 'BE'],
+        'Retake Rule': ["-> 1.. 2_BNR", "-> 1.. 2_BNR/2_BNR_TPF (Take only if its a Edge Sweep not Tail)",
+                        '-> 2.. 2_BNR_TPF', '', "NO RETAKE", "NO RETAKE", "NO RETAKE", '', "NO RETAKE",
+                        "-> 2.. 2_BNR_TPF", "NO RETAKE", '', "NO RETAKE", "NO RETAKE", "NO RETAKE"]
     }
     st.table(table_data5)
 
@@ -9447,7 +9476,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

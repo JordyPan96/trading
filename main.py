@@ -3414,93 +3414,107 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def calculate_position_size(risk_amount_aud, stop_pips, pair):
             """Calculate position size for AUD-based account"""
-            lot_size = 100000  # Standard lot size (100,000 units)
+            lot_size = 100000
 
             # Get AUD/USD rate for conversions
             aud_usd = get_aud_usd()
 
             if "JPY" in pair:
                 if pair == "USDJPY":
-                    # USD/JPY - pip value in USD, convert to AUD
-                    current_price = get_live_rate("USDJPY")
-                    pip_value_usd = 1000 / current_price  # Pip value in USD
+                    # USD/JPY: pip value in USD, convert to AUD
+                    usd_jpy = get_live_rate("USDJPY")
+                    pip_value_usd = 1000 / usd_jpy  # Pip value in USD
                     pip_value = pip_value_usd / aud_usd  # Convert to AUD
                 elif pair == "AUDJPY":
-                    # AUD/JPY - pip value in AUD
-                    current_price = get_aud_jpy()
-                    pip_value = 1000 / current_price  # Pip value in AUD
+                    # AUD/JPY: pip value in AUD
+                    aud_jpy = get_live_rate("AUDJPY")
+                    pip_value = 1000 / aud_jpy  # Pip value in AUD
                 else:
-                    # Other JPY pairs (EUR/JPY, GBP/JPY, etc.)
-                    # Get the pair rate and calculate pip value in base currency
-                    current_price = get_live_rate(pair)
+                    # Other JPY pairs: get rate and convert to AUD
+                    pair_rate = get_live_rate(pair)
                     base_currency = pair[:3]
 
-                    if base_currency == "EUR":
-                        # Need EUR/AUD rate to convert to AUD
-                        eur_aud_rate = get_live_rate("EURAUD") if pair != "EURAUD" else current_price
-                        pip_value_eur = 1000 / current_price  # Pip value in EUR
-                        pip_value = pip_value_eur * (1 / eur_aud_rate)  # Convert to AUD
+                    if base_currency == "AUD":
+                        # AUD/JPY already handled above
+                        pip_value = 1000 / pair_rate
                     else:
-                        # For other base currencies, use AUD/USD as intermediary
-                        current_price = get_live_rate(pair)
-                        pip_value_base = 1000 / current_price  # Pip value in base currency
-                        # Convert base currency to AUD via USD
-                        base_to_usd = get_live_rate(
-                            base_currency + "USD") if base_currency + "USD" != pair else 1 / current_price
-                        pip_value = pip_value_base / (base_to_usd * aud_usd)
+                        # Non-AUD base JPY pair (EUR/JPY, GBP/JPY, etc.)
+                        # Pip value in base currency, convert to AUD
+                        pip_value_base = 1000 / pair_rate
+                        # Get base currency to AUD rate
+                        if base_currency == "USD":
+                            pip_value = pip_value_base / aud_usd
+                        elif base_currency == "EUR":
+                            eur_aud = get_live_rate("EURAUD")
+                            pip_value = pip_value_base / eur_aud
+                        elif base_currency == "GBP":
+                            gbp_aud = get_live_rate("GBPAUD")
+                            pip_value = pip_value_base / gbp_aud
+                        else:
+                            # For other currencies, convert via USD
+                            base_usd = get_live_rate(base_currency + "USD")
+                            pip_value_usd = pip_value_base * base_usd
+                            pip_value = pip_value_usd / aud_usd
 
             elif "XAU" in pair:
-                # XAU/USD - pip value in USD, convert to AUD
+                # XAU/USD: pip value in USD, convert to AUD
                 pip_value_usd = lot_size * 0.001  # $10 per pip
                 pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
             elif "CAD" in pair:
                 if pair == "USDCAD":
-                    # USD/CAD - pip value in CAD, convert to AUD via USD
+                    # USD/CAD: pip value in CAD, convert to USD then AUD
                     usd_cad = get_usd_cad()
-                    pip_value_cad = 10 / usd_cad  # Pip value in USD
+                    pip_value_cad = 10 / usd_cad  # Actually $10 per pip
                     pip_value = pip_value_cad / aud_usd  # Convert to AUD
                 elif pair == "AUDCAD":
-                    # AUD/CAD - pip value in AUD
-                    pip_value = lot_size * 0.0001  # Standard pip value in AUD
+                    # AUD/CAD: pip value in AUD
+                    pip_value = 10  # AUD 10 per pip
                 else:
-                    # Other CAD pairs (EUR/CAD, GBP/CAD, etc.)
-                    pip_value = lot_size * 0.0001  # Assume standard, will convert
+                    # Other CAD pairs
+                    quote_currency = pair[3:]
+                    if quote_currency == "CAD":
+                        # Base/CAD: pip value in CAD, convert to AUD
+                        # For simplicity, convert via USD
+                        usd_cad = get_usd_cad()
+                        pip_value_cad = 10  # CAD 10 per pip
+                        pip_value_usd = pip_value_cad / usd_cad  # Convert to USD
+                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
             elif pair == "EURAUD" or pair == "GBPAUD":
-                # These are special cases where AUD is quote currency
-                # Pip value is in AUD already
-                pip_value = lot_size * 0.0001
+                # These already have AUD as quote currency
+                pip_value = 10  # AUD 10 per pip
 
             elif "CHF" in pair:
                 if pair == "USDCHF":
-                    # USD/CHF - pip value in CHF, convert to AUD via USD
+                    # USD/CHF: pip value in CHF, convert to USD then AUD
                     usd_chf = get_usd_chf()
-                    pip_value_chf = 10 / usd_chf  # Pip value in USD
+                    pip_value_chf = 10 / usd_chf  # Actually $10 per pip
                     pip_value = pip_value_chf / aud_usd  # Convert to AUD
+                elif pair == "AUDCHF":
+                    # AUD/CHF: pip value in AUD
+                    pip_value = 10  # AUD 10 per pip
                 else:
                     # Other CHF pairs
-                    pip_value = lot_size * 0.0001  # Will convert below
+                    pip_value_usd = 10  # Assume $10 per pip
+                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
             else:
-                # For other pairs (EUR/USD, GBP/USD, AUD/USD, etc.)
-                if pair == "AUDUSD":
-                    # AUD/USD - pip value in AUD
-                    pip_value = lot_size * 0.0001
-                else:
-                    # Non-AUD pairs - pip value in quote currency, convert to AUD
-                    # Get the pair's quote currency
-                    quote_currency = pair[3:]
+                # For other pairs
+                quote_currency = pair[3:]
 
-                    if quote_currency == "USD":
-                        # Pair like EUR/USD - pip value in USD
-                        pip_value_usd = lot_size * 0.0001
-                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
-                    else:
-                        # For other quote currencies, we need more conversion
-                        # For simplicity, use standard pip value and convert via USD
-                        pip_value_usd = lot_size * 0.0001
-                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
+                if quote_currency == "USD":
+                    # Pair like EUR/USD, GBP/USD, AUD/USD, etc.
+                    # Pip value is $10 per pip, convert to AUD
+                    pip_value_usd = 10
+                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
+                elif quote_currency == "AUD":
+                    # Pair like EUR/AUD, GBP/AUD (handled above)
+                    pip_value = 10  # AUD 10 per pip
+                else:
+                    # For other quote currencies, assume $10 equivalent
+                    pip_value_usd = 10
+                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
             position_size = risk_amount_aud / (stop_pips * pip_value)
             return round(position_size, 2)

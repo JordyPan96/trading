@@ -3355,48 +3355,20 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_live_rate(pair):
             url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")
-            try:
-                response = requests.get(url).json()
-                rate = response["rates"][pair[3:]]  # Quote currency (e.g., "JPY")
-                return float(rate)  # Convert string to float!
-            except:
-                st.warning(f"Failed to fetch live rate for {pair}. Using fallback calculation.")
-                return None
+            response = requests.get(url).json()
+            rate = response["rates"][pair[3:]]  # Quote currency (e.g., "JPY")
+            return float(rate)  # Convert string to float!
 
 
-        def get_aud_rate(currency):
-            """Get AUD/currency rate. For example, get_aud_rate('USD') returns AUD/USD rate."""
-            if currency == "AUD":
-                return 1.0
-
-            url = f"https://open.er-api.com/v6/latest/AUD"
+        def get_aud_usd():
+            """Get AUD/USD rate (e.g., 0.65 means 1 AUD = 0.65 USD)"""
+            url = "https://open.er-api.com/v6/latest/AUD"
             try:
                 data = requests.get(url).json()
-                if currency in data["rates"]:
-                    if currency == "USD":
-                        # Direct rate for AUD/USD
-                        return float(data["rates"]["USD"])
-                    else:
-                        # For other currencies, get AUD/currency rate
-                        return float(data["rates"][currency])
+                return float(data["rates"]["USD"])  # Direct AUD/USD rate
             except:
-                st.warning(f"Failed to fetch AUD/{currency} rate.")
-            return None
-
-
-        def get_usd_rate(currency):
-            """Get USD/currency rate. For example, get_usd_rate('JPY') returns USD/JPY rate."""
-            if currency == "USD":
-                return 1.0
-
-            url = "https://open.er-api.com/v6/latest/USD"
-            try:
-                data = requests.get(url).json()
-                if currency in data["rates"]:
-                    return float(data["rates"][currency])
-            except:
-                st.warning(f"Failed to fetch USD/{currency} rate.")
-            return None
+                st.warning("Failed to fetch AUD/USD. Using fallback: 0.6500")
+                return 0.65  # Fallback rate
 
 
         def get_usd_cad():
@@ -3419,6 +3391,17 @@ elif st.session_state.current_page == "Risk Calculation":
                 return 0
 
 
+        def get_aud_jpy():
+            """Get AUD/JPY rate"""
+            url = "https://open.er-api.com/v6/latest/AUD"
+            try:
+                data = requests.get(url).json()
+                return float(data["rates"]["JPY"])
+            except:
+                st.warning("Failed to fetch AUD/JPY. Using fallback: 85.00")
+                return 85.00  # Fallback rate
+
+
         def get_aud_usd():
             url = "https://open.er-api.com/v6/latest/AUD"
             try:
@@ -3430,92 +3413,97 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
         def calculate_position_size(risk_amount_aud, stop_pips, pair):
-            """Calculate position size for AUD-based account."""
+            """Calculate position size for AUD-based account"""
             lot_size = 100000  # Standard lot size (100,000 units)
-            base_currency = pair[:3]
-            quote_currency = pair[3:]
 
             # Get AUD/USD rate for conversions
-            aud_usd_rate = get_aud_rate("USD")
+            aud_usd = get_aud_usd()
 
             if "JPY" in pair:
-                # For JPY pairs (e.g., USD/JPY, AUD/JPY)
-                if "USD" in pair:
-                    # USD/JPY - need to convert pip value to AUD
-                    usd_jpy_rate = get_usd_rate("JPY")
-                    if usd_jpy_rate:
-                        pip_value_usd = 1000 / usd_jpy_rate  # Pip value in USD
-                        if aud_usd_rate:
-                            pip_value = pip_value_usd * aud_usd_rate  # Convert to AUD
-                        else:
-                            pip_value = pip_value_usd * 0.65  # Fallback AUD/USD rate
-                    else:
-                        pip_value = 1000 / 110.0 * 0.65  # Fallback USD/JPY and AUD/USD
-                elif "AUD" in pair:
-                    # AUD/JPY
-                    aud_jpy_rate = get_aud_rate("JPY")
-                    if aud_jpy_rate:
-                        pip_value = 1000 / aud_jpy_rate  # Pip value in AUD
-                    else:
-                        pip_value = 1000 / 85.0  # Fallback AUD/JPY rate
+                if pair == "USDJPY":
+                    # USD/JPY - pip value in USD, convert to AUD
+                    current_price = get_live_rate("USDJPY")
+                    pip_value_usd = 1000 / current_price  # Pip value in USD
+                    pip_value = pip_value_usd / aud_usd  # Convert to AUD
+                elif pair == "AUDJPY":
+                    # AUD/JPY - pip value in AUD
+                    current_price = get_aud_jpy()
+                    pip_value = 1000 / current_price  # Pip value in AUD
                 else:
-                    # Other JPY pairs (e.g., EUR/JPY)
-                    # Need to convert from EUR/JPY pip value to AUD
-                    eur_jpy_rate = get_live_rate(pair)
-                    if eur_jpy_rate:
-                        pip_value_eur = 1000 / eur_jpy_rate  # Pip value in EUR
-                        aud_eur_rate = get_aud_rate("EUR")
-                        if aud_eur_rate:
-                            pip_value = pip_value_eur * aud_eur_rate  # Convert to AUD
-                        else:
-                            pip_value = pip_value_eur * 1.6  # Fallback AUD/EUR rate
+                    # Other JPY pairs (EUR/JPY, GBP/JPY, etc.)
+                    # Get the pair rate and calculate pip value in base currency
+                    current_price = get_live_rate(pair)
+                    base_currency = pair[:3]
+
+                    if base_currency == "EUR":
+                        # Need EUR/AUD rate to convert to AUD
+                        eur_aud_rate = get_live_rate("EURAUD") if pair != "EURAUD" else current_price
+                        pip_value_eur = 1000 / current_price  # Pip value in EUR
+                        pip_value = pip_value_eur * (1 / eur_aud_rate)  # Convert to AUD
                     else:
-                        pip_value = 1000 / 130.0 * 1.6  # Fallback rates
+                        # For other base currencies, use AUD/USD as intermediary
+                        current_price = get_live_rate(pair)
+                        pip_value_base = 1000 / current_price  # Pip value in base currency
+                        # Convert base currency to AUD via USD
+                        base_to_usd = get_live_rate(
+                            base_currency + "USD") if base_currency + "USD" != pair else 1 / current_price
+                        pip_value = pip_value_base / (base_to_usd * aud_usd)
 
             elif "XAU" in pair:
-                # For XAU/USD - pip value needs to be in AUD
-                pip_value_usd = lot_size * 0.001  # Pip value in USD
-                if aud_usd_rate:
-                    pip_value = pip_value_usd * aud_usd_rate  # Convert to AUD
-                else:
-                    pip_value = pip_value_usd * 0.65  # Fallback AUD/USD rate
+                # XAU/USD - pip value in USD, convert to AUD
+                pip_value_usd = lot_size * 0.001  # $10 per pip
+                pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
-            elif base_currency == "AUD":
-                # AUD is base currency (e.g., AUD/USD, AUD/CAD, AUD/NZD)
-                # For AUD pairs, 1 pip = 0.0001 * lot_size in AUD
+            elif "CAD" in pair:
+                if pair == "USDCAD":
+                    # USD/CAD - pip value in CAD, convert to AUD via USD
+                    usd_cad = get_usd_cad()
+                    pip_value_cad = 10 / usd_cad  # Pip value in USD
+                    pip_value = pip_value_cad / aud_usd  # Convert to AUD
+                elif pair == "AUDCAD":
+                    # AUD/CAD - pip value in AUD
+                    pip_value = lot_size * 0.0001  # Standard pip value in AUD
+                else:
+                    # Other CAD pairs (EUR/CAD, GBP/CAD, etc.)
+                    pip_value = lot_size * 0.0001  # Assume standard, will convert
+
+            elif pair == "EURAUD" or pair == "GBPAUD":
+                # These are special cases where AUD is quote currency
+                # Pip value is in AUD already
                 pip_value = lot_size * 0.0001
 
-            elif quote_currency == "AUD":
-                # AUD is quote currency (e.g., USD/AUD, EUR/AUD, GBP/AUD)
-                # For these pairs, 1 pip = 0.0001 AUD per unit of base currency
-                # Since lot_size is in base currency, need to adjust
-                if aud_usd_rate:
-                    # Get the rate of the pair
-                    pair_rate = get_live_rate(pair)
-                    if pair_rate:
-                        pip_value = (0.0001 / pair_rate) * lot_size * aud_usd_rate
+            elif "CHF" in pair:
+                if pair == "USDCHF":
+                    # USD/CHF - pip value in CHF, convert to AUD via USD
+                    usd_chf = get_usd_chf()
+                    pip_value_chf = 10 / usd_chf  # Pip value in USD
+                    pip_value = pip_value_chf / aud_usd  # Convert to AUD
+                else:
+                    # Other CHF pairs
+                    pip_value = lot_size * 0.0001  # Will convert below
+
+            else:
+                # For other pairs (EUR/USD, GBP/USD, AUD/USD, etc.)
+                if pair == "AUDUSD":
+                    # AUD/USD - pip value in AUD
+                    pip_value = lot_size * 0.0001
+                else:
+                    # Non-AUD pairs - pip value in quote currency, convert to AUD
+                    # Get the pair's quote currency
+                    quote_currency = pair[3:]
+
+                    if quote_currency == "USD":
+                        # Pair like EUR/USD - pip value in USD
+                        pip_value_usd = lot_size * 0.0001
+                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
                     else:
-                        pip_value = 0.0001 * lot_size * aud_usd_rate
-                else:
-                    pip_value = 0.0001 * lot_size * 0.65
+                        # For other quote currencies, we need more conversion
+                        # For simplicity, use standard pip value and convert via USD
+                        pip_value_usd = lot_size * 0.0001
+                        pip_value = pip_value_usd / aud_usd  # Convert to AUD
 
-            else:
-                # Other non-AUD pairs (e.g., EUR/USD, GBP/USD)
-                # Standard pip value, then convert to AUD
-                pip_value_usd = lot_size * 0.0001  # Pip value in USD
-
-                if aud_usd_rate:
-                    pip_value = pip_value_usd * aud_usd_rate  # Convert to AUD
-                else:
-                    pip_value = pip_value_usd * 0.65  # Fallback AUD/USD rate
-
-            # Calculate position size
-            if pip_value > 0:
-                position_size = risk_amount_aud / (stop_pips * pip_value)
-                return round(position_size, 2)
-            else:
-                st.error("Could not calculate pip value. Please check currency pair.")
-                return 0.0
+            position_size = risk_amount_aud / (stop_pips * pip_value)
+            return round(position_size, 2)
 
 
         def calculate_position_size_propfirm(risk_amount, stop_pips, pair):
@@ -3731,7 +3719,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                       "Variant 2 Daily TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
+                      "Variant 2 Daily TPF","8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
             '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib",  "8H/4H_OB to TPF",
                           "Variant 2 Daily TPF",  "8H/4H TPF Left Leg","Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg",
@@ -4366,7 +4354,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat,available_zone_position)
-            
+
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position2)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
@@ -4661,8 +4649,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         open_target_multiplier = 1
                 else:
                     open_target_multiplier = 1
-                    
-                
+
+
                 return open_target_multiplier
 
 
@@ -5068,7 +5056,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(7,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(7,0)+0.41
-                                
+
                         elif(wave == "Wave 2+" or wave == "Cross Wave 3.5 - 4.99"):
                             if (pair in europe_major or pair in gold_comm):
                                 if(trend == "3%-4.99%"):
@@ -5109,7 +5097,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(6,0)+0.41
                                 elif (trend == ">=13% (5% PullBack)"):
                                     base_target = round(6,0)+0.41
-                                
+
                         elif (wave == "Cross Wave"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
@@ -9220,7 +9208,7 @@ elif st.session_state.current_page == "Guidelines":
         'Trigger Condition': ["BE at 2.5R",
                               'BE at 3R',
                               '', 'Trail Rules','Trail Rules'],
-        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry', 
+        'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry',
                    "",'Trail Behind 8H/4H Structures','Trail Behind 2_Daily/Weekly Candles']
     }
     st.table(table_data2)
@@ -9550,7 +9538,6 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
-
 
 
 

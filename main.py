@@ -4406,7 +4406,10 @@ elif st.session_state.current_page == "Risk Calculation":
             if (POI == 'Whole Wave (3 Trade Allowed)'):
                 POI_multiplier = 1.0
             elif (POI == 'Partial Wave (1 Trade Allowed)'):
-                POI_multiplier = 1.0
+                if(risk_multiplier == "1_BNR"):
+                    POI_multiplier = 1.1
+                else:
+                    POI_multiplier = 1.0
 
             if (within_64 == 'Yes'):
                 sixone_multiplier = 1.1
@@ -9477,6 +9480,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

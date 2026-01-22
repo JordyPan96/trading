@@ -4452,7 +4452,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
                 pattern_multiplier = 1.2
-            elif(pattern == "Weekly Resistance")"
+            elif(pattern == "Weekly Resistance"):
                 pattern_multiplier = 1.1
             elif (pattern == "2 Daily TPF Left Leg"):
                 pattern_multiplier = 1.1
@@ -9483,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

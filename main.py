@@ -3504,7 +3504,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
         shapes = ["8H/4H_OB to TPF", "8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
-                  "Weekly TPF Left Leg",
+                  "Weekly TPF Left Leg", "Weekly Resistance",
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
         time_frame = ['Whole Wave/Trend (3 Trades)', 'Partial Wave/Trend (1 Trade)']
@@ -3646,15 +3646,15 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_17 = {
-            '1_BNR': ["Weekly TPF Left Leg",
+            '1_BNR': ["Weekly TPF Left Leg", "Weekly Resistance",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
             '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H_OB to TPF",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
-            '2_BNR': ["Weekly TPF Left Leg",
+            '2_BNR': ["Weekly TPF Left Leg", "Weekly Resistance",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"],
-            '2_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_OB to TPF",
+            '2_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_OB to TPF", "Weekly Resistance",
                           "8H/4H_TPF to Fib", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg"]
         }
 
@@ -3665,7 +3665,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_19 = {
-            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg",
+            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg", "Weekly Resistance",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                            "8H/4H_TPF to Fib", "8H/4H TPF Left Leg"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
@@ -3690,6 +3690,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Variant 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
             "Variant Fakeout 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
             "Weekly TPF Left Leg": [">=2%"],
+            "Weekly Resistance": [">=2%"],
             "2 Daily TPF Left Leg": [">=2%"],
             "Daily TPF Left Leg": [">=2%"],
 
@@ -4451,6 +4452,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
                 pattern_multiplier = 1.2
+            elif(pattern == "Weekly Resistance")"
+                pattern_multiplier = 1.1
             elif (pattern == "2 Daily TPF Left Leg"):
                 pattern_multiplier = 1.1
             elif (pattern == "Daily TPF Left Leg"):
@@ -9480,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3504,8 +3504,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
         shapes = ["8H/4H_OB to TPF", "8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
-                  "Weekly TPF Left Leg", "Weekly Resistance",
-                  "2 Daily TPF Left Leg", "Daily TPF Left Leg",
+                  "Weekly TPF Left Leg", 
+                  "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Weekly Resistance",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
         time_frame = ['Whole Wave/Trend (3 Trades)', 'Partial Wave/Trend (1 Trade)']
         _559_time = ['0', '1', '2']
@@ -9483,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

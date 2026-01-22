@@ -5312,6 +5312,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
                                 --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --7. Configure SL and target based on calculated or given value<br>
+                                --8. IF entering on entry line (High Conviction), no trigger box then give average of min and max as SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5327,6 +5328,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
                                 --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
                                 --7. Configure SL and target based on calculated or given value<br>
+                                --8. IF entering on entry line (High Conviction), no trigger box then give average of min and max as SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9483,6 +9485,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

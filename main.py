@@ -3522,7 +3522,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
-        within_64 = ["No", "Yes"]
+        within_64 = ["No", "Yes", "NA"]
         incompatible_map_4 = {
             "2_BNR+3": ["No"],
             "2_BNR_TPF": [],
@@ -9485,6 +9485,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

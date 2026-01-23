@@ -4414,7 +4414,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     POI_multiplier = 1.0
 
             if (within_64 == 'Yes'):
-                sixone_multiplier = 1.1
+                if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
+                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
+                        sixone_multiplier = 1.5
+                    else:
+                        sixone_multiplier = 1.1
+                else:
+                    sixone_multiplier = 1.1
             else:
                 sixone_multiplier = 1.0
             # if(Potential == '3.41-4.41'):
@@ -9486,6 +9492,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

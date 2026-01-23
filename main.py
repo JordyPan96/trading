@@ -4317,7 +4317,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             # available_rr = get_available_rr(risk_multiplier)
             concat_risk_zone = risk_multiplier + Zone_Position
-            available_64 = get_available_64(concat_risk_zone)
+            available_64 = get_available_64(risk_multiplier)
             # Potential = st.selectbox("Potential RR", available_rr)
 
             # available_64 = get_available_64(risk_multiplier)
@@ -9486,6 +9486,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

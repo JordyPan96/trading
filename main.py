@@ -1280,7 +1280,7 @@ if st.session_state.current_page == "Home":
 
             with col6:
                 # NEW: within_64 dropdown - UPDATED OPTIONS
-                within_64_options = ["Yes", "No"]
+                within_64_options = ["Yes", "No", "NA"]
                 new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
@@ -9485,6 +9485,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

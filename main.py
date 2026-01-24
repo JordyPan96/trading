@@ -4307,6 +4307,10 @@ elif st.session_state.current_page == "Risk Calculation":
             if (selected_pair not in majors_dollar):
                 if ('50' in available_vairances):
                     available_vairances.remove("50")
+            elif(selected_pair == "XAUUSD"):
+                if ('50' in available_vairances):
+                    available_vairances.remove("50")
+                
             concat_trend = trend_position + risk_multiplier
             final_variance1 = get_available_variance_2(concat_trend, available_vairances)
 
@@ -9499,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3568,7 +3568,9 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURJPY": ["50"],
             "USDJPY": ["50"],
             "AUDJPY": ["50"],
-            "USDCAD": ["50"]}
+            "USDCAD": ["50"],
+            "XAUUSD": ["50"],
+        }
 
         incompatible_map_8 = {
             "GBPAUD": ["3%-4.99%"],
@@ -9497,6 +9499,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -1284,7 +1284,7 @@ if st.session_state.current_page == "Home":
                 new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
-                cross_fib_options = ["Cross Trend", "Cross Trend 3.5 - 4.99", "Wave 1", "Wave 2+"]
+                cross_fib_options = ["Cross Trend", "Cross Trend 4% - 5.99%", "Wave 1", "Wave 2+"]
                 new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
 
                 probability_options = ['Head', 'Tail', 'Edge Outlier']
@@ -3540,7 +3540,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
-        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend', 'Cross Trend 3.5 - 4.99']
+        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend', 'Cross Trend 4% - 5.99%']
 
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
@@ -3583,13 +3583,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_9 = {
             "Cross Trend": ['2_BNR', '1_BNR', '1_BNR_TPF'],
-            "Cross Trend 3.5 - 4.99": [],
+            "Cross Trend 4% - 5.99%": [],
             "9%-10.99%Wave 1": ['1_BNR'],
             "11%-12.99% (3.5% PB)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 2+": ['1_BNR', '1_BNR_TPF', '2_BNR'],
-            ">=13% (5% PB, ACAD 4%)Cross Trend 3.5 - 4.99": ['1_BNR', '1_BNR_TPF', '2_BNR'],
+            ">=13% (5% PB, ACAD 4%)Cross Trend 4% - 5.99%": ['1_BNR', '1_BNR_TPF', '2_BNR'],
             # Add more restrictions as needed
         }
 
@@ -3708,7 +3708,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_24 = {
-            ">=13% (5% PB, ACAD 4%)": ["Cross Trend 3.5 - 4.99"],
+            ">=13% (5% PB, ACAD 4%)": ["Cross Trend 4% - 5.99%"],
             "11%-12.99% (3.5% PB)": [],
             "3%-4.99%": [""]
         }
@@ -3722,7 +3722,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Wave 1": ['Variant Fakeout 2 Daily TPF'],
             "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
             "Cross Trend": ['Variant 2 Daily TPF'],
-            "Cross Trend 3.5 - 4.99": ['Variant 2 Daily TPF'],
+            "Cross Trend 4% - 5.99%": ['Variant 2 Daily TPF'],
         }
 
         incompatible_map_27 = {
@@ -3739,7 +3739,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_29 = {
             "Wave 2+1": ['2_BNR_TPF'],
             "Cross Trend1": [],
-            "Cross Trend 3.5 - 4.991": []
+            "Cross Trend 4% - 5.99%1": []
         }
 
         incompatible_map_30 = {
@@ -3753,10 +3753,10 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Trend5%-6.99%1": ['2_BNR_TPF'],
             "Cross Trend7%-8.99%1": ['2_BNR_TPF'],
             "Cross Trend9%-10.99%1": ['2_BNR_TPF'],
-            "Cross Trend 3.5 - 4.993%-4.99%1": ['2_BNR_TPF'],
-            "Cross Trend 3.5 - 4.995%-6.99%1": ['2_BNR_TPF'],
-            "Cross Trend 3.5 - 4.997%-8.99%1": ['2_BNR_TPF'],
-            "Cross Trend 3.5 - 4.999%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%3%-4.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%5%-6.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%9%-10.99%1": ['2_BNR_TPF'],
         }
 
         incompatible_map_32 = {
@@ -4443,7 +4443,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # elif (Potential == '>=11.41'):
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
-                if (cross_fib == "Wave 1" or cross_fib == "Wave 2+" or cross_fib == "Cross Trend 3.5 - 4.99"):
+                if (cross_fib == "Wave 1" or cross_fib == "Wave 2+" or cross_fib == "Cross Trend 4% - 5.99%"):
                     trend_position_multiplier = 0.91
 
             elif (trend_position == "5%-6.99%"):
@@ -4601,7 +4601,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 swing_tpf_pair = ["AUDUSD", "EURUSD", "GBPUSD", "USDJPY"]
                 swing_tpf_trend = ["3%-4.99%", "5%-6.99%", "7%-8.99%"]
                 if (trend in swing_tpf_trend):
-                    if (wave == "Wave 1" or wave == "Cross Trend 3.5 - 4.99"):
+                    if (wave == "Wave 1" or wave == "Cross Trend 4% - 5.99%"):
                         if (selected_pair in swing_tpf_pair):
                             open_target_multiplier = 3
                         else:
@@ -4938,7 +4938,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(275 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(325 / 25, 0) + 0.41
-                        elif (wave == "Wave 2+" or wave == "Cross Trend 3.5 - 4.99"):
+                        elif (wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%"):
                             if (pair in europe_major or pair in gold_comm):
                                 if (trend == "3%-4.99%"):
                                     base_target = round(400 / 25, 0) + 0.41
@@ -5017,7 +5017,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(7, 0) + 0.41
 
-                        elif (wave == "Wave 2+" or wave == "Cross Trend 3.5 - 4.99"):
+                        elif (wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%"):
                             if (pair in europe_major or pair in gold_comm):
                                 if (trend == "3%-4.99%"):
                                     base_target = round(7, 0) + 0.41
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

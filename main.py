@@ -1235,7 +1235,7 @@ if st.session_state.current_page == "Home":
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
-                variance_display = ["50", "559 - 66", "66 - 786", "786 - 91"]
+                variance_display = ["50", "559 - 66", "66 - 786"]
                 new_variance = st.selectbox("Variance", options=variance_display, key="new_variance")
                 # Store as string directly (no numeric conversion)
                 new_variance_str = new_variance
@@ -3536,7 +3536,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_1b": [">=11.41"],
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
-        Variance = ["559 - 66", "66 - 786", "786 - 91", "50"]
+        Variance = ["559 - 66", "66 - 786", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3589,7 +3589,7 @@ elif st.session_state.current_page == "Risk Calculation":
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 2+": ['1_BNR', '1_BNR_TPF', '2_BNR'],
-            ">=13% (5% PB, ACAD 4%)Cross Trend 4% - 5.99%": ['1_BNR', '1_BNR_TPF', '2_BNR'],
+            ">=13% (5% PB, ACAD 4%)Cross Trend 4% - 5.99%": ['1_BNR_TPF'],
             # Add more restrictions as needed
         }
 
@@ -3708,7 +3708,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_24 = {
-            ">=13% (5% PB, ACAD 4%)": ["Cross Trend 4% - 5.99%"],
+            ">=13% (5% PB, ACAD 4%)": [],
             "11%-12.99% (3.5% PB)": [],
             "3%-4.99%": [""]
         }
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

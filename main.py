@@ -214,7 +214,7 @@ def clean_data_for_google_sheets(df):
         variance_mapping = {
             '50.0': '50',
             '559.0': '559 - 66',
-            '66.0': '66 - 786',
+            '66.0': '66 - 91',
             '786.0': '786 - 91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
@@ -295,11 +295,11 @@ def clean_data_for_calculations(df):
         variance_mapping = {
             '50.0': '50',
             '559.0': '559 - 66',
-            '66.0': '66 - 786',
+            '66.0': '66 - 91',
             '786.0': '786 - 91',
             '50': '50',
             '559': '559 - 66',
-            '66': '66 - 786',
+            '66': '66 - 91',
             '786': '786 - 91'
         }
         df_clean['Variance'] = df_clean['Variance'].replace(variance_mapping)
@@ -1235,7 +1235,7 @@ if st.session_state.current_page == "Home":
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
-                variance_display = ["50", "559 - 66", "66 - 786"]
+                variance_display = ["50", "559 - 66", "66 - 91"]
                 new_variance = st.selectbox("Variance", options=variance_display, key="new_variance")
                 # Store as string directly (no numeric conversion)
                 new_variance_str = new_variance
@@ -3536,7 +3536,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_1b": [">=11.41"],
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
-        Variance = ["559 - 66", "66 - 786", "50"]
+        Variance = ["559 - 66", "66 - 91", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
@@ -3548,7 +3548,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR_TPF": ["50", "559 - 66"],
             "2_BNR": [""],
             "2_BNR_TPF": [""],
-            "3_BNR_TPF": ["50", "786 - 91", "66 - 786"], }
+            "3_BNR_TPF": ["50", "786 - 91", "66 - 91"], }
         incompatible_map_5 = {
             "GBPAUD": [],
             "EURAUD": [],
@@ -3726,7 +3726,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_27 = {
-            "Variant 2 Daily TPF": ['50', '66 - 786', '786 - 91'],
+            "Variant 2 Daily TPF": ['50', '66 - 91', '786 - 91'],
             "Variant Fakeout 2 Daily TPF": ['50', '559 - 66'],
 
         }
@@ -3767,112 +3767,112 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
-            "XAUUSD2_BNR66 - 786": [">=99%", ">=149%", ">=179%", ">=2%"],
+            "XAUUSD2_BNR66 - 91": [">=99%", ">=149%", ">=179%", ">=2%"],
             "XAUUSD2_BNR786 - 91": [">=99%", ">=149%", ">=179%", ">=2%"],
 
             "XAUUSD2_BNR_TPF50": [">=119%", ">=149%", "NA"],
             "XAUUSD2_BNR_TPF559 - 66": [">=99%", ">=149%", "NA"],
-            "XAUUSD2_BNR_TPF66 - 786": [">=99%", ">=149%", ">=179%"],
+            "XAUUSD2_BNR_TPF66 - 91": [">=99%", ">=149%", ">=179%"],
             "XAUUSD2_BNR_TPF786 - 91": [">=99%", ">=149%", ">=179%"],
 
             "AUDUSD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "AUDUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "AUDUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "AUDUSD2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDUSD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "AUDUSD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "USDCAD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDCAD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "USDCAD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "USDCAD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDCAD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "USDCAD2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "USDCAD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "USDCAD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDCAD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "USDCAD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "GBPAUD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPAUD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "GBPAUD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "GBPAUD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPAUD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "GBPAUD2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPAUD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "GBPAUD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPAUD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPAUD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "EURAUD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURAUD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "EURAUD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "EURAUD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURAUD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "EURAUD2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "EURAUD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "EURAUD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURAUD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "EURAUD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "USDJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "USDJPY2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "USDJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDJPY2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "USDJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "USDJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "USDJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "GBPJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "GBPJPY2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "GBPJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPJPY2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "GBPJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "GBPJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "AUDJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "AUDJPY2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "AUDJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDJPY2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "AUDJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "AUDJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "EURJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
-            "EURJPY2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "EURJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURJPY2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
 
             "EURJPY2_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
             "EURJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
-            "EURJPY2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "EURJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "GBPUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
             "GBPUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
-            "GBPUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%"],
+            "GBPUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
             "GBPUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
 
             "GBPUSD2_BNR_TPF50": [">=119%", ">=179%"],
             "GBPUSD2_BNR_TPF559 - 66": [">=119%", ">=179%"],
-            "GBPUSD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%"],
+            "GBPUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
             "GBPUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
             "EURUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
             "EURUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
-            "EURUSD2_BNR66 - 786": [">=119%", ">=149%", ">=179%", ">=2%"],
+            "EURUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
             "EU6rUSD2_BNR786 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
 
             "EURUSD2_BNR_TPF50": [">=119%", ">=179%"],
             "EURUSD2_BNR_TPF559 - 66": [">=119%", ">=179%"],
-            "EURUSD2_BNR_TPF66 - 786": [">=119%", ">=149%", ">=179%"],
+            "EURUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
             "EU6rUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
         }
@@ -4489,7 +4489,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 variance_multiplier = 0.91
             elif (Variances == "559 - 66"):
                 variance_multiplier = 1.0
-            elif (Variances == "66 - 786"):
+            elif (Variances == "66 - 91"):
                 variance_multiplier = 1.0
             else:
                 variance_multiplier = 1.0
@@ -5092,7 +5092,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
-                    elif (Variances == "66 - 786"):
+                    elif (Variances == "66 - 91"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
@@ -5168,7 +5168,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = targeting
 
-                    elif (Variances == "66 - 786"):
+                    elif (Variances == "66 - 91"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
@@ -5273,7 +5273,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                                 exit_text = targeting
 
-                        elif (Variances == "66 - 786"):
+                        elif (Variances == "66 - 91"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
                                 entry_text = "ON EP LINE"
@@ -9139,11 +9139,11 @@ elif st.session_state.current_page == "Guidelines":
     table_data = {
         '': ['2_BNR', '2_BNR_TPF'],
         'XAUUSD 50 - 66': ['1.79%', 'Mid Leg 1.19%'],
-        'XAUUSD 66 - 786': ['1.19%', 'Mid Leg 1.19%'],
+        'XAUUSD 66 - 91': ['1.19%', 'Mid Leg 1.19%'],
         'GBPUSD/EURUSD 50 - 66': ['1.49%', 'Mid Leg 0.99%'],
-        'GBPUSD/EURUSD 66 - 786': ['0.99%', 'Mid Leg 0.99%'],
+        'GBPUSD/EURUSD 66 - 91': ['0.99%', 'Mid Leg 0.99%'],
         'OTHER 50 - 66': ['0.99%', 'Mid Leg 0.99%'],
-        'OTHER 66 - 786': ['0.99%', 'Mid Leg 0.99%']
+        'OTHER 66 - 91': ['0.99%', 'Mid Leg 0.99%']
     }
 
     st.table(table_data)
@@ -9155,11 +9155,11 @@ elif st.session_state.current_page == "Guidelines":
     table_data2 = {
         '': ['2_BNR_TPF'],
         'XAUUSD 50 - 66': ['Mid Leg 2%'],
-        'XAUUSD 66 - 786': ['Mid Leg 2%'],
+        'XAUUSD 66 - 91': ['Mid Leg 2%'],
         'GBPUSD/EURUSD 50 - 66': ['Mid Leg 2%'],
-        'GBPUSD/EURUSD 66 - 786': ['Mid Leg 2%'],
+        'GBPUSD/EURUSD 66 - 91': ['Mid Leg 2%'],
         'OTHER 50 - 66': ['Mid Leg 2%'],
-        'OTHER 66 - 786': ['Mid Leg 2%']
+        'OTHER 66 - 91': ['Mid Leg 2%']
     }
 
     st.table(table_data2)
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

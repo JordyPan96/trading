@@ -1269,7 +1269,7 @@ if st.session_state.current_page == "Home":
                 new_prop_pct = st.number_input("PROP_Pct", value=0.0, step=0.01, key="new_prop_pct")
 
                 # Trend Position dropdown
-                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PB)",
+                trend_position_options = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                                           ">=13% (5% PB, ACAD 4%)"]
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
@@ -3537,7 +3537,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
         Variance = ["559 - 66", "66 - 91", "50"]
-        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (3.5% PB)",
+        Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend', 'Cross Trend 4% - 5.99%']
@@ -3585,7 +3585,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Trend": ['2_BNR', '1_BNR', '1_BNR_TPF'],
             "Cross Trend 4% - 5.99%": [],
             "9%-10.99%Wave 1": ['1_BNR'],
-            "11%-12.99% (3.5% PB)Wave 1": ['1_BNR', '1_BNR_TPF'],
+            "11%-12.99% (4% PB)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13% (5% PB, ACAD 4%)Wave 2+": ['1_BNR', '1_BNR_TPF', '2_BNR'],
@@ -3596,7 +3596,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_10 = {
             "3%-4.99%1_BNR_TPF": ["559 - 66"],
             "9%-10.99%1_BNR_TPF": [],
-            "11%-12.99% (3.5% PB)1_BNR_TPF": [],
+            "11%-12.99% (4% PB)1_BNR_TPF": [],
             ">=13%1_BNR_TPF": ["559 - 66"],
             ">=13% (5% PB, ACAD 4%)1_BNR_TPF": ["559 - 66"],
             "EURAUD1_BNR_TPF": ["559 - 66"],
@@ -3631,7 +3631,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "5%-6.99%": [],
             "7%-8.99%": [],
             "9%-10.99%": [],
-            "11%-12.99% (3.5% PB)": [],
+            "11%-12.99% (4% PB)": [],
             ">=13%": []
         }
 
@@ -3709,7 +3709,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_24 = {
             ">=13% (5% PB, ACAD 4%)": [],
-            "11%-12.99% (3.5% PB)": [],
+            "11%-12.99% (4% PB)": [],
             "3%-4.99%": [""]
         }
 
@@ -4455,7 +4455,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (trend_position == "9%-10.99%"):
                 if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.1
-            elif (trend_position == "11%-12.99% (3.5% PB)"):
+            elif (trend_position == "11%-12.99% (4% PB)"):
                 if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.2
             else:
@@ -4921,7 +4921,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(700 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(450 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(550 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(650 / 25, 0) + 0.41
@@ -4934,7 +4934,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(350 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(225 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(275 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(325 / 25, 0) + 0.41
@@ -4948,7 +4948,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(700 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(450 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(125 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(125 / 25, 0) + 0.41
@@ -4961,7 +4961,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(350 / 25, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(225 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(125 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(125 / 25, 0) + 0.41
@@ -4986,7 +4986,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(8, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(8, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(8, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(8, 0) + 0.41
@@ -4999,7 +4999,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(9, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(9, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(9, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(9, 0) + 0.41
@@ -5012,7 +5012,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(7, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(7, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(7, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(7, 0) + 0.41
@@ -5027,7 +5027,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(7, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(7, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(7, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(50, 0) + 0.41
@@ -5040,7 +5040,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(8, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(8, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(8, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(8, 0) + 0.41
@@ -5053,7 +5053,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(6, 0) + 0.41
                                 elif (trend == "9%-10.99%"):
                                     base_target = round(6, 0) + 0.41
-                                elif (trend == "11%-12.99% (3.5% PB)"):
+                                elif (trend == "11%-12.99% (4% PB)"):
                                     base_target = round(6, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(6, 0) + 0.41
@@ -5104,11 +5104,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
 
                     # if (
-                    # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PB)" or trend_position == ">=13%"):
+                    # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (4% PB)" or trend_position == ">=13%"):
                     # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                     # targeting = get_open_target(selected_pair)
                     # elif (
-                    # trend_position == "11%-12.99% (3.5% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    # trend_position == "11%-12.99% (4% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                     # targeting = get_open_target(selected_pair)
                     # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                     # targeting = get_open_target(selected_pair)
@@ -5224,11 +5224,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     if (selected_pair == "XAUUSD"):
                         # if (
-                        # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (3.5% PB)" or trend_position == ">=13%"):
+                        # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (4% PB)" or trend_position == ">=13%"):
                         # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
                         # targeting = get_open_target(selected_pair)
                         # elif (
-                        # trend_position == "11%-12.99% (3.5% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        # trend_position == "11%-12.99% (4% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                         # targeting = get_open_target(selected_pair)
                         # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
                         # targeting = get_open_target(selected_pair)
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

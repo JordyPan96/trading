@@ -3577,7 +3577,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURAUD": ["3%-4.99%"],
             "GBPJPY": ["3%-4.99%"],
             "EURJPY": ["3%-4.99%"],
-            "USDJPY": ["3%-4.99%"],
+            "USDJPY": [],
             "AUDJPY": ["3%-4.99%"],
             "XAUUSD": ["3%-4.99%"]}
 
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

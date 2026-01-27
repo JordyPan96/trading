@@ -5733,7 +5733,7 @@ elif st.session_state.current_page == "Active Opps":
 
         # Define cross groups
         cross_groups = [
-            ["AUDUSD", "AUDJPY", "GBPAUD", "EURAUD"],
+            ["GBPAUD", "EURAUD"],
             ["AUDUSD", "USDCAD", "EURUSD", "GBPUSD"],
             ['GBPJPY', 'USDJPY', 'AUDJPY', 'EURJPY']
         ]
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

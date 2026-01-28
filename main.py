@@ -9172,7 +9172,7 @@ elif st.session_state.current_page == "Guidelines":
         'Action': ["Trail 5 Pips Below/Above Entry", 'Trail 5 Pips Below/Above Entry',
                    "", 'Trail Behind 8H/4H Structures', 'Trail Behind 2_Daily/Weekly Candles']
     }
-    st.table(table_data2)
+    #st.table(table_data2)
 
     # st.subheader("First Trail Rules")
     table_data3 = {
@@ -9502,6 +9502,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

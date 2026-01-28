@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB to OB", "8H/4H_OB to TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+                pattern_options = ["8H/4H_On OB/TPF", "8H/4H_OB to TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
                                    "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -3503,7 +3503,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB to TPF", "8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
@@ -3652,7 +3652,7 @@ elif st.session_state.current_page == "Risk Calculation":
             '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                       "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
-            '1_BNR_TPF': ["8H/4H_OB to OB", "8H/4H_TPF to Fib", "8H/4H_OB to TPF",
+            '1_BNR_TPF': ["8H/4H_On OB/TPF", "8H/4H_TPF to Fib", "8H/4H_OB to TPF",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
@@ -3669,7 +3669,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H_TPF to Fib", "8H/4H TPF Left Leg","8H/4H_OB to TPF","8H/4H_OB to OB"],
+                           "8H/4H_TPF to Fib", "8H/4H TPF Left Leg","8H/4H_OB to TPF","8H/4H_On OB/TPF"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
                            "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
         }
@@ -4461,7 +4461,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.2
 
-            if (pattern == "8H/4H_OB to OB"):
+            if (pattern == "8H/4H_On OB/TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF Left Leg"):
                 pattern_multiplier = 1.1
@@ -9502,6 +9502,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

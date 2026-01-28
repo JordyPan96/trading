@@ -4265,7 +4265,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
             POI = st.selectbox(
-                "POI Type (If wave >4%, AUDCAD >3% use 2 Daily Fib, Dont use 2 Daily Enter on the most likely Weekly K usually middle)",
+                "POI Type (If wave >4%, AUDCAD >3% use 2 Daily Fib, Enter on the most likely Weekly K usually middle)",
                 available_time_frame_3)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
@@ -9514,6 +9514,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

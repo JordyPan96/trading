@@ -3763,6 +3763,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_33 = {
+            "Cross Trend": ["Partial Wave/Trend (1 Trade)"],
+            "Cross Trend 4% - 5.99%": ["Partial Wave/Trend (1 Trade)"]
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3906,6 +3912,10 @@ elif st.session_state.current_page == "Risk Calculation":
             disabled_timeframe_2 = incompatible_map_14.get(trend, [])
             return [s for s in listone if s not in disabled_timeframe_2]
 
+        def get_available_timeframe_3(listone, wave):
+            disabled_timeframe_3 = incompatible_map_33.get(wave, [])
+            return [s for s in listone if s not in disabled_timeframe_3]
+
 
         def get_available_position(pairlist):
             disabled_position = incompatible_map_7.get(pairlist, [])
@@ -4040,6 +4050,7 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_zone_position2(squeezeStrat, zone_list):
             available_zone_position2 = incompatible_map_32.get(squeezeStrat, [])
             return [s for s in zone_list if s not in available_zone_position2]
+
 
 
         def get_pair_prior_result(current_month_stats, selected_pair):
@@ -4252,9 +4263,10 @@ elif st.session_state.current_page == "Risk Calculation":
             cross_fib = st.selectbox("Weekly Wave Status (One Wave is minimum 3% length)", available_wave_status)
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
+            available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
             POI = st.selectbox(
                 "POI Type (If wave <=4% use whole wave >=2 Candles, else use middle K to adjust fib)",
-                available_time_frame_2)
+                available_time_frame_3)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
             squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1', '2'])
@@ -9502,6 +9514,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

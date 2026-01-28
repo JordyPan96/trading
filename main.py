@@ -521,7 +521,7 @@ def ensure_all_strategies_analyzed(df):
         '1_BNR': ("A", 1.0),
         '1_BNR_TPF': ("A", 1.0),
         '2_BNR': ("A", 1.0),
-        '2_BNR_TPF': ("A", 1.1),
+        '2_BNR_TPF': ("A", 1.0),
     }
 
     # First, analyze strategies that have actual data
@@ -9502,6 +9502,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

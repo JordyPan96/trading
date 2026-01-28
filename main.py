@@ -6739,7 +6739,7 @@ elif st.session_state.current_page == "Active Opps":
                             if (record['risk_multiplier'] == '1_BNR' or record['risk_multiplier'] == '1_BNR_TPF'):
                                 be_mult = 2.5
                             elif (record['risk_multiplier'] == '2_BNR'):
-                                be_mult = 3
+                                be_mult = 2.5
                             elif (record['risk_multiplier'] == '2_BNR_TPF'):
                                 be_mult = 2.5
 
@@ -9503,6 +9503,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

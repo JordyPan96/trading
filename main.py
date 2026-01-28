@@ -3669,9 +3669,9 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H_TPF to Fib", "8H/4H TPF Left Leg"],
+                           "8H/4H_TPF to Fib", "8H/4H TPF Left Leg","8H/4H_OB to TPF","8H/4H_OB to OB"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                           "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "8H/4H_TPF to Fib"]
+                           "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
         }
 
         incompatible_map_20 = {
@@ -9502,6 +9502,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

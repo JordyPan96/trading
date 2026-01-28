@@ -4253,7 +4253,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             POI = st.selectbox(
-                "POI Type (If wave <=4% use whole wave, else use middle K to adjust fib - has to be within first 3 weekly candle) - Whole Wave consists of at least 2 Weekly Candles",
+                "POI Type (If wave <=4% use whole wave, else use middle K to adjust fib - both fib and entry has to be within first 3 weekly candle)",
                 available_time_frame_2)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
@@ -9502,6 +9502,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

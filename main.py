@@ -3785,9 +3785,17 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_35 = {
-            "GBPUSDTrend 0": ["3%-4.99%"],
-            "EURUSDTrend 0": ["3%-4.99%"],
-            "USDJPYTrend 0": ["3%-4.99%"],
+            "GBPUSDTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
+            "EURUSDTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
+            "USDJPYTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
+            "AUDUSDTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "USDCADTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "GBPAUDTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "EURAUDTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "XAUUSDTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "GBPJPYTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "EURJPYTrend 0" : [">=13% (5% PB, ACAD 4%)"],
+            "AUDJPYTrend 0" : [">=13% (5% PB, ACAD 4%)"],
 
         }
 
@@ -9463,6 +9471,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

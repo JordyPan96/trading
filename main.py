@@ -1284,7 +1284,7 @@ if st.session_state.current_page == "Home":
                 new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
-                cross_fib_options = ["Cross Trend", "Cross Trend 4% - 5.99%", "Wave 1", "Wave 2+"]
+                cross_fib_options = ["Cross Trend <=3.99%", "Cross Trend 4% - 5.99%", "Cross Trend >=6%","Wave 1", "Wave 2+"]
                 new_cross_fib = st.selectbox("Cross Fib", options=cross_fib_options, key="new_cross_fib")
 
                 probability_options = ['Head', 'Tail', 'Edge Outlier']
@@ -3540,7 +3540,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
-        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend', 'Cross Trend 4% - 5.99%']
+        Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend <=3.99%', 'Cross Trend 4% - 5.99%','Cross Trend >=6%']
 
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
@@ -3582,8 +3582,9 @@ elif st.session_state.current_page == "Risk Calculation":
             "XAUUSD": ["3%-4.99%"]}
 
         incompatible_map_9 = {
-            "Cross Trend": ['2_BNR', '1_BNR', '1_BNR_TPF'],
+            "Cross Trend <=3.99%": ['2_BNR', '1_BNR', '1_BNR_TPF'],
             "Cross Trend 4% - 5.99%": [],
+            "Cross Trend >=6%":['2_BNR', '1_BNR', '1_BNR_TPF'],
             "9%-10.99%Wave 1": ['1_BNR'],
             "11%-12.99% (4% PB)Wave 1": ['1_BNR', '1_BNR_TPF'],
             ">=13%Wave 1": ['1_BNR', '1_BNR_TPF'],
@@ -3720,8 +3721,9 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_26 = {
             "Wave 1": ['Variant Fakeout 2 Daily TPF'],
             "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
-            "Cross Trend": ['Variant 2 Daily TPF'],
+            "Cross Trend <=3.99%": ['Variant 2 Daily TPF'],
             "Cross Trend 4% - 5.99%": ['Variant 2 Daily TPF'],
+            "Cross Trend >=6%": ['Variant 2 Daily TPF'],
         }
 
         incompatible_map_27 = {
@@ -3737,8 +3739,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_29 = {
             "Wave 2+1": ['2_BNR_TPF'],
-            "Cross Trend1": ['2_BNR_TPF'],
+            "Cross Trend <=3.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%1": ['2_BNR_TPF']
+            "Cross Trend <=6%1": ['2_BNR_TPF'],
         }
 
         incompatible_map_30 = {
@@ -3748,14 +3751,18 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_31 = {
-            "Cross Trend3%-4.99%1": ['2_BNR_TPF'],
-            "Cross Trend5%-6.99%1": ['2_BNR_TPF'],
-            "Cross Trend7%-8.99%1": ['2_BNR_TPF'],
-            "Cross Trend9%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=3.99%3%-4.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=3.99%5%-6.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=3.99%7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=3.99%9%-10.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%3%-4.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%5%-6.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%7%-8.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%9%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=6%3%-4.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=6%5%-6.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=6%7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Trend <=6%9%-10.99%1": ['2_BNR_TPF'],
         }
 
         incompatible_map_32 = {
@@ -3764,8 +3771,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_33 = {
-            "Cross Trend": [],
+            "Cross Trend <=3.99%": [],
             "Cross Trend 4% - 5.99%": []
+            "Cross Trend <=6%":[]
 
         }
 
@@ -4519,10 +4527,6 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 sect_count_multiplier = 0.0
 
-            if (cross_fib == "Cross Trend"):
-                cross_fib_multiplier = 0.91
-            else:
-                cross_fib_multiplier = 1.0
 
             if (selected_pair in europe_major or selected_pair == "XAUUSD"):
                 if (pair_result == "W"):
@@ -4976,7 +4980,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     base_target = round(125 / 25, 0) + 0.41
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(125 / 25, 0) + 0.41
-                        elif (wave == "Cross Trend"):
+                        elif (wave == "Cross Trend <=3.99%"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
                             elif (pair in trade_curr or pair == "USDJPY"):
@@ -5069,7 +5073,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif (trend == ">=13% (5% PB, ACAD 4%)"):
                                     base_target = round(6, 0) + 0.41
 
-                        elif (wave == "Cross Trend"):
+                        elif (wave == "Cross Trend <=3.99%"):
                             if (pair in europe_major or pair in gold_comm):
                                 base_target = 5.41
                             elif (pair in trade_curr or pair == "USDJPY"):
@@ -9514,6 +9518,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

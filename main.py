@@ -3741,7 +3741,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Wave 2+1": ['2_BNR_TPF'],
             "Cross Trend <=3.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%1": ['2_BNR_TPF'],
-            "Cross Trend <=6%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%1": ['2_BNR_TPF'],
         }
 
         incompatible_map_30 = {
@@ -3759,10 +3759,10 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Trend 4% - 5.99%5%-6.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%7%-8.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%9%-10.99%1": ['2_BNR_TPF'],
-            "Cross Trend <=6%3%-4.99%1": ['2_BNR_TPF'],
-            "Cross Trend <=6%5%-6.99%1": ['2_BNR_TPF'],
-            "Cross Trend <=6%7%-8.99%1": ['2_BNR_TPF'],
-            "Cross Trend <=6%9%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%3%-4.99%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%5%-6.99%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%7%-8.99%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%9%-10.99%1": ['2_BNR_TPF'],
         }
 
         incompatible_map_32 = {
@@ -3773,7 +3773,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_33 = {
             "Cross Trend <=3.99%": [],
             "Cross Trend 4% - 5.99%": [],
-            "Cross Trend <=6%":[],
+            "Cross Trend >=6%":[],
 
         }
 
@@ -9518,6 +9518,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4285,7 +4285,7 @@ elif st.session_state.current_page == "Risk Calculation":
             selected_pair = st.selectbox("Trading Pair", currency_pairs)
                         
             available_64 = get_available_64(selected_pair)
-            trend_context = st.selectbox("Entry Price Within 64 from fib drawn", available_64)
+            trend_context = st.selectbox("Trend Context", available_64)
             
             available_trend_position = get_available_trend_position(selected_pair)
             concat_pair_context = selected_pair +  trend_context
@@ -9525,6 +9525,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

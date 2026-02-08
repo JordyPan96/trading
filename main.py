@@ -3772,8 +3772,8 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_33 = {
             "Cross Trend <=3.99%": [],
-            "Cross Trend 4% - 5.99%": []
-            "Cross Trend <=6%":[]
+            "Cross Trend 4% - 5.99%": [],
+            "Cross Trend <=6%":[],
 
         }
 
@@ -9518,6 +9518,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

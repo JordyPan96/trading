@@ -3784,6 +3784,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_35 = {
+            "GBPUSDTrend 0": ["3%-4.99%"],
+            "EURUSDTrend 0": ["3%-4.99%"],
+            "USDJPYTrend 0": ["3%-4.99%"],,
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3940,6 +3947,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_trend_position(pair):
             disabled_trend_position = incompatible_map_8.get(pair, [])
             return [s for s in Trend_Positions if s not in disabled_trend_position]
+
+        def get_available_trend_position2(pair_context,available_list):
+            disabled_trend_position2 = incompatible_map_35.get(pair_context, [])
+            return [s for s in available_list if s not in disabled_trend_position2]
 
 
         def get_available_Wave_status(trend):
@@ -4277,7 +4288,11 @@ elif st.session_state.current_page == "Risk Calculation":
             trend_context = st.selectbox("Entry Price Within 64 from fib drawn", available_64)
             
             available_trend_position = get_available_trend_position(selected_pair)
-            trend_position = st.selectbox("Trend Position (+-0.05%) Note 3%-4.99% CANNOT be at All time high/low", available_trend_position)
+            concat_pair_context = selected_pair +  trend_context
+            available_trend_position2 = get_available_trend_position2(concat_pair_context)
+            trend_position = st.selectbox("Trend Position (+-0.05%)", available_trend_position2)
+
+            
             available_wave_status = get_available_Wave_status(trend_position)
             cross_fib = st.selectbox("Weekly Wave Status (One Wave is minimum 3% length)", available_wave_status)
             available_time_frame = get_available_timeframe(selected_pair)
@@ -9510,6 +9525,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

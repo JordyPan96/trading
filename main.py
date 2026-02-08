@@ -5206,7 +5206,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         # targeting = get_open_target(selected_pair)
                         # else:
                         # targeting = get_open_target(selected_pair)
-                        targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier)
+                        targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier,trend_context)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
@@ -9463,6 +9463,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

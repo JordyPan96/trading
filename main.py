@@ -3787,7 +3787,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_35 = {
             "GBPUSDTrend 0": ["3%-4.99%"],
             "EURUSDTrend 0": ["3%-4.99%"],
-            "USDJPYTrend 0": ["3%-4.99%"],,
+            "USDJPYTrend 0": ["3%-4.99%"],
 
         }
 
@@ -9525,6 +9525,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

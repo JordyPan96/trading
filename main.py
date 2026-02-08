@@ -4621,7 +4621,7 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_one_target(selected_pair, wave, trend):
                 open_target = 0
                 if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
-                    if(wave == "Wave 1" or wave == "Cross Trend >=6%):
+                    if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                         if(trend == "3%-4.99%"):
                             open_target = "Top of trend to 8.99%"
                         elif(trend == "5%-6.99%"):
@@ -9545,6 +9545,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

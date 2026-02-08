@@ -4390,6 +4390,7 @@ elif st.session_state.current_page == "Risk Calculation":
             Zone_Position_multiplier = 1.0
             hh_ll_multiplier = 1.0
             pattern_multiplier = 1.0
+            sixone_multiplier = 1.0
             # Iterate through each strategy in the results
             for strategy, row in strategy_stats.iterrows():
                 # Get the multiplier for this specific strategy
@@ -4441,9 +4442,11 @@ elif st.session_state.current_page == "Risk Calculation":
             if (trend_context == 'Trend 1+'):
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
-                        sixone_multiplier = 1.5
+                        if (risk_multiplier == "1_BNR_TPF"):
+                            sixone_multiplier = 1.5
                     else:
-                        sixone_multiplier = 1.1
+                        if (risk_multiplier == "1_BNR_TPF"):
+                            sixone_multiplier = 1.1
                 else:
                     sixone_multiplier = 1.0
             else:
@@ -4457,8 +4460,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # elif (Potential == '>=11.41'):
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
-                if (cross_fib == "Wave 1" or cross_fib == "Wave 2+" or cross_fib == "Cross Trend 4% - 5.99%"):
-                    trend_position_multiplier = 0.91
+                trend_position_multiplier = 0.91
 
             elif (trend_position == "5%-6.99%"):
                 if (cross_fib == "Wave 1"):
@@ -9509,6 +9511,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

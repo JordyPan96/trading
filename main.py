@@ -1280,7 +1280,7 @@ if st.session_state.current_page == "Home":
 
             with col6:
                 # NEW: trend_context dropdown - UPDATED OPTIONS
-                trend_context_options = ["Yes", "No", "NA"]
+                trend_context_options = ["Trend 0", "Trend 1+"]
                 new_trend_context = st.selectbox("within 64", options=trend_context_options, key="new_trend_context")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
@@ -3522,7 +3522,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
-        trend_context = ["No", "Yes", "NA"]
+        trend_context = ["Trend 0", "Trend 1+"]
         incompatible_map_4 = {
             "2_BNR_TPF": ["No","Yes"],
             "2_BNR": ["No","Yes"],
@@ -4438,19 +4438,14 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     POI_multiplier = 1.0
 
-            if (trend_context == 'Yes'):
+            if (trend_context == 'Trend 1+'):
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
                         sixone_multiplier = 1.5
                     else:
                         sixone_multiplier = 1.1
-                elif(trend_position == "7%-8.99%"):
-                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
-                        sixone_multiplier = 1.25
-                    else:
-                        sixone_multiplier = 1.1
                 else:
-                    sixone_multiplier = 1.1
+                    sixone_multiplier = 1.0
             else:
                 sixone_multiplier = 1.0
             # if(Potential == '3.41-4.41'):
@@ -4534,11 +4529,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (trend_position == "7%-8.99%"):
                             if (cross_fib == "Wave 1"):
                                 big_risk_multiplier = 1.5
-                            elif (cross_fib == "Wave 2+"):
-                                big_risk_multiplier = 1.1
-                        elif (trend_position == "9%-10.99%"):
-                            if (cross_fib == "Wave 2+"):
-                                big_risk_multiplier = 1.1
+
 
             else:
                 big_risk_multiplier = 1.0
@@ -9518,6 +9509,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

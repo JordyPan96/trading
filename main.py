@@ -3740,7 +3740,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_29 = {
             "Wave 2+1": ['2_BNR_TPF'],
             "Cross Trend <=3.99%1": ['2_BNR_TPF'],
-            "Cross Trend 4% - 5.99%1": ['2_BNR_TPF']
+            "Cross Trend 4% - 5.99%1": ['2_BNR_TPF'],
             "Cross Trend <=6%1": ['2_BNR_TPF'],
         }
 
@@ -9518,6 +9518,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

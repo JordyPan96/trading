@@ -3777,6 +3777,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_34 = {
+            "": [],
+            "": [],
+            "":[],
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3945,8 +3952,8 @@ elif st.session_state.current_page == "Risk Calculation":
             return [s for s in potential_rr if s not in disabled_rr]
 
 
-        def get_available_64(strategy):
-            disabled_64 = incompatible_map_4.get(strategy, [])
+        def get_available_64(pair):
+            disabled_64 = incompatible_map_34.get(pair, [])
             return [s for s in trend_context if s not in disabled_64]
 
 
@@ -4265,6 +4272,10 @@ elif st.session_state.current_page == "Risk Calculation":
             # )
             st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
             selected_pair = st.selectbox("Trading Pair", currency_pairs)
+                        
+            available_64 = get_available_64(selected_pair)
+            trend_context = st.selectbox("Entry Price Within 64 from fib drawn", available_64)
+            
             available_trend_position = get_available_trend_position(selected_pair)
             trend_position = st.selectbox("Trend Position (+-0.05%) Note 3%-4.99% CANNOT be at All time high/low", available_trend_position)
             available_wave_status = get_available_Wave_status(trend_position)
@@ -4339,18 +4350,6 @@ elif st.session_state.current_page == "Risk Calculation":
             final_variance3 = get_available_variance_3(pattern, final_variance2)
 
             Variances = st.selectbox("Position Variance (Fib)", final_variance3)
-
-            # available_rr = get_available_rr(risk_multiplier)
-            concat_risk_zone = risk_multiplier + Zone_Position
-            available_64 = get_available_64(risk_multiplier)
-            # Potential = st.selectbox("Potential RR", available_rr)
-
-            # available_64 = get_available_64(risk_multiplier)
-            available_64_2 = get_available_64_2(selected_pair, available_64)
-            available_64_3 = get_available_64_3(Variances, available_64_2)
-            available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
-
-            trend_context = st.selectbox("Entry Price Within 64 from fib drawn", available_64_4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
@@ -9511,6 +9510,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4949,172 +4949,90 @@ elif st.session_state.current_page == "Risk Calculation":
                             return 4.41
 
 
-                def get_potential_target(trend, pair, wave, strategy):
-                    base_target = 0.41
-                    min_vol = 0.5
-                    if (strategy == "2_BNR"):
-                        if (wave == "Wave 1"):
-                            if (pair in europe_major or pair in gold_comm):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(400 / 25, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(500 / 25, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(700 / 25, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(450 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(550 / 25, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(650 / 25, 0) + 0.41
-                            elif (pair in trade_curr or pair == "USDJPY"):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(200 / 25, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(250 / 25, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(350 / 25, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(225 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(275 / 25, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(325 / 25, 0) + 0.41
-                        elif (wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%"):
-                            if (pair in europe_major or pair in gold_comm):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(400 / 25, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(500 / 25, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(700 / 25, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(450 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(125 / 25, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(125 / 25, 0) + 0.41
-                            elif (pair in trade_curr or pair == "USDJPY"):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(200 / 25, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(250 / 25, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(350 / 25, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(225 / 25, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(125 / 25, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(125 / 25, 0) + 0.41
-                        elif (wave == "Cross Trend <=3.99%"):
-                            if (pair in europe_major or pair in gold_comm):
-                                base_target = 5.41
-                            elif (pair in trade_curr or pair == "USDJPY"):
-                                base_target = 5.41
-                            else:
-                                base_target = 5.41
-                        else:
-                            base_target = 5.41
-
-                    elif (strategy == "2_BNR_TPF"):
-                        if (wave == "Wave 1"):
-                            if (pair in europe_major or pair in gold_comm):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(8, 0) + 0.41
-                            elif (pair == "USDJPY"):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(9, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(9, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(9, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(9, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(9, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(9, 0) + 0.41
-                            elif (pair in trade_curr):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(7, 0) + 0.41
-
-                        elif (wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%"):
-                            if (pair in europe_major or pair in gold_comm):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(7, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(50, 0) + 0.41
-                            elif (pair == "USDJPY"):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(8, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(8, 0) + 0.41
-                            elif (pair in trade_curr):
-                                if (trend == "3%-4.99%"):
-                                    base_target = round(6, 0) + 0.41
-                                elif (trend == "5%-6.99%"):
-                                    base_target = round(6, 0) + 0.41
-                                elif (trend == "7%-8.99%"):
-                                    base_target = round(6, 0) + 0.41
-                                elif (trend == "9%-10.99%"):
-                                    base_target = round(6, 0) + 0.41
-                                elif (trend == "11%-12.99% (4% PB)"):
-                                    base_target = round(6, 0) + 0.41
-                                elif (trend == ">=13% (5% PB, ACAD 4%)"):
-                                    base_target = round(6, 0) + 0.41
-
-                        elif (wave == "Cross Trend <=3.99%"):
-                            if (pair in europe_major or pair in gold_comm):
-                                base_target = 5.41
-                            elif (pair in trade_curr or pair == "USDJPY"):
-                                base_target = 5.41
-                            else:
-                                base_target = 5.41
-                        else:
-                            base_target = 5.41
-
-                    if (base_target >= 5.41):
-                        return base_target
+                def get_potential_target(trend, pair, wave, strategy,context):
+                    open_target = 0
+                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
+                        if(context == "Trend 0"):
+                            if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
+                                if(trend == "3%-4.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "5%-6.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "7%-8.99%"):
+                                    open_target = "Top of trend to 9%"
+                                elif(trend == "9%-10.99%"):
+                                    open_target = "Top of wave to 3.99%"
+                                elif(trend == "11%-12.99% (4% PB)"):
+                                    open_target = "Top of wave to 4.99%"
+                               
+                            elif(wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%" or wave == "Cross Trend <=3.99%"):
+                                if(trend == "3%-4.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "5%-6.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "7%-8.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "9%-10.99%"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                                elif(trend == "11%-12.99% (4% PB)"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = 6.41
+                                    else:
+                                        open_target = 5.41
+                            
+                        elif(context == "Trend 1+"):
+                            if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
+                                if(trend == "3%-4.99%"):
+                                    open_target = "Top of trend to 8.99%"
+                                elif(trend == "5%-6.99%"):
+                                    open_target = "Top of trend to 8.99%"
+                                elif(trend == "7%-8.99%"):
+                                    open_target = "Top of trend to 10.99%"
+                                elif(trend == "9%-10.99%"):
+                                    open_target = "Top of trend to 10.99%"
+                                elif(trend == "11%-12.99% (4% PB)"):
+                                    open_target = "Top of wave to 4.99%"
+                                elif(trend == ">=13% (5% PB, ACAD 4%)"):
+                                    open_target = "Top of wave to 10%"
+                            elif(wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%" or wave == "Cross Trend <=3.99%"):
+                                if(trend == "3%-4.99%"):
+                                    open_target = "Top of trend to 8.99%"
+                                elif(trend == "5%-6.99%"):
+                                    open_target = "Top of trend to 8.99%"
+                                elif(trend == "7%-8.99%"):
+                                    open_target = "Top of trend to 10.99%"
+                                elif(trend == "9%-10.99%"):
+                                    open_target = "Top of trend to 10.99%"
+                                elif(trend == "11%-12.99% (4% PB)"):
+                                    open_target = "Top of wave to 3.99%"
+                                elif(trend == ">=13% (5% PB, ACAD 4%)"):
+                                    if(pair == "XAUUSD"):
+                                        open_target = "Top of wave to 13%"
+                                    else:
+                                        open_target = "Top of wave to 6.5%"
+                                
+                            
                     else:
-                        base_target = 5.41
-                        return base_target
+                        open_target = 5.41
+                    return str(open_target)
 
 
                 if (selected_pair in minor_yens):
@@ -5172,7 +5090,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     # targeting = get_open_target(selected_pair)
                     # else:
                     # targeting = get_open_target(selected_pair)
-                    targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier)
+                    targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier,trend_context)
 
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide:"
@@ -9545,6 +9463,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

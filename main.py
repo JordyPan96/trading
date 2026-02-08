@@ -1279,9 +1279,9 @@ if st.session_state.current_page == "Home":
                                                  key="new_Zone_Position")
 
             with col6:
-                # NEW: within_64 dropdown - UPDATED OPTIONS
-                within_64_options = ["Yes", "No", "NA"]
-                new_within_64 = st.selectbox("within 64", options=within_64_options, key="new_within_64")
+                # NEW: trend_context dropdown - UPDATED OPTIONS
+                trend_context_options = ["Yes", "No", "NA"]
+                new_trend_context = st.selectbox("within 64", options=trend_context_options, key="new_trend_context")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
                 cross_fib_options = ["Cross Trend <=3.99%", "Cross Trend 4% - 5.99%", "Cross Trend >=6%","Wave 1", "Wave 2+"]
@@ -1346,8 +1346,8 @@ if st.session_state.current_page == "Home":
                     new_record['leg_length'] = new_leg_length
                 if 'Pattern' in data.columns:
                     new_record['Pattern'] = new_Pattern
-                if 'within_64' in data.columns:
-                    new_record['within_64'] = new_within_64
+                if 'trend_context' in data.columns:
+                    new_record['trend_context'] = new_trend_context
                 if 'squeeze_559_time' in data.columns:
                     new_record['squeeze_559_time'] = new_squeeze_559_time
                 if 'Zone_Position' in data.columns:
@@ -3522,7 +3522,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
-        within_64 = ["No", "Yes", "NA"]
+        trend_context = ["No", "Yes", "NA"]
         incompatible_map_4 = {
             "2_BNR_TPF": ["No","Yes"],
             "2_BNR": ["No","Yes"],
@@ -3947,7 +3947,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_available_64(strategy):
             disabled_64 = incompatible_map_4.get(strategy, [])
-            return [s for s in within_64 if s not in disabled_64]
+            return [s for s in trend_context if s not in disabled_64]
 
 
         def get_available_64_2(pair, list_available):
@@ -4350,7 +4350,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_64_3 = get_available_64_3(Variances, available_64_2)
             available_64_4 = get_available_64_4(squeeze_559_time, available_64_3)
 
-            within_64 = st.selectbox("Entry Price Within 64 from fib drawn", available_64_4)
+            trend_context = st.selectbox("Entry Price Within 64 from fib drawn", available_64_4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)
@@ -4438,7 +4438,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     POI_multiplier = 1.0
 
-            if (within_64 == 'Yes'):
+            if (trend_context == 'Yes'):
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
                         sixone_multiplier = 1.5
@@ -4681,7 +4681,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
             if (risk_multiplier == "1_BNR"):
-                if (within_64 == "Yes"):
+                if (trend_context == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -4756,7 +4756,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     return entry_plus
 
 
-                if (within_64 == "Yes"):
+                if (trend_context == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -5120,12 +5120,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     # if (
                     # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (4% PB)" or trend_position == ">=13%"):
-                    # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                    # if (trend_position == "9%-10.99%" and trend_context == "Yes"):
                     # targeting = get_open_target(selected_pair)
                     # elif (
-                    # trend_position == "11%-12.99% (4% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    # trend_position == "11%-12.99% (4% PB)" and trend_context == "Yes" and selected_pair == "XAUUSD"):
                     # targeting = get_open_target(selected_pair)
-                    # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                    # elif (trend_position == ">=13%" and trend_context == "Yes" and selected_pair == "XAUUSD"):
                     # targeting = get_open_target(selected_pair)
                     # else:
                     # targeting = 5.41
@@ -5240,12 +5240,12 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         # if (
                         # trend_position == "9%-10.99%" or trend_position == "11%-12.99% (4% PB)" or trend_position == ">=13%"):
-                        # if (trend_position == "9%-10.99%" and within_64 == "Yes"):
+                        # if (trend_position == "9%-10.99%" and trend_context == "Yes"):
                         # targeting = get_open_target(selected_pair)
                         # elif (
-                        # trend_position == "11%-12.99% (4% PB)" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        # trend_position == "11%-12.99% (4% PB)" and trend_context == "Yes" and selected_pair == "XAUUSD"):
                         # targeting = get_open_target(selected_pair)
-                        # elif (trend_position == ">=13%" and within_64 == "Yes" and selected_pair == "XAUUSD"):
+                        # elif (trend_position == ">=13%" and trend_context == "Yes" and selected_pair == "XAUUSD"):
                         # targeting = get_open_target(selected_pair)
                         # else:
                         # targeting = 5.41
@@ -5452,7 +5452,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 "Zone_Position": Zone_Position,
                                                 'Variances': Variances,
                                                 'stop_pips': stop_pips,
-                                                'within_64': within_64,
+                                                'trend_context': trend_context,
                                                 'final_risk': final_risk,  # This is important for comparison
                                                 'position_size': position_size,
                                                 'position_size_propfirm': position_size_propfirm,
@@ -5604,7 +5604,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'stop_pips': stop_pips,
 
-                                                'within_64': within_64,
+                                                'trend_context': trend_context,
 
                                                 'final_risk': final_risk,  # This is important for comparison
 
@@ -7092,7 +7092,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'HH_LL': record['HH_LL'],  # Already exists in record
                                             'leg_length': record['leg_length'],
                                             'squeeze_559_time': record['squeeze_559_time'],
-                                            'within_64': record['within_64'],  # Already exists in record
+                                            'trend_context': record['trend_context'],  # Already exists in record
                                             'Probability': new_Probability,
                                             'Withdrawal_Deposit': 0.0,
                                             'PROP_Pct': 0.0,
@@ -7110,7 +7110,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'POI', 'Strategy', 'Variance', 'Result', 'RR',
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
-                                                                    'cross_fib', 'HH_LL', 'within_64',  # ADDED FIELDS
+                                                                    'cross_fib', 'HH_LL', 'trend_context',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
                                                                     'Zone_Position', 'Probability', 'squeeze_559_time',
                                                                     'leg_length', 'Link_to_screenshot']
@@ -9518,6 +9518,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

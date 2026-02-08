@@ -4289,7 +4289,7 @@ elif st.session_state.current_page == "Risk Calculation":
             
             available_trend_position = get_available_trend_position(selected_pair)
             concat_pair_context = selected_pair +  trend_context
-            available_trend_position2 = get_available_trend_position2(concat_pair_context)
+            available_trend_position2 = get_available_trend_position2(concat_pair_context,available_trend_position)
             trend_position = st.selectbox("Trend Position (+-0.05%)", available_trend_position2)
 
             
@@ -9525,6 +9525,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

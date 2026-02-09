@@ -3799,6 +3799,13 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_36 = {
+            "Trend 05%-6.99%": ['Whole Wave/Trend (3 Trades)'],
+            "": [],
+            "":[],
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3945,7 +3952,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_timeframe_3(listone, wave):
             disabled_timeframe_3 = incompatible_map_33.get(wave, [])
             return [s for s in listone if s not in disabled_timeframe_3]
-
+            
+        def get_available_timeframe_4(listone, context_trend):
+            disabled_timeframe_4 = incompatible_map_36.get(context_trend, [])
+            return [s for s in listone if s not in disabled_timeframe_4]
 
         def get_available_position(pairlist):
             disabled_position = incompatible_map_7.get(pairlist, [])
@@ -4306,9 +4316,11 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
+            context_trend = trend_context + trend_position
+            available_time_frame_4 = get_available_timeframe_4(available_time_frame_3,context_trend)
             POI = st.selectbox(
                 "POI Type (If wave >4%, AUDCAD >3% use 2 Daily Fib) For 2_Daily, first check any clear TPF, if unclear use Mid Weekly K to adjust",
-                available_time_frame_3)
+                available_time_frame_4)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
             squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1', '2'])
@@ -9471,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

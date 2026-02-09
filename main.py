@@ -3507,7 +3507,7 @@ elif st.session_state.current_page == "Risk Calculation":
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
-        time_frame = ['Whole Wave/Trend (3 Trades)', 'Partial Wave/Trend (1 Trade)']
+        time_frame = ['3 Trades', '1 Trade']
         _559_time = ['0', '1', '2']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -3606,9 +3606,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_11 = {
-            "AUDJPY": ['Partial Wave/Trend (1 Trade)', 'Daily BOS', '8H/4H BOS'],
-            "GBPJPY": ['Partial Wave/Trend (1 Trade)', 'Daily BOS', '8H/4H BOS'],
-            "EURJPY": ['Partial Wave/Trend (1 Trade)', 'Daily BOS', '8H/4H BOS'],
+            "AUDJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
+            "GBPJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
+            "EURJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
             "EURAUD": ['8H/4H BOS'],
             "GBPAUD": ['8H/4H BOS'],
         }
@@ -3637,7 +3637,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_15 = {
-            "Partial Wave/Trend (1 Trade)": [],
+            "1 Trade": [],
 
         }
 
@@ -3800,7 +3800,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_36 = {
-            "Trend 05%-6.99%": ['Whole Wave/Trend (3 Trades)'],
+            "Trend 05%-6.99%": ['3 Trades'],
             "": [],
             "":[],
 
@@ -4465,9 +4465,9 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
 
-            if (POI == 'Whole Wave/Trend (3 Trades)'):
+            if (POI == '3 Trades'):
                 POI_multiplier = 1.0
-            elif (POI == 'Partial Wave/Trend (1 Trade)'):
+            elif (POI == '1 Trade'):
                 if(risk_multiplier == "1_BNR"):
                     POI_multiplier = 1.1
                 else:
@@ -6946,9 +6946,9 @@ elif st.session_state.current_page == "Active Opps":
                             existing_poi = record.get('poi', '')
                             poi_display = "Whole Wave"  # Default
 
-                            if existing_poi == "Whole" or existing_poi == "Whole Wave/Trend (3 Trades)":
+                            if existing_poi == "Whole" or existing_poi == "3 Trades":
                                 poi_display = "Whole"
-                            elif existing_poi == "Partial Wave/Trend (1 Trade)" or existing_poi == "Partial":
+                            elif existing_poi == "1 Trade" or existing_poi == "Partial":
                                 poi_display = "Partial"
                             elif existing_poi in poi_options:
                                 poi_display = existing_poi
@@ -9483,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

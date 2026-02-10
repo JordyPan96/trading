@@ -3507,7 +3507,7 @@ elif st.session_state.current_page == "Risk Calculation":
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
-        time_frame = ['3 Trades', '1 Trade']
+        time_frame = ['1 Trade','3 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
             "USDCAD": ['1_BNR'],
@@ -9496,6 +9496,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

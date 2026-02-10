@@ -1280,7 +1280,7 @@ if st.session_state.current_page == "Home":
 
             with col6:
                 # NEW: trend_context dropdown - UPDATED OPTIONS
-                trend_context_options = ["Trend 0", "Trend 1+"]
+                trend_context_options = ["Trend 0", "Trend 1+","Range"]
                 new_trend_context = st.selectbox("within 64", options=trend_context_options, key="new_trend_context")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
@@ -3522,7 +3522,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         leg_length = [">=2%", ">=179%", ">=149%", ">=119%", ">=99%", "NA"]
-        trend_context = ["Trend 0", "Trend 1+"]
+        trend_context = ["Trend 0", "Trend 1+","Range"]
         incompatible_map_4 = {
             "2_BNR_TPF": ["No","Yes"],
             "2_BNR": ["No","Yes"],
@@ -4972,7 +4972,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 def get_potential_target(trend, pair, wave, strategy,context):
                     open_target = 0
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
-                        if(context == "Trend 0"):
+                        if(context == "Trend 0" or context == "Range"):
                             if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                                 if(trend == "3%-4.99%"):
                                     if(pair == "XAUUSD"):
@@ -9483,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

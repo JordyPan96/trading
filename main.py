@@ -3806,6 +3806,11 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_37 = {
+            "Range": [">=13% (5% PB, ACAD 4%)","11%-12.99% (4% PB)","5%-6.99%","7%-8.99%","9%-10.99%"],
+
+        }
+
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
             "XAUUSD2_BNR559 - 66": [">=99%", ">=149%", ">=2%", "NA"],
@@ -3969,6 +3974,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_trend_position2(pair_context,available_list):
             disabled_trend_position2 = incompatible_map_35.get(pair_context, [])
             return [s for s in available_list if s not in disabled_trend_position2]
+
+        def get_available_trend_position3(context,available_list):
+            disabled_trend_position3 = incompatible_map_37.get(context, [])
+            return [s for s in available_list if s not in disabled_trend_position3]
 
 
         def get_available_Wave_status(trend):
@@ -4308,7 +4317,8 @@ elif st.session_state.current_page == "Risk Calculation":
             available_trend_position = get_available_trend_position(selected_pair)
             concat_pair_context = selected_pair +  trend_context
             available_trend_position2 = get_available_trend_position2(concat_pair_context,available_trend_position)
-            trend_position = st.selectbox("Trend Position (+-0.05%)", available_trend_position2)
+            available_trend_position3 = get_available_trend_position3(trend_context,available_trend_position2)
+            trend_position = st.selectbox("Trend Position (+-0.05%)", available_trend_position3)
 
             
             available_wave_status = get_available_Wave_status(trend_position)
@@ -9483,6 +9493,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

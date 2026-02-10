@@ -4475,7 +4475,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if (trend_context == 'Trend 1+'):
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
-                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
+                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                         if (risk_multiplier == "1_BNR_TPF"):
                             sixone_multiplier = 1.5
                     else:
@@ -4640,7 +4640,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             def get_one_target(selected_pair, wave, trend):
                 open_target = 0
-                if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
+                if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                     if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                         if(trend == "3%-4.99%"):
                             open_target = "Top of trend to 8.99%"
@@ -4971,7 +4971,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 def get_potential_target(trend, pair, wave, strategy,context):
                     open_target = 0
-                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr):
+                    if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                         if(context == "Trend 0" or context == "Range"):
                             if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                                 if(trend == "3%-4.99%"):
@@ -9483,6 +9483,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

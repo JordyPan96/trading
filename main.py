@@ -4816,7 +4816,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     return entry_plus
 
 
-                if (trend_context == "Trend 1+"):
+                if (trend_context == "Trend 1+" or trend_context == "Range"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -4985,7 +4985,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 def get_potential_target(trend, pair, wave, strategy,context):
                     open_target = 0
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
-                        if(context == "Trend 0" or context == "Range"):
+                        if(context == "Trend 0"):
                             if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                                 if(trend == "3%-4.99%"):
                                     if(pair == "XAUUSD"):
@@ -5031,7 +5031,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     else:
                                         open_target = 5.41
                             
-                        elif(context == "Trend 1+"):
+                        elif(context == "Trend 1+" or context == "Range"):
                             if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                                 if(trend == "3%-4.99%"):
                                     open_target = "Top of trend to 8.99%"
@@ -9496,6 +9496,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

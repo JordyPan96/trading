@@ -3503,7 +3503,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H_OB to TPF", "8H/4H_TPF to Fib", "8H/4H_On OB/TPF", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
@@ -9495,6 +9495,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

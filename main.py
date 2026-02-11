@@ -3510,7 +3510,7 @@ elif st.session_state.current_page == "Risk Calculation":
         time_frame = ['1 Trade','3 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
-            "USDCAD": ['1_BNR'],
+            "USDCAD": [],
             "GBPAUD": ["1_BNR"],
             "AUDUSD": [""],
             "EURAUD": ["1_BNR"],
@@ -9492,6 +9492,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

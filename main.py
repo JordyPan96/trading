@@ -4497,7 +4497,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
                 if(trend_context == "Range"):
-                    trend_position_multiplier = 1.0
+                    trend_position_multiplier = 0.9
                 else:
                     trend_position_multiplier = 1.0
 
@@ -9488,6 +9488,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

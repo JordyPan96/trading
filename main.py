@@ -4452,26 +4452,18 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (Zone_Position == "+2"):
                 Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+3"):
-                Zone_Position_multiplier = 0.95
+                Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+4"):
-                Zone_Position_multiplier = 0.90
+                Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+5"):
-                Zone_Position_multiplier = 0.85
+                Zone_Position_multiplier = 0.95
             elif (Zone_Position == "+6"):
-                Zone_Position_multiplier = 0.80
-            elif (Zone_Position == "+7"):
-                Zone_Position_multiplier = 0.75
-            elif (Zone_Position == "+8"):
-                Zone_Position_multiplier = 0.70
-            elif (Zone_Position == "+9"):
-                Zone_Position_multiplier = 0.65
-            elif (Zone_Position == "+10"):
-                Zone_Position_multiplier = 0.60
+                Zone_Position_multiplier = 0.90
             else:
                 Zone_Position_multiplier = 1.0
 
             if (HH_LL == "No"):
-                hh_ll_multiplier = 0.91
+                hh_ll_multiplier = 1.0
             elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
 
@@ -4479,7 +4471,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 POI_multiplier = 1.0
             elif (POI == '1 Trade'):
                 if(risk_multiplier == "1_BNR"):
-                    POI_multiplier = 1.1
+                    POI_multiplier = 1.0
                 else:
                     POI_multiplier = 1.0
 
@@ -4490,7 +4482,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             sixone_multiplier = 1.5
                     else:
                         if (risk_multiplier == "1_BNR_TPF"):
-                            sixone_multiplier = 1.1
+                            sixone_multiplier = 1.0
                 else:
                     sixone_multiplier = 1.0
             else:
@@ -4505,9 +4497,9 @@ elif st.session_state.current_page == "Risk Calculation":
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
                 if(trend_context == "Range"):
-                    trend_position_multiplier = 0.81
+                    trend_position_multiplier = 1.0
                 else:
-                    trend_position_multiplier = 0.91
+                    trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
                 if (cross_fib == "Wave 1"):
@@ -4523,20 +4515,20 @@ elif st.session_state.current_page == "Risk Calculation":
                     trend_position_multiplier = 1.2
             else:
                 if (cross_fib == "Wave 1"):
-                    trend_position_multiplier = 1.2
+                    trend_position_multiplier = 1.3
 
             if (pattern == "8H/4H_On OB/TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF Left Leg"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.0
             elif (pattern == "8H/4H_OB to TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
-                pattern_multiplier = 1.2
-            elif(pattern == "Previous Trend Top/Bottom"):
-                pattern_multiplier = 1.2
-            elif (pattern == "2 Daily TPF Left Leg"):
                 pattern_multiplier = 1.1
+            elif(pattern == "Previous Trend Top/Bottom"):
+                pattern_multiplier = 1.0
+            elif (pattern == "2 Daily TPF Left Leg"):
+                pattern_multiplier = 1.05
             elif (pattern == "Daily TPF Left Leg"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H_TPF to Fib"):
@@ -9496,6 +9488,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

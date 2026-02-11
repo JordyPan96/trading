@@ -3606,9 +3606,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_11 = {
-            "AUDJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
-            "GBPJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
-            "EURJPY": ['1 Trade', 'Daily BOS', '8H/4H BOS'],
+            "AUDJPY": ['Daily BOS', '8H/4H BOS'],
+            "GBPJPY": ['Daily BOS', '8H/4H BOS'],
+            "EURJPY": ['Daily BOS', '8H/4H BOS'],
             "EURAUD": ['8H/4H BOS'],
             "GBPAUD": ['8H/4H BOS'],
         }
@@ -9492,6 +9492,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4548,7 +4548,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 0.0
 
             if (Variances == "50"):
-                variance_multiplier = 0.91
+                variance_multiplier = 0.90
             elif (Variances == "559 - 66"):
                 variance_multiplier = 1.0
             elif (Variances == "66 - 91"):
@@ -4561,7 +4561,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pair_result == "W"):
                 prior_result_multiplier = 1.20
             elif (pair_result == "L"):
-                prior_result_multiplier = 0.81
+                prior_result_multiplier = 0.80
             elif (pair_result == "X"):
                 prior_result_multiplier = 0
 
@@ -9495,6 +9495,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

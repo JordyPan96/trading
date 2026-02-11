@@ -3803,7 +3803,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_36 = {
             "Trend 05%-6.99%": ['3 Trades'],
-            "": [],
+            "Trend 03%-4.99%": ['3 Trades'],
             "":[],
 
         }
@@ -9550,6 +9550,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

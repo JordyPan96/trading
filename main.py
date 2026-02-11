@@ -3778,10 +3778,12 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_34 = {
-            "": [],
-            "": [],
-            "":[],
-
+            "GBPJPY": ["Range"],
+            "EURJPY": ["Range"],
+            "AUDJPY": ["Range"],
+            "GBPAUD": ["Range"],
+            "EURAUD": ["Range"],
+            "XAUUSD": ["Range"],
         }
 
         incompatible_map_35 = {
@@ -9490,6 +9492,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

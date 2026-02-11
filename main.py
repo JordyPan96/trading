@@ -4326,6 +4326,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
+            context_trend = ""
             if(len(trend_position)>=1):
                 context_trend = trend_context + trend_position
             else:
@@ -9493,6 +9494,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

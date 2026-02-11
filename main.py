@@ -4816,7 +4816,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     return entry_plus
 
 
-                if (trend_context == "Trend 1+"):
+                if (trend_context == "Trend 1+" or trend_context == "Range"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
@@ -9496,6 +9496,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

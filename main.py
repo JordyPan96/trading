@@ -4687,6 +4687,59 @@ elif st.session_state.current_page == "Risk Calculation":
                     open_target = 5.41
                              
                 return str(open_target)
+                
+            def get_one_target_2(selected_pair, wave, trend):
+                open_target = 0
+                if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
+                    if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
+                        if(trend == "3%-4.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "5%-6.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "7%-8.99%"):
+                            open_target = "Top of trend to 9%"
+                        elif(trend == "9%-10.99%"):
+                            open_target = "Top of wave to 3.99%"
+                        elif(trend == "11%-12.99% (4% PB)"):
+                            open_target = "Top of wave to 4.99%"
+
+                    elif(wave == "Wave 2+" or wave == "Cross Trend <=3.99%" or wave == "Cross Trend 4% - 5.99%"):
+                        if(trend == "3%-4.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "5%-6.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "7%-8.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "9%-10.99%"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                        elif(trend == "11%-12.99% (4% PB)"):
+                            if(selected_pair == "XAUUSD"):
+                                open_target = 6.41
+                            else:
+                                open_target = 5.41
+                         
+                else:
+                    open_target = 5.41
+                             
+                return str(open_target)
 
 
             def compare_target(open_target_multiplier, desire_target):
@@ -4885,28 +4938,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = 6.41
+                        exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = 5.41
+                        exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = 5.41
+                        exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
                         SL_text = "17%, " + "box %," + " 32%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
-                        exit_text = 5.41
+                        exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
 
 
@@ -9495,6 +9548,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

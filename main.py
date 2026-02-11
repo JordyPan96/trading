@@ -4497,7 +4497,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # rr_multiplier = 1.3
             if (trend_position == "3%-4.99%"):
                 if(trend_context == "Range"):
-                    trend_position_multiplier = 0.9
+                    trend_position_multiplier = 1.0
                 else:
                     trend_position_multiplier = 1.0
 
@@ -4524,11 +4524,11 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "8H/4H_OB to TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
-                pattern_multiplier = 1.1
+                pattern_multiplier = 1.0
             elif(pattern == "Previous Trend Top/Bottom"):
                 pattern_multiplier = 1.0
             elif (pattern == "2 Daily TPF Left Leg"):
-                pattern_multiplier = 1.05
+                pattern_multiplier = 1.0
             elif (pattern == "Daily TPF Left Leg"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H_TPF to Fib"):
@@ -9488,6 +9488,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

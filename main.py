@@ -4458,9 +4458,9 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (Zone_Position == "+4"):
                 Zone_Position_multiplier = 1.0
             elif (Zone_Position == "+5"):
-                Zone_Position_multiplier = 0.95
-            elif (Zone_Position == "+6"):
                 Zone_Position_multiplier = 0.90
+            elif (Zone_Position == "+6"):
+                Zone_Position_multiplier = 0.80
             else:
                 Zone_Position_multiplier = 1.0
 
@@ -4512,7 +4512,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (trend_position == "7%-8.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
-                        trend_position_multiplier = 1.05
+                        trend_position_multiplier = 1.1
             elif (trend_position == "9%-10.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
@@ -9548,6 +9548,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

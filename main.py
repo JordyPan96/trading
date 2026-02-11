@@ -3778,12 +3778,12 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_34 = {
-            "GBPJPY": ["Range"],
-            "EURJPY": ["Range"],
-            "AUDJPY": ["Range"],
-            "GBPAUD": ["Range"],
-            "EURAUD": ["Range"],
-            "XAUUSD": ["Range"],
+            "GBPJPY": [],
+            "EURJPY": [],
+            "AUDJPY": [],
+            "GBPAUD": [],
+            "EURAUD": [],
+            "XAUUSD": [],
         }
 
         incompatible_map_35 = {
@@ -3809,7 +3809,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_37 = {
-            "Range": [">=13% (5% PB, ACAD 4%)","11%-12.99% (4% PB)","5%-6.99%","7%-8.99%","9%-10.99%"],
+            "Range": [">=13% (5% PB, ACAD 4%)","11%-12.99% (4% PB)","7%-8.99%","9%-10.99%"],
 
         }
 
@@ -9495,6 +9495,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

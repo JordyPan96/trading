@@ -4504,21 +4504,24 @@ elif st.session_state.current_page == "Risk Calculation":
                     trend_position_multiplier = 1.0
 
             elif (trend_position == "5%-6.99%"):
-                if (cross_fib == "Wave 1"):
-                    trend_position_multiplier = 1.0
-                if(trend_context == "Trend 0"):
+                if(trend_context == "Trend 1+"):
+                    if (cross_fib == "Wave 1"):
+                        trend_position_multiplier = 1.0
+                elif(trend_context == "Trend 0"):
                     trend_position_multiplier = 0.8
             elif (trend_position == "7%-8.99%"):
-                if (cross_fib == "Wave 1"):
-                    trend_position_multiplier = 1.05
+                if(trend_context == "Trend 1+"):
+                    if (cross_fib == "Wave 1"):
+                        trend_position_multiplier = 1.05
             elif (trend_position == "9%-10.99%"):
-                if (cross_fib == "Wave 1"):
-                    trend_position_multiplier = 1.1
+                if(trend_context == "Trend 1+"):
+                    if (cross_fib == "Wave 1"):
+                        trend_position_multiplier = 1.1
             elif (trend_position == "11%-12.99% (4% PB)"):
                 if (cross_fib == "Wave 1"):
                     trend_position_multiplier = 1.2
             else:
-                if (cross_fib == "Wave 1"):
+                if (cross_fib == "Wave 1" or cross_fib == "Cross Trend >=6%"):
                     trend_position_multiplier = 1.3
 
             if (pattern == "8H/4H_On OB/TPF"):
@@ -9492,6 +9495,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

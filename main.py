@@ -5370,14 +5370,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Steps to enter a trade<br><br>
-                                --1. Do Top Down Analysis W/2D/D to identify entry model<br>
-                                --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
-                                --3. Navigate to Pattern Trigger timeframe<br>
-                                --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
-                                --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
-                                --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --7. Configure SL and target based on calculated or given value<br>
-                                --8. IF entering on entry line (High Conviction), no trigger box then give average of min and max as SL<br>
+                                --1. Identify Available entry Fib Zone<br>
+                                --2. Identify entry trigger Pattern on trigger timeframe<br>
+                                --3. Identify key price level and decide on precise entry point<br>
+                                <br>
+                                --5. Stop Loss Guide<br>
+                                --6. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
+                                --7. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5386,14 +5385,13 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Steps to enter a trade<br><br>
-                                --1. Do Top Down Analysis W/2D/D to identify entry model<br>
-                                --2. Locate 1 Entry zone based on TPF or OB Wick during top down analysis<br>
-                                --3. Navigate to Pattern Trigger timeframe<br>
-                                --4. Reconfirm Entry zone and draw Trigger Box based on pattern identified<br>
-                                --5. Enter Middle of trigger box, only enter at TOP IF SL covers entire fib or leg one<br>
-                                --6. Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --7. Configure SL and target based on calculated or given value<br>
-                                --8. IF entering on entry line (High Conviction), no trigger box then give average of min and max as SL<br>
+                                --1. Identify Available entry Fib Zone<br>
+                                --2. Identify entry trigger Pattern on trigger timeframe<br>
+                                --3. Identify key price level and decide on precise entry point<br>
+                                <br>
+                                --5. Stop Loss Guide<br>
+                                --6. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
+                                --7. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9550,6 +9548,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

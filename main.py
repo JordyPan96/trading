@@ -5374,9 +5374,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                 --2. Identify entry trigger Pattern on trigger timeframe<br>
                                 --3. Identify key price level and decide on precise entry point<br>
                                 <br>
-                                Stop Loss Guide<br>
-                                --6. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --7. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
+                                Stop Loss Guide<br><br>
+                                --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
+                                --2. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -9548,6 +9548,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

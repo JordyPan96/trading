@@ -4481,7 +4481,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                         if (risk_multiplier == "1_BNR_TPF"):
-                            sixone_multiplier = 1.5
+                            if (cross_fib == "Wave 1"):
+                                sixone_multiplier = 1.5
                     else:
                         if (risk_multiplier == "1_BNR_TPF"):
                             sixone_multiplier = 1.0
@@ -9548,6 +9549,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

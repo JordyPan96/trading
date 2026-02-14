@@ -4515,7 +4515,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (trend_position == "7%-8.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
-                        trend_position_multiplier = 1.1
+                        trend_position_multiplier = 1.2
             elif (trend_position == "9%-10.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
@@ -9549,6 +9549,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

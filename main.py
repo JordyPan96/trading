@@ -2763,11 +2763,11 @@ elif st.session_state.current_page == "Symbol Stats":
                         # Calculate win rates
                         combined['Win_Rate_%'] = (combined['Wins'] / combined['Total_Trades'] * 100).round(2)
 
-                        # Filter only combinations with significant sample size (e.g., at least 3 trades)
+                        # Filter only combinations with significant sample size (e.g., at least 2 Trades)
                         significant_combinations = combined[combined['Total_Trades'] >= 3]
 
                         if not significant_combinations.empty:
-                            st.write("Significant Strategy-Pattern Combinations (min 3 trades):")
+                            st.write("Significant Strategy-Pattern Combinations (min 2 Trades):")
                             st.dataframe(significant_combinations.sort_values('Win_Rate_%', ascending=False))
 
                             # Best combination
@@ -2778,7 +2778,7 @@ elif st.session_state.current_page == "Symbol Stats":
                             st.write(
                                 f"   Win Rate: {best_combo['Win_Rate_%']}% | Trades: {int(best_combo['Total_Trades'])}")
                         else:
-                            st.write("No strategy-pattern combinations with significant sample size (min 3 trades)")
+                            st.write("No strategy-pattern combinations with significant sample size (min 2 Trades)")
 
 
                     # 6. Statistical analysis
@@ -3507,7 +3507,7 @@ elif st.session_state.current_page == "Risk Calculation":
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
-        time_frame = ['1 Trade','3 Trades']
+        time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
             "USDCAD": [],
@@ -3802,8 +3802,8 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_36 = {
-            "Trend 05%-6.99%": ['3 Trades'],
-            "Trend 03%-4.99%": ['3 Trades'],
+            "Trend 05%-6.99%": ['2 Trades'],
+            "Trend 03%-4.99%": ['2 Trades'],
             "":[],
 
         }
@@ -4469,7 +4469,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
 
-            if (POI == '3 Trades'):
+            if (POI == '2 Trades'):
                 POI_multiplier = 1.0
             elif (POI == '1 Trade'):
                 if(risk_multiplier == "1_BNR"):
@@ -7012,7 +7012,7 @@ elif st.session_state.current_page == "Active Opps":
                             existing_poi = record.get('poi', '')
                             poi_display = "Whole Wave"  # Default
 
-                            if existing_poi == "Whole" or existing_poi == "3 Trades":
+                            if existing_poi == "Whole" or existing_poi == "2 Trades":
                                 poi_display = "Whole"
                             elif existing_poi == "1 Trade" or existing_poi == "Partial":
                                 poi_display = "Partial"
@@ -9549,6 +9549,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

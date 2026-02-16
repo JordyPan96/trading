@@ -1227,7 +1227,7 @@ if st.session_state.current_page == "Home":
 
             with col2:
                 # POI dropdown
-                poi_options = ["Whole", "Partial"]
+                poi_options = ["1 Trade", "2 Trades"]
                 new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
@@ -1281,7 +1281,7 @@ if st.session_state.current_page == "Home":
             with col6:
                 # NEW: trend_context dropdown - UPDATED OPTIONS
                 trend_context_options = ["Trend 0", "Trend 1+","Range"]
-                new_trend_context = st.selectbox("within 64", options=trend_context_options, key="new_trend_context")
+                new_trend_context = st.selectbox("Trend Context", options=trend_context_options, key="new_trend_context")
 
                 # NEW: cross_fib dropdown - UPDATED OPTIONS
                 cross_fib_options = ["Cross Trend <=3.99%", "Cross Trend 4% - 5.99%", "Cross Trend >=6%","Wave 1", "Wave 2+"]
@@ -9549,6 +9549,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

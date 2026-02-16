@@ -4324,18 +4324,18 @@ elif st.session_state.current_page == "Risk Calculation":
 
             
             available_wave_status = get_available_Wave_status(trend_position)
-            cross_fib = st.selectbox("Weekly Wave Status (One Wave is minimum 3% length)", available_wave_status)
+            cross_fib = st.selectbox("Weekly Wave Status", available_wave_status)
             available_time_frame = get_available_timeframe(selected_pair)
             available_time_frame_2 = get_available_timeframe_2(available_time_frame, trend_position)
             available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
             context_trend = trend_context + trend_position
             available_time_frame_4 = get_available_timeframe_4(available_time_frame_3,context_trend)
             POI = st.selectbox(
-                "POI Type (If wave >4%, AUDCAD >3% use 2 Daily Fib) For 2_Daily, first check any clear TPF, if unclear use Mid Weekly K to adjust",
+                "POI Type (Use Weekly or 2_Daily Fib, whatever makes sense)",
                 available_time_frame_4)
 
-            HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell)", ['Yes', 'No'])
-            squeeze_559_time = st.selectbox("How many times has price rejected 559 zone on 8H/4H", ['0', '1', '2'])
+            HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell) - If fib reaches 0.2 and >=2.5% in length, create new fib", ['Yes', 'No'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)
@@ -4364,7 +4364,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
 
-            pattern = st.selectbox("Pattern Trigger (Trigger Box drawn to be on same timeframe)",
+            pattern = st.selectbox("Pattern Trigger (Trigger to be on same timeframe)",
                                    available_pattern_trigger4)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
@@ -4405,7 +4405,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
             available_leg_length5 = get_available_leg_length5(squeeze_559_time, available_leg_length4)
 
-            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone", available_leg_length5)
+            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 (50) Zone", available_leg_length5)
 
             Adaptive_value = next_risk
 
@@ -9549,6 +9549,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_TPF to Fib", "8H/4H TPF Left Leg",
+                pattern_options = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_TPF to Fib",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
@@ -9551,6 +9551,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

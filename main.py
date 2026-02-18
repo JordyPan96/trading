@@ -5373,18 +5373,19 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Note All values need to put between min max value to find SL<br>
-                                2_BNR_TPF should always use SL_2 (if any)<br><br>
+                                Use Default, then adjust based on entry model<br><br>
                                 OB_TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
-                                SL: Add 11/7/3 To Box %<br><br>
+                                SL_Default: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
-                                SL_1: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
+                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+
+                                2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any) <br><br>
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
-                                SL_1: Last wick + 7%<br>
-                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                SL_Default: Last wick + 7%<br>
+                                2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any)<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5393,18 +5394,19 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Note All values need to put between min max value to find SL<br>
-                                2_BNR_TPF should always use SL_2 (if any)<br><br>
+                                Use Default, then adjust based on entry model<br><br>
                                 OB_TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
-                                SL: Add 11/7/3 To Box %<br><br>
+                                SL_Default: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
-                                SL_1: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
+                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+
+                                2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any) <br><br>
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
-                                SL_1: Last wick + 7%<br>
-                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                SL_Default: Last wick + 7%<br>
+                                2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any)<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9561,6 +9563,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

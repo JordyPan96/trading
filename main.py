@@ -5373,17 +5373,18 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Steps to enter a trade<br><br>
-                                --1. Identify Available entry Fib Zone<br>
-                                --2. Identify entry trigger Pattern on trigger timeframe<br>
-                                OB_TPF: Enter 1 Pip before the mid point<br>
-                                On OB/ On TPF: Enter on the identified price level, usually key number<br>
-                                Wick Fill: Enter 1 pip before wick top<br>
-                                <br>
-                                Stop Loss Guide<br><br>
-                                --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If On OB/TPF Entry, enter based on top/bottom wick + 7%<br>
-                                --3. If Wick Fill Entry, enter based on min SL<br>
-                                --4. Adjust SL based on areas to cover +7%, or shrink if not required
+                                OB_TPF:<br>
+                                Entry: Enter 1 Pip before the mid point<br>
+                                SL: Add 11/7/3 To Box %, and place between min max value to find SL<br><br>
+
+                                On OB/TPF:<br>
+                                Entry: Enter ON top or bottom of candle stick, choose key level with most contacts<br>
+                                SL_1: Top/bottom wick + 7%<br>
+                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                
+                                Wick Fill:<br>
+                                Entry: Enter 1 pip before wick top/bottom<br>
+                                SL_1: Last wick + 7%<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5392,17 +5393,18 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Steps to enter a trade<br><br>
-                                --1. Identify Available entry Fib Zone<br>
-                                --2. Identify entry trigger Pattern on trigger timeframe<br>
-                                OB_TPF: Enter 1 Pip before the mid point<br>
-                                On OB/ On TPF: Enter on the identified price level, usually key number<br>
-                                Wick Fill: Enter 1 pip before wick top<br>
-                                <br>
-                                Stop Loss Guide<br><br>
-                                --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If On OB/TPF Entry, enter based on top/bottom wick + 7%<br>
-                                --3. If Wick Fill Entry, enter based on min SL<br>
-                                --4. Adjust SL based on areas to cover +7%, or shrink if not required
+                                OB_TPF:<br>
+                                Entry: Enter 1 Pip before the mid point<br>
+                                SL: Add 11/7/3 To Box %, and place between min max value to find SL<br><br>
+
+                                On OB/TPF:<br>
+                                Entry: Enter ON top or bottom of candle stick, choose key level with most contacts<br>
+                                SL_1: Top/bottom wick + 7%<br>
+                                SL_2: Key Order Block or stop loss reference +7%<br><br>
+                                
+                                Wick Fill:<br>
+                                Entry: Enter 1 pip before wick top/bottom<br>
+                                SL_1: Last wick + 7%<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9559,6 +9561,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

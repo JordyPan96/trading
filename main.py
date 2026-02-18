@@ -5379,7 +5379,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
+                                --2. If Meat Entry, enter based on meat length + 7%<br>
+                                --3. If Wick Fill Entry, enter based on min SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5394,7 +5395,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If line entry, give 17.9, 24.9 or 32.9 for SL<br>
+                                --2. If Meat Entry, enter based on meat length + 7%<br>
+                                --3. If Wick Fill Entry, enter based on min SL<br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9551,6 +9553,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

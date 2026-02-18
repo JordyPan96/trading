@@ -5372,10 +5372,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br><br>
+                                Steps to enter a trade<br>
+                                Note All values need to put between min max value to find SL<br><br>
                                 OB_TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
-                                SL: Add 11/7/3 To Box %, and place between min max value to find SL<br><br>
+                                SL: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
                                 SL_1: Top/bottom wick + 7%<br>
@@ -5391,10 +5392,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br><br>
+                                Steps to enter a trade<br>
+                                Note All values need to put between min max value to find SL<br><br>
                                 OB_TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
-                                SL: Add 11/7/3 To Box %, and place between min max value to find SL<br><br>
+                                SL: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
                                 SL_1: Top/bottom wick + 7%<br>
@@ -9559,6 +9561,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -3768,7 +3768,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_32 = {
-            "22_BNR_TPF": ["NA", "0", "+5", "+6", "+7", "+8", "+9", "+10"]
+            "22_BNR_TPF": ["NA", "0", "1-2","5-6"]
 
         }
 
@@ -9551,6 +9551,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

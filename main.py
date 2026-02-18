@@ -5383,6 +5383,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
                                 SL_1: Last wick + 7%<br>
+                                SL_2: Key Order Block or stop loss reference +7%<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5401,6 +5402,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
                                 SL_1: Last wick + 7%<br>
+                                SL_2: Key Order Block or stop loss reference +7%<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9557,6 +9559,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

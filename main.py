@@ -5372,7 +5372,6 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br>
                                 Note All values need to put between min max value to find SL<br>
                                 2_BNR_TPF should always use SL_2 (if any)<br><br>
                                 OB_TPF:<br>
@@ -5393,7 +5392,6 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Steps to enter a trade<br>
                                 Note All values need to put between min max value to find SL<br>
                                 2_BNR_TPF should always use SL_2 (if any)<br><br>
                                 OB_TPF:<br>
@@ -9563,6 +9561,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5379,7 +5379,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
-                                SL_1: Top/bottom wick + 7%<br>
+                                SL_1: Top (Sell)/ bottom (Buy) wick + 7%<br>
                                 SL_2: Key Order Block or stop loss reference +7%<br><br>
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
@@ -9561,6 +9561,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

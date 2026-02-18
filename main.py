@@ -5375,12 +5375,15 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Steps to enter a trade<br><br>
                                 --1. Identify Available entry Fib Zone<br>
                                 --2. Identify entry trigger Pattern on trigger timeframe<br>
-                                 --3. If Wick Fill Entry, enter based on min SL, if clear OB above give medium or max SL to cover that area<br>
+                                OB_TPF: Enter 1 Pip before the mid point<br>
+                                On OB/ On TPF: Enter on the identified price level, usually key number<br>
+                                Wick Fill: Enter 1 pip before wick top<br>
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If Meat Entry, enter based on meat length + 7%<br>
-                                --3. If Wick Fill Entry, enter based on min SL, if clear OB above give medium or max SL to cover that area<br>
+                                --2. If On OB/TPF Entry, enter based on meat length + 7%<br>
+                                --3. If Wick Fill Entry, enter based on min SL<br>
+                                --4. Adjust SL based on areas to cover, or shrink if not required
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5391,12 +5394,15 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Steps to enter a trade<br><br>
                                 --1. Identify Available entry Fib Zone<br>
                                 --2. Identify entry trigger Pattern on trigger timeframe<br>
-                                --3. Identify key price level and decide on precise entry point<br>
+                                OB_TPF: Enter 1 Pip before the mid point<br>
+                                On OB/ On TPF: Enter on the identified price level, usually key number<br>
+                                Wick Fill: Enter 1 pip before wick top<br>
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If Meat Entry, enter based on meat length + 7%<br>
+                                --2. If On OB/TPF Entry, enter based on meat length + 7%<br>
                                 --3. If Wick Fill Entry, enter based on min SL<br>
+                                --4. Adjust SL based on areas to cover, or shrink if not required
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9553,6 +9559,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

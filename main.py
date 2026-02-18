@@ -1276,7 +1276,7 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
+                Zone_Position_options = ["NA", "1-2", "1-4", "5-6"]
                 new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options,
                                                  key="new_Zone_Position")
 
@@ -3541,7 +3541,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Variance = ["559 - 66", "66 - 91", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
-        zone_from_leg_one = ["NA", "+1", "+2", "+3", "+4", "+5", "+6"]
+        zone_from_leg_one = ["NA", "1-2", "1-4","5-6"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend <=3.99%', 'Cross Trend 4% - 5.99%','Cross Trend >=6%']
 
         incompatible_map_3 = {
@@ -3644,10 +3644,10 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_16 = {
-            "1_BNR": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "1_BNR_TPF": ["0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "2_BNR": ["NA", "0", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"],
-            "2_BNR_TPF": ["NA"]
+            "1_BNR": ["0", "1-2","1-4","5-6"],
+            "1_BNR_TPF": ["0", "1-2","1-4","5-6"],
+            "2_BNR": ["NA", "0", "1-4","5-6"],
+            "2_BNR_TPF": ["NA","1-2"]
 
         }
 
@@ -4449,22 +4449,8 @@ elif st.session_state.current_page == "Risk Calculation":
             # multiplier = calculate_strategy_grade_temp(risk_multiplier)
             sum_target_multiplier = get_sum_target_remain()
 
-            if (Zone_Position == "0"):
-                Zone_Position_multiplier = 1.0
-            elif (Zone_Position == "+1"):
-                Zone_Position_multiplier = 1.0
-            elif (Zone_Position == "+2"):
-                Zone_Position_multiplier = 1.0
-            elif (Zone_Position == "+3"):
-                Zone_Position_multiplier = 1.0
-            elif (Zone_Position == "+4"):
-                Zone_Position_multiplier = 1.0
-            elif (Zone_Position == "+5"):
-                Zone_Position_multiplier = 0.90
-            elif (Zone_Position == "+6"):
-                Zone_Position_multiplier = 0.80
-            else:
-                Zone_Position_multiplier = 1.0
+            if (Zone_Position == "5-6"):
+                Zone_Position_multiplier = 0.8
 
             if (HH_LL == "No"):
                 hh_ll_multiplier = 1.0
@@ -9565,6 +9551,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

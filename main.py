@@ -3654,12 +3654,12 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF","8H/4H_TPF","8H/4H_OB X TPF"],
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF","8H/4H_OB X TPF"],
             '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF","8H/4H_TPF","8H/4H_OB X TPF"],
+                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF","8H/4H_OB X TPF"],
             '2_BNR_TPF': ["Previous Trend Top/Bottom", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H TPF Left Leg"]
         }
 
@@ -9565,6 +9565,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

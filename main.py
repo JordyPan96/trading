@@ -5379,6 +5379,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
+                                Entry_2: Round wick top/bottom to next round number, and push towards meat
                                 SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
                                 1_BNR  SL: Shrink to adjust target at 559, so its 5.41+<br>
                                 2_BNR_TPF  SL: Key Order Block or stop loss reference +7% (if any) <br><br>
@@ -5400,6 +5401,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
+                                Entry_2: Round wick top/bottom to next round number, and push towards meat
                                 SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
                                 1_BNR  SL: Shrink to adjust target at 559, so its 5.41+<br>
                                 2_BNR_TPF  SL: Key Order Block or stop loss reference +7% (if any) <br><br>
@@ -9563,6 +9565,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -1258,7 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_Wick Fill",
+                pattern_options = ["8H/4H_OB X TPF", "8H/4H_OB", "8H/4H_TPF",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
@@ -3505,7 +3505,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB to TPF", "8H/4H_On OB/TPF", "8H/4H_Wick Fill", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H_OB X TPF", "8H/4H_OB", "8H/4H_TPF", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
                   "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
@@ -3654,12 +3654,12 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF","8H/4H_Wick Fill","8H/4H_OB to TPF"],
-            '1_BNR_TPF': ["8H/4H_On OB/TPF", "8H/4H_Wick Fill", "8H/4H_OB to TPF",
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF","8H/4H_TPF","8H/4H_OB X TPF"],
+            '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
             '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF","8H/4H_Wick Fill","8H/4H_OB to TPF"],
+                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF","8H/4H_TPF","8H/4H_OB X TPF"],
             '2_BNR_TPF': ["Previous Trend Top/Bottom", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H TPF Left Leg"]
         }
 
@@ -3672,7 +3672,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_19 = {
             "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H_Wick Fill", "8H/4H TPF Left Leg","8H/4H_OB to TPF","8H/4H_On OB/TPF"],
+                           "8H/4H_TPF", "8H/4H TPF Left Leg","8H/4H_OB X TPF","8H/4H_OB"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
                            "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
         }
@@ -4529,11 +4529,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (cross_fib == "Wave 1" or cross_fib == "Cross Trend >=6%"):
                     trend_position_multiplier = 1.5
 
-            if (pattern == "8H/4H_On OB/TPF"):
+            if (pattern == "8H/4H_OB"):
                 pattern_multiplier = 1.0
             elif (pattern == "8H/4H TPF Left Leg"):
                 pattern_multiplier = 1.0
-            elif (pattern == "8H/4H_OB to TPF"):
+            elif (pattern == "8H/4H_OB X TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Weekly TPF Left Leg"):
                 pattern_multiplier = 1.0
@@ -4543,7 +4543,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "Daily TPF Left Leg"):
                 pattern_multiplier = 1.0
-            elif (pattern == "8H/4H_Wick Fill"):
+            elif (pattern == "8H/4H_TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.0
@@ -9565,6 +9565,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

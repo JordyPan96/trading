@@ -5381,7 +5381,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If On OB/TPF Entry, enter based on whole meat + 7%<br>
+                                --2. If On OB/TPF Entry, enter based on top/bottom wick + 7%<br>
                                 --3. If Wick Fill Entry, enter based on min SL<br>
                                 --4. Adjust SL based on areas to cover, or shrink if not required
                             </div>
@@ -5400,7 +5400,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 <br>
                                 Stop Loss Guide<br><br>
                                 --1. If box entry, Add 11/7/3 To Box %, and place between min max value to find SL<br>
-                                --2. If On OB/TPF Entry, enter based on whole meat + 7%<br>
+                                --2. If On OB/TPF Entry, enter based on top/bottom wick + 7%<br>
                                 --3. If Wick Fill Entry, enter based on min SL<br>
                                 --4. Adjust SL based on areas to cover, or shrink if not required
                             </div>
@@ -9559,6 +9559,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

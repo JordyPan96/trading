@@ -5380,7 +5380,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
                                 SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+
+                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+<br>
                                 2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any) <br><br>
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
@@ -5401,7 +5401,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 On OB/TPF:<br>
                                 Entry: Enter ON top or bottom of candle stick, key level with most contacts<br>
                                 SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+
+                                1_BNR_SL: Shrink to adjust target at 559, so its 5.41+<br>
                                 2_BNR_TPF_SL: Key Order Block or stop loss reference +7% (if any) <br><br>
                                 Wick Fill:<br>
                                 Entry: Enter 1 pip before wick top/bottom<br>
@@ -9563,6 +9563,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

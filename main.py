@@ -5394,7 +5394,8 @@ elif st.session_state.current_page == "Risk Calculation":
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
                                 Steps to enter a trade<br>
-                                Note All values need to put between min max value to find SL<br><br>
+                                Note All values need to put between min max value to find SL<br>
+                                2_BNR_TPF should always use SL_2 (if any)<br><br>
                                 OB_TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
                                 SL: Add 11/7/3 To Box %<br><br>
@@ -9562,6 +9563,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

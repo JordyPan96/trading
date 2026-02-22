@@ -4630,6 +4630,33 @@ elif st.session_state.current_page == "Risk Calculation":
                     base_entry = "box"
                     base_sl = "NA"
                     return str(base_entry), str(base_sl)
+                    
+            def getPairEntrySL_max(pair):
+                # target_in = 0
+                if (pair == "GBPUSD"):
+                    base_entry = "box"
+                    base_sl = 24.9
+                    return base_entry, str(base_sl)
+                elif (pair == "EURUSD"):
+                    base_entry = "box"
+                    base_sl = 24.9
+                    return base_entry, str(base_sl)
+                elif (pair == "AUDUSD"):
+                    base_entry = "box"
+                    base_sl = 24.9
+                    return base_entry, str(base_sl)
+                elif (pair == "XAUUSD"):
+                    base_entry = "box"
+                    base_sl = 24.9
+                    return str(base_entry), str(base_sl)
+                elif (pair == "USDJPY"):
+                    base_entry = "box"
+                    base_sl = 24.9
+                    return str(base_entry), str(base_sl)
+                else:
+                    base_entry = "box"
+                    base_sl = "NA"
+                    return str(base_entry), str(base_sl)
 
 
             entry_title = ""
@@ -4639,6 +4666,7 @@ elif st.session_state.current_page == "Risk Calculation":
             exit_title = ""
             exit_text = ""
             entry_pip, sl_pip = getPairEntrySL(selected_pair)
+            max_sl_pip = getPairEntrySL_max(selected_pair)
 
 
             def get_one_target(selected_pair, wave, trend):
@@ -4827,28 +4855,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
 
@@ -4857,28 +4885,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = sl_pip + ", box %, " + " 32%"
+                        SL_text = sl_pip + ", box %, " + max_sl_pip
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
@@ -4901,7 +4929,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4909,14 +4937,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                            SL_text = "17%, " + "box %," + " 32%"
+                            SL_text = "19.9%, " + "box %," + " 24.9%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4924,14 +4952,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                            SL_text = "17%, " + "box %," + " 32%"
+                            SL_text = "19.9%, " + "box %," + " 24.9%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4939,14 +4967,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                            SL_text = "17%, " + "box %," + " 32%"
+                            SL_text = "19.9%, " + "box %," + " 24.9%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4954,7 +4982,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                            SL_text = "17%, " + "box %," + " 32%"
+                            SL_text = "19.9%, " + "box %," + " 24.9%"
                             exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4964,28 +4992,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "17%, " + "box %," + " 32%"
+                        SL_text = "19.9%, " + "box %," + " 24.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
@@ -9597,6 +9625,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

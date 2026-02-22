@@ -5440,17 +5440,15 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (get_global('entry_model') != None):
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Note All values need to put between min max value to find SL<br>
-                                Use Default, then adjust based on entry model<br><br>
                                 OB X TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 OB or TPF:<br><br>
                                 Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
-                                Entry_2: Round wick top/bottom to next round number, and push towards meat<br><br>
-                                SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                1_BNR : Shrink to adjust target at 559, so its 5.41+<br>
-                                2_BNR_TPF : Key Order Block or stop loss reference +7% (if any) <br><br>
+                                Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
+                                SL_Default: Guided by SL Ref, mark it on the chart<br>
+                                TPF 1+2 : Give min SL<br>
+                                Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
@@ -5458,17 +5456,15 @@ elif st.session_state.current_page == "Risk Calculation":
                     entry_percent, base_percent = getPairEntrySL(selected_pair)
                     container.markdown(f"""
                             <div style="color:deepskyblue; font-weight:600;">
-                                Note All values need to put between min max value to find SL<br>
-                                Use Default, then adjust based on entry model<br><br>
                                 OB X TPF:<br>
                                 Entry: Enter 1 Pip before the mid point<br>
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 OB or TPF:<br><br>
                                 Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
-                                Entry_2: Round wick top/bottom to next round number, and push towards meat<br><br>
-                                SL_Default: Top (Sell)/ bottom (Buy) wick + 7%<br>
-                                1_BNR : Shrink to adjust target at 559, so its 5.41+<br>
-                                2_BNR_TPF : Key Order Block or stop loss reference +7% (if any) <br><br>
+                                Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
+                                SL_Default: Guided by SL Ref, mark it on the chart<br>
+                                TPF 1+2 : Give min SL<br>
+                                Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
                             </div>
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>
@@ -9625,6 +9621,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

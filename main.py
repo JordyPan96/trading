@@ -3647,7 +3647,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR": ["0", "1-2","1-4","5-6"],
             "1_BNR_TPF": ["0", "1-2","1-4","5-6"],
             "2_BNR": ["NA", "0", "1-4","5-6"],
-            "2_BNR_TPF": ["NA","1-2"]
+            "2_BNR_TPF": ["0", "1-2","1-4","5-6"]
 
         }
 
@@ -9623,6 +9623,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

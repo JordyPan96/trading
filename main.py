@@ -5116,7 +5116,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "32%, " + "box %," + " 32%"
+                        SL_text = "24.9%, " + "box %," + " 32.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
@@ -5124,7 +5124,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "32%, " + "box %," + " 32%"
+                        SL_text = "24.9%, " + "box %," + " 32.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
@@ -5132,7 +5132,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Box += 11/7/3 %, put between range"
-                        SL_text = "32%, " + "box %," + " 32%"
+                        SL_text = "24.9%, " + "box %," + " 32.9%"
                         exit_title = "Target Guide: Replace With 559 Fib X.41 if not reach 559 Fib"
                         exit_text = "5.41"
 
@@ -9543,6 +9543,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

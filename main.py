@@ -4747,39 +4747,39 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 elif (pair == "AUDUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 elif (pair == "USDCAD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
                 else:
                     if (strategy == '2_BNR_TPF'):
-                        return str(17)
+                        return str(19.9)
                     else:
-                        return str(17)
+                        return str(19.9)
 
 
             if (len(a_momemtum_text) < 1):
@@ -9543,6 +9543,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

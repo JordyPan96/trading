@@ -4608,23 +4608,23 @@ elif st.session_state.current_page == "Risk Calculation":
                 # target_in = 0
                 if (pair == "GBPUSD"):
                     base_entry = "box"
-                    base_sl = 17
+                    base_sl = 17.9
                     return base_entry, str(base_sl)
                 elif (pair == "EURUSD"):
                     base_entry = "box"
-                    base_sl = 17
+                    base_sl = 17.9
                     return base_entry, str(base_sl)
                 elif (pair == "AUDUSD"):
                     base_entry = "box"
-                    base_sl = 17
+                    base_sl = 17.9
                     return base_entry, str(base_sl)
                 elif (pair == "XAUUSD"):
                     base_entry = "box"
-                    base_sl = 17
+                    base_sl = 17.9
                     return str(base_entry), str(base_sl)
                 elif (pair == "USDJPY"):
                     base_entry = "box"
-                    base_sl = 17
+                    base_sl = 17.9
                     return str(base_entry), str(base_sl)
                 else:
                     base_entry = "box"
@@ -9597,6 +9597,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

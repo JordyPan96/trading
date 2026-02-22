@@ -5444,8 +5444,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Entry: Enter 1 Pip before the mid point<br>
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 OB or TPF:<br><br>
-                                Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
-                                Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
+                                Entry 1: Enter ON Wick, identify TPF or OB<br>
+                                Entry 2: Enter on actual price<br>
+                                Decision on entry: Use Common sense filter, then use SL to trial<br><br>
                                 SL_Default: Guided by SL Ref, Must be behind Entry 1<br>
                                 TPF 1+2 : Give min SL<br>
                                 Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
@@ -5460,8 +5461,9 @@ elif st.session_state.current_page == "Risk Calculation":
                                 Entry: Enter 1 Pip before the mid point<br>
                                 SL_Default: Add 11/7/3 To Box %<br><br>
                                 OB or TPF:<br><br>
-                                Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
-                                Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
+                                Entry 1: Enter ON Wick, identify TPF or OB<br>
+                                Entry 2: Enter on actual price<br>
+                                Decision on entry: Use Common sense filter, then use SL to trial<br><br>
                                 SL_Default: Guided by SL Ref, Must be behind Entry 1<br>
                                 TPF 1+2 : Give min SL<br>
                                 Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
@@ -9621,6 +9623,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

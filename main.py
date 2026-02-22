@@ -5446,7 +5446,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 OB or TPF:<br><br>
                                 Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
                                 Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
-                                SL_Default: Guided by SL Ref, mark it on the chart<br>
+                                SL_Default: Guided by SL Ref, Must be behind Entry 1<br>
                                 TPF 1+2 : Give min SL<br>
                                 Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
                             </div>
@@ -5462,7 +5462,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 OB or TPF:<br><br>
                                 Entry: Enter ON top or bottom of candle stick, identify TPF or OB<br>
                                 Entry_2: Round wick top/bottom to next round number, and push towards<br><br>
-                                SL_Default: Guided by SL Ref, mark it on the chart<br>
+                                SL_Default: Guided by SL Ref, Must be behind Entry 1<br>
                                 TPF 1+2 : Give min SL<br>
                                 Entry 1 or Entry 2 : Give SL that can cover SL Ref<br><br>
                             </div>
@@ -9621,6 +9621,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

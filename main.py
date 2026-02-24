@@ -4827,7 +4827,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         return str(24.9)
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return str(29.9)
+                        return str(32.9)
                     else:
                         return str(24.9)
                 elif (pair == "USDJPY"):
@@ -9623,6 +9623,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

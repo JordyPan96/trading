@@ -3721,7 +3721,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_26 = {
-            "Wave 1": ['Variant Fakeout 2 Daily TPF'],
+            "Wave 1": [],
             "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
             "Cross Trend <=3.99%": ['Variant 2 Daily TPF'],
             "Cross Trend 4% - 5.99%": ['Variant 2 Daily TPF'],
@@ -4534,7 +4534,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.0
             elif (pattern == "Variant Fakeout 2 Daily TPF"):
-                pattern_multiplier = 1.0
+                pattern_multiplier = 0.8
             elif (pattern == "No Pattern"):
                 pattern_multiplier = 0.0
 
@@ -9623,6 +9623,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

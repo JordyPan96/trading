@@ -3747,9 +3747,12 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_30 = {
-            "3%-4.99%": [],
-            "5%-6.99%": [],
-            "7%-8.99%": [],
+            "3%-4.99%": ["Variant Fakeout 2 Daily TPF"],
+            "5%-6.99%": ["Variant Fakeout 2 Daily TPF"],
+            "7%-8.99%": ["Variant Fakeout 2 Daily TPF"],
+            "9%-10.99%": ["Variant Fakeout 2 Daily TPF"],
+            "11%-12.99% (4% PB)": ["Variant Fakeout 2 Daily TPF"],
+            ">=13% (5% PB, ACAD 4%)" :[]
         }
 
         incompatible_map_31 = {
@@ -3814,6 +3817,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Range": [">=13% (5% PB, ACAD 4%)","11%-12.99% (4% PB)","7%-8.99%","9%-10.99%"],
 
         }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -9623,6 +9627,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

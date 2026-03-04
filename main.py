@@ -1261,7 +1261,7 @@ if st.session_state.current_page == "Home":
                 pattern_options = ["8H/4H_OB X TPF", "8H/4H_OB", "8H/4H_TPF",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
-                  "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
+                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -3508,7 +3508,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["8H/4H_OB X TPF",  "8H/4H_TPF","8H/4H_OB", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
                   "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
-                  "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF", "No Pattern"]
+                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -3654,12 +3654,12 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF","8H/4H_OB X TPF"],
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF"],
             '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF",
-                          "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout 2 Daily TPF"],
+                          "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF"],
             '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF","8H/4H_OB X TPF"],
+                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF"],
             '2_BNR_TPF': ["Previous Trend Top/Bottom", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H TPF Left Leg"]
         }
 
@@ -3674,7 +3674,7 @@ elif st.session_state.current_page == "Risk Calculation":
                            "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                            "8H/4H_TPF", "8H/4H TPF Left Leg","8H/4H_OB X TPF","8H/4H_OB"],
             "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                           "Variant 2 Daily TPF", "Variant Fakeout 2 Daily TPF"]
+                           "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
         }
 
         incompatible_map_20 = {
@@ -3693,7 +3693,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_21 = {
             "Variant 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
-            "Variant Fakeout 2 Daily TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
+            "Variant Fakeout Any TF TPF": [">=99%", ">=119%", ">=149%", ">=179%"],
             "Weekly TPF Left Leg": [">=2%"],
             "Previous Trend Top/Bottom": [">=2%"],
             "2 Daily TPF Left Leg": [">=2%"],
@@ -3722,7 +3722,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_26 = {
             "Wave 1": [],
-            "Wave 2+": ['Variant Fakeout 2 Daily TPF'],
+            "Wave 2+": ['Variant Fakeout Any TF TPF'],
             "Cross Trend <=3.99%": ['Variant 2 Daily TPF'],
             "Cross Trend 4% - 5.99%": ['Variant 2 Daily TPF'],
             "Cross Trend >=6%": ['Variant 2 Daily TPF'],
@@ -3730,7 +3730,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_27 = {
             "Variant 2 Daily TPF": ['50', '66 - 91', '786 - 91'],
-            "Variant Fakeout 2 Daily TPF": ['50', '559 - 66'],
+            "Variant Fakeout Any TF TPF": ['50', '559 - 66'],
 
         }
 
@@ -3747,11 +3747,11 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_30 = {
-            "3%-4.99%": ["Variant Fakeout 2 Daily TPF"],
-            "5%-6.99%": ["Variant Fakeout 2 Daily TPF"],
-            "7%-8.99%": ["Variant Fakeout 2 Daily TPF"],
-            "9%-10.99%": ["Variant Fakeout 2 Daily TPF"],
-            "11%-12.99% (4% PB)": ["Variant Fakeout 2 Daily TPF"],
+            "3%-4.99%": ["Variant Fakeout Any TF TPF"],
+            "5%-6.99%": ["Variant Fakeout Any TF TPF"],
+            "7%-8.99%": ["Variant Fakeout Any TF TPF"],
+            "9%-10.99%": ["Variant Fakeout Any TF TPF"],
+            "11%-12.99% (4% PB)": ["Variant Fakeout Any TF TPF"],
             ">=13% (5% PB, ACAD 4%)" :[]
         }
 
@@ -4537,7 +4537,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "Variant 2 Daily TPF"):
                 pattern_multiplier = 1.0
-            elif (pattern == "Variant Fakeout 2 Daily TPF"):
+            elif (pattern == "Variant Fakeout Any TF TPF"):
                 pattern_multiplier = 0.8
             elif (pattern == "No Pattern"):
                 pattern_multiplier = 0.0
@@ -9627,6 +9627,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

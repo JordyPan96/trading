@@ -4688,7 +4688,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif(trend == "11%-12.99% (4% PB)"):
                             open_target = "Top of wave to 4.99%"
                         elif(trend == ">=13% (5% PB, ACAD 4%)"):
-                            open_target = "Top of wave to 10%"
+                            open_target = "Top of wave to 4.99% or 559 Fib"
                     elif(wave == "Wave 2+" or wave == "Cross Trend <=3.99%" or wave == "Cross Trend 4% - 5.99%"):
                         if(trend == "3%-4.99%"):
                             open_target = "Top of trend to 8.99%"
@@ -5156,7 +5156,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif(trend == "11%-12.99% (4% PB)"):
                                     open_target = "Top of wave to 4.99%"
                                 elif(trend == ">=13% (5% PB, ACAD 4%)"):
-                                    open_target = "Top of wave to 10%"
+                                    open_target = "Top of wave to 4.99% or 559 Fib"
                             elif(wave == "Wave 2+" or wave == "Cross Trend 4% - 5.99%" or wave == "Cross Trend <=3.99%"):
                                 if(trend == "3%-4.99%"):
                                     open_target = "Top of trend to 8.99%"
@@ -9627,6 +9627,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

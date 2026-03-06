@@ -3698,6 +3698,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Previous Trend Top/Bottom": [">=2%"],
             "2 Daily TPF Left Leg": [">=2%"],
             "Daily TPF Left Leg": [">=2%"],
+            "4H BE Scale-in":[">=99%", ">=119%", ">=149%", ">=179%",">=2%"]
 
         }
 
@@ -9638,6 +9639,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

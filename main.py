@@ -4384,7 +4384,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
-            available_zone_position3 = get_available_zone_position3(squeezeStrat, available_zone_position2)
+            available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
 
             Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position3)
 
@@ -9638,6 +9638,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -4539,6 +4539,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 1.0
             elif (pattern == "Variant Fakeout Any TF TPF"):
                 pattern_multiplier = 0.8
+            elif (pattern == "4H BE Scale-in"):
+                pattern_multiplier = 0.8
             elif (pattern == "No Pattern"):
                 pattern_multiplier = 0.0
 
@@ -9627,6 +9629,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

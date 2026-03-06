@@ -3732,7 +3732,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_27 = {
             "Variant 2 Daily TPF": ['50', '66 - 91', '786 - 91'],
             "Variant Fakeout Any TF TPF": ['50', '559 - 66'],
-
+            "4H BE Scale-in": ['50', '559 - 66','66 - 91', '786 - 91'],
         }
 
         incompatible_map_28 = {
@@ -9639,6 +9639,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

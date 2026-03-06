@@ -3818,6 +3818,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
         }
 
+        incompatible_map_38 = {
+            "4H BE Scale-in":["0", "1-2","1-4","5-6"],
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -3951,7 +3955,6 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_pattern_trigger4(trend, strat_list):
             disabled_strategy4 = incompatible_map_30.get(trend, [])
             return [s for s in strat_list if s not in disabled_strategy4]
-
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -4111,6 +4114,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_zone_position2(squeezeStrat, zone_list):
             available_zone_position2 = incompatible_map_32.get(squeezeStrat, [])
             return [s for s in zone_list if s not in available_zone_position2]
+            
+        def get_available_zone_position3(pattern, zone_list):
+            available_zone_position3 = incompatible_map_38.get(pattern, [])
+            return [s for s in zone_list if s not in available_zone_position3]
 
 
 
@@ -4369,6 +4376,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
+            
 
             pattern = st.selectbox("Pattern Trigger (Trigger to be on same timeframe)",
                                    available_pattern_trigger4)
@@ -4376,8 +4384,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
+            available_zone_position3 = get_available_zone_position3(squeezeStrat, available_zone_position2)
 
-            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position2)
+            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position3)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
@@ -9629,6 +9638,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

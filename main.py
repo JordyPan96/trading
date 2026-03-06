@@ -3654,8 +3654,8 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF"],
-            '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF",
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF","4H BE Scale-in"],
+            '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF","4H BE Scale-in",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF"],
             '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
@@ -9627,6 +9627,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

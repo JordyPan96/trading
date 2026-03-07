@@ -3261,9 +3261,9 @@ elif st.session_state.current_page == "Risk Calculation":
                     record.get('status') in active_stages)
             ]
 
-            if same_pair_records:
-                stages = list(set([record['status'] for record in same_pair_records]))
-                return False, f"Same pair ({selected_pair}) already exists in {', '.join(stages)} stage(s). Please delete it first."
+            #if same_pair_records:
+                #stages = list(set([record['status'] for record in same_pair_records]))
+                #return False, f"Same pair ({selected_pair}) already exists in {', '.join(stages)} stage(s). Please delete it first."
 
             # Check for same group in active stages
             selected_pair_group = get_pair_group(selected_pair)
@@ -9639,6 +9639,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

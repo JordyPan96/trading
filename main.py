@@ -3348,7 +3348,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         f"Group {selected_group} Cooldown period active! "
                         f"({total_hours}h {remaining_minutes}m remaining)"
                     )
-                    return False, error_msg  # BLOCK the order
+                    #return False, error_msg  # BLOCK the order
+                    return True, error_msg  # BLOCK the order
                 else:
                     return True, "Cooldown period has passed"
 
@@ -9639,6 +9640,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

@@ -5189,7 +5189,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 elif(trend == "5%-6.99%"):
                                     open_target = "Top of trend to 8.99%"
                                 elif(trend == "7%-8.99%"):
-                                    open_target = "Top of trend to 10.99%"
+                                    open_target = "Top of trend to 9%"
                                 elif(trend == "9%-10.99%"):
                                     open_target = "Top of wave to 3.99%"
                                 elif(trend == "11%-12.99% (4% PB)"):
@@ -9653,6 +9653,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

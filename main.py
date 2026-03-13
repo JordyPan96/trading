@@ -4636,7 +4636,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     base_sl = 15
                     return base_entry, str(base_sl)
                 elif (pair == "XAUUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "25% below entry 1"
                     base_sl = 15
                     return str(base_entry), str(base_sl)
                 elif (pair == "USDJPY"):
@@ -4663,7 +4663,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "XAUUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "25% below entry 1"
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "USDJPY"):
@@ -4807,9 +4807,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         return "15% below entry 1"
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "25% below entry 1"
                     else:
-                        return "15% below entry 1"
+                        return "25% below entry 1"
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF'):
                         return "15% below entry 1"
@@ -4946,7 +4946,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 50%"
+                        SL_text = "25% below entry 1, " + " 50%"
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4954,7 +4954,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
-                            SL_text = "15% below entry 1, " + " 50%"
+                            SL_text = "25% below entry 1, " + " 50%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
@@ -5009,7 +5009,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 50%"
+                        SL_text = "25% below entry 1, " + " 50%"
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
@@ -9653,6 +9653,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

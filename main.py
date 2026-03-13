@@ -4672,7 +4672,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     return str(base_sl)
                 else:
                     base_entry = "15% below entry 1"
-                    base_sl = "NA"
+                    base_sl = "30"
                     return str(base_sl)
 
 
@@ -4846,7 +4846,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (strategy == '2_BNR_TPF'):
                         return str(50)
                     else:
-                        return str(24.9)
+                        return str(50)
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF'):
                         return str(30)
@@ -4872,28 +4872,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
 
@@ -4902,28 +4902,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip + max_sl_pip
+                        SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
@@ -5268,8 +5268,8 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "ON EP LINE"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
-                                                    risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                    risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                         exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                         exit_text = targeting
 
@@ -5279,8 +5279,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
 
@@ -5289,8 +5289,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         else:
@@ -5298,8 +5298,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
 
@@ -5309,8 +5309,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
@@ -5318,8 +5318,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         else:
@@ -5327,8 +5327,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                     elif (Variances == "50"):
@@ -5337,8 +5337,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
@@ -5346,8 +5346,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         else:
@@ -5355,8 +5355,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                     # if(risk_multiplier == "2_BNR"):
@@ -5393,8 +5393,8 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "ON EP LINE"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = get_pair_volatile(selected_pair,
-                                                        risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                        risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                             exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
@@ -5403,8 +5403,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
                             else:
@@ -5412,8 +5412,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
 
@@ -5423,8 +5423,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
                             else:
@@ -5432,8 +5432,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
                         elif (Variances == "50"):
@@ -5442,8 +5442,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
                             else:
@@ -5451,8 +5451,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                 entry_text = "ON EP LINE"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
-                                                            risk_multiplier) + "%, " + get_pair_volatile_max(selected_pair,
-                                                    risk_multiplier) + "%, "
+                                                            risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
+                                                    risk_multiplier) + "%"
                                 exit_title = "Target Guide: Furthest of 559 Fib, Pull Back Leg (2 entries), below recommend"
                                 exit_text = targeting
                         # if (risk_multiplier == "2_BNR"):
@@ -9653,6 +9653,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

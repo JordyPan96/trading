@@ -4870,28 +4870,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (trend_context == "Yes"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4900,28 +4900,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = entry_pip + ", " + max_sl_pip
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4944,7 +4944,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (trend_context == "Trend 1+"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "25% below entry 1, " + " 50%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4952,14 +4952,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = "25% below entry 1, " + " 50%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4967,14 +4967,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = "15% below entry 1, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4982,14 +4982,14 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = "15% below entry 1, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -4997,7 +4997,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = "15% below entry 1, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -5007,28 +5007,28 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = SL_title = "SL Guide:"
                         SL_text = "25% below entry 1, " + " 50%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -5209,7 +5209,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (selected_pair in minor_yens):
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -5217,7 +5217,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "559 - 66"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -5225,7 +5225,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     elif (Variances == "66 - 91"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
                         SL_text = "15% below entry 1, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
@@ -5265,7 +5265,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide:"
-                        entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                        entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
                                                     risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5276,7 +5276,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "559 - 66"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5286,7 +5286,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5295,7 +5295,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5306,7 +5306,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "66 - 91"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5315,7 +5315,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5324,7 +5324,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5334,7 +5334,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5343,7 +5343,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5352,7 +5352,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5390,7 +5390,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         targeting = get_potential_target(trend_position, selected_pair, cross_fib, risk_multiplier,trend_context)
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
-                            entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                            entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: Must be Behind 91 Fib"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5400,7 +5400,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5409,7 +5409,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5420,7 +5420,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "66 - 91"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5429,7 +5429,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5439,7 +5439,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF"):
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -5448,7 +5448,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
-                                entry_text = "1H - Entry 1 or Entry 2, depend on Target"
+                                entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier) + ",  " + get_pair_volatile_max(selected_pair,
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

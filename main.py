@@ -1258,10 +1258,10 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H_OB X TPF", "8H/4H_OB", "8H/4H_TPF",
+                pattern_options = ["8H/4H SR Zone", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
-                  "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
-                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in"]
+                  "2 Daily TPF Left Leg", "Daily TPF Left Leg",
+                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "4H BE Scale-in", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=99%", ">=119%", ">=149%", ">=179%", ">=2%", "NA"]
@@ -3506,9 +3506,9 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H_OB X TPF",  "8H/4H_TPF","8H/4H_OB", "8H/4H TPF Left Leg",
+        shapes = ["8H/4H SR Zone", "8H/4H TPF Left Leg",
                   "Weekly TPF Left Leg", 
-                  "2 Daily TPF Left Leg", "Daily TPF Left Leg", "Previous Trend Top/Bottom",
+                  "2 Daily TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "4H BE Scale-in", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
@@ -3653,15 +3653,15 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_17 = {
-            '1_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
+            '1_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF","4H BE Scale-in"],
-            '1_BNR_TPF': ["8H/4H_OB", "8H/4H_TPF", "8H/4H_OB X TPF","4H BE Scale-in",
+                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","4H BE Scale-in"],
+            '1_BNR_TPF': ["8H/4H SR Zone","4H BE Scale-in",
                           "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF"],
-            '2_BNR': ["Weekly TPF Left Leg", "Previous Trend Top/Bottom",
+            '2_BNR': ["Weekly TPF Left Leg",
                       "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","8H/4H_OB X TPF"],
-            '2_BNR_TPF': ["Previous Trend Top/Bottom", "Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H TPF Left Leg"]
+                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
+            '2_BNR_TPF': ["Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H SR Zone"]
         }
 
         incompatible_map_18 = {
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

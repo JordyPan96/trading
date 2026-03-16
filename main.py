@@ -4624,54 +4624,54 @@ elif st.session_state.current_page == "Risk Calculation":
             def getPairEntrySL(pair):
                 # target_in = 0
                 if (pair == "GBPUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 15
                     return base_entry, str(base_sl)
                 elif (pair == "EURUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 15
                     return base_entry, str(base_sl)
                 elif (pair == "AUDUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 15
                     return base_entry, str(base_sl)
                 elif (pair == "XAUUSD"):
-                    base_entry = "25% below entry 1"
+                    base_entry = "25-32% in Length"
                     base_sl = 15
                     return str(base_entry), str(base_sl)
                 elif (pair == "USDJPY"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 15
                     return str(base_entry), str(base_sl)
                 else:
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = "NA"
                     return str(base_entry), str(base_sl)
                     
             def getPairEntrySL_max(pair):
                 # target_in = 0
                 if (pair == "GBPUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "EURUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "AUDUSD"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "XAUUSD"):
-                    base_entry = "25% below entry 1"
+                    base_entry = "25-32% in Length"
                     base_sl = 30
                     return str(base_sl)
                 elif (pair == "USDJPY"):
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = 30
                     return str(base_sl)
                 else:
-                    base_entry = "15% below entry 1"
+                    base_entry = "18-25% in Length"
                     base_sl = "30"
                     return str(base_sl)
 
@@ -4792,39 +4792,39 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                 elif (pair == "AUDUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "25% below entry 1"
+                        return "25-32% in Length"
                     else:
-                        return "25% below entry 1"
+                        return "25-32% in Length"
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                 elif (pair == "USDCAD"):
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                 else:
                     if (strategy == '2_BNR_TPF'):
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                     else:
-                        return "15% below entry 1"
+                        return "18-25% in Length"
                         
             def get_pair_volatile_max(pair, strategy):
                 if (pair == "GBPUSD"):
@@ -4946,7 +4946,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "25% below entry 1, " + " 50%"
+                        SL_text = "25-32% in Length, " + " 50%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4954,14 +4954,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "25% below entry 1, " + " 50%"
+                            SL_text = "25-32% in Length, " + " 50%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4969,14 +4969,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "15% below entry 1, " + " 30%"
+                            SL_text = "18-25% in Length, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4984,14 +4984,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "15% below entry 1, " + " 30%"
+                            SL_text = "18-25% in Length, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -4999,7 +4999,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
-                            SL_text = "15% below entry 1, " + " 30%"
+                            SL_text = "18-25% in Length, " + " 30%"
                             exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5009,28 +5009,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = SL_title = "SL Guide:"
-                        SL_text = "25% below entry 1, " + " 50%"
+                        SL_text = "25-32% in Length, " + " 50%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
@@ -5211,7 +5211,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 
@@ -5219,7 +5219,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 
@@ -5227,7 +5227,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "15% below entry 1, " + " 30%"
+                        SL_text = "18-25% in Length, " + " 30%"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

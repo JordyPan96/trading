@@ -1276,7 +1276,7 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["NA", "1-2", "1-4", "5-6"]
+                Zone_Position_options = ["NA", "0-2", "1-4", "5-6"]
                 new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options,
                                                  key="new_Zone_Position")
 
@@ -3542,7 +3542,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Variance = ["559 - 66", "66 - 91", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
-        zone_from_leg_one = ["NA", "1-2", "1-4","5-6"]
+        zone_from_leg_one = ["NA", "0-2", "1-4","5-6"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend <=3.99%', 'Cross Trend 4% - 5.99%','Cross Trend >=6%']
 
         incompatible_map_3 = {
@@ -3645,10 +3645,10 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_16 = {
-            "1_BNR": ["0", "1-2","1-4","5-6"],
-            "1_BNR_TPF": ["0", "1-2","1-4","5-6"],
+            "1_BNR": ["0", "0-2","1-4","5-6"],
+            "1_BNR_TPF": ["0", "0-2","1-4","5-6"],
             "2_BNR": ["NA", "0", "1-4","5-6"],
-            "2_BNR_TPF": ["0", "1-2","NA"]
+            "2_BNR_TPF": ["0", "0-2","NA"]
 
         }
 
@@ -3773,7 +3773,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_32 = {
-            "22_BNR_TPF": ["NA","0", "1-2"]
+            "22_BNR_TPF": ["NA","0", "0-2"]
 
         }
 
@@ -3821,7 +3821,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_38 = {
-            "4H BE Scale-in":["0", "1-2","1-4","5-6"],
+            "4H BE Scale-in":["0", "0-2","1-4","5-6"],
         }
 
 
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

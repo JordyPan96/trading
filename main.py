@@ -4472,13 +4472,13 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (HH_LL == "Yes"):
                 hh_ll_multiplier = 1.0
 
-            if (POI == '2 Trades'):
-                POI_multiplier = 1.0
-            elif (POI == '1 Trade'):
-                if(risk_multiplier == "1_BNR"):
-                    POI_multiplier = 1.0
-                else:
-                    POI_multiplier = 1.0
+            #if (POI == '2 Trades'):
+                #POI_multiplier = 1.0
+            #elif (POI == '1 Trade'):
+                #if(risk_multiplier == "1_BNR"):
+                    #POI_multiplier = 1.0
+                #else:
+                    #POI_multiplier = 1.0
 
             if (trend_context == 'Trend 1+'):
                 if(trend_position == "3%-4.99%" or trend_position == "5%-6.99%"):
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

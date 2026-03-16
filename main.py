@@ -4345,9 +4345,9 @@ elif st.session_state.current_page == "Risk Calculation":
             available_time_frame_3 = get_available_timeframe_3(available_time_frame_2, cross_fib)
             context_trend = trend_context + trend_position
             available_time_frame_4 = get_available_timeframe_4(available_time_frame_3,context_trend)
-            POI = st.selectbox(
-                "How many attempts is this trade worth?",
-                available_time_frame_4)
+            #POI = st.selectbox(
+                #"How many attempts is this trade worth?",
+                #available_time_frame_4)
 
             HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell) - If fib reaches 0.2 and >=2.5% in length, create new fib", ['Yes', 'No'])
             squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
@@ -9641,6 +9641,7 @@ if st.session_state.current_page == "Entry Criteria Check":
 
     if __name__ == "__main__":
         main()
+
 
 
 

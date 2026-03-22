@@ -3548,7 +3548,7 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_3 = {
             "1_TPF": ["50", "786 - 91"],
             "1_BNR": ["50", "559 - 66"],
-            "1_BNR_TPF": ["50", "559 - 66"],
+            "1_BNR_TPF": ["50"],
             "2_BNR": [""],
             "2_BNR_TPF": [""],
             "3_BNR_TPF": ["50", "786 - 91", "66 - 91"], }

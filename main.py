@@ -5544,7 +5544,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 # More detailed timestamp
                                                 'selected_pair': selected_pair,
                                                 'trend_position': trend_position,
-                                                'POI': POI,
+                                                #'POI': POI,
                                                 'cross_fib': cross_fib,
                                                 'HH_LL': HH_LL,
                                                 'leg_length': leg_length,
@@ -5686,7 +5686,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'trend_position': trend_position,
 
-                                                'POI': POI,
+                                                 #'POI': POI,
 
                                                 'cross_fib': cross_fib,
 

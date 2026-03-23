@@ -1258,9 +1258,7 @@ if st.session_state.current_page == "Home":
                 hh_ll_options = ["Yes", "No"]
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                pattern_options = ["8H/4H SR Zone", "8H/4H TPF Left Leg",
-                  "Weekly TPF Left Leg", 
-                  "2 Daily TPF Left Leg", "Daily TPF Left Leg",
+                pattern_options = ["8H/4H SR Zone", "8H/4H TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "4H BE Scale-in", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -3506,9 +3504,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["8H/4H SR Zone", "8H/4H TPF Left Leg",
-                  "Weekly TPF Left Leg", 
-                  "2 Daily TPF Left Leg", "Daily TPF Left Leg",
+        shapes = ["8H/4H SR Zone", "8H/4H TPF Left Leg", "Daily TPF Left Leg",
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "4H BE Scale-in", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']

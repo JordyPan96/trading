@@ -3820,6 +3820,13 @@ elif st.session_state.current_page == "Risk Calculation":
             "4H BE Scale-in":["0", "0-2","1-4","5-6"],
         }
 
+        incompatible_map_39 = {
+            "Wave 2+1_BNR_TPF": ['559 - 66'],
+            "Cross Trend 4% - 5.99%1_BNR_TPF": ['559 - 66'],
+            "Cross Trend >=6%1_BNR_TPF": ['559 - 66'],
+            "Cross Trend <=3.99%1_BNR_TPF": ['559 - 66']
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=119%", ">=149%", ">=2%", "NA"],
@@ -4077,6 +4084,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_variance_3(shape, variancelist):
             available_variances2 = incompatible_map_27.get(shape, [])
             return [s for s in variancelist if s not in available_variances2]
+
+        def get_available_variance_4(wave_strat, variancelist):
+            available_variances3 = incompatible_map_39.get(wave_strat, [])
+            return [s for s in variancelist if s not in available_variances3]
 
 
         def get_available_leg_length(pair):
@@ -4409,7 +4420,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
             final_variance3 = get_available_variance_3(pattern, final_variance2)
 
-            Variances = st.selectbox("Position Variance (Fib)", final_variance3)
+            wave_strat =  cross_fib + risk_multiplier
+            final_variance4 = get_available_variance_4(wave_strat, final_variance3)
+
+            Variances = st.selectbox("Position Variance (Fib)", final_variance4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)

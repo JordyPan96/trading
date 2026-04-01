@@ -5221,7 +5221,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "18-25 Pip/% in Length"
+                        SL_text = "25-32 P/$/% in Length"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 
@@ -5229,7 +5229,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "18-25 Pip/% in Length"
+                        SL_text = "25-32 P/$/% in Length"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 
@@ -5237,7 +5237,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Middle of 1H SR Zone"
                         SL_title = "SL Guide:"
-                        SL_text = "18-25 Pip/% in Length"
+                        SL_text = "25-32 P/$/% in Length"
                         exit_title = "Target Guide: Mid of 559/Pull back leg or 382/5.41"
                         exit_text = "5.41"
 

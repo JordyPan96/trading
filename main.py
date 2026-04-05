@@ -3504,7 +3504,8 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "No Setup"]
-        shapes = ["On OMSS (With TPF)", "On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick","4H BE Scale-in", "No Pattern"]
+        shapes = ["On OMSS (With TPF)", "On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
+                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "4H BE Scale-in", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {

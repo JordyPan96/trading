@@ -3650,15 +3650,14 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_17 = {
-            '1_BNR': ["Weekly TPF Left Leg",
-                      "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF","4H BE Scale-in"],
-            '1_BNR_TPF': ["8H/4H SR Zone","4H BE Scale-in",
-                          "Variant 2 Daily TPF", "8H/4H TPF Left Leg", "Variant Fakeout Any TF TPF"],
-            '2_BNR': ["Weekly TPF Left Leg",
-                      "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                      "8H/4H TPF Left Leg", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
-            '2_BNR_TPF': ["Weekly TPF Left Leg", "2 Daily TPF Left Leg", "Daily TPF Left Leg","8H/4H SR Zone"]
+            '1_BNR': ["Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF",
+                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in"],
+            '1_BNR_TPF': ["On OMSS (With TPF)", "On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
+                          "4H BE Scale-in", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
+            '2_BNR': ["Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF", 
+                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
+            '2_BNR_TPF': ["On OMSS (With TPF)", "On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
+                         "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
         }
 
         incompatible_map_18 = {
@@ -3668,11 +3667,8 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_19 = {
-            "12_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB", "Weekly TPF Left Leg", "Previous Trend Top/Bottom",
-                           "2 Daily TPF Left Leg", "Daily TPF Left Leg",
-                           "8H/4H_TPF", "8H/4H TPF Left Leg","8H/4H_OB X TPF","8H/4H_OB"],
-            "22_BNR_TPF": ["Weekly OB", "2 Daily OB", "Daily OB",
-                           "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
+            "12_BNR_TPF": ["On OMSS (With TPF)", "On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick"],
+            "22_BNR_TPF": ["Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
         }
 
         incompatible_map_20 = {

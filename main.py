@@ -4540,25 +4540,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (cross_fib == "Wave 1" or cross_fib == "Cross Trend >=6%"):
                     trend_position_multiplier = 1.5
 
-            if (pattern == "8H/4H_OB"):
-                pattern_multiplier = 1.0
-            elif (pattern == "8H/4H TPF Left Leg"):
-                pattern_multiplier = 1.0
-            elif (pattern == "8H/4H_OB X TPF"):
-                pattern_multiplier = 1.0
-            elif (pattern == "Weekly TPF Left Leg"):
-                pattern_multiplier = 1.0
-            elif(pattern == "Previous Trend Top/Bottom"):
-                pattern_multiplier = 1.0
-            elif (pattern == "2 Daily TPF Left Leg"):
-                pattern_multiplier = 1.0
-            elif (pattern == "Daily TPF Left Leg"):
-                pattern_multiplier = 1.0
-            elif (pattern == "8H/4H_TPF"):
-                pattern_multiplier = 1.0
-            elif (pattern == "Variant 2 Daily TPF"):
-                pattern_multiplier = 1.0
-            elif (pattern == "Variant Fakeout Any TF TPF"):
+
+            if (pattern == "Variant Fakeout Any TF TPF"):
                 pattern_multiplier = 0.8
             elif (pattern == "4H BE Scale-in"):
                 pattern_multiplier = 0.8

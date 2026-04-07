@@ -4526,17 +4526,30 @@ elif st.session_state.current_page == "Risk Calculation":
             elif (trend_position == "7%-8.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
-                        trend_position_multiplier = 1.2
+                        if(Variances == "559 - 66"):
+                            trend_position_multiplier = 1.0
+                        else:
+                            trend_position_multiplier = 1.2
+                        
             elif (trend_position == "9%-10.99%"):
                 if(trend_context == "Trend 1+"):
                     if (cross_fib == "Wave 1"):
-                        trend_position_multiplier = 1.2
+                        if(Variances == "559 - 66"):
+                            trend_position_multiplier = 1.0
+                        else:
+                            trend_position_multiplier = 1.2
             elif (trend_position == "11%-12.99% (4% PB)"):
                 if (cross_fib == "Wave 1"):
-                    trend_position_multiplier = 1.5
+                        if(Variances == "559 - 66"):
+                            trend_position_multiplier = 1.0
+                        else:
+                            trend_position_multiplier = 1.5
             else:
                 if (cross_fib == "Wave 1" or cross_fib == "Cross Trend >=6%"):
-                    trend_position_multiplier = 1.5
+                        if(Variances == "559 - 66"):
+                            trend_position_multiplier = 1.0
+                        else:
+                            trend_position_multiplier = 1.5
 
 
             if (pattern == "Variant Fakeout Any TF TPF"):
@@ -4575,7 +4588,11 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (risk_multiplier == "2_BNR"):
                         if (trend_position == "7%-8.99%"):
                             if (cross_fib == "Wave 1"):
-                                big_risk_multiplier = 1.5
+                                if(Variances == "559 - 66"):
+                                    big_risk_multiplier = 1.2
+                                else:
+                                    big_risk_multiplier = 1.5
+                                
 
 
             else:

@@ -5191,7 +5191,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                     open_target = 5.41
                                 elif(trend == ">=13% (5% PB, ACAD 4%)"):
                                     open_target = 5.41
-                            elif(wave == "Wave 1" or wave == "Cross Trend >=6%" or ):
+                            elif(wave == "Wave 1" or wave == "Cross Trend >=6%"):
                                 if(trend == "3%-4.99%"):
                                     open_target = 7.41
                                 elif(trend == "5%-6.99%"):

@@ -3669,7 +3669,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_19 = {
             "12_BNR_TPF": ["Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF","On OMSS"],
-            "22_BNR_TPF": ["Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","On OMSS"]
+            "22_BNR_TPF": ["Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
         }
 
         incompatible_map_20 = {

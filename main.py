@@ -3652,12 +3652,12 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_17 = {
             '1_BNR': ["Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF",
-                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in"],
-            '1_BNR_TPF': ["On OMSS (With TPF)", "Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
+                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in","On OMSS (With TPF)"],
+            '1_BNR_TPF': ["Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
                           "4H BE Scale-in", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
             '2_BNR': ["Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF", 
-                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
-            '2_BNR_TPF': ["On OMSS (With TPF)", "Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
+                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","On OMSS (With TPF)"],
+            '2_BNR_TPF': ["Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
                          ]
         }
 

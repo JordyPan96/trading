@@ -4493,7 +4493,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                         if (risk_multiplier == "1_BNR_TPF"):
                             if (cross_fib == "Wave 1"):
-                                sixone_multiplier = 1.5
+                                if(Variances == "559 - 66"):
+                                    sixone_multiplier = 1.0
+                                else:
+                                    sixone_multiplier = 1.5
                     else:
                         if (risk_multiplier == "1_BNR_TPF"):
                             sixone_multiplier = 1.0

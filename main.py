@@ -3538,7 +3538,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "EM_2b": [">=11.41"],
             "EM_3b": [">=11.41"], }
         Variance = ["559 - 66", "66 - 91", "50"]
-        Trend_Positions = ["0-2.99%","3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
+        Trend_Positions = ["0%-2.99%","3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
         zone_from_leg_one = ["NA", "0-2", "1-4","5-6"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend <=3.99%', 'Cross Trend 4% - 5.99%','Cross Trend >=6%']

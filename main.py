@@ -3660,7 +3660,7 @@ elif st.session_state.current_page == "Risk Calculation":
             '2_BNR_TPF': ["Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
                          ],
             '3_BNR_TPF': ["Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
-                         ],
+                         "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
         }
 
         incompatible_map_18 = {

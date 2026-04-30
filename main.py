@@ -3554,6 +3554,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "2_BNR": [""],
             "2_BNR_TPF": [""],
             "3_BNR_TPF": [""],
+        }
         incompatible_map_5 = {
             "GBPAUD": [],
             "EURAUD": [],

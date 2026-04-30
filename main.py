@@ -7461,7 +7461,7 @@ elif st.session_state.current_page == "Trade Signal":
                 '1_BNR': 2.5,
                 '1_BNR_TPF': 2.5,
                 '2_BNR': 2.0,
-                '2_BNR_TPF': 2.0
+                '2_BNR_TPF': 2.0,
                 '3_BNR_TPF': 2.0
             }
             multiplier = strategy_multipliers.get(strategy, 2.0)

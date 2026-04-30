@@ -942,7 +942,7 @@ st.sidebar.markdown("---")
 
 # Analysis Section
 st.sidebar.markdown("**Analysis**")
-create_nav_button("Trading Guidelines", "Guidelines", "Guidelines")
+#create_nav_button("Trading Guidelines", "Guidelines", "Guidelines")
 create_nav_button("Performance Stats", "Stats", "Stats")
 
 st.sidebar.markdown("---")

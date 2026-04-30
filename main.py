@@ -444,6 +444,8 @@ def calculate_strategy_grade_static(strategy_name):
         "2_BNR": ("A", 1.0),  # Fib + wick/ob
         "2_BNR_TPF": ("A", 1.0),  # Fake out or wick/ob
 
+        "3_BNR_TPF": ("A", 1.0)
+
         # 3 Touch  wick>percentage>fib
 
         # "3_BNR_TPF": ("A", 1), # Fib + wick/ob + 50% outside of discount zone
@@ -522,6 +524,7 @@ def ensure_all_strategies_analyzed(df):
         '1_BNR_TPF': ("A", 1.0),
         '2_BNR': ("A", 1.0),
         '2_BNR_TPF': ("A", 1.0),
+        '3_BNR_TPF': ("A",1.0),
     }
 
     # First, analyze strategies that have actual data
@@ -3526,6 +3529,7 @@ elif st.session_state.current_page == "Risk Calculation":
         trend_context = ["Trend 0", "Trend 1+","Range"]
         incompatible_map_4 = {
             "2_BNR_TPF": ["No","Yes"],
+            "3_BNR_TPF": ["No","Yes"],
             "2_BNR": ["No","Yes"],
             "1_BNR": ["No","Yes"],
             "1_BNR_TPF":["NA"]
@@ -3549,7 +3553,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR_TPF": ["50"],
             "2_BNR": [""],
             "2_BNR_TPF": [""],
-            "3_BNR_TPF": ["50", "786 - 91", "66 - 91"], }
+            "3_BNR_TPF": [""],
         incompatible_map_5 = {
             "GBPAUD": [],
             "EURAUD": [],
@@ -3646,7 +3650,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR": ["0", "0-2","1-4","5-6"],
             "1_BNR_TPF": ["0", "0-2","1-4","5-6"],
             "2_BNR": ["NA", "0", "1-4","5-6"],
-            "2_BNR_TPF": ["0", "0-2","NA"]
+            "2_BNR_TPF": ["0", "0-2","NA"],
+            "3_BNR_TPF": ["0", "0-2","NA"]
 
         }
 
@@ -3704,6 +3709,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR_TPF": [">=99%", ">=119%", ">=149%", ">=179%", ">=2%"],
             "2_BNR": ["NA"],
             "2_BNR_TPF": ["NA"],
+            "3_BNR_TPF": ["NA"],
 
         }
 
@@ -3769,7 +3775,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_32 = {
-            "22_BNR_TPF": ["NA","0", "0-2"]
+            "23_BNR_TPF": ["NA","0", "0-2"]
 
         }
 
@@ -3840,6 +3846,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "XAUUSD2_BNR_TPF66 - 91": [">=99%", ">=149%", ">=179%"],
             "XAUUSD2_BNR_TPF786 - 91": [">=99%", ">=149%", ">=179%"],
 
+            "XAUUSD3_BNR_TPF50": [">=119%", ">=149%", "NA"],
+            "XAUUSD3_BNR_TPF559 - 66": [">=99%", ">=149%", "NA"],
+            "XAUUSD3_BNR_TPF66 - 91": [">=99%", ">=149%", ">=179%"],
+            "XAUUSD3_BNR_TPF786 - 91": [">=99%", ">=149%", ">=179%"],
+
             "AUDUSD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3849,6 +3860,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "AUDUSD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
+            "AUDUSD3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDUSD3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDUSD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDUSD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "USDCAD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDCAD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3860,6 +3876,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "USDCAD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "USDCAD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
+            "USDCAD3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDCAD3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDCAD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDCAD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
             "GBPAUD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPAUD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPAUD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3869,6 +3890,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "GBPAUD2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPAUD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPAUD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
+            "GBPAUD3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPAUD3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPAUD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPAUD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "EURAUD2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURAUD2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3880,6 +3906,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURAUD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "EURAUD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
+            "EURAUD3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURAUD3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURAUD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURAUD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
             "USDJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "USDJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3889,6 +3920,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "USDJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
             "USDJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "USDJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
+            "USDJPY3_BNR_TPF50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
+            "USDJPY3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDJPY3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "USDJPY3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "GBPJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "GBPJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3900,6 +3936,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "GBPJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "GBPJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
+            "GBPJPY3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPJPY3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPJPY3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "GBPJPY3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
             "AUDJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "AUDJPY2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3909,6 +3950,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "AUDJPY2_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "AUDJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
+            "AUDJPY3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDJPY3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDJPY3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "AUDJPY3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
             "EURJPY2_BNR50": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
             "EURJPY2_BNR559 - 66": [">=119%", ">=149%", ">=179%", ">=2%", "NA"],
@@ -3920,6 +3966,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURJPY2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
             "EURJPY2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
 
+            "EURJPY3_BNR_TPF50": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURJPY3_BNR_TPF559 - 66": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURJPY3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+            "EURJPY3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%", "NA"],
+
             "GBPUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
             "GBPUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
             "GBPUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
@@ -3930,6 +3981,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "GBPUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
             "GBPUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
+            "GBPUSD3_BNR_TPF50": [">=119%", ">=179%"],
+            "GBPUSD3_BNR_TPF559 - 66": [">=119%", ">=179%"],
+            "GBPUSD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
+            "GBPUSD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
+
             "EURUSD2_BNR50": [">=119%", ">=179%", ">=2%"],
             "EURUSD2_BNR559 - 66": [">=119%", ">=179%", ">=2%"],
             "EURUSD2_BNR66 - 91": [">=119%", ">=149%", ">=179%", ">=2%"],
@@ -3939,6 +3995,11 @@ elif st.session_state.current_page == "Risk Calculation":
             "EURUSD2_BNR_TPF559 - 66": [">=119%", ">=179%"],
             "EURUSD2_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
             "EU6rUSD2_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
+
+            "EURUSD3_BNR_TPF50": [">=119%", ">=179%"],
+            "EURUSD3_BNR_TPF559 - 66": [">=119%", ">=179%"],
+            "EURUSD3_BNR_TPF66 - 91": [">=119%", ">=149%", ">=179%"],
+            "EU6rUSD3_BNR_TPF786 - 91": [">=119%", ">=149%", ">=179%"],
 
         }
 
@@ -4802,74 +4863,74 @@ elif st.session_state.current_page == "Risk Calculation":
 
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                 elif (pair == "EURUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                 elif (pair == "AUDUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                 elif (pair == "XAUUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "25-32 % in Length"
                     else:
                         return "25-32 % in Length"
                 elif (pair == "USDJPY"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                 elif (pair == "USDCAD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                 else:
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "15-32 % in Length"
                     else:
                         return "15-32 % in Length"
                         
             def get_pair_volatile_max(pair, strategy):
                 if (pair == "GBPUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
                 elif (pair == "EURUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
                 elif (pair == "AUDUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
                 elif (pair == "XAUUSD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(50)
                     else:
                         return str(50)
                 elif (pair == "USDJPY"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
                 elif (pair == "USDCAD"):
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
                 else:
-                    if (strategy == '2_BNR_TPF'):
+                    if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return str(30)
                     else:
                         return str(30)
@@ -5047,7 +5108,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
 
 
-            elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+            elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF" or risk_multiplier == '3_BNR_TPF'):
                 length_title = "Leg One Length Requirement:"
                 length_text = ""
 
@@ -5284,7 +5345,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         exit_text = targeting
 
                     elif (Variances == "559 - 66"):
-                        if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
+                        if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
@@ -5293,7 +5354,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "5.41"
                             exit_text = targeting
 
-                        elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
+                        elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
@@ -5311,7 +5372,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_text = targeting
 
                     elif (Variances == "66 - 91"):
-                        if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
+                        if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
@@ -5319,7 +5380,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                         risk_multiplier)
                             exit_title = "5.41"
                             exit_text = targeting
-                        elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
+                        elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide:"
@@ -5336,7 +5397,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "5.41"
                             exit_text = targeting
                     elif (Variances == "50"):
-                        if (risk_multiplier == "2_BNR_TPF" and selected_pair in majors_dollar):
+                        if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
@@ -5344,7 +5405,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                         risk_multiplier)
                             exit_title = "5.41"
                             exit_text = targeting
-                        elif (risk_multiplier == "2_BNR_TPF" and selected_pair not in majors_dollar):
+                        elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Middle of 1H SR Zone"
                             SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
@@ -5398,7 +5459,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             exit_title = "5.41"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
-                            if (risk_multiplier == "2_BNR_TPF"):
+                            if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                                 entry_title = "Entry Guide:"
                                 entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
@@ -5416,7 +5477,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_text = targeting
 
                         elif (Variances == "66 - 91"):
-                            if (risk_multiplier == "2_BNR_TPF"):
+                            if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                                 entry_title = "Entry Guide:"
                                 entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide:"
@@ -5433,7 +5494,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 exit_title = "5.41"
                                 exit_text = targeting
                         elif (Variances == "50"):
-                            if (risk_multiplier == "2_BNR_TPF"):
+                            if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                                 entry_title = "Entry Guide:"
                                 entry_text = "Middle of 1H SR Zone"
                                 SL_title = "SL Guide: NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
@@ -5493,7 +5554,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     set_global("final_risk", Risk_percentage)
                     if (position_size > 0):
                         if (position_size_propfirm > 0):
-                            if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+                            if (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                                 if (pair_result == "W" or pair_result == "N"):
                                     if (selected_pair in europe_major or selected_pair in gold_comm):
                                         container.metric("Your Calculated lot size should be:",
@@ -5617,7 +5678,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             st.rerun()
 
                         st.markdown("<div style='height:150px;'></div>", unsafe_allow_html=True)
-                    elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF"):
+                    elif (risk_multiplier == "2_BNR" or risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                         container.metric(entry_title, entry_text)
 
                         container.metric(SL_title, SL_text)
@@ -6874,6 +6935,8 @@ elif st.session_state.current_page == "Active Opps":
                                 be_mult = 2.5
                             elif (record['risk_multiplier'] == '2_BNR_TPF'):
                                 be_mult = 2.5
+                            elif (record['risk_multiplier'] == '3_BNR_TPF'):
+                                be_mult = 2.5
 
                             if (entry_price > exit_price):
                                 if ('XAU' in record['selected_pair']):
@@ -7398,6 +7461,7 @@ elif st.session_state.current_page == "Trade Signal":
                 '1_BNR_TPF': 2.5,
                 '2_BNR': 2.0,
                 '2_BNR_TPF': 2.0
+                '3_BNR_TPF': 2.0
             }
             multiplier = strategy_multipliers.get(strategy, 2.0)
 
@@ -7429,6 +7493,7 @@ elif st.session_state.current_page == "Trade Signal":
                 '1_BNR_TPF': 3.0,
                 '2_BNR': 3.0,
                 '2_BNR_TPF': 3.0
+                '3_BNR_TPF': 3.0
             }
             multiplier = strategy_multipliers.get(strategy, 3.0)
 
@@ -7461,6 +7526,7 @@ elif st.session_state.current_page == "Trade Signal":
                 '1_BNR_TPF': 4.0,
                 '2_BNR': 4.0,
                 '2_BNR_TPF': 4.0
+                '3_BNR_TPF': 4.0
             }
             multiplier = strategy_multipliers.get(strategy, 4.0)
 

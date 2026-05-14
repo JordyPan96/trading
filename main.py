@@ -3508,8 +3508,8 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
-        shapes = ["Zone/On OB (With TPF)", "Zone/On Left TPF + Left Wick", "Zone/On Right Impulse Candle Wick",
-                  "Zone/On Left TPF + Left TPF", "Zone/On Left TPF + OMSS", "Zone/On Left TPF", "On OMSS",
+        shapes = ["Zone/On Left TPF + Left Wick", "Zone/On OB (With TPF)", "Zone/On Right Impulse Candle Wick",
+                  "Zone/On Left TPF", "Zone/On Left TPF + Left TPF", "On OMSS", "Zone/On Left TPF + OMSS", 
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']

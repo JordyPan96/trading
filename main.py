@@ -4262,7 +4262,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     
             if(min_pips < 15.0):
                 if(pair == "XAUUSD"):
-                    min_pips = 5.0
+                    min_pips = min_pips
                 else:
                     min_pips = 15.0
                 

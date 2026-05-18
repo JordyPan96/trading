@@ -4789,7 +4789,7 @@ elif st.session_state.current_page == "Risk Calculation":
             def getPairEntrySL(pair,entry):
                 # target_in = 0
                 min_entry, max_entry = get_min_max_pips(pair,entry)
-                result = "Min " + min_entry + " Max" + " max_entry" + " Pips" 
+                result = "Min " + str(min_entry) + " Max" + str(max_entry) + " Pips" 
                 return result
                     
             def getPairEntrySL_max(pair):

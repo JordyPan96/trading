@@ -4238,7 +4238,7 @@ elif st.session_state.current_page == "Risk Calculation":
             try:
                 entry_price = float(entry_price)
             except (ValueError, TypeError):
-                return 15.0, 80.0
+                return 0.0
                 
             min_pips = 15.0
             max_pips = 15.0

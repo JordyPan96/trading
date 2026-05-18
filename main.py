@@ -4906,19 +4906,19 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                 elif (pair == "AUDUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return "25-32 % in Length"
@@ -4926,19 +4926,19 @@ elif st.session_state.current_page == "Risk Calculation":
                         return "25-32 % in Length"
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                 elif (pair == "USDCAD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                 else:
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "15-32 % in Length"
+                        return entry_pip
                     else:
-                        return "15-32 % in Length"
+                        return entry_pip
                         
             def get_pair_volatile_max(pair, strategy):
                 if (pair == "GBPUSD"):
@@ -5090,7 +5090,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5098,14 +5098,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = "15-32 % in Length"
+                            SL_text = entry_pip
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5113,7 +5113,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = "15-32 % in Length"
+                            SL_text = entry_pip
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5130,21 +5130,21 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 

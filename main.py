@@ -4861,7 +4861,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     result = (open_target_multiplier * desire_target) + 0.41
                     return str(result)
 
-            def calc_pips (entry_price, percentage, pair)
+            def calc_pips (entry_price, percentage, pair):
                 result = 1.0
                 if "JPY" in pair:
                     result = round(entry_price * percentage,3)*10

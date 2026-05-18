@@ -4224,7 +4224,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 entry_price = float(entry_price)
                 percentage = float(percentage)
             except (ValueError, TypeError):
-                return 0.0, 1.0
+                return 0.0
                 
             result = 1.0
             if "JPY" in pair:
@@ -4238,7 +4238,7 @@ elif st.session_state.current_page == "Risk Calculation":
             try:
                 entry_price = float(entry_price)
             except (ValueError, TypeError):
-                return 0.0
+                return 0.0, 1.0
                 
             min_pips = 15.0
             max_pips = 15.0

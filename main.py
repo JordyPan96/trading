@@ -5382,7 +5382,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (Variances == "786 - 91"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
-                        SL_title = ""SL Guide: In Pips" Must be Behind 91 Fib"
+                        SL_title = "SL Guide: In Pips"
                         SL_text = get_pair_volatile(selected_pair,
                                                     risk_multiplier,SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") )
                         exit_title = "5.41"
@@ -5497,7 +5497,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (Variances == "786 - 91"):
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
-                            SL_title = ""SL Guide: In Pips" Must be Behind 91 Fib"
+                            SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
                             exit_title = "5.41"

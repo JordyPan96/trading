@@ -4826,7 +4826,7 @@ elif st.session_state.current_page == "Risk Calculation":
             SL_text = ""
             exit_title = ""
             exit_text = ""
-            entry_pip = getPairEntrySL(selected_pair)
+            entry_pip = getPairEntrySL(selected_pair,entry_price)
             max_sl_pip = getPairEntrySL_max(selected_pair)
 
 

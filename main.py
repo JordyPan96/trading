@@ -4789,35 +4789,9 @@ elif st.session_state.current_page == "Risk Calculation":
             def getPairEntrySL(pair,entry):
                 # target_in = 0
                 min_entry, max_entry = get_min_max_pips(pair,entry)
-                result = "Min " + str(min_entry) + " Max" + str(max_entry) + " Pips" 
+                result = "Min:" + str(min_entry) + " ,Max:" + str(max_entry) + " Pips" 
                 return result
                     
-            def getPairEntrySL_max(pair):
-                # target_in = 0
-                if (pair == "GBPUSD"):
-                    base_entry = "15-32 % in Length"
-                    base_sl = 30
-                    return str(base_sl)
-                elif (pair == "EURUSD"):
-                    base_entry = "15-32 % in Length"
-                    base_sl = 30
-                    return str(base_sl)
-                elif (pair == "AUDUSD"):
-                    base_entry = "15-32 % in Length"
-                    base_sl = 30
-                    return str(base_sl)
-                elif (pair == "XAUUSD"):
-                    base_entry = "25-32 % in Length"
-                    base_sl = 30
-                    return str(base_sl)
-                elif (pair == "USDJPY"):
-                    base_entry = "15-32 % in Length"
-                    base_sl = 30
-                    return str(base_sl)
-                else:
-                    base_entry = "15-32 % in Length"
-                    base_sl = "30"
-                    return str(base_sl)
 
 
             entry_title = ""
@@ -4827,7 +4801,6 @@ elif st.session_state.current_page == "Risk Calculation":
             exit_title = ""
             exit_text = ""
             entry_pip = getPairEntrySL(selected_pair,entry_price)
-            max_sl_pip = getPairEntrySL_max(selected_pair)
 
 
             def get_one_target(selected_pair, wave, trend):

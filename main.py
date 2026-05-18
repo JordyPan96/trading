@@ -4498,7 +4498,7 @@ elif st.session_state.current_page == "Risk Calculation":
             leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 (50) Zone", available_leg_length5)
 
             Adaptive_value = next_risk
-
+            entry_price = st.number_input("Entry Price", min_value=1.0, value=None, step=1.0)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=1.0, value=None, step=1.0)
 
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)

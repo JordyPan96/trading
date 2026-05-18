@@ -4802,7 +4802,7 @@ elif st.session_state.current_page == "Risk Calculation":
             SL_text = ""
             exit_title = ""
             exit_text = ""
-            entry_pip = SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+            entry_pip = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
 
 
             def get_one_target(selected_pair, wave, trend):

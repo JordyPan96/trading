@@ -4588,7 +4588,7 @@ elif st.session_state.current_page == "Risk Calculation":
             Adaptive_value = next_risk
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")
             min_price, max_price = get_min_max_pips(entry_price, selected_pair)
-            stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,value=None,step=0.01,format="%.2f")
+            stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,value=None,step=0.1,format="%.1f")
 
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 

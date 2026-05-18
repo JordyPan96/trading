@@ -4305,7 +4305,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 max_pips = mult
             elif(pair == "XAUUSD"):
                 max_pips = 50.0
-            return min_pips, max_pips
+            return round(min_pips,1), round(max_pips,1)
 
 
         def get_focus_pair(current_month_stats):

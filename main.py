@@ -4273,7 +4273,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "AUDUSD"):
-                percentage = 0.0015 * 2.5
+                percentage = 0.0015 * 1.87
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "USDCAD"):

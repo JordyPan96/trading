@@ -4232,7 +4232,7 @@ elif st.session_state.current_page == "Risk Calculation":
             elif "XAU" in pair:
                 result = 2500 * percentage
             else:
-                result = round(entry_price * percentage,5)*1000
+                result = round(entry_price * percentage,6)*10000
             return result
         def get_min_max_pips(entry_price, pair):
             try:

@@ -4220,6 +4220,12 @@ elif st.session_state.current_page == "Risk Calculation":
                 return "N"
 
         def calc_pips (entry_price, percentage, pair):
+            try:
+                entry_price = float(entry_price)
+                percentage = float(percentage)
+            except (ValueError, TypeError):
+                return 0.0
+                
             result = 1.0
             if "JPY" in pair:
                 result = round(entry_price * percentage,3)*10
@@ -4229,6 +4235,11 @@ elif st.session_state.current_page == "Risk Calculation":
                 result = round(entry_price * percentage,6)*10000
             return result
         def get_min_max_pips(entry_price, pair):
+            try:
+                entry_price = float(entry_price)
+            except (ValueError, TypeError):
+                return 15.0, 100.0
+                
             min_pips = 15.0
             max_pips = 15.0
             mult = 0

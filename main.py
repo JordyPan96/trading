@@ -5608,7 +5608,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             """, unsafe_allow_html=True)
                     # --Entry: {get_global('entry_model')}<br>
                 elif (get_global('entry_model') == None):
-                    entry_percent, base_percent = getPairEntrySL(selected_pair)
+                    base_percent = getPairEntrySL(selected_pair,entry_price)
                     container.markdown(f"""
                             """, unsafe_allow_html=True)
                     # --Min Length for {selected_pair} is {base_percent}%<br>

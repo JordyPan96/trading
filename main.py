@@ -4238,7 +4238,7 @@ elif st.session_state.current_page == "Risk Calculation":
             try:
                 entry_price = float(entry_price)
             except (ValueError, TypeError):
-                return 15.0, 100.0
+                return 15.0, 80.0
                 
             min_pips = 15.0
             max_pips = 15.0
@@ -4789,7 +4789,7 @@ elif st.session_state.current_page == "Risk Calculation":
             def getPairEntrySL(pair,entry):
                 # target_in = 0
                 min_entry, max_entry = get_min_max_pips(pair,entry)
-                result = "Min:" + str(min_entry) + " ,Max:" + str(max_entry) + " Pips" 
+                result = "Min:" + str(min_entry) + ", Max:" + str(max_entry) + " Pips" 
                 return result
                     
 

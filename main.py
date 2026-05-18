@@ -4906,39 +4906,39 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 elif (pair == "AUDUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 elif (pair == "USDCAD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                 else:
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                     else:
-                        return entry_pip
+                        return getPairEntrySL(selected_pair,entry_price)
                         
             def get_pair_volatile_max(pair, strategy):
                 if (pair == "GBPUSD"):
@@ -4986,28 +4986,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
 
@@ -5016,28 +5016,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
@@ -5060,7 +5060,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5068,14 +5068,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = entry_pip
+                            SL_text = getPairEntrySL(selected_pair,entry_price)
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5083,14 +5083,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = entry_pip
+                            SL_text = getPairEntrySL(selected_pair,entry_price)
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5098,14 +5098,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = entry_pip
+                            SL_text = getPairEntrySL(selected_pair,entry_price)
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5113,7 +5113,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = entry_pip
+                            SL_text = getPairEntrySL(selected_pair,entry_price)
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5123,28 +5123,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
@@ -5325,7 +5325,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5333,7 +5333,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5341,7 +5341,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = entry_pip
+                        SL_text = getPairEntrySL(selected_pair,entry_price)
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5382,7 +5382,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
-                                                    risk_multiplier,entry_pip)
+                                                    risk_multiplier,getPairEntrySL(selected_pair,entry_price))
                         exit_title = "5.41"
                         exit_text = targeting
 

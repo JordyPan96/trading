@@ -4586,7 +4586,7 @@ elif st.session_state.current_page == "Risk Calculation":
             leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 (50) Zone", available_leg_length5)
 
             Adaptive_value = next_risk
-            entry_price = st.number_input("Entry Price", min_value=1.00, value=None, step=0.001,format="%.3f")
+            entry_price = st.number_input("Entry Price", min_value=1.00, value=None, step=0.00001,format="%.5f")
             min_price, max_price = get_min_max_pips(entry_price, selected_pair)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,step=0.01,format="%.2f")
 

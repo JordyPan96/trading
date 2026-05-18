@@ -5060,7 +5060,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "25-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5068,14 +5068,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = "25-32 % in Length"
+                            SL_text = entry_pip
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "15-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target(selected_pair, cross_fib, trend_position)
 
@@ -5083,7 +5083,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide:"
-                            SL_text = "15-32 % in Length"
+                            SL_text = entry_pip
                             exit_title = "5.41"
                             exit_text = get_one_target(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):

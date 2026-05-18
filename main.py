@@ -4861,6 +4861,84 @@ elif st.session_state.current_page == "Risk Calculation":
                     result = (open_target_multiplier * desire_target) + 0.41
                     return str(result)
 
+            def calc_pips (entry_price, percentage, pair)
+                result = 1.0
+                if "JPY" in pair:
+                    result = round(entry_price * percentage,3)*10
+                elif "XAU" in pair:
+                    result = 2500 * percentage
+                else:
+                    result = round(entry_price * percentage,6)*10000
+                    return result
+            def get_min_max_pips(entry_price, pair):
+                min_pips = 15.0
+                max_pips = 0.0
+                mult = 0
+                percentage = 0.0015
+                min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY"]
+                min_group_two = ["GBPUSD","EURJPY","AUDJPY","EURAUD","GBPAUD"]
+                min_group_three = ["GBPJPY","XAUUSD"]
+                if (pair in min_group_one):
+                    percentage = 0.0015
+                    mult = calc_pips(entry_price, percentage, pair)
+                    min_pips = mult
+                elif (pair in min_group_two):
+                    percentage = 0.00175
+                    mult = calc_pips(entry_price, percentage, pair)
+                    min_pips = mult
+                elif (pair in min_group_three):
+                    percentage = 0.0020
+                    mult = calc_pips(entry_price, percentage, pair)
+                    min_pips = mult
+                    
+                if(min_pips < 15.0):
+                    min_pips = 15.0
+                
+                if(pair == "EURUSD"):
+                    percentage = 0.0016
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "GBPUSD"):
+                    percentage = 0.0015 * 1.34
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "AUDUSD"):
+                    percentage = 0.0015 * 1.87
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "USDCAD"):
+                    percentage = 0.0015 * 1.07
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "USDJPY"):
+                    percentage = 0.0015 * 1.56
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "EURJPY"):
+                    percentage = 0.0015 * 1.64
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "GBPJPY"):
+                    percentage = 0.0015 * 2.13
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "AUDJPY"):
+                    percentage = 0.0015 * 1.29
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "EURAUD"):
+                    percentage = 0.0015 * 1.61
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "GBPAUD"):
+                    percentage = 0.0015 * 1.85
+                    mult = calc_pips(entry_price, percentage, pair)
+                    max_pips = mult
+                elif(pair == "XAUUSD"):
+                    max_pips = 50
+                return min_pips, max_pips
+                
+
 
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):

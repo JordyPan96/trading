@@ -4870,10 +4870,10 @@ elif st.session_state.current_page == "Risk Calculation":
                     result = 2500 * percentage
                 else:
                     result = round(entry_price * percentage,6)*10000
-                    return result
+                return result
             def get_min_max_pips(entry_price, pair):
                 min_pips = 15.0
-                max_pips = 0.0
+                max_pips = 15.0
                 mult = 0
                 percentage = 0.0015
                 min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY"]

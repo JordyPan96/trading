@@ -4921,9 +4921,9 @@ elif st.session_state.current_page == "Risk Calculation":
                         return entry_pip
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return "25-32 % in Length"
+                        return entry_pip
                     else:
-                        return "25-32 % in Length"
+                        return entry_pip
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
                         return entry_pip
@@ -5123,7 +5123,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = SL_title = "SL Guide:"
-                        SL_text = "25-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
@@ -5325,7 +5325,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
-                        SL_text = "25-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5333,7 +5333,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "25-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5341,7 +5341,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide:"
-                        SL_text = "25-32 % in Length"
+                        SL_text = entry_pip
                         exit_title = "5.41"
                         exit_text = "5.41"
 
@@ -5382,7 +5382,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: Must be Behind 91 Fib"
                         SL_text = get_pair_volatile(selected_pair,
-                                                    risk_multiplier)
+                                                    risk_multiplier,entry_pip)
                         exit_title = "5.41"
                         exit_text = targeting
 

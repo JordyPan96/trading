@@ -4983,7 +4983,7 @@ elif st.session_state.current_page == "Risk Calculation":
             if (len(a_momemtum_text) < 1):
                 a_momemtum_text = "To be Filled"
             if (risk_multiplier == "1_BNR"):
-                if (trend_context == "Yes"):
+                if (trend_context == "Trend 1+"):
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"

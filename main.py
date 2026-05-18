@@ -4908,39 +4908,39 @@ elif st.session_state.current_page == "Risk Calculation":
             def get_pair_volatile(pair, strategy):
                 if (pair == "GBPUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 elif (pair == "EURUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 elif (pair == "AUDUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 elif (pair == "XAUUSD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 elif (pair == "USDJPY"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 elif (pair == "USDCAD"):
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                 else:
                     if (strategy == '2_BNR_TPF' or strategy == '3_BNR_TPF'):
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                     else:
-                        return SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
+                        return "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                         
             def get_pair_volatile_max(pair, strategy):
                 if (pair == "GBPUSD"):

@@ -4228,7 +4228,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 
             result = 1.0
             if "JPY" in pair:
-                result = round(entry_price * percentage,3)*10
+                result = round(entry_price * percentage,3)*100
             elif "XAU" in pair:
                 result = 2500 * percentage
             else:

@@ -4589,8 +4589,8 @@ elif st.session_state.current_page == "Risk Calculation":
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")
             min_price, max_price = get_min_max_pips(entry_price, selected_pair)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,value=None,step=0.1,format="%.1f")
-            set_global("min_price",min_price)
-            set_global("max_price", max_price)
+            set_global("min_price",str(min_price))
+            set_global("max_price", str(max_price))
 
             st.markdown("<div style='height:30px;'></div>", unsafe_allow_html=True)
 

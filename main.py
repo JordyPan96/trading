@@ -4304,7 +4304,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "XAUUSD"):
-                max_pips = 50
+                max_pips = 50.0
             return min_pips, max_pips
 
 

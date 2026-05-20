@@ -1262,7 +1262,7 @@ if st.session_state.current_page == "Home":
                 new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
                 pattern_options = ["On Mid OMSS", "On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
-                  "Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF",
+                    "Zone Left TPF + OMSS", "Zone/On Left TPF",
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -3509,7 +3509,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
         shapes = ["On Left TPF + Wick", "On/Zone Mid OB", "Zone/On Right Impulse Candle Wick",
-                  "Zone/On Left TPF", "Zone Left TPF + Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
+                  "Zone/On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
                   "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']

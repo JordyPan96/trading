@@ -1263,7 +1263,7 @@ if st.session_state.current_page == "Home":
 
                 pattern_options = ["On Mid OMSS", "On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                     "Zone Left TPF + OMSS", "Zone/On Left TPF",
-                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
+                  "Variant Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=90%", ">=115%", ">=135%", ">=170%", ">=2%", "NA"]
@@ -3510,7 +3510,7 @@ elif st.session_state.current_page == "Risk Calculation":
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
         shapes = ["On Left TPF + Wick", "On/Zone Mid OB", "Zone/On Right Impulse Candle Wick",
                   "Zone/On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
-                  "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
+                  "Variant Daily TPF", "Variant Fakeout Any TF TPF", "No Pattern"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -3658,15 +3658,15 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_17 = {
             '1_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF",
-                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in","On Mid OMSS"],
+                      "Variant Daily TPF", "Variant Fakeout Any TF TPF","4H BE Scale-in","On Mid OMSS"],
             '1_BNR_TPF': ["On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
-                          "4H BE Scale-in", "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
+                          "4H BE Scale-in", "Variant Daily TPF", "Variant Fakeout Any TF TPF"],
             '2_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF", 
-                      "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF","On Mid OMSS"],
+                      "Variant Daily TPF", "Variant Fakeout Any TF TPF","On Mid OMSS"],
             '2_BNR_TPF': ["On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                          ],
             '3_BNR_TPF': ["On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
-                         "Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"],
+                         "Variant Daily TPF", "Variant Fakeout Any TF TPF"],
         }
 
         incompatible_map_18 = {
@@ -3677,7 +3677,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_19 = {
             "12_BNR_TPF": ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF","On Mid OMSS"],
-            "22_BNR_TPF": ["Variant 2 Daily TPF", "Variant Fakeout Any TF TPF"]
+            "22_BNR_TPF": ["Variant Daily TPF", "Variant Fakeout Any TF TPF"]
         }
 
         incompatible_map_20 = {
@@ -3695,7 +3695,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_21 = {
-            "Variant 2 Daily TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
+            "Variant Daily TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
             "Variant Fakeout Any TF TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
             "Weekly TPF Left Leg": [">=2%"],
             "Previous Trend Top/Bottom": [">=2%"],
@@ -3728,13 +3728,13 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_26 = {
             "Wave 1": [],
             "Wave 2+": ['Variant Fakeout Any TF TPF'],
-            "Cross Trend <=3.99%": ['Variant 2 Daily TPF'],
-            "Cross Trend 4% - 5.99%": ['Variant 2 Daily TPF'],
-            "Cross Trend >=6%": ['Variant 2 Daily TPF'],
+            "Cross Trend <=3.99%": ['Variant Daily TPF'],
+            "Cross Trend 4% - 5.99%": ['Variant Daily TPF'],
+            "Cross Trend >=6%": ['Variant Daily TPF'],
         }
 
         incompatible_map_27 = {
-            "Variant 2 Daily TPF": ['50', '66 - 91', '786 - 91'],
+            "Variant Daily TPF": ['50', '66 - 91', '786 - 91'],
             "Variant Fakeout Any TF TPF": ['50', '559 - 66'],
             "4H BE Scale-in": [],
         }

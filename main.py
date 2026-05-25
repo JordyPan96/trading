@@ -4594,6 +4594,15 @@ elif st.session_state.current_page == "Risk Calculation":
             set_global("min_price",str(min_price))
             set_global("max_price", str(max_price))
 
+            st.markdown("""
+                <hr style="
+                    margin-top: 2px;
+                    margin-bottom: 2px;
+                    border: 0;
+                    border-top: 1px solid #ddd;
+                ">
+            """, unsafe_allow_html=True)
+
             Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")

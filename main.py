@@ -1261,6 +1261,9 @@ if st.session_state.current_page == "Home":
                 #hh_ll_options = ["Yes", "No"]
                 #new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
+                trigger_signal_options = ["Outer BOS","Inner BOS","NA","Anchor"]
+                new_trigger_signal = st.selectbox("trigger_signal", options=trigger_signal_options, key="new_trigger_signal")
+
                 pattern_options = ["On Mid OMSS", "On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                     "Zone Left TPF + OMSS", "Zone/On Left TPF",
                   "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF", "No Pattern"]
@@ -1346,6 +1349,8 @@ if st.session_state.current_page == "Home":
                     new_record['cross_fib'] = new_cross_fib
                 if 'HH_LL' in data.columns:
                     new_record['HH_LL'] = new_hh_ll
+                if 'trigger_signal' in data.columns:
+                    new_record['trigger_signal'] = new_trigger_signal
                 if 'leg_length' in data.columns:
                     new_record['leg_length'] = new_leg_length
                 if 'Pattern' in data.columns:
@@ -5682,6 +5687,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 #'POI': POI,
                                                 'cross_fib': cross_fib,
                                                 #'HH_LL': HH_LL,
+                                                'trigger_signal':trigger_signal,
                                                 'leg_length': leg_length,
                                                 'squeeze_559_time': squeeze_559_time,
                                                 'risk_multiplier': risk_multiplier,
@@ -5826,6 +5832,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'cross_fib': cross_fib,
 
                                                 #'HH_LL': HH_LL,
+                                                'trigger_signal': trigger_signal,
 
                                                 'leg_length': leg_length,
 
@@ -7329,6 +7336,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Maximum Adverse Excursion': max_adverse_excursion,
                                             'cross_fib': record['cross_fib'],  # Already exists in record
                                             #'HH_LL': record['HH_LL'],  # Already exists in record
+                                            'trigger_signal':record['trigger_signal'],
                                             'leg_length': record['leg_length'],
                                             'squeeze_559_time': record['squeeze_559_time'],
                                             'trend_context': record['trend_context'],  # Already exists in record

@@ -4541,7 +4541,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
             
 
-            pattern = st.selectbox("Pattern Trigger (Swtich to trigger timeframe, with 3 Candles within 559, then find Pattern)",
+            pattern = st.selectbox("Entry",
                                    available_pattern_trigger4)
 
             available_zone_position = get_available_zone_position(risk_multiplier)

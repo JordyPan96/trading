@@ -1347,8 +1347,8 @@ if st.session_state.current_page == "Home":
                 # NEW: Add the three fields
                 if 'cross_fib' in data.columns:
                     new_record['cross_fib'] = new_cross_fib
-                if 'HH_LL' in data.columns:
-                    new_record['HH_LL'] = new_hh_ll
+                #if 'HH_LL' in data.columns:
+                    #new_record['HH_LL'] = new_hh_ll
                 if 'trigger_signal' in data.columns:
                     new_record['trigger_signal'] = new_trigger_signal
                 if 'leg_length' in data.columns:

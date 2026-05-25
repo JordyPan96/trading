@@ -3511,6 +3511,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["On Left TPF + Wick", "On/Zone Mid OB", "Zone/On Right Impulse Candle Wick",
                   "Zone/On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
                   "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
+        trigger_signal = ["Outer BOS","Inner BOS","Anchor","NA"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -3837,6 +3838,15 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Trend <=3.99%1_BNR_TPF": ['559 - 66']
         }
 
+        incompatible_map_40 = {
+            ["Outer BOS","Inner BOS","Anchor","NA"]
+            "1_BNR": ["Outer BOS","Inner BOS","Anchor"],
+            "1_BNR_TPF": ["Outer BOS","Inner BOS","Anchor"],
+            "2_BNR": ["Anchor","NA"],
+            "2_BNR_TPF": ["Inner BOS","NA"],
+            "3_BNR_TPF": ["Inner BOS","NA"]
+        }
+
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=115%", ">=135%", ">=2%", "NA"],
@@ -4025,6 +4035,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_pattern_trigger4(trend, strat_list):
             disabled_strategy4 = incompatible_map_30.get(trend, [])
             return [s for s in strat_list if s not in disabled_strategy4]
+
+        def get_available_trigger_pattern(strategy):
+            disabled_strategy = incompatible_map_40.get(strategy, [])
+            return [s for s in trigger_signals if s not in disabled_strategy]
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -4533,6 +4547,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                            available_strats_7,
                                            index=0,
                                            help="Adjust risk based on trade quality")
+
+            Trigger_pattern = get_available_trigger_pattern(risk_multiplier)
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
             pattern_concat = squeeze_559_time + risk_multiplier

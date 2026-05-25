@@ -4037,7 +4037,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_available_trigger_pattern(strategy):
             disabled_strategy = incompatible_map_40.get(strategy, [])
-            return [s for s in trigger_signals if s not in disabled_strategy]
+            return [s for s in trigger_signal if s not in disabled_strategy]
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])

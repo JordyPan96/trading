@@ -3516,7 +3516,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["On Left TPF + Wick", "On/Zone Mid OB", "Zone/On Right Impulse Candle Wick",
                   "Zone/On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
                   "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
-        trigger_signal = ["Outer BOS","Inner BOS","Anchor","NA"]
+        trigger_signals = ["Outer BOS","Inner BOS","Anchor","NA"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -4042,7 +4042,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_available_trigger_pattern(strategy):
             disabled_strategy = incompatible_map_40.get(strategy, [])
-            return [s for s in trigger_signal if s not in disabled_strategy]
+            return [s for s in trigger_signals if s not in disabled_strategy]
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])

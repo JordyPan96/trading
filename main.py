@@ -4521,7 +4521,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_2 = get_available_strategies3(trend_position, selected_pair, available_strats_crossfib)
             #available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
             #available_strats_4 = get_available_strategies5(POI, available_strats_3)
-            available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_3)
+            available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_2)
 
             wavesqueeze = cross_fib + squeeze_559_time
             available_strats_6 = get_available_strategies7(wavesqueeze, available_strats_5)

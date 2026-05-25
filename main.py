@@ -4549,7 +4549,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
             available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
 
-            Zone_Position = st.selectbox("Zone Position From Closest Daily Leg one", available_zone_position3)
+            Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(

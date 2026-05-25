@@ -4586,7 +4586,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_leg_length4 = get_available_leg_length4(concat_leg_length, available_leg_length3)
             available_leg_length5 = get_available_leg_length5(squeeze_559_time, available_leg_length4)
 
-            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 (50) Zone", available_leg_length5)
+            leg_length = st.selectbox("Implulse Leg requirement pushing out of 559 Zone", available_leg_length5)
 
             Adaptive_value = next_risk
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")

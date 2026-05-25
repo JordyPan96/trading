@@ -3839,7 +3839,6 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_40 = {
-            ["Outer BOS","Inner BOS","Anchor","NA"]
             "1_BNR": ["Outer BOS","Inner BOS","Anchor"],
             "1_BNR_TPF": ["Outer BOS","Inner BOS","Anchor"],
             "2_BNR": ["Anchor","NA"],

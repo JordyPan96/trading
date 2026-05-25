@@ -4570,7 +4570,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
 
 
-            pattern = st.selectbox("Entry",
+            pattern = st.selectbox("Entry Type",
                                    available_pattern_trigger4)
             available_trigger_pattern = get_available_trigger_pattern(risk_multiplier)
             trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern)

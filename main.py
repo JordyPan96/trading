@@ -1323,8 +1323,8 @@ if st.session_state.current_page == "Home":
                     new_record['Symbol'] = new_symbol
                 if 'Direction' in data.columns:
                     new_record['Direction'] = new_direction
-                if 'POI' in data.columns:
-                    new_record['POI'] = new_poi
+                #if 'POI' in data.columns:
+                    #new_record['POI'] = new_poi
                 if 'Strategy' in data.columns:
                     new_record['Strategy'] = new_strategy
                 if 'Variance' in data.columns:

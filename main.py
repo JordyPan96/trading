@@ -4519,7 +4519,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_strats_crossfib = get_available_strategies2(varcross, available_strats)
 
             available_strats_2 = get_available_strategies3(trend_position, selected_pair, available_strats_crossfib)
-            available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
+            #available_strats_3 = get_available_strategies4(HH_LL, available_strats_2)
             #available_strats_4 = get_available_strategies5(POI, available_strats_3)
             available_strats_5 = get_available_strategies6(squeeze_559_time, available_strats_3)
 
@@ -5669,7 +5669,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                                 'trend_position': trend_position,
                                                 #'POI': POI,
                                                 'cross_fib': cross_fib,
-                                                'HH_LL': HH_LL,
+                                                #'HH_LL': HH_LL,
                                                 'leg_length': leg_length,
                                                 'squeeze_559_time': squeeze_559_time,
                                                 'risk_multiplier': risk_multiplier,
@@ -5813,7 +5813,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
                                                 'cross_fib': cross_fib,
 
-                                                'HH_LL': HH_LL,
+                                                #'HH_LL': HH_LL,
 
                                                 'leg_length': leg_length,
 
@@ -7316,7 +7316,7 @@ elif st.session_state.current_page == "Active Opps":
                                             'Stop Loss Percentage': stop_loss_pct,
                                             'Maximum Adverse Excursion': max_adverse_excursion,
                                             'cross_fib': record['cross_fib'],  # Already exists in record
-                                            'HH_LL': record['HH_LL'],  # Already exists in record
+                                            #'HH_LL': record['HH_LL'],  # Already exists in record
                                             'leg_length': record['leg_length'],
                                             'squeeze_559_time': record['squeeze_559_time'],
                                             'trend_context': record['trend_context'],  # Already exists in record
@@ -7337,7 +7337,7 @@ elif st.session_state.current_page == "Active Opps":
                                                                     'POI', 'Strategy', 'Variance', 'Result', 'RR',
                                                                     'PnL', 'Stop Loss Percentage',
                                                                     'Maximum Adverse Excursion',
-                                                                    'cross_fib', 'HH_LL', 'trend_context',  # ADDED FIELDS
+                                                                    'cross_fib', 'trend_context',  # ADDED FIELDS
                                                                     'Withdrawal_Deposit', 'PROP_Pct', 'Pattern',
                                                                     'Zone_Position', 'Probability', 'squeeze_559_time',
                                                                     'leg_length', 'Link_to_screenshot']

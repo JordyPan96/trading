@@ -1230,8 +1230,8 @@ if st.session_state.current_page == "Home":
 
             with col2:
                 # POI dropdown
-                poi_options = ["1 Trade", "2 Trades"]
-                new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
+                #poi_options = ["1 Trade", "2 Trades"]
+                #new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
                 strategy_options = ["1_BNR", "1_BNR_TPF", "2_BNR", "2_BNR_TPF","3_BNR_TPF"]

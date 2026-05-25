@@ -4634,10 +4634,6 @@ elif st.session_state.current_page == "Risk Calculation":
             if (Zone_Position == "5-6"):
                 Zone_Position_multiplier = 0.8
 
-            if (HH_LL == "No"):
-                hh_ll_multiplier = 1.0
-            elif (HH_LL == "Yes"):
-                hh_ll_multiplier = 1.0
 
             #if (POI == '2 Trades'):
                 #POI_multiplier = 1.0

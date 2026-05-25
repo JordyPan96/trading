@@ -4561,14 +4561,19 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
-            available_trigger_pattern = get_available_trigger_pattern(risk_multiplier)
-            trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern)
+
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
             pattern_concat = squeeze_559_time + risk_multiplier
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
+
+
+            pattern = st.selectbox("Entry",
+                                   available_pattern_trigger4)
+            available_trigger_pattern = get_available_trigger_pattern(risk_multiplier)
+            trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern)
 
             st.markdown("""
                 <hr style="
@@ -4578,9 +4583,6 @@ elif st.session_state.current_page == "Risk Calculation":
                     border-top: 1px solid #ddd;
                 ">
             """, unsafe_allow_html=True)
-
-            pattern = st.selectbox("Entry",
-                                   available_pattern_trigger4)
 
             available_zone_position = get_available_zone_position(risk_multiplier)
             squeezeStrat = squeeze_559_time + risk_multiplier

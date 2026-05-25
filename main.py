@@ -1258,8 +1258,8 @@ if st.session_state.current_page == "Home":
                                                          key="new_withdrawal_deposit")
 
                 # NEW: HH_LL dropdown - UPDATED OPTIONS
-                hh_ll_options = ["Yes", "No"]
-                new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
+                #hh_ll_options = ["Yes", "No"]
+                #new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
                 pattern_options = ["On Mid OMSS", "On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                     "Zone Left TPF + OMSS", "Zone/On Left TPF",
@@ -4510,8 +4510,8 @@ elif st.session_state.current_page == "Risk Calculation":
                 #"How many attempts is this trade worth?",
                 #available_time_frame_4)
 
-            HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell) - If fib reaches 0.2 and >=2.5% in length, create new fib", ['Yes', 'No'])
-            squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
+            #HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell) - If fib reaches 0.2 and >=2.5% in length, create new fib", ['Yes', 'No'])
+            #squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)

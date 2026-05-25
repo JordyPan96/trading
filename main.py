@@ -4578,6 +4578,14 @@ elif st.session_state.current_page == "Risk Calculation":
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
             available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
+            st.markdown("""
+                <hr style="
+                    margin-top: 2px;
+                    margin-bottom: 2px;
+                    border: 0;
+                    border-top: 1px solid #ddd;
+                ">
+            """, unsafe_allow_html=True)
 
             Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
 

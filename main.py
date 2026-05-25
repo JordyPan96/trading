@@ -4569,15 +4569,7 @@ elif st.session_state.current_page == "Risk Calculation":
             available_pattern_trigger2 = get_available_pattern_trigger2(pattern_concat, available_pattern_trigger)
             available_pattern_trigger3 = get_available_pattern_trigger3(cross_fib, available_pattern_trigger2)
             available_pattern_trigger4 = get_available_pattern_trigger4(trend_position, available_pattern_trigger3)
-            
 
-            pattern = st.selectbox("Entry",
-                                   available_pattern_trigger4)
-
-            available_zone_position = get_available_zone_position(risk_multiplier)
-            squeezeStrat = squeeze_559_time + risk_multiplier
-            available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
-            available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
             st.markdown("""
                 <hr style="
                     margin-top: 2px;
@@ -4586,6 +4578,15 @@ elif st.session_state.current_page == "Risk Calculation":
                     border-top: 1px solid #ddd;
                 ">
             """, unsafe_allow_html=True)
+
+            pattern = st.selectbox("Entry",
+                                   available_pattern_trigger4)
+
+            available_zone_position = get_available_zone_position(risk_multiplier)
+            squeezeStrat = squeeze_559_time + risk_multiplier
+            available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
+            available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
+
 
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")
             min_price, max_price = get_min_max_pips(entry_price, selected_pair)

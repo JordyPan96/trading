@@ -4511,7 +4511,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 #available_time_frame_4)
 
             #HH_LL = st.selectbox("FIB drawn on Highest High (Buy)/ Lowest Low (Sell) - If fib reaches 0.2 and >=2.5% in length, create new fib", ['Yes', 'No'])
-            #squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
+            squeeze_559_time = st.selectbox("How many times has price rejected 559 (50) zone on 8H/4H", ['0', '1', '2'])
 
             available_strategies = get_available_strategies(selected_pair)
             available_strats = get_available_strategies2(cross_fib, available_strategies)

@@ -4547,7 +4547,8 @@ elif st.session_state.current_page == "Risk Calculation":
                                            index=0,
                                            help="Adjust risk based on trade quality")
 
-            Trigger_pattern = get_available_trigger_pattern(risk_multiplier)
+            available_trigger_pattern = get_available_trigger_pattern(risk_multiplier)
+            trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern)
 
             available_pattern_trigger = get_available_pattern_trigger(risk_multiplier)
             pattern_concat = squeeze_559_time + risk_multiplier

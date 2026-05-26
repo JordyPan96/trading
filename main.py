@@ -7199,9 +7199,10 @@ elif st.session_state.current_page == "Active Opps":
                                 if save_workflow_to_sheets(st.session_state.saved_records):
                                     if new_position_size is not None:
                                         st.success(f"Updated and recalculated position size: {new_position_size}")
+                                        st.rerun()
                                     else:
                                         st.warning(f"Updated but could not recalculate (risk: {risk_amount}, stop: {stop_pips})")
-                                    st.rerun()
+                                    
                                 else:
                                     st.error("Failed to save")
 

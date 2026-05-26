@@ -7097,7 +7097,7 @@ elif st.session_state.current_page == "Active Opps":
                             record['selected_pair'], active_stage_records
                         )
 
-                        col_update, col_move, col_delete = st.columns(3)
+                        col_update, col_move, col_recalc, col_delete = st.columns(4)
 
                         with col_update:
                             if st.button("Update Record", key=f"update_{unique_key_base}"):
@@ -7131,6 +7131,27 @@ elif st.session_state.current_page == "Active Opps":
                                 st.error("Max 2 active records reached (Order Ready + Order Placed + Order Filled)")
                             elif current_order_ready_count >= 2:
                                 st.error("Maximum limit of 2 'Order Ready' orders reached!")
+                        with col_recalc:
+                            if st.button("Recalculate", key=f"recalc_{unique_key_base}"):
+                                # Get current values
+                                risk_amount = record.get('final_risk', 0)
+                                stop_pips = record.get('stop_pips', 0)
+                                pair = record['selected_pair']
+                                
+                                # Validate inputs
+                                if risk_amount <= 0:
+                                    st.error(f"Cannot recalculate: Invalid final_risk value ({risk_amount})")
+                                elif stop_pips <= 0:
+                                    st.error(f"Cannot recalculate: Invalid stop_pips value ({stop_pips})")
+                                else:
+                                    # Calculate new position size
+                                    new_position_size = calculate_position_size(risk_amount, stop_pips, pair)
+                                    
+                                    # Update the record
+                                    st.session_state.saved_records[record_index]['position_size'] = new_position_size
+                                    st.success(f"Position size recalculated: {new_position_size}")
+                                    st.rerun()
+
 
                         with col_delete:
                             if st.button("Delete", key=f"delete_{unique_key_base}"):

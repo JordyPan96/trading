@@ -3172,13 +3172,21 @@ elif st.session_state.current_page == "Risk Calculation":
         # PAIR GROUPING FUNCTIONS
         def get_pair_group_spec(selected_pair):
             """Determine which group a pair belongs to"""
-            group_one = ["EURAUD", "GBPAUD"]
-            group_two = ["GBPJPY", "EURJPY", "AUDJPY"]
-            group_three = ["AUDUSD"]
-            group_four = ["GBPUSD", "EURUSD"]
-            group_five = ["XAUUSD"]
-            group_six = ["USDJPY"]
-            group_seven = ["USDCAD"]
+            #group_one = ["EURAUD", "GBPAUD"]
+            #group_two = ["GBPJPY", "EURJPY", "AUDJPY"]
+            #group_three = ["AUDUSD"]
+            #group_four = ["GBPUSD", "EURUSD"]
+            #group_five = ["XAUUSD"]
+            #group_six = ["USDJPY"]
+            #group_seven = ["USDCAD"]
+
+            group_one = []
+            group_two = []
+            group_three = []
+            group_four = []
+            group_five = []
+            group_six = []
+            group_seven = []
 
             if selected_pair in group_one:
                 return "group_one"

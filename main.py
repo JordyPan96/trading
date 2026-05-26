@@ -3154,9 +3154,8 @@ elif st.session_state.current_page == "Risk Calculation":
             """Determine which group a pair belongs to"""
             group_one = ["EURAUD", "GBPAUD"]
             group_two = ["GBPJPY", "EURJPY", "AUDJPY", "USDJPY"]
-            group_three = ["AUDUSD", "USDCAD"]
-            group_four = ["GBPUSD", "EURUSD"]
-            group_five = ["XAUUSD"]
+            group_three = ["AUDUSD", "USDCAD","GBPUSD", "EURUSD"]
+            group_four = ["XAUUSD"]
 
             if selected_pair in group_one:
                 return "group_one"
@@ -3166,8 +3165,6 @@ elif st.session_state.current_page == "Risk Calculation":
                 return "group_three"
             elif selected_pair in group_four:
                 return "group_four"
-            elif selected_pair in group_five:
-                return "group_five"
             else:
                 return None
 

@@ -5976,6 +5976,85 @@ elif st.session_state.current_page == "Active Opps":
     from dateutil.parser import isoparse
     from collections import defaultdict
 
+    def get_live_rate(pair):
+        url = f"https://open.er-api.com/v6/latest/{pair[:3]}"  # Base currency (e.g., "USD")
+        response = requests.get(url).json()
+        rate = response["rates"][pair[3:]]  # Quote currency (e.g., "JPY")
+        return float(rate)  # Convert string to float!
+
+
+    def get_aud_usd():
+        """Get AUD/USD rate (e.g., 0.65 means 1 AUD = 0.65 USD)"""
+        url = "https://open.er-api.com/v6/latest/AUD"
+        try:
+            data = requests.get(url).json()
+            return float(data["rates"]["USD"])
+        except:
+            st.warning("Failed to fetch AUD/USD. Using fallback: 0.6500")
+            return 0.65
+
+
+    def get_usd_cad():
+        url = "https://open.er-api.com/v6/latest/USD"
+        try:
+            data = requests.get(url).json()
+            return float(data["rates"]["CAD"])
+        except:
+            st.warning("Failed to fetch live rate. Using fallback: 1.35")
+            return 0  # Fallback rate
+
+
+    def get_usd_chf():
+        url = "https://open.er-api.com/v6/latest/USD"
+        try:
+            data = requests.get(url).json()
+            return float(data["rates"]["CHF"])  # USD/CHF rate
+        except:
+            st.warning("Failed to fetch live rate. Using fallback: 0.9000")
+            return 0
+
+
+    def get_aud_usd():
+        url = "https://open.er-api.com/v6/latest/AUD"
+        try:
+            data = requests.get(url).json()
+            return 1 / float(data["rates"]["USD"])  # AUD/USD rate
+        except:
+            st.warning("Failed to fetch AUD/USD. Using fallback: 0.7000")
+            return 0
+
+
+    def calculate_position_size(risk_amount, stop_pips, pair):
+        lot_size = 100000  # Standard lot size (100,000 units)
+        aud_usd = get_aud_usd()
+
+        if "JPY" in pair:
+            current_price = get_live_rate("USDJPY")  # Live rate for accuracy
+            pip_value_usd = 1000 / current_price  # Precise JPY pip value
+            pip_value = pip_value_usd * aud_usd
+        elif "XAU" in pair:
+            # For XAU/USD, 1 pip = $0.01 per ounce for a standard lot
+
+            pip_value_usd = lot_size * 0.001
+            pip_value = pip_value_usd * aud_usd
+        elif "CAD" in pair:
+            pip_value_usd = 10 / get_usd_cad()  # USD/CAD pip value (USD account)
+            pip_value = pip_value_usd * aud_usd
+        elif pair == "EURAUD" or pair == "GBPAUD":
+            pip_value_usd = 10 / get_aud_usd()
+            pip_value = pip_value_usd * aud_usd
+
+        elif "CHF" in pair:
+            pip_value_usd = 10 / get_usd_chf()
+            pip_value = pip_value_usd * aud_usd
+        else:
+            # For other pairs, 1 pip = 0.0001
+            pip_value_usd = lot_size * 0.0001
+            pip_value = pip_value_usd * aud_usd
+
+        position_size = risk_amount / (stop_pips * pip_value)
+        return round(position_size, 2)
+
 
     # ==================== CROSS GROUP VALIDATION FUNCTION ====================
     def check_cross_group_conflict(selected_pair, current_stage_records):

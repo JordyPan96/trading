@@ -7199,6 +7199,7 @@ elif st.session_state.current_page == "Active Opps":
                                 st.session_state.saved_records[record_index]['entry_price'] = entry_price
                                 st.session_state.saved_records[record_index]['exit_price'] = exit_price
                                 st.session_state.saved_records[record_index]['target_price'] = target_price
+                                st.session_state.saved_records[record_index]['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                                 
                                 if new_position_size is not None:
                                     st.session_state.saved_records[record_index]['position_size'] = new_position_size

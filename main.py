@@ -7228,8 +7228,12 @@ elif st.session_state.current_page == "Active Opps":
                                     
                                     # Update the record
                                     st.session_state.saved_records[record_index]['position_size'] = new_position_size
-                                    st.success(f"Position size recalculated: {new_position_size}")
-                                    st.rerun()
+                                     # Auto-save to sheets immediately
+                                    if save_workflow_to_sheets(st.session_state.saved_records):
+                                        st.success(f"Position size recalculated and saved: {new_position_size}")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to save after recalculation")
 
 
                         with col_delete:

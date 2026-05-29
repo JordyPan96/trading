@@ -4273,7 +4273,7 @@ elif st.session_state.current_page == "Risk Calculation":
             min_group_two = ["GBPUSD","EURJPY","AUDJPY","EURAUD","GBPAUD"]
             min_group_three = ["GBPJPY","XAUUSD"]
             if (pair in min_group_one):
-                if(pair == "USDJPY"):
+                if(pair == "USDJP"):
                     if(risk_multiplier == "3_BNR_TPF"):
                         percentage = 0.0020
                     else:
@@ -4322,7 +4322,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 max_pips = mult
             elif(pair == "USDJPY"):
                 if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 2.1
+                    percentage = 0.0015 * 1.56
                 else:
                     percentage = 0.0015 * 1.56
                 mult = calc_pips(entry_price, percentage, pair)

@@ -4268,35 +4268,22 @@ elif st.session_state.current_page == "Risk Calculation":
             min_pips = 15.0
             max_pips = 15.0
             mult = 0
+            min_max_diff = 0
             percentage = 0.0015
             min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY"]
             min_group_two = ["GBPUSD","EURJPY","AUDJPY","EURAUD","GBPAUD"]
             min_group_three = ["GBPJPY","XAUUSD"]
+            group_four = ["USDJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY","XAUUSD","USDCAD","EURUSD","AUDUSD","GBPUSD"]
             if (pair in min_group_one):
-                if(pair == "USDJP"):
-                    if(risk_multiplier == "3_BNR_TPF"):
-                        percentage = 0.0020
-                    else:
-                        percentage = 0.0015
-                else:
-                    percentage = 0.0015
+                percentage = 0.0015
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_two):
-                if(pair == "GBPUSD"):
-                    percentage = 0.00175
-                else:
-                    if(risk_multiplier == "3_BNR_TPF"):
-                        percentage = 0.00236
-                    else:
-                        percentage = 0.00175
+                percentage = 0.00175
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_three):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0027
-                else:
-                    percentage = 0.0020
+                percentage = 0.0020
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
                     
@@ -4321,50 +4308,40 @@ elif st.session_state.current_page == "Risk Calculation":
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "USDJPY"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 1.56
-                else:
-                    percentage = 0.0015 * 1.56
+                percentage = 0.0015 * 1.56
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "EURJPY"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 2.21
-                else:
-                    percentage = 0.0015 * 1.64
+                percentage = 0.0015 * 1.64
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "GBPJPY"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 2.87
-                else:
-                    percentage = 0.0015 * 2.13
+                percentage = 0.0015 * 2.13
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "AUDJPY"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 1.74
-                else:
-                    percentage = 0.0015 * 1.29
+                percentage = 0.0015 * 1.29
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "EURAUD"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 2.17
-                else:
-                    percentage = 0.0015 * 1.61
+                percentage = 0.0015 * 1.61
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "GBPAUD"):
-                if(risk_multiplier == "3_BNR_TPF"):
-                    percentage = 0.0015 * 2.5
-                else:
-                    percentage = 0.0015 * 1.85
+                percentage = 0.0015 * 1.85
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "XAUUSD"):
                 max_pips = 32.0
-            return round(min_pips,1), round(max_pips,1)
+
+            min_pips_final = round(min_pips,1)
+            max_pips_final = round(max_pips,1)
+            if(risk_multiplier == "3_BNR_TPF"):
+                min_max_diff = max_pips_final - min_pips_final
+                min_pips_final += min_max_diff
+                max_pips_final += min_max_diff
+                
+            return min_pips_final, max_pips_final
 
 
         def get_focus_pair(current_month_stats):

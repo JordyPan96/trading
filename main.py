@@ -4273,15 +4273,30 @@ elif st.session_state.current_page == "Risk Calculation":
             min_group_two = ["GBPUSD","EURJPY","AUDJPY","EURAUD","GBPAUD"]
             min_group_three = ["GBPJPY","XAUUSD"]
             if (pair in min_group_one):
-                percentage = 0.0015
+                if(pair == "USDJPY"):
+                    if(risk_multiplier == "3_BNR_TPF"):
+                        percentage = 0.0020
+                    else:
+                        percentage = 0.0015
+                else:
+                    percentage = 0.0015
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_two):
-                percentage = 0.00175
+                if(pair == "GBPUSD"):
+                    percentage = 0.00175
+                else:
+                    if(risk_multiplier == "3_BNR_TPF"):
+                        percentage = 0.00236
+                    else:
+                        percentage = 0.00175
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_three):
-                percentage = 0.0020
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0027
+                else:
+                    percentage = 0.0020
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
                     
@@ -4306,27 +4321,45 @@ elif st.session_state.current_page == "Risk Calculation":
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "USDJPY"):
-                percentage = 0.0015 * 1.56
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 2.1
+                else:
+                    percentage = 0.0015 * 1.56
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "EURJPY"):
-                percentage = 0.0015 * 1.64
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 2.21
+                else:
+                    percentage = 0.0015 * 1.64
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "GBPJPY"):
-                percentage = 0.0015 * 2.13
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 2.87
+                else:
+                    percentage = 0.0015 * 2.13
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "AUDJPY"):
-                percentage = 0.0015 * 1.29
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 1.74
+                else:
+                    percentage = 0.0015 * 1.29
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "EURAUD"):
-                percentage = 0.0015 * 1.61
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 2.17
+                else:
+                    percentage = 0.0015 * 1.61
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "GBPAUD"):
-                percentage = 0.0015 * 1.85
+                if(risk_multiplier == "3_BNR_TPF"):
+                    percentage = 0.0015 * 2.5
+                else:
+                    percentage = 0.0015 * 1.85
                 mult = calc_pips(entry_price, percentage, pair)
                 max_pips = mult
             elif(pair == "XAUUSD"):

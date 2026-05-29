@@ -4340,6 +4340,10 @@ elif st.session_state.current_page == "Risk Calculation":
                 min_max_diff = round(max_pips_final - min_pips_final,1)
                 min_pips_final = round(min_pips_final + min_max_diff,1)
                 max_pips_final = round (max_pips_final + min_max_diff,1)
+
+            if(min_pips_final > max_pips_final):
+                min_pips_final = 0.0
+                max_pips_final = 1.0
                 
             return min_pips_final, max_pips_final
 

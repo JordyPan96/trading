@@ -4337,9 +4337,13 @@ elif st.session_state.current_page == "Risk Calculation":
             min_pips_final = round(min_pips,1)
             max_pips_final = round(max_pips,1)
             if(risk_multiplier == "3_BNR_TPF"):
-                min_max_diff = round(max_pips_final - min_pips_final,1)
-                min_pips_final = round(min_pips_final + min_max_diff,1)
-                max_pips_final = round (max_pips_final + min_max_diff,1)
+                if(pair == "XAUUSD"):
+                    min_pips_final = round(min_pips_final * 1.35,1)
+                    max_pips_final = round(max_pips_final * 1.35,1)
+                else:
+                    min_max_diff = round(max_pips_final - min_pips_final,1)
+                    min_pips_final = round(min_pips_final + min_max_diff,1)
+                    max_pips_final = round (max_pips_final + min_max_diff,1)
 
             if(min_pips_final > max_pips_final):
                 min_pips_final = 0.0

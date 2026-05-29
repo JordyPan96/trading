@@ -4542,7 +4542,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             
             available_wave_status = get_available_Wave_status(trend_position)
-            cross_fib = st.selectbox("Weekly Wave Status -  (Use Weekly or 2_Daily Fib, based on Wave + %)", available_wave_status)
+            cross_fib = st.selectbox("Weekly Wave Status -  Perform Wave 2 AND 2 Daily Check where applicable", available_wave_status)
             st.markdown("""
                 <hr style="
                     margin-top: 2px;

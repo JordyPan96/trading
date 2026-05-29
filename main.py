@@ -4949,7 +4949,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif(trend == "11%-12.99% (4% PB)"):
                             open_target = "Top of wave to 4.99%"
 
-                    elif(wave == "Wave 2+" or wave == "Cross Trend <=3.99%" or wave == "Cross Trend 4% - 5.99%"):
+                    elif(wave == "Wave 2+"):
                         if(trend == "3%-4.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 6.41
@@ -4975,6 +4975,19 @@ elif st.session_state.current_page == "Risk Calculation":
                                 open_target = 6.41
                             else:
                                 open_target = 5.41
+                    elif(wave == "Cross Trend <=3.99%" or wave == "Cross Trend 4% - 5.99%"):
+                        if(trend == "3%-4.99%"):
+                            open_target = 4.11
+                        elif(trend == "5%-6.99%"):
+                            open_target = 4.11
+                        elif(trend == "7%-8.99%"):
+                            open_target = 4.11
+                        elif(trend == "9%-10.99%"):
+                            open_target = 4.11
+                        elif(trend == "11%-12.99% (4% PB)"):
+                            open_target = 4.11
+                        elif(trend == ">=13% (5% PB, ACAD 4%)"):
+                            open_target = 4.11
                          
                 else:
                     open_target = 5.41

@@ -3789,7 +3789,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_32 = {
-            "23_BNR_TPF": ["NA","0", "1-2"]
+            "23_BNR_TPF": ["NA","0"]
 
         }
 

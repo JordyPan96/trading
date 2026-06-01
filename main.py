@@ -3660,10 +3660,10 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_16 = {
             "1_BNR": ["0", "1-2","3-6","5-6"],
-            "1_BNR_TPF": ["0", "1-2","3-6","5-6"],
+            "1_BNR_TPF": ["0","1-2","3-6","5-6"],
             "2_BNR": ["NA", "0", "3-6","5-6"],
-            "2_BNR_TPF": ["0", "1-2","NA"],
-            "3_BNR_TPF": ["0", "1-2","NA"]
+            "2_BNR_TPF": ["0", "NA"],
+            "3_BNR_TPF": ["0", "NA"]
 
         }
 

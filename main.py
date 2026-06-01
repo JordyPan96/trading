@@ -4625,6 +4625,27 @@ elif st.session_state.current_page == "Risk Calculation":
             available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
             Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
 
+            available_vairances = get_available_variance(risk_multiplier)
+            if (selected_pair not in majors_dollar):
+                if ('50' in available_vairances):
+                    available_vairances.remove("50")
+            elif(selected_pair == "XAUUSD"):
+                if ('50' in available_vairances):
+                    available_vairances.remove("50")
+                
+            concat_trend = trend_position + risk_multiplier
+            final_variance1 = get_available_variance_2(concat_trend, available_vairances)
+
+            concat_trend2 = selected_pair + risk_multiplier
+            final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
+
+            final_variance3 = get_available_variance_3(pattern, final_variance2)
+
+            wave_strat =  cross_fib + risk_multiplier
+            final_variance4 = get_available_variance_4(wave_strat, final_variance3)
+
+            Variances = st.selectbox("Position Variance (Fib)", final_variance4)
+
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")
             min_price, max_price = get_min_max_pips(entry_price, selected_pair,risk_multiplier,Zone_Position)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,value=None,step=0.1,format="%.1f")
@@ -4649,26 +4670,7 @@ elif st.session_state.current_page == "Risk Calculation":
             #	disabled=True,
             #	format = "%.3f"
             # )
-            available_vairances = get_available_variance(risk_multiplier)
-            if (selected_pair not in majors_dollar):
-                if ('50' in available_vairances):
-                    available_vairances.remove("50")
-            elif(selected_pair == "XAUUSD"):
-                if ('50' in available_vairances):
-                    available_vairances.remove("50")
-                
-            concat_trend = trend_position + risk_multiplier
-            final_variance1 = get_available_variance_2(concat_trend, available_vairances)
 
-            concat_trend2 = selected_pair + risk_multiplier
-            final_variance2 = get_available_variance_2(concat_trend2, final_variance1)
-
-            final_variance3 = get_available_variance_3(pattern, final_variance2)
-
-            wave_strat =  cross_fib + risk_multiplier
-            final_variance4 = get_available_variance_4(wave_strat, final_variance3)
-
-            Variances = st.selectbox("Position Variance (Fib)", final_variance4)
 
             available_leg_length = get_available_leg_length(selected_pair)
             available_leg_length2 = get_available_leg_length2(pattern, available_leg_length)

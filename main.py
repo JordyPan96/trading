@@ -3852,8 +3852,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "1_BNR": ["Outer BOS","Inner BOS","Anchor"],
             "1_BNR_TPF": ["Outer BOS", "Anchor","Inner BOS"],
             "2_BNR": ["Anchor","NA"],
-            "2_BNR_TPF": ["Inner BOS","NA"],
-            "3_BNR_TPF": ["Inner BOS","NA"]
+            "2_BNR_TPF": ["Inner BOS","NA","Outer BOS",],
+            "3_BNR_TPF": ["Inner BOS","NA","Outer BOS",]
         }
 
 

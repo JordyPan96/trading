@@ -5091,7 +5091,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     if (selected_pair == "XAUUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
-                        SL_title = "SL Guide: In Pips"
+                        SL_title = "SL Guide: In Pips - IF only 1 entry for 3_BNR_TPF, give MAX"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
                         exit_title = "Target"
                         exit_text = "559 Fib X.41"

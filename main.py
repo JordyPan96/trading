@@ -4259,7 +4259,7 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 result = round(entry_price * percentage,6)*10000
             return result
-        def get_min_max_pips(entry_price, pair,risk_multiplier):
+        def get_min_max_pips(entry_price, pair,risk_multiplier,Zone_Position):
             try:
                 entry_price = float(entry_price)
             except (ValueError, TypeError):
@@ -4352,6 +4352,9 @@ elif st.session_state.current_page == "Risk Calculation":
                 min_pips_final = max_pips_final
             if(max_pips_final - min_pips_final < 5.0):
                 max_pips_final = min_pips_final + 5.0
+            if(Zone_Position = "3-6"):
+                min_pips_final = max_pips_final
+                max_pips_final = max_pips_final + 5.0
                 
             return min_pips_final, max_pips_final
 

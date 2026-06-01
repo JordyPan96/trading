@@ -3855,6 +3855,10 @@ elif st.session_state.current_page == "Risk Calculation":
             "2_BNR_TPF": ["Inner BOS","NA","Outer BOS",],
             "3_BNR_TPF": ["Inner BOS","NA","Outer BOS",]
         }
+        incompatible_map_41 = {
+            "Variant Daily TPF": ["Anchor"],
+            "Variant Fakeout Daily TPF": ["Anchor"],
+        }
 
 
         incompatible_map_23 = {
@@ -4048,6 +4052,9 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_trigger_pattern(strategy):
             disabled_strategy = incompatible_map_40.get(strategy, [])
             return [s for s in trigger_signals if s not in disabled_strategy]
+        def get_available_trigger_pattern2(pattern_list,pattern):
+            disabled_strategy2 = incompatible_map_41.get(pattern, [])
+            return [s for s in pattern_list if s not in disabled_strategy2]
 
         def get_available_timeframe(selected_pair):
             disabled_timeframe = incompatible_map_11.get(selected_pair, [])
@@ -4608,7 +4615,8 @@ elif st.session_state.current_page == "Risk Calculation":
             pattern = st.selectbox("Entry Type",
                                    available_pattern_trigger4)
             available_trigger_pattern = get_available_trigger_pattern(risk_multiplier)
-            trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern)
+            available_trigger_pattern2 = get_available_trigger_pattern2(available_trigger_pattern,pattern)
+            trigger_signal = st.selectbox("Trigger Signal",available_trigger_pattern2)
 
             st.markdown("""
                 <hr style="

@@ -4618,10 +4618,10 @@ elif st.session_state.current_page == "Risk Calculation":
             squeezeStrat = squeeze_559_time + risk_multiplier
             available_zone_position2 = get_available_zone_position2(squeezeStrat, available_zone_position)
             available_zone_position3 = get_available_zone_position3(pattern, available_zone_position2)
-
+            Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
 
             entry_price = st.number_input("Entry Price", min_value=0.0, value=None, step=0.00001,format="%.5f")
-            min_price, max_price = get_min_max_pips(entry_price, selected_pair,risk_multiplier)
+            min_price, max_price = get_min_max_pips(entry_price, selected_pair,risk_multiplier,Zone_Position)
             stop_pips = st.number_input("Stop Loss (pips)", min_value=min_price, max_value=max_price,value=None,step=0.1,format="%.1f")
             set_global("min_price",str(min_price))
             set_global("max_price", str(max_price))
@@ -4635,7 +4635,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 ">
             """, unsafe_allow_html=True)
 
-            Zone_Position = st.selectbox("Zone Position relative to Top/Bottom", available_zone_position3)
+            
 
             # Adaptive_value = st.number_input("Adaptive risk based on streak",next_risk,format="%.3f")
             # Adaptive_value = st.number_input(
@@ -4871,7 +4871,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # 1_BNR
             def getPairEntrySL(pair,entry):
                 # target_in = 0
-                min_entry, max_entry = get_min_max_pips(pair,entry,risk_multiplier)
+                min_entry, max_entry = get_min_max_pips(pair,entry,risk_multiplier,Zone_Position)
                 result = "Min:" + str(min_entry) + ", Max:" + str(max_entry) + " Pips" 
                 return result
                     

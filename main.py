@@ -1281,7 +1281,7 @@ if st.session_state.current_page == "Home":
                 new_trend_position = st.selectbox("Trend Position (Weekly)", options=trend_position_options,
                                                   key="new_trend_position")
 
-                Zone_Position_options = ["NA", "1-2", "1-4", "5-6"]
+                Zone_Position_options = ["NA", "1-2", "1-6"]
                 new_Zone_Position = st.selectbox("Zone_Position", options=Zone_Position_options,
                                                  key="new_Zone_Position")
 
@@ -3535,7 +3535,7 @@ elif st.session_state.current_page == "Risk Calculation":
             # Add more restrictions as needed
         }
 
-        potential_rr = ["3.41-4.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
+        potential_rr = ["3.41-6.41", "5.41-7.41", "8.41-10.41", ">=11.41"]
         leg_length = [">=2%", ">=170%", ">=135%", ">=115%", ">=90%", "NA"]
         trend_context = ["Trend 0", "Trend 1+","Range"]
         incompatible_map_4 = {
@@ -3555,7 +3555,7 @@ elif st.session_state.current_page == "Risk Calculation":
         Variance = ["559 - 66", "66 - 91", "50"]
         Trend_Positions = ["3%-4.99%", "5%-6.99%", "7%-8.99%", "9%-10.99%", "11%-12.99% (4% PB)",
                            ">=13% (5% PB, ACAD 4%)"]
-        zone_from_leg_one = ["NA", "1-2", "1-4","5-6"]
+        zone_from_leg_one = ["NA", "1-2", "1-6"]
         Wave_status = ['Wave 1', 'Wave 2+', 'Cross Trend <=3.99%', 'Cross Trend 4% - 5.99%','Cross Trend >=6%']
 
         incompatible_map_3 = {
@@ -3659,9 +3659,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_16 = {
-            "1_BNR": ["0", "1-2","1-4","5-6"],
-            "1_BNR_TPF": ["0", "1-2","1-4","5-6"],
-            "2_BNR": ["NA", "0", "1-4","5-6"],
+            "1_BNR": ["0", "1-2","1-6","5-6"],
+            "1_BNR_TPF": ["0", "1-2","1-6","5-6"],
+            "2_BNR": ["NA", "0", "1-6","5-6"],
             "2_BNR_TPF": ["0", "1-2","NA"],
             "3_BNR_TPF": ["0", "1-2","NA"]
 
@@ -3838,7 +3838,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_38 = {
-            "4H BE Scale-in":["0", "1-2","1-4","5-6"],
+            "4H BE Scale-in":["0", "1-2","1-6","5-6"],
         }
 
         incompatible_map_39 = {
@@ -4738,7 +4738,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     sixone_multiplier = 1.0
             else:
                 sixone_multiplier = 1.0
-            # if(Potential == '3.41-4.41'):
+            # if(Potential == '3.41-6.41'):
             # rr_multiplier = 1.0
             # elif(Potential == '5.41-7.41'):
             # rr_multiplier = 1.1

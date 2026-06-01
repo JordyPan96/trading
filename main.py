@@ -7990,6 +7990,12 @@ elif st.session_state.current_page == "Trade Signal":
         """Quickly get positions without extensive synchronization"""
         try:
             from metaapi_cloud_sdk import MetaApi
+            account, error = await get_metaapi_account()
+            if error:
+                return [], f"Account error: {error}"
+        
+            if not account:
+                return [], "No account returned"
 
             config = get_metaapi_config()
             token = config.get("token", "")

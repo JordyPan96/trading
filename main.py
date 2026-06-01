@@ -8005,19 +8005,19 @@ elif st.session_state.current_page == "Trade Signal":
             if account.state != 'DEPLOYED':
                 return [], None
 
-            #connection = account.get_rpc_connection()
-            #await connection.connect()
+            connection = account.get_rpc_connection()
+            await connection.connect()
 
             # Quick sync with short timeout
-            #try:
-                #await asyncio.wait_for(connection.wait_synchronized(), timeout=15)
-            #except asyncio.TimeoutError:
-                #await connection.close()
-                #return [], "Connection timeout"
-
-            #positions = await connection.get_positions()
-            #await connection.close()
-            positions = await account.get_positions()
+            try:
+                await asyncio.wait_for(connection.wait_synchronized(), timeout=15)
+            except asyncio.TimeoutError:
+                await connection.close()
+                return [], "Connection timeout"
+                
+            positions = await connection.get_positions()
+            await connection.close()
+            
 
             # Format positions data quickly - USE CAMELCASE DIRECTLY FROM METAAPI
             formatted_positions = []
@@ -8037,10 +8037,10 @@ elif st.session_state.current_page == "Trade Signal":
             return formatted_positions, None
 
         except Exception as e:
-            #try:
-                #await connection.close()
-            #except:
-                #pass
+            try:
+                await connection.close()
+            except:
+                pass
             return [], f"Quick position error: {str(e)}"
 
 

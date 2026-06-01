@@ -4358,7 +4358,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         def get_focus_pair(current_month_stats):
             """Determine which pair to focus on based on most recent loss"""
-            major_pairs = ["GBPUSD", "EURUSD"]
+            major_pairs = []
             focus_pair = None
 
             if len(current_month_stats) > 0:

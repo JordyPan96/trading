@@ -8010,7 +8010,7 @@ elif st.session_state.current_page == "Trade Signal":
 
             # Quick sync with short timeout
             try:
-                await asyncio.wait_for(connection.wait_synchronized(), timeout=15)
+                await asyncio.wait_for(connection.wait_synchronized(), timeout=5)
             except asyncio.TimeoutError:
                 await connection.close()
                 return [], "Connection timeout"

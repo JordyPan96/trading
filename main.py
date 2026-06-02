@@ -4366,7 +4366,9 @@ elif st.session_state.current_page == "Risk Calculation":
                 else:
                     min_pips_final = min_pips_final + 5.0
                     max_pips_final = max_pips_final + 5.0
-                    
+            if(pair == "XAUUSD"):
+                if(max_pips_final > 32.0):
+                    max_pips_final = 32.0
                 
             return min_pips_final, max_pips_final
 

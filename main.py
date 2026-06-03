@@ -4357,7 +4357,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             if(Zone_Position == "3-6"):
                 min_max_diff = round(max_pips_final - min_pips_final,1)
-                if(pair != "XAUUSD"):
+                if(pair == "XAUUSD"):
                     min_pips_final = min_pips_final + 5.0
                     max_pips_final = 32.0
                 else:

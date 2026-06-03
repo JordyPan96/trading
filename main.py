@@ -4344,9 +4344,11 @@ elif st.session_state.current_page == "Risk Calculation":
             min_pips_final = round(min_pips,1)
             max_pips_final = round(max_pips,1)
 
+            gold_min_max_diff = round(min_pips_final * 1.35 - min_pips_final,1)
+
             if(risk_multiplier == "3_BNR_TPF"):
                 if(pair == "XAUUSD"):
-                    min_pips_final = round(min_pips_final * 1.35,1)
+                    min_pips_final = round(min_pips_final + gold_min_max_diff,1)
                     max_pips_final = 32.0
                 else:
                     min_max_diff = round(max_pips_final - min_pips_final,1)
@@ -4356,15 +4358,16 @@ elif st.session_state.current_page == "Risk Calculation":
                     max_pips_final = round (max_pips_final + min_max_diff,1)
 
             if(Zone_Position == "3-6"):
-                min_max_diff = round(max_pips_final - min_pips_final,1)
-                if(min_max_diff > 10.0):
-                    min_max_diff = 10.0
                 if(pair == "XAUUSD"):
-                    min_pips_final = min_pips_final + 5.0
+                    min_pips_final = round(min_pips_final + gold_min_max_diff,1)
                     max_pips_final = 32.0
                 else:
+                    min_max_diff = round(max_pips_final - min_pips_final,1)
+                    if(min_max_diff > 10.0):
+                        min_max_diff = 10.0
                     min_pips_final = round(min_pips_final + min_max_diff,1)
                     max_pips_final = round (max_pips_final + min_max_diff,1)
+                    
             if(min_pips_final > max_pips_final):
                 min_pips_final = max_pips_final
             if(max_pips_final - min_pips_final < 5.0):

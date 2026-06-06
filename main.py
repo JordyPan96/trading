@@ -4756,7 +4756,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 if(Variances == "559 - 66"):
                                     sixone_multiplier = 1.0
                                 else:
-                                    sixone_multiplier = 1.0
+                                    sixone_multiplier = 1.2
                     else:
                         if (risk_multiplier == "1_BNR_TPF"):
                             sixone_multiplier = 1.0

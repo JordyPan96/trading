@@ -4866,9 +4866,12 @@ elif st.session_state.current_page == "Risk Calculation":
                 if (pair_result != "L"):
                     if(trend_context == "Trend 1+"):
                         ultra_risk_multiplier = 2.0
-                        sixone_multiplier == 1.0
-                        trend_position_multiplier = 1.0
-                        prior_result_multiplier = 1.0
+                        if(sixone_multiplier != 1.0):
+                            sixone_multiplier = 1.0
+                        if(trend_position_multiplier != 1.0):
+                            trend_position_multiplier = 1.0
+                        if(prior_result_multiplier != 1.0):
+                            prior_result_multiplier = 1.0
                                    
 
 

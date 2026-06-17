@@ -4722,6 +4722,7 @@ elif st.session_state.current_page == "Risk Calculation":
             cross_fib_multiplier = 1.0
             sum_target_multiplier = 1.0
             big_risk_multiplier = 1.0
+            ultra_risk_multiplier = 1.0
             Zone_Position_multiplier = 1.0
             hh_ll_multiplier = 1.0
             pattern_multiplier = 1.0
@@ -4845,6 +4846,11 @@ elif st.session_state.current_page == "Risk Calculation":
             else:
                 sect_count_multiplier = 0.0
 
+            if(risk_multiplier == "3_BNR_TPF"):
+                if (pair_result != "L"):
+                    if(trend_context == "Trend 1+"):
+                       ultra_risk_multiplier = 2.0
+
 
             if (selected_pair in europe_major or selected_pair == "XAUUSD"):
                 if (pair_result == "W"):
@@ -4862,7 +4868,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 big_risk_multiplier = 1.0
             yearly_factor = starting_capital
             final_risk_1 = (
-                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier * pattern_multiplier
+                                   yearly_factor * Adaptive_value) * multiplier * POI_multiplier * trend_position_multiplier * sixone_multiplier * ultra_risk_multiplier * prior_result_multiplier * sect_count_multiplier * big_risk_multiplier * cross_fib_multiplier * variance_multiplier * sum_target_multiplier * Zone_Position_multiplier * hh_ll_multiplier * pattern_multiplier
             final_risk = math.floor(final_risk_1)
             if (final_risk > (yearly_factor * 0.05)):
                 final_risk = yearly_factor * 0.05

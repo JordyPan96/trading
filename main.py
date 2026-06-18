@@ -1265,7 +1265,7 @@ if st.session_state.current_page == "Home":
                 new_trigger_signal = st.selectbox("trigger_signal", options=trigger_signal_options, key="new_trigger_signal")
 
                 pattern_options = ["On Mid OMSS", "On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
-                    "Zone Left TPF + OMSS", "Zone/On Left TPF",
+                    "Zone Left TPF + OMSS", "On Left TPF",
                   "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
@@ -3519,7 +3519,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
         shapes = ["On Left TPF + Wick", "On/Zone Mid OB", "Zone/On Right Impulse Candle Wick",
-                  "Zone/On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
+                  "On Left TPF", "On Mid OMSS", "Zone Left TPF + OMSS", 
                   "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
         trigger_signals = ["Outer BOS","Inner BOS","Anchor","NA"]
         time_frame = ['1 Trade','2 Trades']
@@ -3668,11 +3668,11 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_17 = {
-            '1_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF",
+            '1_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF",
                       "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","4H BE Scale-in","On Mid OMSS"],
             '1_BNR_TPF': ["On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                           "4H BE Scale-in", "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
-            '2_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF", 
+            '2_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF", 
                       "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","On Mid OMSS"],
             '2_BNR_TPF': ["On/Zone Mid OB", "On Left TPF + Wick", "Zone/On Right Impulse Candle Wick",
                          ],
@@ -3687,7 +3687,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_19 = {
-            "12_BNR_TPF": ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "Zone/On Left TPF","On Mid OMSS"],
+            "12_BNR_TPF": ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF","On Mid OMSS"],
             "22_BNR_TPF": ["Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"]
         }
 

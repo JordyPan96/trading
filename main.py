@@ -30,7 +30,7 @@ from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode
 
 # Configure page - keep it as wide for desktop
 st.set_page_config(
-    page_title="x Trade",
+    page_title="TradeX",
     layout="wide",  # Keep wide for desktop
     initial_sidebar_state="auto"
 )
@@ -1432,7 +1432,7 @@ if st.session_state.current_page == "Home":
                 column['editable'] = False  # Don't allow editing hidden columns
 
         # Display
-        st.title("x Trade")
+        st.title("TradeX")
         # st.markdown("Use the grid below to explore and filter trading data")
 
         import streamlit as st
@@ -1586,7 +1586,7 @@ if st.session_state.current_page == "Home":
 
     else:
         # Show welcome message when no data is loaded
-        st.title("x Trade")
+        st.title("TradeX")
         st.info("👆 Use the **Cloud Data Management** section in the sidebar to load your data")
         st.markdown("""
         ### How to get started:

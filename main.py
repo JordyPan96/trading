@@ -5143,28 +5143,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
 
                 else:
@@ -5173,28 +5173,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "559 Fib X.41"
             elif (risk_multiplier == "1_BNR_TPF"):
                 def get_entry_zone_plus_(pair_volatile, selected_pair):
@@ -5217,7 +5217,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
                         if (Variances == "786 - 91"):
@@ -5225,14 +5225,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide: In Pips"
                             SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
                         if (Variances == "786 - 91"):
@@ -5240,14 +5240,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide: In Pips"
                             SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
                         if (Variances == "786 - 91"):
@@ -5255,14 +5255,14 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide: In Pips"
                             SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
                         if (Variances == "786 - 91"):
@@ -5270,7 +5270,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             entry_text = "Enter on EP Line"
                             SL_title = "SL Guide: In Pips"
                             SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
 
@@ -5280,28 +5280,28 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair in minors or selected_pair == "AUDUSD"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     elif (selected_pair == "USDJPY"):
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
                     else:
                         entry_title = "Entry Guide:"
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = get_one_target_2(selected_pair, cross_fib, trend_position)
 
 
@@ -5535,7 +5535,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "5.41"
 
                     elif (Variances == "559 - 66"):
@@ -5543,7 +5543,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "5.41"
 
                     elif (Variances == "66 - 91"):
@@ -5551,7 +5551,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         entry_text = "Enter on EP Line"
                         SL_title = "SL Guide: In Pips"
                         SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = "5.41"
 
 
@@ -5592,7 +5592,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         SL_title = "SL Guide: In Pips"
                         SL_text = get_pair_volatile(selected_pair,
                                                     risk_multiplier,SL_text = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") )
-                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                        exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                         exit_text = targeting
 
                     elif (Variances == "559 - 66"):
@@ -5602,7 +5602,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
 
                         elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair not in majors_dollar):
@@ -5611,7 +5611,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5619,7 +5619,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
 
                     elif (Variances == "66 - 91"):
@@ -5629,7 +5629,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
@@ -5637,7 +5637,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5645,7 +5645,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                     elif (Variances == "50"):
                         if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair in majors_dollar):
@@ -5654,7 +5654,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
@@ -5662,7 +5662,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         else:
                             entry_title = "Entry Guide:"
@@ -5670,7 +5670,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                     # if(risk_multiplier == "2_BNR"):
                     # exit_title = "Target Guide One:"
@@ -5707,7 +5707,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             SL_title = "SL Guide: In Pips"
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
-                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                            exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                             exit_text = targeting
                         elif (Variances == "559 - 66"):
                             if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
@@ -5716,7 +5716,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5724,7 +5724,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
 
                         elif (Variances == "66 - 91"):
@@ -5734,7 +5734,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5742,7 +5742,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
                         elif (Variances == "50"):
                             if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
@@ -5751,7 +5751,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
                             else:
                                 entry_title = "Entry Guide:"
@@ -5759,7 +5759,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
-                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Pullback Leg)"
+                                exit_title = "Target (For 2/3 8H Triggers 5.41 Give 15.41 R IF Target Beaks Neckline Leg)"
                                 exit_text = targeting
                         # if (risk_multiplier == "2_BNR"):
                         # exit_title = "Target Guide One:"

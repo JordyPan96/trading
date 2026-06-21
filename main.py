@@ -4924,7 +4924,7 @@ elif st.session_state.current_page == "Risk Calculation":
             entry_pip = "Min:" + get_global("min_price") + ", " + "Max: " + get_global("max_price") 
 
 
-            def get_one_target_2(selected_pair, wave, trend):
+            def get_one_target(selected_pair, wave, trend):
                 open_target = 0
                 if (selected_pair in europe_major or selected_pair == "XAUUSD" or selected_pair in trade_curr or selected_pair == "USDJPY"):
                     if(wave == "Wave 1" or wave == "Cross Trend >=6%"):
@@ -4980,54 +4980,54 @@ elif st.session_state.current_page == "Risk Calculation":
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "5%-6.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "7%-8.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "9%-10.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "11%-12.99% (4% PB)"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
 
                     elif(wave == "Wave 2+"):
                         if(trend == "3%-4.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "5%-6.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "7%-8.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "9%-10.99%"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                         elif(trend == "11%-12.99% (4% PB)"):
                             if(selected_pair == "XAUUSD"):
                                 open_target = 7.41
                             else:
-                                open_target = 5.41
+                                open_target = 7.41
                     elif(wave == "Cross Trend <=3.99%" or wave == "Cross Trend 4% - 5.99%"):
                         if(trend == "3%-4.99%"):
                             open_target = 4.11

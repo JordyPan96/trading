@@ -3740,7 +3740,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_26 = {
             "Wave 1": [],
-            "Wave 2+": ['Variant Fakeout Daily TPF','Variant Fakeout Trigger TPF'],
+            "Wave 2+": ['Variant Fakeout Daily TPF','Variant Fakeout Trigger TPF','Left Side Daily TPF',],
             "Cross Trend <=3.99%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
             "Cross Trend 4% - 5.99%": ['Left Side Daily TPF'],
             "Cross Trend >=6%": ['Left Side Daily TPF',"Pull Back Daily TPF"],

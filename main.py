@@ -1234,7 +1234,7 @@ if st.session_state.current_page == "Home":
                 #new_poi = st.selectbox("POI", options=poi_options, key="new_poi")
 
                 # Strategy dropdown (uses existing values from data)
-                strategy_options = ["1_BNR", "1_BNR_TPF", "2_BNR", "2_BNR_TPF","3_BNR_TPF"]
+                strategy_options = [ "1_BNR_TPF","1_BNR", "2_BNR_TPF","2_BNR","3_BNR_TPF"]
                 new_strategy = st.selectbox("Strategy", options=strategy_options, key="new_strategy")
 
                 # Variance dropdown - STORE AS STRING
@@ -3517,7 +3517,7 @@ elif st.session_state.current_page == "Risk Calculation":
         majors_dollar = ["AUDUSD", "EURUSD", "GBPUSD", "XAUUSD"]
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
-        strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
+        strategies = ['1_BNR_TPF', '1_BNR', '2_BNR_TPF', '2_BNR', "3_BNR_TPF","No Setup"]
         shapes = ["On Left TPF + Wick", "Wick/Zone Mid OB", "On Right Impulse Candle Wick",
                   "On Left TPF", "Wick Mid OMSS", "Zone Left TPF + OMSS", 
                   "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]

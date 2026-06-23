@@ -1261,7 +1261,7 @@ if st.session_state.current_page == "Home":
                 #hh_ll_options = ["Yes", "No"]
                 #new_hh_ll = st.selectbox("HH/LL", options=hh_ll_options, key="new_hh_ll")
 
-                trigger_signal_options = ["Outer BOS","Inner BOS","NA","Anchor"]
+                trigger_signal_options = ["Outer BOS","Inner BOS","NA","Anchor", "Variant Left leg Anchor"]
                 new_trigger_signal = st.selectbox("trigger_signal", options=trigger_signal_options, key="new_trigger_signal")
 
                 pattern_options = ["Wick Mid OMSS", "Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
@@ -3521,7 +3521,7 @@ elif st.session_state.current_page == "Risk Calculation":
         shapes = ["On Left TPF + Wick", "Wick/Zone Mid OB", "On Right Impulse Candle Wick",
                   "On Left TPF", "Wick Mid OMSS", "Zone Left TPF + OMSS", 
                   "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
-        trigger_signals = ["Outer BOS","Inner BOS","Anchor","NA"]
+        trigger_signals = ["Outer BOS","Inner BOS","Anchor","Variant Left leg Anchor","NA"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
         incompatible_map = {
@@ -3853,16 +3853,16 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_40 = {
-            "1_BNR": ["Outer BOS","Inner BOS","Anchor"],
-            "1_BNR_TPF": ["Outer BOS", "Anchor","Inner BOS"],
-            "2_BNR": ["Anchor","NA"],
-            "2_BNR_TPF": ["Inner BOS","NA","Outer BOS",],
+            "1_BNR": ["Outer BOS","Inner BOS","Anchor","Variant Left leg Anchor"],
+            "1_BNR_TPF": ["Outer BOS", "Anchor","Inner BOS","Variant Left leg Anchor"],
+            "2_BNR": ["Anchor","Variant Left leg Anchor","NA"],
+            "2_BNR_TPF": ["Inner BOS","NA","Outer BOS","Variant Left leg Anchor"],
             "3_BNR_TPF": ["Inner BOS","NA","Outer BOS",]
         }
         incompatible_map_41 = {
-            "Left Side Daily TPF": ["Anchor"],
-            "Pull Back Daily TPF":[],
-            "Variant Fakeout Daily TPF": ["Anchor"],
+            "Left Side Daily TPF": ["Anchor","Variant Left leg Anchor"],
+            "Pull Back Daily TPF":["Variant Left leg Anchor"],
+            "Variant Fakeout Daily TPF": ["Anchor","Variant Left leg Anchor"],
         }
 
 
@@ -4870,13 +4870,14 @@ elif st.session_state.current_page == "Risk Calculation":
             if(risk_multiplier == "3_BNR_TPF"):
                 if (pair_result != "L"):
                     if(trend_context == "Trend 1+"):
-                        ultra_risk_multiplier = 2.0
-                        if(sixone_multiplier > 1.0):
-                            sixone_multiplier = 1.0
-                        if(trend_position_multiplier > 1.0):
-                            trend_position_multiplier = 1.0
-                        if(prior_result_multiplier > 1.0):
-                            prior_result_multiplier = 1.0
+                        if(trigger_signal != "Variant Left leg Anchor"):
+                            ultra_risk_multiplier = 2.0
+                            if(sixone_multiplier > 1.0):
+                                sixone_multiplier = 1.0
+                            if(trend_position_multiplier > 1.0):
+                                trend_position_multiplier = 1.0
+                            if(prior_result_multiplier > 1.0):
+                                prior_result_multiplier = 1.0
                                    
 
 

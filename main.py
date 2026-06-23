@@ -1266,7 +1266,7 @@ if st.session_state.current_page == "Home":
 
                 pattern_options = ["Wick Mid OMSS", "Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
                     "Zone Left TPF + OMSS", "On Left TPF",
-                  "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF", "No Pattern"]
+                  "Left Side Daily TPF","Pull Back Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
 
                 leg_length_options = [">=90%", ">=115%", ">=135%", ">=170%", ">=2%", "NA"]
@@ -3520,7 +3520,7 @@ elif st.session_state.current_page == "Risk Calculation":
         strategies = ['1_BNR', '1_BNR_TPF', '2_BNR', '2_BNR_TPF', "3_BNR_TPF","No Setup"]
         shapes = ["On Left TPF + Wick", "Wick/Zone Mid OB", "On Right Impulse Candle Wick",
                   "On Left TPF", "Wick Mid OMSS", "Zone Left TPF + OMSS", 
-                  "Variant Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
+                  "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
         trigger_signals = ["Outer BOS","Inner BOS","Anchor","NA"]
         time_frame = ['1 Trade','2 Trades']
         _559_time = ['0', '1', '2']
@@ -3669,15 +3669,15 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_17 = {
             '1_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF",
-                      "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","4H BE Scale-in","Wick Mid OMSS"],
+                      "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","4H BE Scale-in","Wick Mid OMSS"],
             '1_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
-                          "4H BE Scale-in", "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
+                          "4H BE Scale-in", "Left Side Daily TPF","Pull Back Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
             '2_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF", 
-                      "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","Wick Mid OMSS"],
+                      "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","Wick Mid OMSS"],
             '2_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
                          ],
             '3_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
-                         "Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
+                         "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
         }
 
         incompatible_map_18 = {
@@ -3688,7 +3688,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
         incompatible_map_19 = {
             "12_BNR_TPF": ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF","Wick Mid OMSS"],
-            "22_BNR_TPF": ["Variant Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"]
+            "22_BNR_TPF": ["Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"]
         }
 
         incompatible_map_20 = {
@@ -3706,7 +3706,8 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_21 = {
-            "Variant Daily TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
+            "Left Side Daily TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
+            "Pull Back Daily TPF":[">=2%"],
             "Variant Fakeout Daily TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
             "Variant Fakeout Trigger TPF": [">=90%", ">=115%", ">=135%", ">=170%"],
             "Weekly TPF Left Leg": [">=2%"],
@@ -3740,13 +3741,14 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_26 = {
             "Wave 1": [],
             "Wave 2+": ['Variant Fakeout Daily TPF','Variant Fakeout Trigger TPF'],
-            "Cross Trend <=3.99%": ['Variant Daily TPF'],
-            "Cross Trend 4% - 5.99%": ['Variant Daily TPF'],
-            "Cross Trend >=6%": ['Variant Daily TPF'],
+            "Cross Trend <=3.99%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
+            "Cross Trend 4% - 5.99%": ['Left Side Daily TPF'],
+            "Cross Trend >=6%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
         }
 
         incompatible_map_27 = {
-            "Variant Daily TPF": ['50', '66 - 91', '786 - 91'],
+            "Left Side Daily TPF": ['50', '66 - 91', '786 - 91'],
+            "Pull Back Daily TPF":[],
             "Variant Fakeout Daily TPF": ['50', '559 - 66'],
             "Variant Fakeout Trigger TPF": ['50', '559 - 66'],
             "4H BE Scale-in": [],
@@ -3758,9 +3760,9 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_29 = {
-            "Wave 2+1": ['2_BNR_TPF'],
+            "Wave 2+1": [],
             "Cross Trend <=3.99%1": ['2_BNR_TPF'],
-            "Cross Trend 4% - 5.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%1": [],
             "Cross Trend >=6%1": [],
         }
 
@@ -3856,7 +3858,8 @@ elif st.session_state.current_page == "Risk Calculation":
             "3_BNR_TPF": ["Inner BOS","NA","Outer BOS",]
         }
         incompatible_map_41 = {
-            "Variant Daily TPF": ["Anchor"],
+            "Left Side Daily TPF": ["Anchor"],
+            "Pull Back Daily TPF":[],
             "Variant Fakeout Daily TPF": ["Anchor"],
         }
 

@@ -3742,7 +3742,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Wave 1": [],
             "Wave 2+": ['Variant Fakeout Daily TPF','Variant Fakeout Trigger TPF','Left Side Daily TPF',],
             "Cross Trend <=3.99%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
-            "Cross Trend 4% - 5.99%": ['Left Side Daily TPF'],
+            "Cross Trend 4% - 5.99%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
             "Cross Trend >=6%": ['Left Side Daily TPF',"Pull Back Daily TPF"],
         }
 
@@ -3784,10 +3784,12 @@ elif st.session_state.current_page == "Risk Calculation":
             "Cross Trend 4% - 5.99%5%-6.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%7%-8.99%1": ['2_BNR_TPF'],
             "Cross Trend 4% - 5.99%9%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend 4% - 5.99%11%-12.99% (4% PB)1": ['2_BNR_TPF'],
             "Cross Trend >=6%3%-4.99%1": ['2_BNR_TPF'],
             "Cross Trend >=6%5%-6.99%1": ['2_BNR_TPF'],
             "Cross Trend >=6%7%-8.99%1": ['2_BNR_TPF'],
             "Cross Trend >=6%9%-10.99%1": ['2_BNR_TPF'],
+            "Cross Trend >=6%11%-12.99% (4% PB)1": ['2_BNR_TPF'],
         }
 
         incompatible_map_32 = {

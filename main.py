@@ -5675,7 +5675,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF"  and selected_pair in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
-                            SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: In Pips "
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
                             exit_title = get_exit_title(risk_multiplier, pattern)
@@ -5683,7 +5683,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         elif (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" and selected_pair not in majors_dollar):
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
-                            SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: In Pips "
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
                             exit_title = get_exit_title(risk_multiplier, pattern)
@@ -5691,7 +5691,7 @@ elif st.session_state.current_page == "Risk Calculation":
                         else:
                             entry_title = "Entry Guide:"
                             entry_text = "Enter on EP Line"
-                            SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                            SL_title = "SL Guide: In Pips "
                             SL_text = get_pair_volatile(selected_pair,
                                                         risk_multiplier)
                             exit_title = get_exit_title(risk_multiplier, pattern)
@@ -5772,7 +5772,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             if (risk_multiplier == "2_BNR_TPF" or risk_multiplier == "3_BNR_TPF" ):
                                 entry_title = "Entry Guide:"
                                 entry_text = "Enter on EP Line"
-                                SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                                SL_title = "SL Guide: In Pips "
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
                                 exit_title = get_exit_title(risk_multiplier, pattern)
@@ -5780,7 +5780,7 @@ elif st.session_state.current_page == "Risk Calculation":
                             else:
                                 entry_title = "Entry Guide:"
                                 entry_text = "Enter on EP Line"
-                                SL_title = "SL Guide: In Pips NOTE THAT 50 NEEDS 618 ZONE TO BE TAPPED"
+                                SL_title = "SL Guide: In Pips "
                                 SL_text = get_pair_volatile(selected_pair,
                                                             risk_multiplier)
                                 exit_title = get_exit_title(risk_multiplier, pattern)

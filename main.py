@@ -3836,7 +3836,7 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_37 = {
-            "Range": [],
+            "Range": [">=13% (5% PB, ACAD 4%)",11%-12.99% (4% PB)],
             "Trend 0" : ["0%-2.99%"],
 
         }

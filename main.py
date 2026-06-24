@@ -3864,7 +3864,12 @@ elif st.session_state.current_page == "Risk Calculation":
             "Pull Back Daily TPF":["Variant Left leg Anchor"],
             "Variant Fakeout Daily TPF": ["Anchor","Variant Left leg Anchor"],
         }
-
+        incompatible_map_42 = {
+            "Range": ["Wave 2+"],
+            "Range": ["Cross Trend <=3.99%"],
+            "Range": ["Cross Trend 4%-5.99%"],
+            "Range": ["Cross Trend >=6%"],
+        }
 
         incompatible_map_23 = {
             "XAUUSD2_BNR50": [">=115%", ">=135%", ">=2%", "NA"],
@@ -4099,6 +4104,10 @@ elif st.session_state.current_page == "Risk Calculation":
         def get_available_Wave_status(trend):
             disabled_wave_status = incompatible_map_24.get(trend, [])
             return [s for s in Wave_status if s not in disabled_wave_status]
+
+        def get_available_Wave_status_2(trend_context,available_wave):
+            disabled_wave_status_2 = incompatible_map_42.get(trend_context, [])
+            return [s for s in available_wave if s not in disabled_wave_status_2]
 
 
         def get_available_rr(strategy):
@@ -4573,6 +4582,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             
             available_wave_status = get_available_Wave_status(trend_position)
+            available_wave_status_2 = get_available_Wave_status_2(trend_context,available_wave_status)
             cross_fib = st.selectbox("Weekly Wave Status -  Perform Wave 2 AND 2 Daily Check where applicable", available_wave_status)
             st.markdown("""
                 <hr style="

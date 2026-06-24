@@ -3865,7 +3865,7 @@ elif st.session_state.current_page == "Risk Calculation":
             "Variant Fakeout Daily TPF": ["Anchor","Variant Left leg Anchor"],
         }
         incompatible_map_42 = {
-            "Range": ["Wave 2+","Cross Trend <=3.99%","Cross Trend 4%-5.99%","Cross Trend >=6%"],
+            "Range": ["Wave 2+","Cross Trend <=3.99%","Cross Trend 4% - 5.99%","Cross Trend >=6%"],
         }
 
         incompatible_map_23 = {

@@ -3814,8 +3814,8 @@ elif st.session_state.current_page == "Risk Calculation":
         }
 
         incompatible_map_35 = {
-            "GBPUSDTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
-            "EURUSDTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
+            "GBPUSDTrend 0": [">=13% (5% PB, ACAD 4%)"],
+            "EURUSDTrend 0": [">=13% (5% PB, ACAD 4%)"],
             "USDJPYTrend 0": ["3%-4.99%",">=13% (5% PB, ACAD 4%)"],
             "AUDUSDTrend 0" : [">=13% (5% PB, ACAD 4%)"],
             "USDCADTrend 0" : [">=13% (5% PB, ACAD 4%)"],

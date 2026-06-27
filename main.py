@@ -4326,9 +4326,8 @@ elif st.session_state.current_page == "Risk Calculation":
             elif(pair == "AUDUSD"):
                 #percentage = 0.0015 * 1.87
                 #mult = calc_pips(entry_price, percentage, pair)
-                min_pips = round(base_min_pips * 1.0,1)
-                diff = 0.0
-                max_pips = round(min_pips + diff,1)
+                min_pips = base_min_pips
+                max_pips = base_max_pips
             elif(pair == "USDCAD"):
                 #percentage = 0.0015 * 1.07
                 #mult = calc_pips(entry_price, percentage, pair)

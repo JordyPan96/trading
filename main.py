@@ -4290,8 +4290,8 @@ elif st.session_state.current_page == "Risk Calculation":
             mult = 0
             min_max_diff = 0
             percentage = 0.0015
-            min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY","GBPUSD"]
-            min_group_two = ["EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY"]
+            min_group_one = ["EURUSD","AUDUSD","USDCAD","GBPUSD",]
+            min_group_two = ["EURJPY","AUDJPY","GBPJPY","USDJPY","EURAUD","GBPAUD","XAUUSD"]
             min_group_three = ["XAUUSD"]
             group_four = ["USDJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY","XAUUSD","USDCAD","EURUSD","AUDUSD","GBPUSD"]
             #if (pair in min_group_one):
@@ -4332,13 +4332,13 @@ elif st.session_state.current_page == "Risk Calculation":
             elif(pair == "USDCAD"):
                 #percentage = 0.0015 * 1.07
                 #mult = calc_pips(entry_price, percentage, pair)
-                min_pips = round(base_min_pips * 1.4,1)
+                min_pips = round(base_min_pips * 1.2,1)
                 diff = round(min_pips - base_min_pips,1)
                 max_pips = round(base_max_pips + diff,1)
             elif(pair == "USDJPY"):
                 #percentage = 0.0015 * 1.56
                 #mult = calc_pips(entry_price, percentage, pair)
-                min_pips = round(base_min_pips * 1.7,1)
+                min_pips = round(base_min_pips * 1.75,1)
                 diff = round(min_pips - base_min_pips,1)
                 max_pips = round(base_max_pips + diff,1)
             elif(pair == "EURJPY"):
@@ -4393,7 +4393,7 @@ elif st.session_state.current_page == "Risk Calculation":
                     min_pips_final = round(min_pips_final + min_max_diff,1)
                     max_pips_final = round (max_pips_final + min_max_diff,1)
 
-            if(Zone_Position == "3-6"):
+            if(Zone_Position == "3-6" and pair in min_group_two):
                 if(pair == "XAUUSD"):
                     min_pips_final = round(min_pips_final + gold_min_max_diff,1)
                     max_pips_final = 32.0

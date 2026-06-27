@@ -4293,15 +4293,15 @@ elif st.session_state.current_page == "Risk Calculation":
             min_group_three = ["XAUUSD"]
             group_four = ["USDJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY","XAUUSD","USDCAD","EURUSD","AUDUSD","GBPUSD"]
             if (pair in min_group_one):
-                percentage = 0.00151
+                percentage = 0.00153
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_two):
-                percentage = 0.00176
+                percentage = 0.00175
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_three):
-                percentage = 0.00202
+                percentage = 0.00203
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
                     

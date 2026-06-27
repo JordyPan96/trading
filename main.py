@@ -4870,7 +4870,7 @@ elif st.session_state.current_page == "Risk Calculation":
                 pattern_multiplier = 0.0
 
             if (Variances == "50"):
-                variance_multiplier = 0.90
+                variance_multiplier = 1.0
             elif (Variances == "559 - 66"):
                 variance_multiplier = 1.0
             elif (Variances == "66 - 91"):

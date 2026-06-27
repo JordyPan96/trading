@@ -4990,9 +4990,9 @@ elif st.session_state.current_page == "Risk Calculation":
 
                 if("Cross Trend" in trend_pos):
                     exit_title = "Static TP"
-                if(trend_percentage == "3%-4.99%"):
-                    if(trend_pos == "Wave 1"):
-                        exit_title = "Static TP"
+                #if(trend_percentage == "3%-4.99%"):
+                    #if(trend_pos == "Wave 1"):
+                        
                 return exit_title
 
 

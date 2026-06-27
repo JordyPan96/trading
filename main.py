@@ -4288,9 +4288,9 @@ elif st.session_state.current_page == "Risk Calculation":
             mult = 0
             min_max_diff = 0
             percentage = 0.0015
-            min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY"]
-            min_group_two = ["GBPUSD","EURJPY","AUDJPY","EURAUD","GBPAUD"]
-            min_group_three = ["GBPJPY","XAUUSD"]
+            min_group_one = ["EURUSD","AUDUSD","USDCAD","USDJPY","GBPUSD"]
+            min_group_two = ["EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY"]
+            min_group_three = ["XAUUSD"]
             group_four = ["USDJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY","XAUUSD","USDCAD","EURUSD","AUDUSD","GBPUSD"]
             if (pair in min_group_one):
                 percentage = 0.0015

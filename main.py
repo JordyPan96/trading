@@ -5597,7 +5597,7 @@ elif st.session_state.current_page == "Risk Calculation":
                                 
                             
                     else:
-                        open_target = 4.11
+                        open_target = 5.41
                     return str(open_target)
 
 

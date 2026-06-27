@@ -4321,56 +4321,56 @@ elif st.session_state.current_page == "Risk Calculation":
                 #percentage = 0.0015 * 1.34
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.3,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 6.0
+                max_pips = round(min_pips + diff,1)
             elif(pair == "AUDUSD"):
                 #percentage = 0.0015 * 1.87
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.0,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 0.0
+                max_pips = round(min_pips + diff,1)
             elif(pair == "USDCAD"):
                 #percentage = 0.0015 * 1.07
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.2,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 4.0
+                max_pips = round(min_pips + diff,1)
             elif(pair == "USDJPY"):
                 #percentage = 0.0015 * 1.56
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.75,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "EURJPY"):
                 #percentage = 0.0015 * 1.64
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.525,1)+10
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "GBPJPY"):
                 #percentage = 0.0015 * 2.13
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 2.35,1)+10
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "AUDJPY"):
                 #percentage = 0.0015 * 1.29
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.2,1)+10
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "EURAUD"):
                 #percentage = 0.0015 * 1.61
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.475,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "GBPAUD"):
                 #percentage = 0.0015 * 1.85
                 #mult = calc_pips(entry_price, percentage, pair)
                 min_pips = round(base_min_pips * 1.875,1)
-                diff = round(min_pips - base_min_pips,1)
-                max_pips = round(base_max_pips + diff,1)
+                diff = 7.5
+                max_pips = round(min_pips + diff,1)
             elif(pair == "XAUUSD"):
                 percentage = 0.00200
                 mult = calc_pips(entry_price, percentage, pair)

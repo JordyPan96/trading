@@ -4382,7 +4382,7 @@ elif st.session_state.current_page == "Risk Calculation":
 
             gold_min_max_diff = round(min_pips_final * 1.35 - min_pips_final,1)
 
-            if(risk_multiplier == "3_BNR_TPF"):
+            if(risk_multiplier == "3_BNR_TPF" or risk_multiplier == "2_BNR_TPF"):
                 if(pair == "XAUUSD"):
                     min_pips_final = round(min_pips_final + gold_min_max_diff,1)
                     max_pips_final = 32.0

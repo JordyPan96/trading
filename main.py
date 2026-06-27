@@ -4977,16 +4977,16 @@ elif st.session_state.current_page == "Risk Calculation":
                 elif(risk_multiplier == "1_BNR_TPF"):
                     exit_title = "Static TP"
                 elif(risk_multiplier == "2_BNR"):
-                    exit_title = "Change to 15.41 if Pass Absolute BE Check"
+                    exit_title = "Change to 15.41 if Pass Absolute BE/7.41 Check"
                 elif(risk_multiplier == "2_BNR_TPF"):
                     if(pattern_s == "Pull Back Daily TPF"):
-                        exit_title = "Change to 15.41 if Pass Absolute BE Check"
+                        exit_title = "Change to 15.41 if Pass Absolute BE/7.41 Check"
                     elif(pattern_s == "Variant Fakeout Trigger TPF"):
-                        exit_title = "Change to 15.41 if Pass Absolute BE Check"
+                        exit_title = "Change to 15.41 if Pass Absolute BE/7.41 Check"
                     else:
                         exit_title = "Static TP"
                 elif(risk_multiplier == "3_BNR_TPF"):
-                    exit_title = "Change to 15.41 if Pass Absolute BE Check"
+                    exit_title = "Change to 15.41 if Pass Absolute BE/7.41 Check"
 
                 if("Cross Trend" in trend_pos):
                     exit_title = "Static TP"

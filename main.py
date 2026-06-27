@@ -1264,7 +1264,7 @@ if st.session_state.current_page == "Home":
                 trigger_signal_options = ["Outer BOS","Inner BOS","NA","Anchor", "Variant Left leg Anchor"]
                 new_trigger_signal = st.selectbox("trigger_signal", options=trigger_signal_options, key="new_trigger_signal")
 
-                pattern_options = ["Wick Mid OMSS", "Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
+                pattern_options = ["Wick Mid OMSS", "Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle + Wick",
                     "Zone Left TPF + OMSS", "On Left TPF",
                   "Left Side Daily TPF","Pull Back Daily TPF", "Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF", "No Pattern"]
                 new_Pattern = st.selectbox("Pattern", options=pattern_options, key="new_Pattern")
@@ -3518,7 +3518,7 @@ elif st.session_state.current_page == "Risk Calculation":
         minors = ["GBPAUD", "EURAUD", "GBPJPY", "EURJPY", "AUDJPY"]
 
         strategies = ['1_BNR_TPF', '1_BNR', '2_BNR_TPF', '2_BNR', "3_BNR_TPF","No Setup"]
-        shapes = ["On Left TPF + Wick", "Wick/Zone Mid OB", "On Right Impulse Candle Wick",
+        shapes = ["On Left TPF + Wick", "Wick/Zone Mid OB", "On Right Impulse Candle + Wick",
                   "On Left TPF", "Wick Mid OMSS", "Zone Left TPF + OMSS", 
                   "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF", "Variant Fakeout Trigger TPF","No Pattern"]
         trigger_signals = ["Outer BOS","Inner BOS","Anchor","Variant Left leg Anchor","NA"]
@@ -3670,13 +3670,13 @@ elif st.session_state.current_page == "Risk Calculation":
         incompatible_map_17 = {
             '1_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF",
                       "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","4H BE Scale-in","Wick Mid OMSS"],
-            '1_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
+            '1_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle + Wick",
                           "4H BE Scale-in", "Left Side Daily TPF","Pull Back Daily TPF", "Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
             '2_BNR': ["Zone Left TPF + Left TPF", "Zone Left TPF + OMSS", "On Left TPF", 
                       "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF","Wick Mid OMSS"],
-            '2_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
+            '2_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle + Wick",
                          ],
-            '3_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle Wick",
+            '3_BNR_TPF': ["Wick/Zone Mid OB", "On Left TPF + Wick", "On Right Impulse Candle + Wick",
                          "Left Side Daily TPF", "Pull Back Daily TPF","Variant Fakeout Daily TPF","Variant Fakeout Trigger TPF"],
         }
 
@@ -4293,15 +4293,15 @@ elif st.session_state.current_page == "Risk Calculation":
             min_group_three = ["XAUUSD"]
             group_four = ["USDJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","GBPJPY","XAUUSD","USDCAD","EURUSD","AUDUSD","GBPUSD"]
             if (pair in min_group_one):
-                percentage = 0.0015
+                percentage = 0.00151
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_two):
-                percentage = 0.00175
+                percentage = 0.00176
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
             elif (pair in min_group_three):
-                percentage = 0.0020
+                percentage = 0.00202
                 mult = calc_pips(entry_price, percentage, pair)
                 min_pips = mult
                     
